@@ -95,7 +95,9 @@ Zunächst genügt GET.
 
 Beispiel:
 
+```text
 /rpc/Switch.Set?id=0&on=true&toggle_after=1
+```
 
 ### ApiMethod
 
