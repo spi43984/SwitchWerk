@@ -1,10 +1,17 @@
 package de.piecha.switchwerk.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,7 +19,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -21,23 +30,24 @@ fun StartScreen(
     viewModel: MainViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val devices = uiState.devices.sortedBy { it.sortOrder }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(24.dp)
     ) {
         Text(
             text = "SwitchWerk",
             style = MaterialTheme.typography.headlineLarge
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
-            text = "${uiState.devices.size} Geräte gefunden",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 16.dp)
+            text = "${devices.size} Geräte gefunden",
+            style = MaterialTheme.typography.bodyLarge
         )
 
         uiState.errorMessage?.let { message ->
@@ -48,11 +58,82 @@ fun StartScreen(
             )
         }
 
-        Button(
-            onClick = { },
-            modifier = Modifier.padding(top = 24.dp)
+        Spacer(modifier = Modifier.height(24.dp))
+
+        if (devices.isEmpty()) {
+            EmptyDeviceList()
+        } else {
+            DeviceList(
+                devices = devices,
+                onDeviceActionClick = { device ->
+                    Toast.makeText(
+                        context,
+                        "Gerät ${device.name} ausgewählt",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyDeviceList() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Keine Geräte konfiguriert",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+private fun DeviceList(
+    devices: List<Device>,
+    onDeviceActionClick: (Device) -> Unit
+) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(
+            items = devices,
+            key = { device -> device.id }
+        ) { device ->
+            DeviceCard(
+                device = device,
+                onActionClick = { onDeviceActionClick(device) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeviceCard(
+    device: Device,
+    onActionClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Text("Gerät hinzufügen")
+            Text(
+                text = device.name,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = onActionClick
+            ) {
+                Text(device.actionLabel)
+            }
         }
     }
 }
