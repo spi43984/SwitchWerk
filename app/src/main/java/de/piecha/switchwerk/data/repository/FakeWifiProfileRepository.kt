@@ -1,9 +1,13 @@
 package de.piecha.switchwerk.data.repository
 
 import de.piecha.switchwerk.domain.model.WifiProfile
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class FakeWifiProfileRepository : WifiProfileRepository {
-    override suspend fun getWifiProfiles(): List<WifiProfile> =
+
+    private val profiles = MutableStateFlow(
         listOf(
             WifiProfile(
                 id = "garage-ap",
@@ -14,4 +18,54 @@ class FakeWifiProfileRepository : WifiProfileRepository {
                 ssid = "Home-WLAN"
             )
         )
+    )
+
+    private val passwords = mutableMapOf(
+        "garage-ap" to "geheim123",
+        "home-wifi" to "geheim123"
+    )
+
+    override fun observeWifiProfiles(): Flow<List<WifiProfile>> {
+        return profiles.asStateFlow()
+    }
+
+    override suspend fun getWifiProfiles(): List<WifiProfile> {
+        return profiles.value
+    }
+
+    override suspend fun saveWifiProfile(
+        profile: WifiProfile,
+        password: String?,
+        shouldUpdatePassword: Boolean
+    ) {
+        profiles.value = profiles.value
+            .filterNot { it.id == profile.id }
+            .plus(profile)
+            .sortedBy { it.ssid }
+
+        if (shouldUpdatePassword) {
+            if (password == null) {
+                passwords.remove(profile.id)
+            } else {
+                passwords[profile.id] = password
+            }
+        }
+    }
+
+    override suspend fun getPassword(id: String): String? {
+        return passwords[id]
+    }
+
+    override suspend fun hasPassword(id: String): Boolean {
+        return passwords.containsKey(id)
+    }
+
+    override suspend fun deletePassword(id: String) {
+        passwords.remove(id)
+    }
+
+    override suspend fun deleteWifiProfile(id: String) {
+        profiles.value = profiles.value.filterNot { it.id == id }
+        passwords.remove(id)
+    }
 }
