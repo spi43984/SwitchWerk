@@ -14,7 +14,7 @@ val appModule = module {
     }
 
     single<WifiProfileRepository> {
-    FakeWifiProfileRepository()
+        FakeWifiProfileRepository()
     }
 
     viewModel {

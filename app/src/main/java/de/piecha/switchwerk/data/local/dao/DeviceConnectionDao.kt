@@ -1,0 +1,23 @@
+package de.piecha.switchwerk.data.local.dao
+
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Upsert
+import de.piecha.switchwerk.data.local.entity.DeviceConnectionEntity
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface DeviceConnectionDao {
+
+    @Query("SELECT * FROM connections ORDER BY priority")
+    fun observeAll(): Flow<List<DeviceConnectionEntity>>
+
+    @Query("SELECT * FROM connections WHERE deviceId = :deviceId ORDER BY priority")
+    fun observeForDevice(deviceId: String): Flow<List<DeviceConnectionEntity>>
+
+    @Upsert
+    suspend fun upsert(connection: DeviceConnectionEntity)
+
+    @Query("DELETE FROM connections WHERE id = :id")
+    suspend fun deleteById(id: String)
+}
