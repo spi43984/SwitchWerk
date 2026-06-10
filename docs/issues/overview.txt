@@ -1,3 +1,4 @@
+# alt
 Issue #1: Configuration Domain Foundation
 Issue #2: Daten- und Architekturgrundlage
 Issue #3: Dashboard zeigt Geräteliste
@@ -8,3 +9,18 @@ Issue #7: HTTP/API-Call-Dienst
 Issue #8: Geräteaktion mit WLAN-Fallback
 Issue #9: Import/Export
 Issue #10: QR-Code-Import
+
+# aktualisiert
+001 Configuration Domain Foundation
+002 Dashboard Device List
+003 Settings Navigation Foundation
+004 UI Foundation Cleanup
+005 Local Persistence Foundation
+006 Encrypted WiFi Password Storage
+007 WiFi Profile Management
+008 Device Management
+009 WiFi Connection Service
+010 HTTP/API Call Service
+011 Device Action With WiFi Fallback
+012 Import/Export
+013 QR Code Import
