@@ -18,7 +18,7 @@ Funktionen:
 - Löschen
 
 ## Akzeptanzkriterien
-- [ ] Gerät anlegen
-- [ ] Gerät bearbeiten
-- [ ] Gerät löschen
-- [ ] WLAN-Zuordnungen verwaltbar
+- [x] Gerät anlegen
+- [x] Gerät bearbeiten
+- [x] Gerät löschen
+- [x] WLAN-Zuordnungen verwaltbar
