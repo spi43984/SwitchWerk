@@ -36,7 +36,6 @@ data class DeviceFormState(
     val actionLabel: String = "",
     val apiMethod: String = ApiMethod.GET.name,
     val apiPath: String = "",
-    val sortOrder: String = "",
     val connections: List<DeviceConnectionFormState> = emptyList()
 )
 
@@ -214,18 +213,11 @@ class SettingsViewModel(
     }
 
     fun startNewDevice() {
-        val nextSortOrder = (_uiState.value.devices.maxOfOrNull { it.sortOrder } ?: 0) + 1
-
         _uiState.value = _uiState.value.copy(
             deviceForm = DeviceFormState(
                 actionLabel = "Schalten",
                 apiMethod = ApiMethod.GET.name,
-                apiPath = "/rpc/Switch.Toggle?id=0",
-                sortOrder = nextSortOrder.toString(),
-                connections = buildConnectionForms(
-                    wifiProfiles = _uiState.value.wifiProfiles,
-                    device = null
-                )
+                apiPath = "/rpc/Switch.Toggle?id=0"
             ),
             isEditingDevice = true,
             isEditingWifiProfile = false,
@@ -241,11 +233,14 @@ class SettingsViewModel(
                 actionLabel = device.actionLabel,
                 apiMethod = device.apiCall.method.name,
                 apiPath = device.apiCall.path,
-                sortOrder = device.sortOrder.toString(),
-                connections = buildConnectionForms(
-                    wifiProfiles = _uiState.value.wifiProfiles,
-                    device = device
-                )
+                connections = device.connections.map { connection ->
+                    DeviceConnectionFormState(
+                        wifiProfileId = connection.wifiProfileId,
+                        ssid = _uiState.value.wifiProfiles.firstOrNull { it.id == connection.wifiProfileId }?.ssid
+                            ?: "Unbekanntes WLAN",
+                        host = connection.host
+                    )
+                }
             ),
             isEditingDevice = true,
             isEditingWifiProfile = false,
@@ -277,19 +272,73 @@ class SettingsViewModel(
         updateDeviceForm { it.copy(apiPath = apiPath) }
     }
 
-    fun updateDeviceSortOrder(sortOrder: String) {
-        updateDeviceForm { it.copy(sortOrder = sortOrder.filter { char -> char.isDigit() }) }
+    fun addDeviceConnection(wifiProfileId: String, host: String) {
+        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == wifiProfileId } ?: return
+        val trimmedHost = host.trim()
+
+        if (trimmedHost.isBlank()) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Hostname/IP darf nicht leer sein")
+            return
+        }
+
+        val form = _uiState.value.deviceForm
+        if (form.connections.any { it.wifiProfileId == wifiProfileId }) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Dieses WLAN ist bereits zugeordnet")
+            return
+        }
+
+        updateDeviceForm {
+            it.copy(
+                connections = it.connections + DeviceConnectionFormState(
+                    wifiProfileId = profile.id,
+                    ssid = profile.ssid,
+                    host = trimmedHost
+                )
+            )
+        }
     }
 
-    fun updateDeviceConnectionHost(wifiProfileId: String, host: String) {
-        updateDeviceForm { form ->
-            form.copy(
-                connections = form.connections.map { connection ->
-                    if (connection.wifiProfileId == wifiProfileId) {
-                        connection.copy(host = host)
+    fun updateDeviceConnection(
+        oldWifiProfileId: String,
+        newWifiProfileId: String,
+        host: String
+    ) {
+        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == newWifiProfileId } ?: return
+        val trimmedHost = host.trim()
+
+        if (trimmedHost.isBlank()) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Hostname/IP darf nicht leer sein")
+            return
+        }
+
+        val form = _uiState.value.deviceForm
+        if (oldWifiProfileId != newWifiProfileId && form.connections.any { it.wifiProfileId == newWifiProfileId }) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Dieses WLAN ist bereits zugeordnet")
+            return
+        }
+
+        updateDeviceForm {
+            it.copy(
+                connections = it.connections.map { connection ->
+                    if (connection.wifiProfileId == oldWifiProfileId) {
+                        DeviceConnectionFormState(
+                            wifiProfileId = profile.id,
+                            ssid = profile.ssid,
+                            host = trimmedHost
+                        )
                     } else {
                         connection
                     }
+                }
+            )
+        }
+    }
+
+    fun deleteDeviceConnection(wifiProfileId: String) {
+        updateDeviceForm {
+            it.copy(
+                connections = it.connections.filterNot { connection ->
+                    connection.wifiProfileId == wifiProfileId
                 }
             )
         }
@@ -300,7 +349,6 @@ class SettingsViewModel(
         val trimmedName = form.name.trim()
         val trimmedActionLabel = form.actionLabel.trim()
         val trimmedApiPath = form.apiPath.trim()
-        val sortOrder = form.sortOrder.toIntOrNull()
 
         if (trimmedName.isBlank()) {
             _uiState.value = _uiState.value.copy(errorMessage = "Gerätename darf nicht leer sein")
@@ -317,11 +365,6 @@ class SettingsViewModel(
             return
         }
 
-        if (sortOrder == null) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Sortierreihenfolge muss eine Zahl sein")
-            return
-        }
-
         val apiMethod = runCatching {
             ApiMethod.valueOf(form.apiMethod)
         }.getOrElse {
@@ -329,18 +372,9 @@ class SettingsViewModel(
             return
         }
 
-        val connections = form.connections
-            .mapNotNull { connection ->
-                val host = connection.host.trim()
-                if (host.isBlank()) {
-                    null
-                } else {
-                    DeviceConnection(
-                        wifiProfileId = connection.wifiProfileId,
-                        host = host
-                    )
-                }
-            }
+        val sortOrder = form.id?.let { existingId ->
+            _uiState.value.devices.firstOrNull { it.id == existingId }?.sortOrder
+        } ?: ((_uiState.value.devices.maxOfOrNull { it.sortOrder } ?: 0) + 1)
 
         viewModelScope.launch {
             runCatching {
@@ -353,7 +387,12 @@ class SettingsViewModel(
                             method = apiMethod,
                             path = trimmedApiPath
                         ),
-                        connections = connections,
+                        connections = form.connections.map {
+                            DeviceConnection(
+                                wifiProfileId = it.wifiProfileId,
+                                host = it.host.trim()
+                            )
+                        },
                         sortOrder = sortOrder
                     )
                 )
@@ -383,22 +422,52 @@ class SettingsViewModel(
         }
     }
 
+    fun moveDeviceUp(deviceId: String) {
+        moveDevice(deviceId = deviceId, offset = -1)
+    }
+
+    fun moveDeviceDown(deviceId: String) {
+        moveDevice(deviceId = deviceId, offset = 1)
+    }
+
+    private fun moveDevice(deviceId: String, offset: Int) {
+        val devices = _uiState.value.devices.sortedBy { it.sortOrder }
+        val currentIndex = devices.indexOfFirst { it.id == deviceId }
+        val targetIndex = currentIndex + offset
+
+        if (currentIndex !in devices.indices || targetIndex !in devices.indices) {
+            return
+        }
+
+        val currentDevice = devices[currentIndex]
+        val targetDevice = devices[targetIndex]
+
+        viewModelScope.launch {
+            runCatching {
+                deviceRepository.saveDevice(currentDevice.copy(sortOrder = targetDevice.sortOrder))
+                deviceRepository.saveDevice(targetDevice.copy(sortOrder = currentDevice.sortOrder))
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = error.message ?: "Gerätereihenfolge konnte nicht geändert werden"
+                )
+            }
+        }
+    }
+
     private fun observeWifiProfiles() {
         viewModelScope.launch {
             wifiProfileRepository.observeWifiProfiles().collect { profiles ->
                 val current = _uiState.value
                 _uiState.value = current.copy(
                     wifiProfiles = profiles,
-                    deviceForm = if (current.isEditingDevice) {
-                        current.deviceForm.copy(
-                            connections = mergeConnectionForms(
-                                profiles = profiles,
-                                existing = current.deviceForm.connections
-                            )
-                        )
-                    } else {
-                        current.deviceForm
-                    },
+                    deviceForm = current.deviceForm.copy(
+                        connections = current.deviceForm.connections.mapNotNull { connection ->
+                            val profile = profiles.firstOrNull { it.id == connection.wifiProfileId }
+                            profile?.let {
+                                connection.copy(ssid = it.ssid)
+                            }
+                        }
+                    ),
                     errorMessage = null
                 )
             }
@@ -421,40 +490,6 @@ class SettingsViewModel(
             deviceForm = update(_uiState.value.deviceForm),
             errorMessage = null
         )
-    }
-
-    private fun buildConnectionForms(
-        wifiProfiles: List<WifiProfile>,
-        device: Device?
-    ): List<DeviceConnectionFormState> {
-        return wifiProfiles.map { profile ->
-            val existingConnection = device?.connections?.firstOrNull {
-                it.wifiProfileId == profile.id
-            }
-
-            DeviceConnectionFormState(
-                wifiProfileId = profile.id,
-                ssid = profile.ssid,
-                host = existingConnection?.host.orEmpty()
-            )
-        }
-    }
-
-    private fun mergeConnectionForms(
-        profiles: List<WifiProfile>,
-        existing: List<DeviceConnectionFormState>
-    ): List<DeviceConnectionFormState> {
-        return profiles.map { profile ->
-            val existingConnection = existing.firstOrNull {
-                it.wifiProfileId == profile.id
-            }
-
-            DeviceConnectionFormState(
-                wifiProfileId = profile.id,
-                ssid = profile.ssid,
-                host = existingConnection?.host.orEmpty()
-            )
-        }
     }
 
     private companion object {

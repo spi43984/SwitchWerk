@@ -44,3 +44,13 @@ Beim Erstellen oder Ändern von Code:
 ## Entwicklungsziel
 
 Lieber eine kleine, stabile App als eine überarchitektierte App.
+
+## UI-Regel für Sicherheitsabfragen
+
+Bei Sicherheitsabfragen steht die sichere Abbruchaktion immer rechts.
+
+Beispiel:
+- links: Ja / Löschen / Bestätigen
+- rechts: Nein / Abbrechen
+
+Damit ist „Nein“ bei Lösch- oder Sicherheitsabfragen immer auf der rechten Seite.

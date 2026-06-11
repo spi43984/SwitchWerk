@@ -58,7 +58,11 @@ fun SettingsScreen(
         viewModel.cancelWifiProfileEdit()
     }
 
-    BackHandler(enabled = !uiState.isEditingWifiProfile) {
+    BackHandler(enabled = uiState.isEditingDevice) {
+        viewModel.cancelDeviceEdit()
+    }
+
+    BackHandler(enabled = !uiState.isEditingWifiProfile && !uiState.isEditingDevice) {
         onNavigateBack()
     }
 
@@ -99,9 +103,23 @@ fun SettingsScreen(
             onCancelClick = viewModel::cancelWifiProfileEdit
         )
 
-        SettingsSection(
-            title = "Geräte",
-            description = "Gerätenamen, Aktionsbuttons, API-Aufrufe und WLAN-Zuordnungen werden später hier verwaltet."
+        DeviceManagementSection(
+            devices = uiState.devices,
+            wifiProfiles = uiState.wifiProfiles,
+            isEditing = uiState.isEditingDevice,
+            form = uiState.deviceForm,
+            onAddClick = viewModel::startNewDevice,
+            onEditClick = viewModel::startEditDevice,
+            onDeleteClick = viewModel::deleteDevice,
+            onNameChange = viewModel::updateDeviceName,
+            onActionLabelChange = viewModel::updateDeviceActionLabel,
+            onApiMethodChange = viewModel::updateDeviceApiMethod,
+            onApiPathChange = viewModel::updateDeviceApiPath,
+            onAddConnection = viewModel::addDeviceConnection,
+            onUpdateConnection = viewModel::updateDeviceConnection,
+            onDeleteConnection = viewModel::deleteDeviceConnection,
+            onSaveClick = viewModel::saveDevice,
+            onCancelClick = viewModel::cancelDeviceEdit
         )
 
         SettingsSection(
