@@ -33,6 +33,34 @@ Issue sollte enthalten:
 - Sicherheits-/Datenschutzhinweise
 - Testhinweise
 
+## Issue-Dateien und GitHub Issues
+
+Die fachliche Issue-Planung liegt im Repository unter `docs/issues`.
+
+Für jedes umzusetzende Issue wird zuerst die passende Datei unter `docs/issues/*.md` geprüft.
+
+Vor Beginn der Implementierung wird aus dieser Datei ein GitHub Issue erzeugt, zum Beispiel:
+
+```bash
+gh issue create \
+  --title "Device Management" \
+  --body-file docs/issues/008-device-management.md
+```
+
+Die von GitHub vergebene Issue-Nummer muss nicht mit der Dateinummer übereinstimmen.
+
+Nach erfolgreicher Implementierung, Build, Test und Merge wird:
+
+1. die Datei unter `docs/issues/*.md` abgehakt,
+2. die Änderung committet und gepusht,
+3. das zugehörige GitHub Issue geschlossen.
+
+Beispiel:
+
+```bash
+gh issue close <NUMMER> --comment "Implemented, tested and merged."
+```
+
 ## Pull Requests
 
 Auch wenn du alleine arbeitest:
