@@ -41,3 +41,22 @@ Auch wenn du alleine arbeitest:
 - Diff prüfen
 - Tests ausführen
 - erst dann nach main mergen
+
+## Branch-Workflow für Issues
+
+Für jedes neue Issue wird vor der Implementierung ein eigener Branch
+angelegt.
+
+Beispiel:
+
+    git pull
+    git switch -c issue-008-device-management
+
+Nach erfolgreichem Build und Test:
+
+    git status
+    git add .
+    git commit -m "feat: implement device management"
+    git push -u origin issue-008-device-management
+
+Änderungen werden anschließend per Pull Request nach main gemerged.

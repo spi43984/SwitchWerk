@@ -54,3 +54,16 @@ Beispiel:
 - rechts: Nein / Abbrechen
 
 Damit ist „Nein“ bei Lösch- oder Sicherheitsabfragen immer auf der rechten Seite.
+
+## Branch-Regel
+
+Implementierungen und größere Änderungen werden nie direkt auf main
+begonnen.
+
+Vor jeder Issue-Umsetzung wird ein eigener Branch angelegt, zum
+Beispiel:
+
+    git pull
+    git switch -c issue-008-device-management
+
+Der Assistent gibt dafür immer die vollständigen Git-Befehle aus.
