@@ -19,23 +19,25 @@ class MainViewModel(
     private val repository: DeviceRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainUiState())
+    private val _uiState = MutableStateFlow(MainUiState(isLoading = true))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
-        loadDevices()
+        observeDevices()
     }
 
-    private fun loadDevices() {
+    private fun observeDevices() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
             runCatching {
-                repository.getDevices()
-            }.onSuccess { devices ->
-                _uiState.value = MainUiState(devices = devices)
+                repository.observeDevices().collect { devices ->
+                    _uiState.value = MainUiState(
+                        devices = devices.sortedBy { it.sortOrder },
+                        isLoading = false
+                    )
+                }
             }.onFailure { error ->
                 _uiState.value = MainUiState(
+                    isLoading = false,
                     errorMessage = error.message ?: "Geräte konnten nicht geladen werden"
                 )
             }

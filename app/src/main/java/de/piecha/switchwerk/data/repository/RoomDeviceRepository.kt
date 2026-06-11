@@ -24,8 +24,8 @@ class RoomDeviceRepository(
             devices.map { device ->
                 device.toDomain(
                     connections = connections
-                        .filter { connection -> connection.deviceId == device.id }
-                        .sortedBy { connection -> connection.priority }
+                        .filter { it.deviceId == device.id }
+                        .sortedBy { it.priority }
                 )
             }
         }

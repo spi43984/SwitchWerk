@@ -2,7 +2,6 @@ package de.piecha.switchwerk.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,13 +13,10 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -43,7 +39,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -58,63 +57,95 @@ fun SettingsScreen(
         viewModel.cancelWifiProfileEdit()
     }
 
-    BackHandler(enabled = !uiState.isEditingWifiProfile) {
+    BackHandler(enabled = uiState.isEditingDevice) {
+        viewModel.cancelDeviceEdit()
+    }
+
+    BackHandler(enabled = !uiState.isEditingWifiProfile && !uiState.isEditingDevice) {
         onNavigateBack()
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Einstellungen",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        uiState.errorMessage?.let { message ->
+        item {
             Text(
-                text = message,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
+                text = "Einstellungen",
+                style = MaterialTheme.typography.headlineLarge
             )
         }
 
-        WifiProfileManagementSection(
-            profiles = uiState.wifiProfiles,
-            isEditing = uiState.isEditingWifiProfile,
-            ssid = uiState.form.ssid,
-            password = uiState.form.password,
-            isPasswordVisible = uiState.form.isPasswordVisible,
-            onAddClick = viewModel::startNewWifiProfile,
-            onEditClick = viewModel::startEditWifiProfile,
-            onDeleteClick = viewModel::deleteWifiProfile,
-            onSsidChange = viewModel::updateWifiProfileSsid,
-            onPasswordChange = viewModel::updateWifiProfilePassword,
-            onClearPasswordClick = viewModel::clearWifiProfilePassword,
-            onTogglePasswordVisibility = viewModel::toggleWifiPasswordVisibility,
-            onSaveClick = viewModel::saveWifiProfile,
-            onCancelClick = viewModel::cancelWifiProfileEdit
-        )
+        uiState.errorMessage?.let { message ->
+            item {
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
 
-        SettingsSection(
-            title = "Geräte",
-            description = "Gerätenamen, Aktionsbuttons, API-Aufrufe und WLAN-Zuordnungen werden später hier verwaltet."
-        )
+        item {
+            WifiProfileManagementSection(
+                profiles = uiState.wifiProfiles,
+                isEditing = uiState.isEditingWifiProfile,
+                ssid = uiState.form.ssid,
+                password = uiState.form.password,
+                isPasswordVisible = uiState.form.isPasswordVisible,
+                onAddClick = viewModel::startNewWifiProfile,
+                onEditClick = viewModel::startEditWifiProfile,
+                onDeleteClick = viewModel::deleteWifiProfile,
+                onSsidChange = viewModel::updateWifiProfileSsid,
+                onPasswordChange = viewModel::updateWifiProfilePassword,
+                onClearPasswordClick = viewModel::clearWifiProfilePassword,
+                onTogglePasswordVisibility = viewModel::toggleWifiPasswordVisibility,
+                onSaveClick = viewModel::saveWifiProfile,
+                onCancelClick = viewModel::cancelWifiProfileEdit
+            )
+        }
 
-        SettingsSection(
-            title = "Import / Export",
-            description = "Konfigurationen können später ohne WLAN-Passwörter exportiert und importiert werden."
-        )
+        item {
+            DeviceManagementSection(
+                devices = uiState.devices,
+                wifiProfiles = uiState.wifiProfiles,
+                isEditing = uiState.isEditingDevice,
+                name = uiState.deviceForm.name,
+                actionLabel = uiState.deviceForm.actionLabel,
+                apiMethod = uiState.deviceForm.apiMethod,
+                apiPath = uiState.deviceForm.apiPath,
+                sortOrder = uiState.deviceForm.sortOrder,
+                connections = uiState.deviceForm.connections,
+                onAddClick = viewModel::startNewDevice,
+                onEditClick = viewModel::startEditDevice,
+                onDeleteClick = viewModel::deleteDevice,
+                onNameChange = viewModel::updateDeviceName,
+                onActionLabelChange = viewModel::updateDeviceActionLabel,
+                onApiMethodChange = viewModel::updateDeviceApiMethod,
+                onApiPathChange = viewModel::updateDeviceApiPath,
+                onSortOrderChange = viewModel::updateDeviceSortOrder,
+                onConnectionHostChange = viewModel::updateDeviceConnectionHost,
+                onSaveClick = viewModel::saveDevice,
+                onCancelClick = viewModel::cancelDeviceEdit
+            )
+        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        item {
+            SettingsSection(
+                title = "Import / Export",
+                description = "Konfigurationen können später ohne WLAN-Passwörter exportiert und importiert werden."
+            )
+        }
 
-        Button(
-            onClick = onNavigateBack
-        ) {
-            Text("Zurück zum Dashboard")
+        item {
+            Button(
+                onClick = onNavigateBack
+            ) {
+                Text("Zurück zum Dashboard")
+            }
         }
     }
 }
@@ -136,35 +167,17 @@ private fun WifiProfileManagementSection(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Card(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(start = 12.dp, top = 12.dp, end = 6.dp, bottom = 12.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "WLAN-Profile (SSID)",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                if (!isEditing) {
-                    IconButton(
-                        onClick = onAddClick,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "WLAN-Profil hinzufügen"
-                        )
-                    }
-                }
-            }
+            SectionHeader(
+                title = "WLAN-Profile",
+                showAddButton = !isEditing,
+                onAddClick = onAddClick,
+                addDescription = "WLAN-Profil hinzufügen"
+            )
 
             if (isEditing) {
                 WifiProfileForm(
@@ -178,80 +191,114 @@ private fun WifiProfileManagementSection(
                     onSaveClick = onSaveClick,
                     onCancelClick = onCancelClick
                 )
+            } else if (profiles.isEmpty()) {
+                Text("Keine WLAN-Profile konfiguriert.")
             } else {
-                WifiProfileList(
-                    profiles = profiles,
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick
-                )
+                profiles.forEach { profile ->
+                    WifiProfileRow(
+                        profile = profile,
+                        onEditClick = { onEditClick(profile) },
+                        onDeleteClick = { onDeleteClick(profile.id) }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun WifiProfileList(
-    profiles: List<WifiProfile>,
-    onEditClick: (WifiProfile) -> Unit,
-    onDeleteClick: (String) -> Unit
+private fun DeviceManagementSection(
+    devices: List<Device>,
+    wifiProfiles: List<WifiProfile>,
+    isEditing: Boolean,
+    name: String,
+    actionLabel: String,
+    apiMethod: String,
+    apiPath: String,
+    sortOrder: String,
+    connections: List<DeviceConnectionFormState>,
+    onAddClick: () -> Unit,
+    onEditClick: (Device) -> Unit,
+    onDeleteClick: (String) -> Unit,
+    onNameChange: (String) -> Unit,
+    onActionLabelChange: (String) -> Unit,
+    onApiMethodChange: (String) -> Unit,
+    onApiPathChange: (String) -> Unit,
+    onSortOrderChange: (String) -> Unit,
+    onConnectionHostChange: (String, String) -> Unit,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit
 ) {
-    if (profiles.isEmpty()) {
-        Text(
-            text = "Keine WLAN-Profile konfiguriert.",
-            style = MaterialTheme.typography.bodyMedium
-        )
-        return
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SectionHeader(
+                title = "Geräte",
+                showAddButton = !isEditing,
+                onAddClick = onAddClick,
+                addDescription = "Gerät hinzufügen"
+            )
+
+            if (isEditing) {
+                DeviceForm(
+                    wifiProfiles = wifiProfiles,
+                    name = name,
+                    actionLabel = actionLabel,
+                    apiMethod = apiMethod,
+                    apiPath = apiPath,
+                    sortOrder = sortOrder,
+                    connections = connections,
+                    onNameChange = onNameChange,
+                    onActionLabelChange = onActionLabelChange,
+                    onApiMethodChange = onApiMethodChange,
+                    onApiPathChange = onApiPathChange,
+                    onSortOrderChange = onSortOrderChange,
+                    onConnectionHostChange = onConnectionHostChange,
+                    onSaveClick = onSaveClick,
+                    onCancelClick = onCancelClick
+                )
+            } else if (devices.isEmpty()) {
+                Text("Keine Geräte konfiguriert.")
+            } else {
+                devices.forEach { device ->
+                    DeviceRow(
+                        device = device,
+                        onEditClick = { onEditClick(device) },
+                        onDeleteClick = { onDeleteClick(device.id) }
+                    )
+                }
+            }
+        }
     }
+}
 
-    val listState = rememberLazyListState()
-
-    Column(
-        modifier = Modifier.height(172.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+@Composable
+private fun SectionHeader(
+    title: String,
+    showAddButton: Boolean,
+    onAddClick: () -> Unit,
+    addDescription: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollBackward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "Weitere WLAN-Profile oberhalb",
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium
+        )
 
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier.height(140.dp)
-        ) {
-            items(
-                items = profiles,
-                key = { profile -> profile.id }
-            ) { profile ->
-                WifiProfileRow(
-                    profile = profile,
-                    onEditClick = { onEditClick(profile) },
-                    onDeleteClick = { onDeleteClick(profile.id) }
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollForward) {
+        if (showAddButton) {
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier.size(32.dp)
+            ) {
                 Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Weitere WLAN-Profile unterhalb",
-                    modifier = Modifier.size(16.dp)
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = addDescription
                 )
             }
         }
@@ -264,81 +311,100 @@ private fun WifiProfileRow(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    var pendingDeleteProfile by remember { mutableStateOf<WifiProfile?>(null) }
+    var pendingDelete by remember { mutableStateOf(false) }
 
-    pendingDeleteProfile?.let { profileToDelete ->
-        AlertDialog(
-            onDismissRequest = {
-                pendingDeleteProfile = null
+    if (pendingDelete) {
+        ConfirmDeleteDialog(
+            title = "WLAN-Profil löschen",
+            text = "SSID ${profile.ssid} wirklich löschen?",
+            onConfirm = {
+                pendingDelete = false
+                onDeleteClick()
             },
-            title = {
-                Text("WLAN-Profil löschen")
-            },
-            text = {
-                Text("SSID ${profileToDelete.ssid} wirklich löschen?")
-            },
-            confirmButton = {
-                OutlinedButton(
-                    onClick = {
-                        pendingDeleteProfile = null
-                    }
-                ) {
-                    Text("Nein")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = {
-                        pendingDeleteProfile = null
-                        onDeleteClick()
-                    }
-                ) {
-                    Text("Ja")
-                }
+            onDismiss = {
+                pendingDelete = false
             }
         )
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = profile.ssid,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 4.dp, bottom = 4.dp)
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyMedium
         )
 
+        Row {
+            IconButton(onClick = onEditClick) {
+                Icon(Icons.Filled.Edit, contentDescription = "WLAN-Profil bearbeiten")
+            }
+
+            IconButton(onClick = { pendingDelete = true }) {
+                Icon(Icons.Filled.Delete, contentDescription = "WLAN-Profil löschen")
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeviceRow(
+    device: Device,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var pendingDelete by remember { mutableStateOf(false) }
+
+    if (pendingDelete) {
+        ConfirmDeleteDialog(
+            title = "Gerät löschen",
+            text = "Gerät ${device.name} wirklich löschen?",
+            onConfirm = {
+                pendingDelete = false
+                onDeleteClick()
+            },
+            onDismiss = {
+                pendingDelete = false
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onEditClick,
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "WLAN-Profil bearbeiten"
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = device.name,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${device.apiCall.method} ${device.apiCall.path}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "${device.connections.size} WLAN-Zuordnung(en)",
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
 
-            IconButton(
-                onClick = {
-                    pendingDeleteProfile = profile
-                },
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "WLAN-Profil löschen"
-                )
+            Row {
+                IconButton(onClick = onEditClick) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Gerät bearbeiten")
+                }
+
+                IconButton(onClick = { pendingDelete = true }) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Gerät löschen")
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -354,9 +420,7 @@ private fun WifiProfileForm(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
             value = ssid,
             onValueChange = onSsidChange,
@@ -370,21 +434,11 @@ private fun WifiProfileForm(
             onValueChange = onPasswordChange,
             label = { Text("Passwort") },
             singleLine = true,
-            visualTransformation = if (isPasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
+            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(
-                    onClick = onTogglePasswordVisibility
-                ) {
+                IconButton(onClick = onTogglePasswordVisibility) {
                     Icon(
-                        imageVector = if (isPasswordVisible) {
-                            Icons.Filled.VisibilityOff
-                        } else {
-                            Icons.Filled.Visibility
-                        },
+                        imageVector = if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                         contentDescription = "Passwort anzeigen oder verbergen"
                     )
                 }
@@ -397,28 +451,152 @@ private fun WifiProfileForm(
             style = MaterialTheme.typography.bodySmall
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Button(
-                onClick = onSaveClick
-            ) {
-                Text("Speichern")
-            }
+        FormButtons(
+            onSaveClick = onSaveClick,
+            onCancelClick = onCancelClick
+        )
 
-            OutlinedButton(
-                onClick = onCancelClick
-            ) {
-                Text("Abbrechen")
-            }
-
-            OutlinedButton(
-                onClick = onClearPasswordClick
-            ) {
-                Text("Passwort leeren")
-            }
+        OutlinedButton(onClick = onClearPasswordClick) {
+            Text("Passwort leeren")
         }
     }
+}
+
+@Composable
+private fun DeviceForm(
+    wifiProfiles: List<WifiProfile>,
+    name: String,
+    actionLabel: String,
+    apiMethod: String,
+    apiPath: String,
+    sortOrder: String,
+    connections: List<DeviceConnectionFormState>,
+    onNameChange: (String) -> Unit,
+    onActionLabelChange: (String) -> Unit,
+    onApiMethodChange: (String) -> Unit,
+    onApiPathChange: (String) -> Unit,
+    onSortOrderChange: (String) -> Unit,
+    onConnectionHostChange: (String, String) -> Unit,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(
+            value = name,
+            onValueChange = onNameChange,
+            label = { Text("Name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = actionLabel,
+            onValueChange = onActionLabelChange,
+            label = { Text("Button-Beschriftung") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ApiMethod.entries.forEach { method ->
+                OutlinedButton(
+                    onClick = { onApiMethodChange(method.name) }
+                ) {
+                    Text(if (apiMethod == method.name) "✓ ${method.name}" else method.name)
+                }
+            }
+        }
+
+        OutlinedTextField(
+            value = apiPath,
+            onValueChange = onApiPathChange,
+            label = { Text("API-Aufruf") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = sortOrder,
+            onValueChange = onSortOrderChange,
+            label = { Text("Sortierreihenfolge") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Text(
+            text = "WLAN-Zuordnungen",
+            style = MaterialTheme.typography.titleSmall
+        )
+
+        if (wifiProfiles.isEmpty()) {
+            Text(
+                text = "Lege zuerst mindestens ein WLAN-Profil an.",
+                style = MaterialTheme.typography.bodySmall
+            )
+        } else {
+            connections.forEach { connection ->
+                OutlinedTextField(
+                    value = connection.host,
+                    onValueChange = { host ->
+                        onConnectionHostChange(connection.wifiProfileId, host)
+                    },
+                    label = { Text("${connection.ssid}: Hostname/IP") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Text(
+                text = "Leere Host-Felder bedeuten: Dieses WLAN ist dem Gerät nicht zugeordnet.",
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
+        FormButtons(
+            onSaveClick = onSaveClick,
+            onCancelClick = onCancelClick
+        )
+    }
+}
+
+@Composable
+private fun FormButtons(
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(onClick = onSaveClick) {
+            Text("Speichern")
+        }
+
+        OutlinedButton(onClick = onCancelClick) {
+            Text("Abbrechen")
+        }
+    }
+}
+
+@Composable
+private fun ConfirmDeleteDialog(
+    title: String,
+    text: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text("Nein")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onConfirm) {
+                Text("Ja")
+            }
+        }
+    )
 }
 
 @Composable
@@ -426,12 +604,8 @@ private fun SettingsSection(
     title: String,
     description: String
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium

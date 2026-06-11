@@ -3,7 +3,7 @@ package de.piecha.switchwerk.di
 import androidx.room.Room
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.repository.DeviceRepository
-import de.piecha.switchwerk.data.repository.FakeDeviceRepository
+import de.piecha.switchwerk.data.repository.RoomDeviceRepository
 import de.piecha.switchwerk.data.repository.RoomWifiProfileRepository
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.security.EncryptedWifiCredentialStore
@@ -23,12 +23,15 @@ val appModule = module {
         ).build()
     }
 
-    single {
-        get<AppDatabase>().wifiProfileDao()
-    }
+    single { get<AppDatabase>().deviceDao() }
+    single { get<AppDatabase>().deviceConnectionDao() }
+    single { get<AppDatabase>().wifiProfileDao() }
 
     single<DeviceRepository> {
-        FakeDeviceRepository()
+        RoomDeviceRepository(
+            deviceDao = get(),
+            deviceConnectionDao = get()
+        )
     }
 
     single<WifiCredentialStore> {
@@ -49,6 +52,9 @@ val appModule = module {
     }
 
     viewModel {
-        SettingsViewModel(get())
+        SettingsViewModel(
+            wifiProfileRepository = get(),
+            deviceRepository = get()
+        )
     }
 }
