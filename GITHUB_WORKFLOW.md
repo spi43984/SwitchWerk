@@ -33,33 +33,31 @@ Issue sollte enthalten:
 - Sicherheits-/Datenschutzhinweise
 - Testhinweise
 
-## Issue-Dateien und GitHub Issues
+
+## Issue-Dateien, GitHub Issues und Branches
 
 Die fachliche Issue-Planung liegt im Repository unter `docs/issues`.
 
 Für jedes umzusetzende Issue wird zuerst die passende Datei unter `docs/issues/*.md` geprüft.
 
-Vor Beginn der Implementierung wird aus dieser Datei ein GitHub Issue erzeugt, zum Beispiel:
+Vor Beginn der Implementierung wird aus dieser Datei ein GitHub-Issue erzeugt.
 
-```bash
-gh issue create \
-  --title "Device Management" \
-  --body-file docs/issues/008-device-management.md
-```
+Beispiel für Issue 009:
+
+    git switch main
+    git pull
+
+    gh issue create \
+      --title "WiFi Connection Service" \
+      --body-file docs/issues/009-wifi-connection-service.md
 
 Die von GitHub vergebene Issue-Nummer muss nicht mit der Dateinummer übereinstimmen.
 
-Nach erfolgreicher Implementierung, Build, Test und Merge wird:
-
-1. die Datei unter `docs/issues/*.md` abgehakt,
-2. die Änderung committet und gepusht,
-3. das zugehörige GitHub Issue geschlossen.
+Erst danach wird ein eigener Branch angelegt. Der Branchname orientiert sich am fachlichen Thema und muss nicht mit `issue-` beginnen.
 
 Beispiel:
 
-```bash
-gh issue close <NUMMER> --comment "Implemented, tested and merged."
-```
+    git switch -c wifi-connection-service
 
 ## Pull Requests
 
@@ -68,23 +66,35 @@ Auch wenn du alleine arbeitest:
 - PR erstellen
 - Diff prüfen
 - Tests ausführen
-- erst dann nach main mergen
+- erst dann nach `main` mergen
 
-## Branch-Workflow für Issues
+## Vollständiger Issue-Workflow
 
-Für jedes neue Issue wird vor der Implementierung ein eigener Branch
-angelegt.
+1. Nächstes offenes Issue unter `docs/issues` bestimmen.
+2. Auf `main` wechseln.
+3. `git pull` ausführen.
+4. GitHub-Issue aus der passenden Datei unter `docs/issues/*.md` erzeugen.
+5. GitHub-Issue-Nummer notieren.
+6. Fachlichen Branch anlegen.
+7. Implementieren.
+8. Build und Installation testen:
 
-Beispiel:
+       ./gradlew clean assembleDebug
+       ./gradlew installDebug
 
+9. Commit auf dem Feature-Branch erstellen.
+10. Branch pushen.
+11. Pull Request erstellen.
+12. Pull Request prüfen und nach `main` mergen.
+13. Lokale Issue-Datei unter `docs/issues` abhaken.
+14. Änderung an der Issue-Datei committen und pushen.
+15. Zugehöriges GitHub-Issue schließen.
+16. Branch lokal und remote löschen.
+
+Beispiel nach Merge:
+
+    git switch main
     git pull
-    git switch -c issue-008-device-management
 
-Nach erfolgreichem Build und Test:
-
-    git status
-    git add .
-    git commit -m "feat: implement device management"
-    git push -u origin issue-008-device-management
-
-Änderungen werden anschließend per Pull Request nach main gemerged.
+    git branch -d wifi-connection-service
+    git push origin --delete wifi-connection-service

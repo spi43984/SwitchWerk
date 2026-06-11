@@ -55,15 +55,29 @@ Beispiel:
 
 Damit ist „Nein“ bei Lösch- oder Sicherheitsabfragen immer auf der rechten Seite.
 
-## Branch-Regel
 
-Implementierungen und größere Änderungen werden nie direkt auf main
-begonnen.
+## Branch- und Issue-Workflow
 
-Vor jeder Issue-Umsetzung wird ein eigener Branch angelegt, zum
+Implementierungen und größere Änderungen werden nie direkt auf `main` begonnen.
+
+Für jedes fachliche Issue gilt:
+
+1. Auf `main` wechseln.
+2. Aktuellen Stand holen.
+3. Aus der passenden Datei unter `docs/issues/*.md` ein GitHub-Issue erzeugen.
+4. Danach einen eigenen Branch mit fachlichem Namen anlegen, z. B. `wifi-connection-service`.
+5. Implementieren, bauen und testen.
+6. Branch pushen und Pull Request erstellen.
+7. PR prüfen und nach `main` mergen.
+8. Lokale Issue-Datei abhaken.
+9. Zugehöriges GitHub-Issue schließen.
+10. Feature-Branch lokal und remote löschen.
+
 Beispiel:
 
+    git switch main
     git pull
-    git switch -c issue-008-device-management
+    gh issue create --title "WiFi Connection Service" --body-file docs/issues/009-wifi-connection-service.md
+    git switch -c wifi-connection-service
 
-Der Assistent gibt dafür immer die vollständigen Git-Befehle aus.
+Der Assistent gibt dafür immer die vollständigen Copy-&-Paste-Befehle aus.
