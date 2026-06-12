@@ -1,7 +1,11 @@
 package de.piecha.switchwerk.di
 
+import android.content.Context
+import android.net.ConnectivityManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.local.AppDatabase
+import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
+import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.RoomDeviceRepository
 import de.piecha.switchwerk.data.repository.RoomWifiProfileRepository
@@ -26,6 +30,16 @@ val appModule = module {
     single { get<AppDatabase>().deviceDao() }
     single { get<AppDatabase>().deviceConnectionDao() }
     single { get<AppDatabase>().wifiProfileDao() }
+
+    single {
+        androidContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+
+    single<WifiConnectionService> {
+        AndroidWifiConnectionService(
+            connectivityManager = get()
+        )
+    }
 
     single<DeviceRepository> {
         RoomDeviceRepository(
