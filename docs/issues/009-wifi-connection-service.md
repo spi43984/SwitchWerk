@@ -10,6 +10,6 @@ Verbindung zu Geräte-WLANs herstellen.
 - Fehlerbehandlung
 
 ## Akzeptanzkriterien
-- [ ] Verbindung möglich
-- [ ] Timeout vorhanden
-- [ ] Fehler werden gemeldet
+- [x] Verbindung möglich
+- [x] Timeout vorhanden
+- [x] Fehler werden gemeldet
