@@ -27,3 +27,4 @@ Issue #10: QR-Code-Import
 014 Dashboard Device Reordering
 015 WiFi Profile Dialog Management
 016 Edit Items By Name Click
+017 Unique WiFi Profile Name
