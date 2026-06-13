@@ -16,6 +16,8 @@ Vor jeder Analyse, Planung oder Implementierung zuerst lesen:
 
 - ai-context.md
 - AGENTS.md
+- AI_SESSION_PROMPT.md
+- AI_HANDOFF.md
 - GITHUB_WORKFLOW.md
 - ARCHITECTURE.md
 - CODE_STYLE.md
