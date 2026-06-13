@@ -81,36 +81,39 @@ Für jedes neue Issue:
 
 3. Passendes Issue unter docs/issues bestimmen
 
-4. GitHub-Issue aus der Datei erzeugen
+4. Prüfen, ob bereits ein passendes GitHub-Issue oder ein Feature-Branch
+   existiert
+
+5. GitHub-Issue nur dann aus der Datei erzeugen, wenn noch keines existiert
 
        gh issue create \
          --title "Titel" \
          --body-file docs/issues/xxx.md
 
-5. Eigenen Branch anlegen
+6. Eigenen Branch anlegen oder vorhandenen passenden Branch verwenden
 
        git switch -c fachlicher-branch-name
 
-6. Implementieren
+7. Implementieren
 
-7. Build ausführen
+8. Build ausführen
 
        ./gradlew clean assembleDebug
        ./gradlew installDebug
 
-8. Committen
+9. Ohne ausdrücklichen Auftrag nicht committen, pushen oder einen Pull Request
+   erstellen.
 
-9. Branch pushen
+10. Erst nach ausdrücklicher Veröffentlichungsanforderung committen, Branch
+   pushen und Pull Request erstellen.
 
-10. Pull Request erstellen
+11. Erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
 
-11. Nach main mergen
+12. Nach dem Merge die lokale Issue-Datei abhaken.
 
-12. Lokale Issue-Datei abhaken
+13. Zugehöriges GitHub-Issue schließen.
 
-13. GitHub-Issue schließen
-
-14. Branch lokal und remote löschen
+14. Feature-Branch lokal und remote löschen.
 
 ---
 

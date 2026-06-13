@@ -106,10 +106,16 @@ docs/issues/011-device-action-with-wifi-fallback.md
 Issue 011 verbindet die bestehenden Bausteine:
 
 - gespeichertes Gerät und API-Konfiguration
-- primärer HTTP-Aufruf
-- optionales Geräte-WLAN
+- Abgleich des aktuellen WLANs mit den zugeordneten WLAN-Profilen
+- pragmatische Zuordnung über übereinstimmende SSID
+- direkter, an das konkrete WLAN-`Network` gebundener HTTP-Aufruf nur in einem
+  zugeordneten aktuellen WLAN
+- andernfalls WLAN-Fallback in gespeicherter Reihenfolge
 - WLAN-Verbindungsdienst
-- erneuter HTTP-Aufruf über das gelieferte `Network`
+- HTTP-Aufruf über das gelieferte `Network`
+- nächstes WLAN nach API-Fehler nur bei eindeutigem DNS- oder
+  Verbindungsfehler vor Ausführung der Aktion
+- kein erneuter Schaltversuch nach API-Timeout
 - strukturierte Status- und Fehleranzeige
 
 Vor Beginn einer neuen Implementierung müssen `AGENTS.md`, `ai-context.md`,

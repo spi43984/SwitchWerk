@@ -14,7 +14,7 @@ WLAN-Passwörter sollen sicher gespeichert werden.
 - Import/Export
 
 ## Akzeptanzkriterien
-- [ ] WLAN-Passwörter werden nicht im Klartext gespeichert
-- [ ] Passwörter können wieder gelesen werden
-- [ ] Build erfolgreich
-- [ ] installDebug erfolgreich
+- [x] WLAN-Passwörter werden nicht im Klartext gespeichert
+- [x] Passwörter können wieder gelesen werden
+- [x] Build erfolgreich
+- [x] installDebug erfolgreich

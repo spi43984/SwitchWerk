@@ -1,4 +1,4 @@
-# 003 Settings Navigation Foundation
+# Issue #3: Settings Navigation Foundation
 
 ## Ziel
 
@@ -18,7 +18,7 @@ Navigation zwischen Dashboard und Einstellungen vorbereiten.
 
 ## Akzeptanzkriterien
 
-- [ ] Einstieg vorhanden
-- [ ] Einstellungsseite vorhanden
-- [ ] Rueckweg vorhanden
-- [ ] Build erfolgreich
+- [x] Einstieg vorhanden
+- [x] Einstellungsseite vorhanden
+- [x] Rueckweg vorhanden
+- [x] Build erfolgreich

@@ -5,7 +5,7 @@ Geräte und WLAN-Profile durch Klick auf den Namen bearbeiten.
 
 ## Scope
 - Klick auf Gerätenamen öffnet Bearbeiten
-- Klick auf WLAN-SSID öffnet Bearbeiten
+- Klick auf WLAN-Eintrag öffnet Bearbeiten
 - Bleistift-Icon kann entfernt werden
 - Mülleimer bleibt zum Löschen erhalten
 
@@ -15,6 +15,6 @@ Geräte und WLAN-Profile durch Klick auf den Namen bearbeiten.
 
 ## Akzeptanzkriterien
 - [ ] Klick auf Gerätenamen öffnet Gerätebearbeitung
-- [ ] Klick auf WLAN-SSID öffnet WLAN-Bearbeitung
+- [ ] Klick auf WLAN-Eintrag öffnet WLAN-Bearbeitung
 - [ ] Bleistift-Icons sind entfernt
 - [ ] Löschen bleibt möglich

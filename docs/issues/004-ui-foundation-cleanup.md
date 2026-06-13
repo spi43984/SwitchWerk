@@ -29,11 +29,11 @@ Die App verwendet `enableEdgeToEdge()`. Das ist modern, erfordert aber, dass Com
 
 ## Akzeptanzkriterien
 
-- [ ] Statusleiste wird nicht überdeckt
-- [ ] Navigationsleiste wird nicht überdeckt
-- [ ] Statusleisten-Symbole sind sichtbar
-- [ ] Dashboard bleibt nutzbar
-- [ ] SettingsScreen bleibt nutzbar
-- [ ] Navigation Dashboard zu Einstellungen und zurück funktioniert weiterhin
-- [ ] Build erfolgreich
-- [ ] installDebug erfolgreich
+- [x] Statusleiste wird nicht überdeckt
+- [x] Navigationsleiste wird nicht überdeckt
+- [x] Statusleisten-Symbole sind sichtbar
+- [x] Dashboard bleibt nutzbar
+- [x] SettingsScreen bleibt nutzbar
+- [x] Navigation Dashboard zu Einstellungen und zurück funktioniert weiterhin
+- [x] Build erfolgreich
+- [x] installDebug erfolgreich

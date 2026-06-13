@@ -25,10 +25,10 @@ Jedes Gerät erhält eine Karte mit Gerätenamen und Aktionsbutton.
 
 ## Akzeptanzkriterien
 
-- [ ] Dashboard zeigt Geräte als Liste
-- [ ] Geräte werden nach `sortOrder` sortiert
-- [ ] Jede Gerätekarte zeigt Name und Button
-- [ ] Empty State vorhanden
-- [ ] Button reagiert sichtbar auf Klick
-- [ ] Build erfolgreich
-- [ ] installDebug erfolgreich
+- [x] Dashboard zeigt Geräte als Liste
+- [x] Geräte werden nach `sortOrder` sortiert
+- [x] Jede Gerätekarte zeigt Name und Button
+- [x] Empty State vorhanden
+- [x] Button reagiert sichtbar auf Klick
+- [x] Build erfolgreich
+- [x] installDebug erfolgreich

@@ -40,7 +40,9 @@ Die fachliche Issue-Planung liegt im Repository unter `docs/issues`.
 
 Für jedes umzusetzende Issue wird zuerst die passende Datei unter `docs/issues/*.md` geprüft.
 
-Vor Beginn der Implementierung wird aus dieser Datei ein GitHub-Issue erzeugt.
+Vor Beginn der Implementierung wird geprüft, ob bereits ein passendes
+GitHub-Issue oder ein passender Feature-Branch existiert. Nur wenn noch kein
+GitHub-Issue existiert, wird es aus der lokalen Issue-Datei erzeugt.
 
 Beispiel für Issue 009:
 
@@ -73,23 +75,30 @@ Auch wenn du alleine arbeitest:
 1. Nächstes offenes Issue unter `docs/issues` bestimmen.
 2. Auf `main` wechseln.
 3. `git pull` ausführen.
-4. GitHub-Issue aus der passenden Datei unter `docs/issues/*.md` erzeugen.
-5. GitHub-Issue-Nummer notieren.
-6. Fachlichen Branch anlegen.
-7. Implementieren.
-8. Build und Installation testen:
+4. Prüfen, ob bereits ein passendes GitHub-Issue oder ein Feature-Branch
+   existiert.
+5. GitHub-Issue nur bei Bedarf aus der passenden Datei unter
+   `docs/issues/*.md` erzeugen.
+6. GitHub-Issue-Nummer notieren.
+7. Fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
+8. Implementieren.
+9. Build und Installation testen:
 
        ./gradlew clean assembleDebug
        ./gradlew installDebug
 
-9. Commit auf dem Feature-Branch erstellen.
-10. Branch pushen.
-11. Pull Request erstellen.
-12. Pull Request prüfen und nach `main` mergen.
-13. Lokale Issue-Datei unter `docs/issues` abhaken.
-14. Änderung an der Issue-Datei committen und pushen.
-15. Zugehöriges GitHub-Issue schließen.
-16. Branch lokal und remote löschen.
+10. Ohne ausdrückliche Veröffentlichungsanforderung nicht committen, pushen
+   oder einen Pull Request erstellen.
+11. Nach ausdrücklicher Veröffentlichungsanforderung auf dem Feature-Branch
+    committen.
+12. Feature-Branch pushen.
+13. Pull Request erstellen.
+14. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe
+    nach `main` mergen.
+15. Lokale Issue-Datei unter `docs/issues` abhaken.
+16. Änderung an der Issue-Datei committen und pushen.
+17. Zugehöriges GitHub-Issue schließen.
+18. Branch lokal und remote löschen.
 
 Beispiel nach Merge:
 

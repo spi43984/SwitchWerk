@@ -20,9 +20,9 @@ Funktionen:
 - Geräteverwaltung
 
 ## Akzeptanzkriterien
-- [ ] WLAN-Profil anlegen
-- [ ] WLAN-Profil bearbeiten
-- [ ] WLAN-Profil löschen
-- [ ] Liste sichtbar
-- [ ] Build erfolgreich
-- [ ] installDebug erfolgreich
+- [x] WLAN-Profil anlegen
+- [x] WLAN-Profil bearbeiten
+- [x] WLAN-Profil löschen
+- [x] Liste sichtbar
+- [x] Build erfolgreich
+- [x] installDebug erfolgreich

@@ -1,15 +1,3 @@
-# alt
-Issue #1: Configuration Domain Foundation
-Issue #2: Daten- und Architekturgrundlage
-Issue #3: Dashboard zeigt Geräteliste
-Issue #4: lokale Speicherung
-Issue #5: verschlüsselte WLAN-Passwörter
-Issue #6: WLAN-Verbindungsdienst
-Issue #7: HTTP/API-Call-Dienst
-Issue #8: Geräteaktion mit WLAN-Fallback
-Issue #9: Import/Export
-Issue #10: QR-Code-Import
-
 # aktualisiert
 001 Configuration Domain Foundation
 002 Dashboard Device List

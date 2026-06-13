@@ -18,10 +18,10 @@ SwitchWerk soll Konfigurationen dauerhaft auf dem Gerät speichern können.
 - Import/Export
 
 ## Akzeptanzkriterien
-- [ ] Room integriert
-- [ ] Datenbank startet
-- [ ] Geräte speicherbar
-- [ ] WLAN-Profile speicherbar
-- [ ] Repositorys verwenden Room
-- [ ] Build erfolgreich
-- [ ] installDebug erfolgreich
+- [x] Room integriert
+- [x] Datenbank startet
+- [x] Geräte speicherbar
+- [x] WLAN-Profile speicherbar
+- [x] Repositorys verwenden Room
+- [x] Build erfolgreich
+- [x] installDebug erfolgreich

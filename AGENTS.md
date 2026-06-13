@@ -66,17 +66,23 @@ Für jedes fachliche Issue gilt zunächst:
 
 1. Auf `main` wechseln.
 2. Aktuellen Stand holen.
-3. Aus der passenden Datei unter `docs/issues/*.md` ein GitHub-Issue erzeugen.
-4. Danach einen eigenen Branch mit fachlichem Namen anlegen, z. B. `wifi-connection-service`.
-5. Ausschließlich den vereinbarten Issue-Scope implementieren.
-6. Änderungen und Diff prüfen.
-7. Verfügbare statische Prüfungen und Tests ausführen, die keine Android-SDK
-   benötigen.
-8. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
+3. Prüfen, ob zur passenden Datei unter `docs/issues/*.md` bereits ein
+   GitHub-Issue oder Feature-Branch existiert.
+4. Nur falls noch kein GitHub-Issue existiert, dieses aus der lokalen
+   Issue-Datei erzeugen.
+5. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
+   vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
+6. Ausschließlich den vereinbarten Issue-Scope implementieren.
+7. Änderungen und Diff prüfen.
+8. Verfügbare statische Prüfungen und Tests im Container ausführen.
+9. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
    auf dem Host ausgeben.
 
-Der Codex-Container enthält keine Android-SDK. Deshalb werden insbesondere
-folgende Befehle vom Benutzer lokal auf dem Host ausgeführt:
+Der Codex-Container enthält ein persistent eingebundenes Android-SDK und einen
+persistenten Gradle-Cache. Verfügbare Tests und Builds sollen deshalb auch im
+Container ausgeführt werden. Die maßgebliche Bestätigung für Build,
+Installation und manuelle Tests erfolgt weiterhin durch den Benutzer auf dem
+Host, insbesondere mit:
 
     ./gradlew clean assembleDebug
     ./gradlew installDebug

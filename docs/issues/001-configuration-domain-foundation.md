@@ -30,8 +30,8 @@ Die App soll später Geräte wie Shelly oder ähnliche API-basierte Geräte scha
 
 ## Akzeptanzkriterien
 
-- [ ] Domain-Modelle vorhanden
-- [ ] Repository-Schnittstellen vorhanden
-- [ ] Fake-Repositories vorhanden
-- [ ] Build erfolgreich
-- [ ] installDebug erfolgreich
+- [x] Domain-Modelle vorhanden
+- [x] Repository-Schnittstellen vorhanden
+- [x] Fake-Repositories vorhanden
+- [x] Build erfolgreich
+- [x] installDebug erfolgreich
