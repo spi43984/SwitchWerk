@@ -143,6 +143,7 @@ Offen:
 - 017 Unique WiFi Profile Name
 - 018 Adaptive WiFi Security Fallback
 - 019 Configurable WiFi List Sorting
+- 020 Device Assigned WiFi Order
 
 ---
 
