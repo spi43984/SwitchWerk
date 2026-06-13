@@ -124,10 +124,10 @@ Abgeschlossen:
 - 006 Encrypted WiFi Password Storage
 - 007 WiFi Profile Management
 - 008 Device Management
+- 009 WiFi Connection Service
 
 Offen:
 
-- 009 WiFi Connection Service
 - 010 HTTP/API Call Service
 - 011 Device Action With WiFi Fallback
 - 012 Import/Export
