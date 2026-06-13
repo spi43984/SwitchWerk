@@ -13,10 +13,14 @@ implementiert.
 - Branch: `http-api-call-service`
 - Ausgangspunkt: `main` bei Commit `6475635`
 - Implementierungscommit: `b1043a7 feat: implement http api call service`
+- Dokumentationscommit: `aa4e4aa docs: add reusable ai session prompt`
+- Pull Request: #20
+- PR-URL: https://github.com/spi43984/SwitchWerk/pull/20
+- PR-Status: Draft, offen
 
 Phase 2 wurde vom Benutzer ausdrücklich angefordert. Der Implementierungscommit
-ist erstellt. Branch-Push und Pull Request folgen; das Issue bleibt bis zum
-Merge offen.
+und der Dokumentationscommit wurden erstellt, der Branch wurde gepusht und der
+Draft-PR wurde geöffnet. Das Issue bleibt bis zum Merge offen.
 
 ## Implementierter Umfang
 
@@ -201,6 +205,6 @@ vollständig vor:
 
 ## Nächster Schritt
 
-Branch pushen und Pull Request gegen `main` erstellen. Merge, Abhaken der
-lokalen Issue-Datei, Schließen von Issue #19 und Löschen des Branches erfolgen
-erst nach ausdrücklicher Merge-Freigabe.
+Pull Request #20 prüfen und nach ausdrücklicher Merge-Freigabe nach `main`
+mergen. Erst danach die lokale Issue-Datei abhaken, Issue #19 schließen und den
+Feature-Branch lokal und remote löschen.
