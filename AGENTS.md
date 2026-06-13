@@ -121,3 +121,14 @@ vollständigen Copy-&-Paste-Befehle aus.
 
 Die Datei `AI_HANDOFF.md` wird immer direkt im Hauptverzeichnis des
 Repositories abgelegt und aktualisiert.
+
+Die wiederverwendbare Startvorlage liegt als `AI_SESSION_PROMPT.md` ebenfalls
+im Hauptverzeichnis. Vor jeder Analyse, Planung oder Implementierung müssen
+`AI_SESSION_PROMPT.md` und `AI_HANDOFF.md` vollständig gelesen werden.
+
+Bei Widersprüchen gilt folgende Priorität:
+
+1. `AGENTS.md`
+2. `ai-context.md`
+3. `AI_SESSION_PROMPT.md`
+4. `AI_HANDOFF.md`

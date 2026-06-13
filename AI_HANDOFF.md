@@ -2,326 +2,205 @@
 
 Stand: 13. Juni 2026
 
-## Zweck
+## Aktueller Auftrag
 
-Diese Datei dokumentiert den in der vorherigen AI-Sitzung bearbeiteten Stand von
-SwitchWerk. Maßgeblich bleibt immer der aktuelle Git-Stand sowie die Vorgaben in
-`AGENTS.md` und `ai-context.md`.
+Issue 010 "HTTP API Call Service" wurde gemäß Phase 1 des Projekt-Workflows
+implementiert.
 
-Hinweis: `ai-context.md` liegt im Repository-Root. Eine Datei
-`docs/ai-context.md` existiert derzeit nicht.
+- GitHub-Issue: #19
+- URL: https://github.com/spi43984/SwitchWerk/issues/19
+- Status: offen
+- Branch: `http-api-call-service`
+- Ausgangspunkt: `main` bei Commit `6475635`
+- Implementierungscommit: `b1043a7 feat: implement http api call service`
 
-## Umgesetzte Arbeit
-
-Am 12. Juni 2026 wurde Issue 009 "WiFi Connection Service" implementiert.
-
-Ausgangspunkt war GitHub-Issue #17:
-
-- Titel: `WiFi Connection Service`
-- URL: https://github.com/spi43984/SwitchWerk/issues/17
-- Status: geschlossen
-- Geschlossen am: 12. Juni 2026
-
-Die Implementierung erfolgte auf dem Branch:
-
-```text
-wifi-connection-service
-```
-
-Sie wurde über Pull Request #18 nach `main` gemergt:
-
-- PR: https://github.com/spi43984/SwitchWerk/pull/18
-- Merge-Commit: `43986d2793dd5b27a9f00503d798034b3f855da4`
-- Commit-Titel: `feat: implement wifi connection service (#18)`
-- Gemergt am: 12. Juni 2026
-
-Der Feature-Branch ist lokal und remote nicht mehr vorhanden.
+Phase 2 wurde vom Benutzer ausdrücklich angefordert. Der Implementierungscommit
+ist erstellt. Branch-Push und Pull Request folgen; das Issue bleibt bis zum
+Merge offen.
 
 ## Implementierter Umfang
 
-Issue 009 umfasst ausschließlich den Aufbau einer Verbindung zu einem lokalen
-Geräte-WLAN:
+- suspendierendes `HttpApiCallService`-Interface
+- GET-Aufrufe
+- POST-Aufrufe mit optionalem Body und konfigurierbarem Content-Type
+- OkHttp 5.4.0
+- standardmäßiger Call-Timeout von 10 Sekunden
+- pro Aufruf konfigurierbarer Timeout
+- Coroutine-Abbruch bricht den OkHttp-Call ab
+- optionale Bindung an ein `android.net.Network`
+- DNS-Auflösung und Socket-Erzeugung über das ausgewählte Android-Netzwerk
+- strukturierte erfolgreiche Responses mit Statuscode, Headern und Body
+- strukturierte HTTP-Fehler mit vollständiger Response
+- strukturierte Timeout-, Netzwerk- und Validierungsfehler
+- keine automatische Wiederholung fehlgeschlagener Requests
+- keine automatische Weiterleitung von Requests
+- Koin-Registrierung für `OkHttpClient` und `HttpApiCallService`
+- `INTERNET`-Berechtigung
+- Freigabe von Klartext-HTTP für lokale Geräteendpunkte
+- JVM-Tests mit MockWebServer für GET, POST, HTTP-Fehler, Redirect,
+  Timeout, Verbindungsfehler und ungültige URL
 
-- `WifiConnectionService` als suspendierendes Service-Interface
-- `AndroidWifiConnectionService` als Android-Implementierung
-- `WifiConnectionResult` für strukturierte Ergebnisse
-- WLAN-Anforderung mit `WifiNetworkSpecifier`
-- Aufruf über `ConnectivityManager.requestNetwork(...)`
-- Behandlung von `NetworkCallback.onAvailable(...)`
-- Behandlung von `NetworkCallback.onUnavailable()`
-- Behandlung von `NetworkCallback.onLost(...)`
-- konfigurierbarer Timeout, standardmäßig 15 Sekunden
-- Abbruchunterstützung über Coroutines
-- explizites `disconnect()` und Freigabe aktiver Callbacks
-- Koin-Registrierung des Service und des `ConnectivityManager`
-- Manifest-Berechtigung `CHANGE_NETWORK_STATE`
+Nicht Bestandteil dieses Issues:
 
-Nicht Bestandteil der Implementierung:
-
-- HTTP- oder API-Aufrufe
-- Shelly-Steuerbefehle
-- Auswahl eines Geräte-WLAN-Profils
-- WLAN-Fallback zwischen mehreren Geräteverbindungen
+- Geräteaktionen
+- Auswahl eines WLAN-Profils
+- WLAN-Fallback
 - UI- oder ViewModel-Anbindung
+- Import/Export
+
+Diese Punkte bleiben insbesondere Issue 011 und späteren Issues vorbehalten.
 
 ## Architekturentscheidung
 
-Die Implementierung liegt unter `data/network`, weil sie Android-spezifischen
-Netzwerkzugriff kapselt. UI und Composables enthalten keine Netzwerklogik.
+Der Dienst liegt wie der WLAN-Verbindungsdienst unter `data/network`.
+`HttpApiCallService` kapselt die öffentliche Coroutine-API,
+`OkHttpApiCallService` die konkrete OkHttp-Implementierung.
 
-`WifiConnectionService.connect(...)` ist eine Coroutine-API. Der interne
-Android-Callback wird mit `suspendCancellableCoroutine` adaptiert. Ein
-erfolgreiches Ergebnis enthält das konkrete `android.net.Network`, damit ein
-späterer HTTP-Dienst Verbindungen gezielt über dieses WLAN öffnen kann.
+Ein von `WifiConnectionResult.Success` geliefertes `Network` kann direkt an
+GET oder POST übergeben werden. Der OkHttp-Client verwendet dann sowohl
+`Network.socketFactory` als auch `Network.getAllByName(...)`, damit Verbindung
+und DNS-Auflösung über das angeforderte Geräte-WLAN erfolgen.
 
-Der aktive `NetworkCallback` bleibt nach `onAvailable(...)` registriert. Dadurch
-bleibt die angeforderte WLAN-Verbindung für nachfolgende Operationen erhalten.
-Sie wird durch `disconnect()`, Coroutine-Abbruch, Verbindungsverlust oder Fehler
-freigegeben.
+2xx-Antworten werden als `Success` geliefert. Andere HTTP-Statuscodes werden
+nicht als Transportfehler behandelt, sondern als `HttpError` einschließlich
+Statuscode, Headern und Body. Es werden keine Requests, URLs, Header oder Bodies
+geloggt.
 
-Es wird immer nur eine aktive WLAN-Anforderung verwaltet. Ein neuer
-Verbindungsversuch beendet zunächst einen vorhandenen Request.
-
-Unterstützt werden:
-
-- offene WLANs bei leerem oder fehlendem Passwort
-- WPA2-PSK über `setWpa2Passphrase(...)`
-- Android 10 / API 29 und neuer
-
-Es werden keine SSIDs, Passwörter oder anderen sensiblen Netzwerkdaten geloggt.
+Automatische Retries und Redirects sind deaktiviert, damit spätere
+Schaltaktionen nicht still wiederholt oder an ein anderes Ziel weitergeleitet
+werden.
 
 ## Geänderte Dateien
 
-Durch Issue 009 wurden folgende Dateien geändert oder angelegt:
-
 ```text
+AGENTS.md
+AI_HANDOFF.md
+AI_SESSION_PROMPT.md
+ai-context.md
+app/build.gradle.kts
 app/src/main/AndroidManifest.xml
-app/src/main/java/de/piecha/switchwerk/data/network/AndroidWifiConnectionService.kt
-app/src/main/java/de/piecha/switchwerk/data/network/WifiConnectionResult.kt
-app/src/main/java/de/piecha/switchwerk/data/network/WifiConnectionService.kt
+app/src/main/java/de/piecha/switchwerk/data/network/HttpApiCallResult.kt
+app/src/main/java/de/piecha/switchwerk/data/network/HttpApiCallService.kt
+app/src/main/java/de/piecha/switchwerk/data/network/HttpApiResponse.kt
+app/src/main/java/de/piecha/switchwerk/data/network/OkHttpApiCallService.kt
 app/src/main/java/de/piecha/switchwerk/di/AppModule.kt
+app/src/test/java/de/piecha/switchwerk/data/network/OkHttpApiCallServiceTest.kt
+gradle/libs.versions.toml
 ```
 
-Zusätzlich wurde nach dem Merge die lokale Issue-Datei abgehakt:
+Die frühere wiederverwendbare Vorlage "Prompt für den nächsten Chat" wurde aus
+dem Handoff zu Issue 009 in `AI_SESSION_PROMPT.md` im Repository-Root
+überführt. `AGENTS.md` und `ai-context.md` schreiben ihre Lektüre für neue
+Sessions vor. Die Vorlage wurde an den aktuellen zweiphasigen Workflow
+angepasst; insbesondere enthält sie keine fest verdrahtete Issue-Nummer und
+keine automatische Veröffentlichung.
 
-```text
-docs/issues/009-wifi-connection-service.md
-```
+Die lokale Issue-Datei
+`docs/issues/010-http-api-call-service.md` bleibt bis zum Abschluss der
+Veröffentlichungsphase unverändert und nicht abgehakt.
 
-## Build und Verifikation
+## Verifikation
 
-In der Implementierungssitzung wurde nach Einrichtung der fehlenden lokalen
-Android-SDK folgender Build erfolgreich ausgeführt:
+Erfolgreich:
 
 ```bash
-./gradlew clean assembleDebug
+git diff --check
+```
+
+Der Benutzer führte auf dem Host aus:
+
+```bash
+./gradlew testDebugUnitTest
+```
+
+Dabei kompilierten Anwendung und Tests. Von neun Tests schlug zunächst der
+Timeout-Test fehl:
+
+```text
+expected: Timeout
+actual: NetworkError(cause=java.io.InterruptedIOException: timeout)
+```
+
+Ursache war, dass ein Timeout beim Lesen des Response-Bodys im
+`onResponse`-Zweig als allgemeiner Netzwerkfehler eingeordnet wurde. Die
+Fehlerklassifizierung wurde danach zentralisiert; `InterruptedIOException`
+wird nun sowohl in `onFailure` als auch beim Lesen der Response als `Timeout`
+geliefert.
+
+Der Benutzer führte den korrigierten Stand anschließend erneut auf dem Host aus:
+
+```bash
+./gradlew testDebugUnitTest
 ```
 
 Ergebnis:
 
 ```text
-BUILD SUCCESSFUL in 38s
-38 actionable tasks: 38 executed
+BUILD SUCCESSFUL in 5s
+26 actionable tasks: 7 executed, 19 up-to-date
 ```
 
-Das Debug-APK wurde unter folgendem Pfad erzeugt:
+Damit sind alle neun JVM-Tests erfolgreich. Der vollständige Debug-Build und
+die Installation wurden anschließend ebenfalls auf dem Host ausgeführt.
 
-```text
-app/build/outputs/apk/debug/app-debug.apk
-```
-
-Der Build meldete bereits vorher vorhandene Warnungen:
-
-- kein Room-Schemaexport konfiguriert
-- `EncryptedSharedPreferences` und `MasterKey` sind in der verwendeten
-  AndroidX-Version als veraltet markiert
-
-Diese Warnungen wurden nicht im Rahmen von Issue 009 bearbeitet.
-
-## Aktueller Stand
-
-Zum Zeitpunkt dieser Übergabe:
-
-- aktiver Branch: `main`
-- `main` entspricht `origin/main`
-- letzter Commit: `e3bd39abbd7481f6f181d7d2bb2ad9eafce1e3d7`
-- Issue 009 ist lokal abgehakt
-- GitHub-Issue #17 ist geschlossen
-- Pull Request #18 ist gemergt
-- die Implementierung von Issue 009 ist vollständig in `main`
-- vor Erstellung dieser Datei war der Arbeitsbaum sauber
-- diese Datei ist die einzige neue Änderung dieser Übergabe
-
-## Offene Probleme und Annahmen
-
-1. Die Verbindung wurde gebaut, aber in der AI-Umgebung nicht mit einem echten
-   Android-Gerät und einem Shelly-Geräte-WLAN praktisch verifiziert.
-2. WPA3 und andere Security-Typen sind nicht implementiert. Der aktuelle Scope
-   umfasst offene und WPA2-PSK-Netze.
-3. Android-Versionen unter API 29 liefern
-   `WifiConnectionResult.UnsupportedAndroidVersion`.
-4. Die App-Installation per `adb install -r` schlug beim Benutzer fehl, weil die
-   bereits installierte App mit einem anderen Schlüssel signiert war. Ein Update
-   ist nur mit demselben Keystore möglich; eine Deinstallation löscht lokale
-   App-Daten.
-5. `ai-context.md` führt Issue 009 noch unter "Offen", obwohl das Issue
-   implementiert, gemergt und geschlossen ist. Diese Dokumentation sollte
-   korrigiert werden.
-6. Der GitHub-PR-Text nennt einen damals fehlenden SDK-Pfad. Danach wurde die
-   Android-SDK in der AI-Umgebung eingerichtet und der Build erfolgreich
-   ausgeführt. Der erfolgreiche Build oben ist der spätere und maßgebliche
-   Stand.
-
-## Nächster fachlicher Schritt
-
-Der nächste geplante Funktionsbaustein ist Issue 010 "HTTP API Call Service":
-
-```text
-docs/issues/010-http-api-call-service.md
-```
-
-Vorgesehener Scope:
-
-- OkHttp
-- GET
-- POST
-- Timeout
-- strukturierte Response
-- strukturierte Fehlerbehandlung
-
-Issue 010 soll das von `WifiConnectionResult.Success` gelieferte
-`android.net.Network` nutzen können, ohne die WLAN-Verbindungslogik zu
-duplizieren. Geräteaktionen und WLAN-Fallback bleiben weiterhin außerhalb des
-Scopes und gehören zu Issue 011.
-
-Vor der Umsetzung muss gemäß `AGENTS.md` geprüft werden, ob bereits ein
-zugehöriges GitHub-Issue existiert. Danach gilt der vollständige Workflow:
+Der Benutzer bestätigte folgende Befehle als erfolgreich:
 
 ```bash
-git status
-git switch main
-git pull
-gh issue create \
-  --title "HTTP API Call Service" \
-  --body-file docs/issues/010-http-api-call-service.md
-git switch -c http-api-call-service
+./gradlew clean assembleDebug
+./gradlew installDebug
 ```
 
-Falls das GitHub-Issue oder der Branch bereits existiert, darf kein Duplikat
-angelegt werden. In diesem Fall zuerst den bestehenden Stand ermitteln und den
-vorhandenen Branch verwenden.
+Damit sind Unit-Tests, Debug-Build und Installation für Issue 010 erfolgreich
+bestätigt.
 
-## Arbeitsauftrag für die nächste AI-Sitzung
+Der Benutzer bestätigte anschließend auch die manuellen Regressionstests der
+installierten App als erfolgreich. Eine echte Shelly-Schaltaktion war dabei
+nicht Bestandteil der Prüfung, weil die Anbindung von Dashboard, Geräteaktion,
+WLAN-Verbindung und HTTP-Dienst erst mit Issue 011 erfolgt.
 
-1. Alle in `ai-context.md` vorgeschriebenen Dateien vollständig lesen.
-2. Git-Status, Branch, letzte Commits und vorhandene Änderungen prüfen.
-3. Diese Übergabe gegen den tatsächlichen Repository-Zustand verifizieren.
-4. Die veraltete Statusangabe zu Issue 009 in `ai-context.md` erkennen und bei
-   passender Gelegenheit korrigieren.
-5. Ohne ausdrücklichen Auftrag keine neue Implementierung beginnen.
-6. Bei einem Auftrag für Issue 010 dessen Datei und GitHub-Status prüfen und den
-   Branch-/Issue-Workflow aus `AGENTS.md` einhalten.
-7. Keine HTTP-, Geräteaktions- oder Fallback-Logik nachträglich in Issue 009
-   vermischen.
+Die Host-Ausgabe enthielt außerdem bereits bestehende Warnungen:
 
-## Prompt für den nächsten Chat
+- kein Room-Schemaexport konfiguriert
+- `EncryptedSharedPreferences` und `MasterKey` sind veraltet
+- `local.properties` enthält zusätzlich einen nicht existierenden SDK-Pfad,
+  obwohl Gradle auf dem Host ein SDK finden und kompilieren konnte
 
-```text
-Implementiere das nächste offene Issue.
+## Auf dem Host auszuführen
 
-WICHTIG:
-Bevor du Änderungen vornimmst, lies und berücksichtige folgende Dateien:
+Im lokalen Repository auf dem Branch `http-api-call-service`:
 
-* ai-context.md
-* AGENTS.md
-* GITHUB_WORKFLOW.md
-* ARCHITECTURE.md
-* CODE_STYLE.md
-* TESTING.md
-* SECURITY.md
-* README.md
-* AI_HANDOFF.md
-
-Zusätzlich lesen:
-
-* docs/issues/overview.txt
-* das nächste offene Issue in docs/issues/...
-
-Bei Android-/ Build-/Dependency-Fragen zusätzlich prüfen:
-
-* settings.gradle.kts
-* build.gradle.kts
-* app/build.gradle.kts
-* gradle/libs.versions.toml
-* gradle.properties
-
-GitHub-Issue:
-
-* Erstelle das nächste Issue auf github
-
-Führe zuerst den Workflow aus:
-
-1. git status
-2. git switch main
-3. git pull
-4. gh issue view 17
-5. git switch -c BRANCH-NAME
-
-Falls der Branch bereits existiert:
-
-git switch BRANCH-NAME
-
-Nutze das Repository ShellyPulse nur als funktionale Referenz für den Ablauf:
-
-* WifiNetworkSpecifier
-* ConnectivityManager.requestNetwork(...)
-* NetworkCallback
-* onAvailable
-* onUnavailable
-* Timeout
-* Fehlerbehandlung
-
-Übernimm KEINEN Code aus ShellyPulse.
-
-Halte dich an die bestehende SwitchWerk-Architektur:
-
-* Kotlin
-* Jetpack Compose
-* MVVM
-* Koin
-* Coroutines
-* Room
-* Keine Netzwerklogik in UI/Composables
-* Keine sensiblen Daten loggen
-
-Implementiere ausschließlich das nächste Issue.
-
-Prüfe den Scope des nächsten Issues und zeige ihn an.
-
-Vor jeder Änderung:
-
-* bestehende Architektur analysieren
-* vorhandene Packages prüfen
-* bestehende Patterns übernehmen
-
-Nach der Implementierung zeige mir, was ich lokal ausführen muss, z. B.:
-
-1. ./gradlew clean assembleDebug
-
-Danach ausgeben:
-
-* Architekturentscheidung
-* Liste aller geänderten Dateien
-* vollständigen Diff
-* Build-Ergebnis
-* offene Probleme oder Annahmen
-* Bewertung, ob alle Akzeptanzkriterien des Issues erfüllt sind
-
-WICHTIG:
-
-* NICHT committen
-* NICHT pushen
-* KEINEN Pull Request erstellen
-* Nur implementieren und Ergebnis zeigen, bauen und installieren mache ich lokal auf dem Host
-* aktualisiere ai-context.md und erstelle eine neue AI_HANDOFF.md im Hauptverzeichnis
+```bash
+./gradlew testDebugUnitTest
 ```
+
+Manuelle Prüfung mit einem lokalen HTTP-Endpunkt oder Shelly:
+
+1. GET liefert Statuscode, Header und Body.
+2. POST überträgt den erwarteten Body und Content-Type.
+3. Ein 4xx/5xx-Status liefert `HttpError` mit Response.
+4. Ein nicht erreichbares Ziel liefert `NetworkError`.
+5. Ein zu kurzer Timeout liefert `Timeout`.
+6. Ein Request mit dem von `WifiConnectionService` gelieferten `Network`
+   erreicht das Gerät über dessen WLAN.
+
+## Akzeptanzkriterien
+
+- GET möglich: implementiert, Test vorhanden
+- POST möglich: implementiert, Test vorhanden
+- Response verfügbar: Statuscode, Header und Body implementiert
+- Fehler verfügbar: HTTP-, Timeout-, Netzwerk- und Validierungsfehler
+  implementiert
+
+Die Kriterien sind im Code abgedeckt. Ihre Build- und Laufzeitbestätigung steht
+vollständig vor:
+
+- alle neun JVM-Tests erfolgreich
+- Debug-Build erfolgreich
+- Installation erfolgreich
+- manuelle Regressionstests der App erfolgreich
+
+## Nächster Schritt
+
+Branch pushen und Pull Request gegen `main` erstellen. Merge, Abhaken der
+lokalen Issue-Datei, Schließen von Issue #19 und Löschen des Branches erfolgen
+erst nach ausdrücklicher Merge-Freigabe.
