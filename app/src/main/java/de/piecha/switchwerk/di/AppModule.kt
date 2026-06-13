@@ -5,6 +5,8 @@ import android.net.ConnectivityManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
+import de.piecha.switchwerk.data.network.HttpApiCallService
+import de.piecha.switchwerk.data.network.OkHttpApiCallService
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.RoomDeviceRepository
@@ -17,6 +19,7 @@ import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import okhttp3.OkHttpClient
 
 val appModule = module {
     single {
@@ -38,6 +41,14 @@ val appModule = module {
     single<WifiConnectionService> {
         AndroidWifiConnectionService(
             connectivityManager = get()
+        )
+    }
+
+    single { OkHttpClient() }
+
+    single<HttpApiCallService> {
+        OkHttpApiCallService(
+            baseClient = get()
         )
     }
 
