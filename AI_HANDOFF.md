@@ -122,7 +122,11 @@ Vor Beginn einer neuen Implementierung müssen `AGENTS.md`, `ai-context.md`,
 `AI_SESSION_PROMPT.md`, diese Datei sowie die dort vorgeschriebenen
 Projektdokumente vollständig gelesen werden.
 
-Zusätzlich wurde das zukünftige Issue 019 zur konfigurierbaren Sortierung der
-WLAN-Verwaltungsliste und zur festen alphabetischen Sortierung der
-Geräteverwaltungsliste dokumentiert. Die manuelle Dashboard-Reihenfolge aus
-Issue 014 bleibt davon unberührt.
+Zusätzlich sind die zukünftigen Issue-Dokumente 019 und 020 vorhanden:
+
+- Issue 019 zur konfigurierbaren Sortierung der WLAN-Verwaltungsliste und zur
+  festen alphabetischen Sortierung der Geräteverwaltungsliste
+- Issue 020 zur manuellen Sortierung der einem Gerät zugewiesenen WLANs in der
+  Verbindungsreihenfolge
+
+Die manuelle Dashboard-Reihenfolge aus Issue 014 bleibt davon unberührt.

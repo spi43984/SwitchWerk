@@ -63,12 +63,16 @@ Beispiel:
 
 ## Pull Requests
 
-Auch wenn du alleine arbeitest:
+Für die allgemeine GitHub-Nutzung und manuelle Repository-Arbeit:
 
 - PR erstellen
 - Diff prüfen
 - Tests ausführen
 - erst dann nach `main` mergen
+
+Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus
+`AGENTS.md`, `ai-context.md` und `AI_SESSION_PROMPT.md`: PRs und Merge nur nach
+ausdrücklicher Freigabe.
 
 ## Vollständiger Issue-Workflow
 
