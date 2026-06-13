@@ -62,6 +62,10 @@ Bei der Implementierung eines neuen fachlichen Issues:
 12. Führe verfügbare statische Prüfungen und Tests aus, die in der Umgebung möglich sind.
 13. Aktualisiere AI_HANDOFF.md im Hauptverzeichnis.
 
+Jeder aktualisierte AI_HANDOFF.md muss für die nächste Session ausdrücklich auf
+AI_SESSION_PROMPT.md als Pflichtlektüre verweisen. Der Verweis darf beim
+Ersetzen oder Kürzen des Handoffs nicht entfernt werden.
+
 Nutze externe Repositories nur dann als funktionale Referenz, wenn der Auftrag
 oder AI_HANDOFF.md dies ausdrücklich verlangt. Übernimm keinen fremden Code.
 
