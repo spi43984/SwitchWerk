@@ -127,10 +127,10 @@ Abgeschlossen:
 - 007 WiFi Profile Management
 - 008 Device Management
 - 009 WiFi Connection Service
+- 010 HTTP/API Call Service
 
 Offen:
 
-- 010 HTTP/API Call Service
 - 011 Device Action With WiFi Fallback
 - 012 Import/Export
 - 013 QR Code Import

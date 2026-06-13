@@ -11,7 +11,7 @@ API-Aufrufe abstrahieren.
 - Fehlerbehandlung
 
 ## Akzeptanzkriterien
-- [ ] GET möglich
-- [ ] POST möglich
-- [ ] Response verfügbar
-- [ ] Fehler verfügbar
+- [x] GET möglich
+- [x] POST möglich
+- [x] Response verfügbar
+- [x] Fehler verfügbar
