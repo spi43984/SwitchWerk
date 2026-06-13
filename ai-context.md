@@ -137,6 +137,9 @@ Offen:
 - 014 Dashboard Device Reordering
 - 015 WiFi Profile Dialog Management
 - 016 Edit Items By Name Click
+- 017 Unique WiFi Profile Name
+- 018 Adaptive WiFi Security Fallback
+- 019 Configurable WiFi List Sorting
 
 ---
 

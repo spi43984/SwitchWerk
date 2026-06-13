@@ -15,8 +15,7 @@ veröffentlicht und nach `main` gemergt.
 - Merge-Methode: Squash
 - Commit-Titel: `feat: implement http api call service (#20)`
 
-Der Feature-Branch `http-api-call-service` wird nach diesem
-Dokumentationscommit lokal und remote gelöscht.
+Der Feature-Branch `http-api-call-service` wurde lokal und remote gelöscht.
 
 ## Implementierter Umfang
 
@@ -65,10 +64,36 @@ Dashboard, Geräteaktion, WLAN-Verbindungsdienst und HTTP-Dienst gehört zu Issu
 
 - Room-Schemaexport ist nicht konfiguriert.
 - `EncryptedSharedPreferences` und `MasterKey` sind veraltet.
-- Die Host-Konfiguration meldete einen zusätzlichen ungültigen SDK-Pfad in
-  `local.properties`, obwohl Build und Installation erfolgreich waren.
 
 Diese Punkte waren nicht Bestandteil von Issue 010.
+
+## Entwicklungsumgebung
+
+Die Docker-Entwicklungsumgebung speichert folgende Verzeichnisse persistent auf
+dem Host:
+
+- `/home/ubuntu/.gradle`
+- `/opt/android-sdk`
+- `/home/ubuntu/.android`
+
+Verifiziert wurden:
+
+- Gradle 9.4.1 und Maven-Abhängigkeiten im persistenten Gradle-Cache
+- Android-Plattformen 36 und 36.1
+- Android Build Tools 36.0.0
+- persistente Platform Tools mit ADB 37.0.0
+- persistenter Debug-Keystore
+- korrektes `local.properties` mit `sdk.dir=/opt/android-sdk`
+
+Der Offline-Test war erfolgreich:
+
+```bash
+./gradlew --offline testDebugUnitTest
+```
+
+Damit sind für den aktuellen Build keine erneuten Downloads erforderlich.
+ADB-Geräteschlüssel werden bei Bedarf erzeugt und anschließend ebenfalls über
+`/home/ubuntu/.android` persistent gespeichert.
 
 ## Nächster fachlicher Schritt
 
@@ -90,3 +115,8 @@ Issue 011 verbindet die bestehenden Bausteine:
 Vor Beginn einer neuen Implementierung müssen `AGENTS.md`, `ai-context.md`,
 `AI_SESSION_PROMPT.md`, diese Datei sowie die dort vorgeschriebenen
 Projektdokumente vollständig gelesen werden.
+
+Zusätzlich wurde das zukünftige Issue 019 zur konfigurierbaren Sortierung der
+WLAN-Verwaltungsliste und zur festen alphabetischen Sortierung der
+Geräteverwaltungsliste dokumentiert. Die manuelle Dashboard-Reihenfolge aus
+Issue 014 bleibt davon unberührt.
