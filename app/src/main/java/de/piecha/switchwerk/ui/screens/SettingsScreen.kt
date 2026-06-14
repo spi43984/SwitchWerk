@@ -1,6 +1,8 @@
 package de.piecha.switchwerk.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -26,11 +30,13 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,6 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import de.piecha.switchwerk.data.repository.ConfigurationImportMode
+import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -53,6 +61,26 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var pendingFileImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
+    var showFileImportModeDialog by remember { mutableStateOf(false) }
+    var showUrlImportDialog by remember { mutableStateOf(false) }
+    var showPasswordExportWarning by remember { mutableStateOf(false) }
+
+    val exportWithoutPasswordsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let { viewModel.exportConfiguration(it, includePasswords = false) }
+    }
+    val exportWithPasswordsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let { viewModel.exportConfiguration(it, includePasswords = true) }
+    }
+    val importFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let { viewModel.prepareImportFromFile(it, pendingFileImportMode) }
+    }
 
     BackHandler(enabled = uiState.isEditingWifiProfile) {
         viewModel.cancelWifiProfileEdit()
@@ -70,6 +98,7 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -82,6 +111,14 @@ fun SettingsScreen(
             Text(
                 text = message,
                 color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        uiState.statusMessage?.let { message ->
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -122,9 +159,21 @@ fun SettingsScreen(
             onCancelClick = viewModel::cancelDeviceEdit
         )
 
-        SettingsSection(
-            title = "Import / Export",
-            description = "Konfigurationen können später ohne WLAN-Passwörter exportiert und importiert werden."
+        ImportExportSection(
+            isTransferInProgress = uiState.isTransferInProgress,
+            onExportClick = {
+                viewModel.clearStatusMessage()
+                exportWithoutPasswordsLauncher.launch(EXPORT_FILE_NAME)
+            },
+            onExportWithPasswordsClick = {
+                showPasswordExportWarning = true
+            },
+            onImportFileClick = {
+                showFileImportModeDialog = true
+            },
+            onImportUrlClick = {
+                showUrlImportDialog = true
+            }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -134,6 +183,59 @@ fun SettingsScreen(
         ) {
             Text("Zurück zum Dashboard")
         }
+    }
+
+    if (showPasswordExportWarning) {
+        PasswordExportWarningDialog(
+            onExport = {
+                showPasswordExportWarning = false
+                exportWithPasswordsLauncher.launch(EXPORT_FILE_NAME)
+            },
+            onCancel = {
+                showPasswordExportWarning = false
+            }
+        )
+    }
+
+    if (showFileImportModeDialog) {
+        ImportModeDialog(
+            onContinue = { mode ->
+                pendingFileImportMode = mode
+                showFileImportModeDialog = false
+                importFileLauncher.launch(arrayOf("application/json", "text/json", "text/plain"))
+            },
+            onCancel = {
+                showFileImportModeDialog = false
+            }
+        )
+    }
+
+    if (showUrlImportDialog) {
+        UrlImportDialog(
+            onImport = { url, mode ->
+                showUrlImportDialog = false
+                viewModel.prepareImportFromUrl(url, mode)
+            },
+            onCancel = {
+                showUrlImportDialog = false
+            }
+        )
+    }
+
+    uiState.importSummary?.let { summary ->
+        ImportSummaryDialog(
+            summary = summary,
+            mode = uiState.importMode ?: ConfigurationImportMode.MERGE,
+            onImport = viewModel::confirmImportSummary,
+            onCancel = viewModel::cancelPendingImport
+        )
+    }
+
+    if (uiState.showImportPasswordWarning) {
+        PasswordImportWarningDialog(
+            onImport = viewModel::confirmPasswordImport,
+            onCancel = viewModel::cancelPendingImport
+        )
     }
 }
 
@@ -440,9 +542,12 @@ private fun WifiProfileForm(
 }
 
 @Composable
-private fun SettingsSection(
-    title: String,
-    description: String
+private fun ImportExportSection(
+    isTransferInProgress: Boolean,
+    onExportClick: () -> Unit,
+    onExportWithPasswordsClick: () -> Unit,
+    onImportFileClick: () -> Unit,
+    onImportUrlClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -450,17 +555,246 @@ private fun SettingsSection(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Text("Import / Export", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = description,
+                text = "Konfigurationen als JSON-Datei sichern oder aus einer vertrauenswürdigen Quelle importieren.",
                 style = MaterialTheme.typography.bodyMedium
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (isTransferInProgress) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    Text("Konfiguration wird verarbeitet …")
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = onExportClick) {
+                            Text("Exportieren")
+                        }
+                        OutlinedButton(onClick = onExportWithPasswordsClick) {
+                            Text("Mit Passwörtern")
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = onImportFileClick) {
+                            Text("Datei importieren")
+                        }
+                        OutlinedButton(onClick = onImportUrlClick) {
+                            Text("URL importieren")
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+@Composable
+private fun PasswordExportWarningDialog(
+    onExport: () -> Unit,
+    onCancel: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text("Passwörter unverschlüsselt exportieren?") },
+        text = {
+            Text(
+                "Die Exportdatei enthält WLAN-Passwörter im Klartext. " +
+                    "Teile sie nur mit Personen, die diese Passwörter kennen dürfen."
+            )
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onCancel) {
+                Text("Abbrechen")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onExport) {
+                Text("Passwörter exportieren")
+            }
+        }
+    )
+}
+
+@Composable
+private fun ImportModeDialog(
+    onContinue: (ConfigurationImportMode) -> Unit,
+    onCancel: () -> Unit
+) {
+    var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text("Importmodus wählen") },
+        text = {
+            ImportModeSelection(
+                mode = mode,
+                onModeChange = { mode = it }
+            )
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onCancel) {
+                Text("Abbrechen")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onContinue(mode) }) {
+                Text("Datei auswählen")
+            }
+        }
+    )
+}
+
+@Composable
+private fun UrlImportDialog(
+    onImport: (String, ConfigurationImportMode) -> Unit,
+    onCancel: () -> Unit
+) {
+    var url by remember { mutableStateOf("") }
+    var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text("Aus HTTPS-URL importieren") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = { url = it },
+                    label = { Text("HTTPS-URL") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                ImportModeSelection(
+                    mode = mode,
+                    onModeChange = { mode = it }
+                )
+            }
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onCancel) {
+                Text("Abbrechen")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = { onImport(url, mode) },
+                enabled = url.isNotBlank()
+            ) {
+                Text("Import prüfen")
+            }
+        }
+    )
+}
+
+@Composable
+private fun ImportModeSelection(
+    mode: ConfigurationImportMode,
+    onModeChange: (ConfigurationImportMode) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ImportModeOption(
+            selected = mode == ConfigurationImportMode.MERGE,
+            title = "Ergänzen / überschreiben",
+            description = "Bestehende Einträge bleiben erhalten. Gleiche IDs werden überschrieben.",
+            onClick = { onModeChange(ConfigurationImportMode.MERGE) }
+        )
+        ImportModeOption(
+            selected = mode == ConfigurationImportMode.REPLACE,
+            title = "Alles ersetzen",
+            description = "Alle lokalen Geräte, WLAN-Profile und Passwörter werden zuerst gelöscht.",
+            onClick = { onModeChange(ConfigurationImportMode.REPLACE) }
+        )
+    }
+}
+
+@Composable
+private fun ImportModeOption(
+    selected: Boolean,
+    title: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.Top
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+        Column(modifier = Modifier.padding(top = 10.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium)
+            Text(description, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun ImportSummaryDialog(
+    summary: ConfigurationImportSummary,
+    mode: ConfigurationImportMode,
+    onImport: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val text = buildString {
+        appendLine("WLAN-Profile: ${summary.wifiProfilesNew} neu, ${summary.wifiProfilesOverwritten} überschrieben")
+        appendLine("Geräte: ${summary.devicesNew} neu, ${summary.devicesOverwritten} überschrieben")
+        appendLine("Passwörter: ${summary.passwordsIncluded} enthalten, ${summary.passwordsDeleted} werden gelöscht")
+        if (mode == ConfigurationImportMode.REPLACE) {
+            appendLine()
+            appendLine("${summary.localWifiProfilesDeleted} lokale WLAN-Profile werden gelöscht.")
+            append("${summary.localDevicesDeleted} lokale Geräte werden gelöscht.")
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text("Import-Zusammenfassung") },
+        text = { Text(text) },
+        confirmButton = {
+            OutlinedButton(onClick = onCancel) {
+                Text("Abbrechen")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onImport) {
+                Text("Importieren")
+            }
+        }
+    )
+}
+
+@Composable
+private fun PasswordImportWarningDialog(
+    onImport: () -> Unit,
+    onCancel: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text("Import enthält Passwörter") },
+        text = {
+            Text(
+                "Die Importdatei enthält WLAN-Passwörter im Klartext oder löscht gespeicherte Passwörter. " +
+                    "Importiere sie nur aus einer vertrauenswürdigen Quelle."
+            )
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onCancel) {
+                Text("Abbrechen")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onImport) {
+                Text("Importieren")
+            }
+        }
+    )
+}
+
+private const val EXPORT_FILE_NAME = "switchwerk-config.json"

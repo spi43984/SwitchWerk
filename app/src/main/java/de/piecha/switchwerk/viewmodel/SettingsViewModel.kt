@@ -1,8 +1,13 @@
 package de.piecha.switchwerk.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.piecha.switchwerk.data.repository.ConfigurationImportMode
+import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
+import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
+import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
@@ -46,16 +51,23 @@ data class SettingsUiState(
     val deviceForm: DeviceFormState = DeviceFormState(),
     val isEditingWifiProfile: Boolean = false,
     val isEditingDevice: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val statusMessage: String? = null,
+    val isTransferInProgress: Boolean = false,
+    val importSummary: ConfigurationImportSummary? = null,
+    val importMode: ConfigurationImportMode? = null,
+    val showImportPasswordWarning: Boolean = false
 )
 
 class SettingsViewModel(
     private val wifiProfileRepository: WifiProfileRepository,
-    private val deviceRepository: DeviceRepository
+    private val deviceRepository: DeviceRepository,
+    private val configurationTransferRepository: ConfigurationTransferRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private var pendingImport: PreparedConfigurationImport? = null
 
     init {
         observeWifiProfiles()
@@ -210,6 +222,64 @@ class SettingsViewModel(
                 )
             }
         }
+    }
+
+    fun exportConfiguration(uri: Uri, includePasswords: Boolean) {
+        runTransfer(
+            successMessage = "Konfiguration wurde exportiert"
+        ) {
+            configurationTransferRepository.exportToUri(
+                uri = uri,
+                includePasswords = includePasswords
+            )
+        }
+    }
+
+    fun prepareImportFromFile(uri: Uri, mode: ConfigurationImportMode) {
+        prepareImport(mode) {
+            configurationTransferRepository.prepareImportFromUri(
+                uri = uri,
+                mode = mode
+            )
+        }
+    }
+
+    fun prepareImportFromUrl(url: String, mode: ConfigurationImportMode) {
+        prepareImport(mode) {
+            configurationTransferRepository.prepareImportFromUrl(
+                url = url,
+                mode = mode
+            )
+        }
+    }
+
+    fun confirmImportSummary() {
+        val prepared = pendingImport ?: return
+        if (prepared.containsPasswordChanges) {
+            _uiState.value = _uiState.value.copy(
+                importSummary = null,
+                showImportPasswordWarning = true
+            )
+        } else {
+            applyPendingImport()
+        }
+    }
+
+    fun confirmPasswordImport() {
+        applyPendingImport()
+    }
+
+    fun cancelPendingImport() {
+        pendingImport = null
+        _uiState.value = _uiState.value.copy(
+            importSummary = null,
+            importMode = null,
+            showImportPasswordWarning = false
+        )
+    }
+
+    fun clearStatusMessage() {
+        _uiState.value = _uiState.value.copy(statusMessage = null)
     }
 
     fun startNewDevice() {
@@ -471,6 +541,100 @@ class SettingsViewModel(
                     errorMessage = null
                 )
             }
+        }
+    }
+
+    private fun prepareImport(
+        mode: ConfigurationImportMode,
+        load: suspend () -> PreparedConfigurationImport
+    ) {
+        if (_uiState.value.isTransferInProgress) {
+            return
+        }
+        _uiState.value = _uiState.value.copy(
+            isTransferInProgress = true,
+            errorMessage = null,
+            statusMessage = null
+        )
+        viewModelScope.launch {
+            runCatching { load() }
+                .onSuccess { prepared ->
+                    pendingImport = prepared
+                    _uiState.value = _uiState.value.copy(
+                        isTransferInProgress = false,
+                        importSummary = prepared.summary,
+                        importMode = mode
+                    )
+                }
+                .onFailure { error ->
+                    pendingImport = null
+                    _uiState.value = _uiState.value.copy(
+                        isTransferInProgress = false,
+                        errorMessage = error.message ?: "Import konnte nicht vorbereitet werden"
+                    )
+                }
+        }
+    }
+
+    private fun applyPendingImport() {
+        val prepared = pendingImport ?: return
+        val mode = _uiState.value.importMode ?: return
+        pendingImport = null
+        _uiState.value = _uiState.value.copy(
+            isTransferInProgress = true,
+            importSummary = null,
+            showImportPasswordWarning = false,
+            errorMessage = null,
+            statusMessage = null
+        )
+        viewModelScope.launch {
+            runCatching {
+                configurationTransferRepository.applyImport(
+                    preparedImport = prepared,
+                    mode = mode
+                )
+            }.onSuccess {
+                _uiState.value = _uiState.value.copy(
+                    isTransferInProgress = false,
+                    importMode = null,
+                    statusMessage = "Konfiguration wurde importiert"
+                )
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    isTransferInProgress = false,
+                    importMode = null,
+                    errorMessage = error.message ?: "Konfiguration konnte nicht importiert werden"
+                )
+            }
+        }
+    }
+
+    private fun runTransfer(
+        successMessage: String,
+        transfer: suspend () -> Unit
+    ) {
+        if (_uiState.value.isTransferInProgress) {
+            return
+        }
+        _uiState.value = _uiState.value.copy(
+            isTransferInProgress = true,
+            errorMessage = null,
+            statusMessage = null
+        )
+        viewModelScope.launch {
+            runCatching { transfer() }
+                .onSuccess {
+                    _uiState.value = _uiState.value.copy(
+                        isTransferInProgress = false,
+                        statusMessage = successMessage
+                    )
+                }
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isTransferInProgress = false,
+                        errorMessage = error.message ?: "Vorgang ist fehlgeschlagen"
+                    )
+                }
         }
     }
 

@@ -12,6 +12,9 @@ interface DeviceConnectionDao {
     @Query("SELECT * FROM connections ORDER BY priority")
     fun observeAll(): Flow<List<DeviceConnectionEntity>>
 
+    @Query("SELECT * FROM connections ORDER BY priority")
+    suspend fun getAll(): List<DeviceConnectionEntity>
+
     @Query("SELECT * FROM connections WHERE deviceId = :deviceId ORDER BY priority")
     fun observeForDevice(deviceId: String): Flow<List<DeviceConnectionEntity>>
 
@@ -29,4 +32,7 @@ interface DeviceConnectionDao {
 
     @Query("DELETE FROM connections WHERE deviceId = :deviceId")
     suspend fun deleteForDevice(deviceId: String)
+
+    @Query("DELETE FROM connections")
+    suspend fun deleteAll()
 }
