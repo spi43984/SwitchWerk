@@ -12,6 +12,7 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
+import java.net.SocketException
 import java.net.UnknownHostException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
@@ -214,6 +215,39 @@ class DefaultDeviceActionServiceTest {
             assertEquals(listOf("First WiFi"), wifiService.requestedSsids)
             assertEquals(1, wifiService.disconnectCount)
         }
+    }
+
+    @Test
+    fun vpnSocketBindingFailureIsReportedExplicitly() = runBlocking {
+        val network = mock(Network::class.java)
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(network)))
+            ),
+            httpService = FakeHttpApiCallService(
+                ArrayDeque(
+                    listOf(
+                        HttpApiCallResult.NetworkError(
+                            SocketException(
+                                "Binding socket to network failed: EPERM (Operation not permitted)"
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "192.168.33.1"))
+            )
+        )
+
+        assertEquals(
+            DeviceActionResult.NetworkError(NetworkFailureReason.VPN_BLOCKED),
+            result
+        )
     }
 
     @Test

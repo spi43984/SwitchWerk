@@ -17,7 +17,15 @@ sealed interface DeviceActionResult {
 
     data object InvalidRequest : DeviceActionResult
 
-    data object NetworkError : DeviceActionResult
+    data class NetworkError(val reason: NetworkFailureReason) : DeviceActionResult
 
     data object UnexpectedError : DeviceActionResult
+}
+
+enum class NetworkFailureReason {
+    DNS,
+    CONNECTION,
+    NO_ROUTE,
+    VPN_BLOCKED,
+    OTHER
 }

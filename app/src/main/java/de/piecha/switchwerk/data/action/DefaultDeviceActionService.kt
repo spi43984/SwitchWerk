@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.data.action
 
 import android.net.Network
+import android.util.Log
 import de.piecha.switchwerk.data.network.HttpApiCallResult
 import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.WifiConnectionResult
@@ -13,6 +14,7 @@ import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
 import java.net.ConnectException
 import java.net.NoRouteToHostException
+import java.net.SocketException
 import java.net.UnknownHostException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
@@ -55,8 +57,9 @@ class DefaultDeviceActionService(
         }
 
         var lastFailure: DeviceActionResult = DeviceActionResult.WifiConnectionFailed
-        for (connectionWithProfile in availableConnections) {
+        for ((index, connectionWithProfile) in availableConnections.withIndex()) {
             val password = wifiProfileRepository.getPassword(connectionWithProfile.profile.id)
+            logInfo("Starting explicit WiFi attempt ${index + 1}/${availableConnections.size}")
 
             try {
                 when (
@@ -66,6 +69,7 @@ class DefaultDeviceActionService(
                     )
                 ) {
                     is WifiConnectionResult.Success -> {
+                        logInfo("Requested WiFi network available; starting bound HTTP call")
                         when (
                             val outcome = callApi(
                                 connection = connectionWithProfile.connection,
@@ -75,8 +79,8 @@ class DefaultDeviceActionService(
                         ) {
                             ApiCallOutcome.Success -> return DeviceActionResult.Success
                             is ApiCallOutcome.Terminal -> return outcome.result
-                            ApiCallOutcome.TryNextNetwork -> {
-                                lastFailure = DeviceActionResult.NetworkError
+                            is ApiCallOutcome.TryNextNetwork -> {
+                                lastFailure = DeviceActionResult.NetworkError(outcome.reason)
                             }
                         }
                     }
@@ -92,10 +96,12 @@ class DefaultDeviceActionService(
                     WifiConnectionResult.Timeout,
                     WifiConnectionResult.Unavailable,
                     is WifiConnectionResult.Error -> {
+                        logWarning("Explicit WiFi attempt failed: ${connectionResult.logName()}")
                         lastFailure = DeviceActionResult.WifiConnectionFailed
                     }
                 }
             } finally {
+                logInfo("Releasing requested WiFi network")
                 wifiConnectionService.disconnect()
             }
         }
@@ -127,19 +133,32 @@ class DefaultDeviceActionService(
         return when (result) {
             is HttpApiCallResult.Success -> ApiCallOutcome.Success
             is HttpApiCallResult.HttpError -> {
+                logWarning("Bound HTTP call returned status ${result.response.statusCode}")
                 ApiCallOutcome.Terminal(DeviceActionResult.HttpError(result.response.statusCode))
             }
 
-            HttpApiCallResult.Timeout -> ApiCallOutcome.Terminal(DeviceActionResult.Timeout)
+            HttpApiCallResult.Timeout -> {
+                logWarning("Bound HTTP call timed out")
+                ApiCallOutcome.Terminal(DeviceActionResult.Timeout)
+            }
             is HttpApiCallResult.InvalidRequest -> {
+                logWarning("Bound HTTP request is invalid")
                 ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
             }
 
             is HttpApiCallResult.NetworkError -> {
-                if (result.cause.isSafeBeforeRequestFailure()) {
-                    ApiCallOutcome.TryNextNetwork
+                val reason = result.cause.toNetworkFailureReason()
+                logWarning(
+                    "Bound HTTP call failed: ${result.cause.javaClass.simpleName}; reason=$reason"
+                )
+                if (
+                    reason == NetworkFailureReason.DNS ||
+                    reason == NetworkFailureReason.CONNECTION ||
+                    reason == NetworkFailureReason.NO_ROUTE
+                ) {
+                    ApiCallOutcome.TryNextNetwork(reason)
                 } else {
-                    ApiCallOutcome.Terminal(DeviceActionResult.NetworkError)
+                    ApiCallOutcome.Terminal(DeviceActionResult.NetworkError(reason))
                 }
             }
         }
@@ -157,19 +176,47 @@ class DefaultDeviceActionService(
         return baseUrl.resolve(path.trim().trimStart('/'))?.toString()
     }
 
-    private fun Throwable.isSafeBeforeRequestFailure(): Boolean {
+    private fun Throwable.toNetworkFailureReason(): NetworkFailureReason {
         var current: Throwable? = this
         while (current != null) {
-            if (
-                current is UnknownHostException ||
-                current is ConnectException ||
-                current is NoRouteToHostException
-            ) {
-                return true
+            when (current) {
+                is UnknownHostException -> return NetworkFailureReason.DNS
+                is NoRouteToHostException -> return NetworkFailureReason.NO_ROUTE
+                is ConnectException -> return NetworkFailureReason.CONNECTION
+                is SocketException -> {
+                    if (
+                        current.message?.contains("EPERM", ignoreCase = true) == true ||
+                        current.message?.contains(
+                            "Operation not permitted",
+                            ignoreCase = true
+                        ) == true
+                    ) {
+                        return NetworkFailureReason.VPN_BLOCKED
+                    }
+                }
             }
             current = current.cause
         }
-        return false
+        return NetworkFailureReason.OTHER
+    }
+
+    private fun WifiConnectionResult.logName(): String {
+        return when (this) {
+            is WifiConnectionResult.Success -> "Success"
+            WifiConnectionResult.Timeout -> "Timeout"
+            WifiConnectionResult.Unavailable -> "Unavailable"
+            WifiConnectionResult.PermissionDenied -> "PermissionDenied"
+            WifiConnectionResult.UnsupportedAndroidVersion -> "UnsupportedAndroidVersion"
+            is WifiConnectionResult.Error -> "Error(${cause.javaClass.simpleName})"
+        }
+    }
+
+    private fun logInfo(message: String) {
+        runCatching { Log.i(LOG_TAG, message) }
+    }
+
+    private fun logWarning(message: String) {
+        runCatching { Log.w(LOG_TAG, message) }
     }
 
     private data class ConnectionWithProfile(
@@ -180,8 +227,12 @@ class DefaultDeviceActionService(
     private sealed interface ApiCallOutcome {
         data object Success : ApiCallOutcome
 
-        data object TryNextNetwork : ApiCallOutcome
+        data class TryNextNetwork(val reason: NetworkFailureReason) : ApiCallOutcome
 
         data class Terminal(val result: DeviceActionResult) : ApiCallOutcome
+    }
+
+    private companion object {
+        const val LOG_TAG = "SwitchWerkNetwork"
     }
 }

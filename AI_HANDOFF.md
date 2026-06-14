@@ -7,16 +7,45 @@ Stand: 14. Juni 2026
 Issue 011 "Device Action With WiFi Fallback" ist auf dem Feature-Branch
 `device-action-with-wifi-fallback` implementiert und im Container geprüft.
 
+Die HTTP-Methodik war bereits gleichwertig: `Network.openConnection()`, GET und
+automatische Ergänzung von `http://`. Im Host-Feld genügt daher
+`192.168.33.1`; der Pfad bleibt
+`/rpc/Switch.Set?id=0&on=true&toggle_after=1`.
+
+Die Android-WLAN-Historie zeigte einen erfolgreichen Aufbau der lokalen
+Zweitverbindung zu `TEAMWERK-Tor`. Die aktuell installierte SwitchWerk-
+Datenbank enthielt bei der Analyse jedoch weder dieses WLAN noch
+`192.168.33.1`, sondern ausschließlich Testprofile und Testadressen. Vor dem
+nächsten Gerätetest muss die reale Konfiguration in der installierten App
+erneut geprüft werden.
+
+Ein späterer Live-Test mit korrekter Konfiguration hat die eigentliche Ursache
+gezeigt: NetGuard betreibt auf dem Testgerät ein nicht umgehbares VPN.
+SwitchWerk-UID 10300 liegt im VPN-Bereich, ShellyPulse-UID 10602 ist vom VPN
+ausgenommen. Das Binden des HTTP-Sockets an das angeforderte WLAN scheitert
+deshalb mit `EPERM (Operation not permitted)`. SwitchWerk zeigt dafür nun
+gezielt an, dass VPN oder Firewall den lokalen Netzwerkzugriff blockiert.
+
+Die während der Fehlersuche vorgenommene Angleichung des `NetworkRequest` an
+ShellyPulse wurde anschließend zurückgenommen, da sie nicht ursächlich war.
+SwitchWerk fordert das Geräte-WLAN weiterhin ausdrücklich als lokales Netzwerk
+ohne `NET_CAPABILITY_INTERNET` an und behält den Coroutine-Timeout bei.
+
+Diagnoselogs verwenden den Tag `SwitchWerkNetwork` und enthalten keine SSIDs,
+Passwörter, IP-Adressen, URLs oder Payloads. Abruf:
+
+```bash
+adb logcat -c
+adb logcat -v time -s SwitchWerkNetwork:*
+```
+
 - GitHub-Issue: #21
 - Issue-URL: https://github.com/spi43984/SwitchWerk/issues/21
 - lokales Issue: `docs/issues/011-device-action-with-wifi-fallback.md`
-- kein Commit
-- kein Push
-- kein Pull Request
-- lokale Issue-Datei noch nicht abgehakt
-
-Die Veröffentlichung und der Abschluss dürfen erst nach ausdrücklicher
-Anforderung des Benutzers gemäß Phase 2 aus `AGENTS.md` erfolgen.
+- Host-Gerätetest erfolgreich, nachdem SwitchWerk in NetGuard vom VPN
+  ausgenommen wurde
+- Benutzer hat Commit, Push, Pull Request und Merge ausdrücklich freigegeben
+- Akzeptanzkriterien in der lokalen Issue-Datei sind abgehakt
 
 ## Implementierter Umfang
 
@@ -87,11 +116,10 @@ Projektversionen. Der bekannte Room-Schemaexport-Hinweis sowie die
 Deprecation-Warnungen für `EncryptedSharedPreferences` und `MasterKey` bestehen
 weiterhin.
 
-Der Container-Build ist erfolgreich. Gemäß Projektregel gilt der Build erst
-nach erfolgreicher Rückmeldung des Benutzers für Build, Installation und
-manuelle Tests auf dem Host als bestätigt.
+Container-Build, Installation und manueller Schaltversuch auf dem Host wurden
+erfolgreich bestätigt.
 
-## Ausstehende Host-Prüfung
+## Bestätigte Host-Prüfung
 
 Mindestens auszuführen:
 
@@ -115,11 +143,8 @@ Manuell insbesondere prüfen:
 
 ## Nächste Schritte
 
-Nach erfolgreicher Host-Rückmeldung kann der Benutzer ausdrücklich die
-Veröffentlichung von Issue 011 anfordern. Erst dann committen, pushen und einen
-Pull Request erstellen. Merge, Abhaken der lokalen Issue-Datei, Schließen von
-GitHub-Issue #21 und Löschen des Branches benötigen die in `AGENTS.md`
-vorgesehenen ausdrücklichen Freigaben.
+Issue 011 wird gemäß ausdrücklicher Benutzerfreigabe veröffentlicht und nach
+erfolgreichem Pull-Request-Check nach `main` gemergt.
 
 Das nächste fachliche Issue nach Abschluss von Issue 011 ist:
 

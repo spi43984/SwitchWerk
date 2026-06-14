@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -40,6 +41,7 @@ class AndroidWifiConnectionService(
         }
 
         disconnect()
+        logInfo("Requesting explicit WiFi network")
 
         return try {
             withTimeoutOrNull(timeoutMillis) {
@@ -89,12 +91,14 @@ class AndroidWifiConnectionService(
         return suspendCancellableCoroutine { continuation ->
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
+                    logInfo("Explicit WiFi network callback: available")
                     if (continuation.isActive) {
                         continuation.resume(WifiConnectionResult.Success(network))
                     }
                 }
 
                 override fun onUnavailable() {
+                    logWarning("Explicit WiFi network callback: unavailable")
                     clearActiveCallback(this)
                     if (continuation.isActive) {
                         continuation.resume(WifiConnectionResult.Unavailable)
@@ -102,6 +106,7 @@ class AndroidWifiConnectionService(
                 }
 
                 override fun onLost(network: Network) {
+                    logWarning("Explicit WiFi network callback: lost")
                     clearActiveCallback(this)
                     unregisterCallback(this)
                 }
@@ -146,5 +151,17 @@ class AndroidWifiConnectionService(
         } catch (_: IllegalArgumentException) {
             // The callback may already have been released by Android.
         }
+    }
+
+    private fun logInfo(message: String) {
+        runCatching { Log.i(LOG_TAG, message) }
+    }
+
+    private fun logWarning(message: String) {
+        runCatching { Log.w(LOG_TAG, message) }
+    }
+
+    private companion object {
+        const val LOG_TAG = "SwitchWerkNetwork"
     }
 }

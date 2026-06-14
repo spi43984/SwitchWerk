@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionService
+import de.piecha.switchwerk.data.action.NetworkFailureReason
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.domain.model.Device
 import kotlinx.coroutines.Job
@@ -112,8 +113,17 @@ class MainViewModel(
                 DeviceActionUiState.Error("Die gespeicherte Geräteadresse ist ungültig")
             }
 
-            DeviceActionResult.NetworkError -> {
-                DeviceActionUiState.Error("Das Gerät ist über die zugeordneten WLANs nicht erreichbar")
+            is DeviceActionResult.NetworkError -> {
+                val detail = when (reason) {
+                    NetworkFailureReason.DNS -> "Der Gerätename konnte nicht aufgelöst werden"
+                    NetworkFailureReason.CONNECTION -> "Port 80 des Geräts ist nicht erreichbar"
+                    NetworkFailureReason.NO_ROUTE -> "Es besteht keine Netzwerkroute zum Gerät"
+                    NetworkFailureReason.VPN_BLOCKED -> {
+                        "VPN oder Firewall blockiert den lokalen Netzwerkzugriff"
+                    }
+                    NetworkFailureReason.OTHER -> "Der gebundene Netzwerkzugriff ist fehlgeschlagen"
+                }
+                DeviceActionUiState.Error(detail)
             }
 
             DeviceActionResult.UnexpectedError -> {

@@ -99,29 +99,29 @@ weiteren Versuch aus.
 
 ## Akzeptanzkriterien
 
-- [ ] Geräteaktionen werden ausschließlich über explizit angeforderte
+- [x] Geräteaktionen werden ausschließlich über explizit angeforderte
       WLAN-Verbindungen der zugeordneten WLAN-Profile ausgeführt
-- [ ] Zugeordnete WLAN-Profile werden in ihrer gespeicherten Reihenfolge
+- [x] Zugeordnete WLAN-Profile werden in ihrer gespeicherten Reihenfolge
       versucht
-- [ ] Profile mit identischer SSID werden als getrennte Verbindungsversuche
+- [x] Profile mit identischer SSID werden als getrennte Verbindungsversuche
       verarbeitet
-- [ ] GET-Geräteaktionen werden unterstützt
-- [ ] POST-Geräteaktionen werden unterstützt
-- [ ] Der API-Aufruf verwendet ausschließlich das von
+- [x] GET-Geräteaktionen werden unterstützt
+- [x] POST-Geräteaktionen werden unterstützt
+- [x] Der API-Aufruf verwendet ausschließlich das von
       `WifiConnectionResult.Success` gelieferte `Network`
-- [ ] Gebundene lokale HTTP-Aufrufe verwenden `Network.openConnection()`
-- [ ] Ein fehlgeschlagener WLAN-Verbindungsaufbau führt zum nächsten Profil
-- [ ] Ein HTTP-Fehler führt nicht zum nächsten WLAN-Profil
-- [ ] Ein ungültiger Request führt nicht zum nächsten WLAN-Profil
-- [ ] Ein eindeutiger DNS- oder Verbindungsfehler kann zum nächsten WLAN-Profil
+- [x] Gebundene lokale HTTP-Aufrufe verwenden `Network.openConnection()`
+- [x] Ein fehlgeschlagener WLAN-Verbindungsaufbau führt zum nächsten Profil
+- [x] Ein HTTP-Fehler führt nicht zum nächsten WLAN-Profil
+- [x] Ein ungültiger Request führt nicht zum nächsten WLAN-Profil
+- [x] Ein eindeutiger DNS- oder Verbindungsfehler kann zum nächsten WLAN-Profil
       führen
-- [ ] Ein API-Timeout löst keinen erneuten Schaltversuch über ein anderes WLAN
+- [x] Ein API-Timeout löst keinen erneuten Schaltversuch über ein anderes WLAN
       aus
-- [ ] Erfolg und Fehler werden im Dashboard verständlich angezeigt
-- [ ] Mehrfache gleichzeitige Aktionen desselben Geräts werden verhindert
-- [ ] Die angeforderte WLAN-Verbindung wird nach jedem Versuch freigegeben
-- [ ] Coroutine-Abbruch beendet die laufende Aktion sauber
-- [ ] Es werden keine sensiblen Netzwerk- oder API-Daten geloggt
+- [x] Erfolg und Fehler werden im Dashboard verständlich angezeigt
+- [x] Mehrfache gleichzeitige Aktionen desselben Geräts werden verhindert
+- [x] Die angeforderte WLAN-Verbindung wird nach jedem Versuch freigegeben
+- [x] Coroutine-Abbruch beendet die laufende Aktion sauber
+- [x] Es werden keine sensiblen Netzwerk- oder API-Daten geloggt
 
 ## Testhinweise
 
