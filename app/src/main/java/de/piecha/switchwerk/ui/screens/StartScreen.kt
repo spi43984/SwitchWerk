@@ -1,6 +1,5 @@
 package de.piecha.switchwerk.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +21,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -34,7 +33,6 @@ fun StartScreen(
     viewModel: MainViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
     val devices = uiState.devices.sortedBy { it.sortOrder }
 
     Column(
@@ -82,13 +80,8 @@ fun StartScreen(
         } else {
             DeviceList(
                 devices = devices,
-                onDeviceActionClick = { device ->
-                    Toast.makeText(
-                        context,
-                        "Gerät ${device.name} ausgewählt",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                actionStates = uiState.deviceActionStates,
+                onDeviceActionClick = viewModel::executeDeviceAction
             )
         }
     }
@@ -111,6 +104,7 @@ private fun EmptyDeviceList() {
 @Composable
 private fun DeviceList(
     devices: List<Device>,
+    actionStates: Map<String, DeviceActionUiState>,
     onDeviceActionClick: (Device) -> Unit
 ) {
     LazyColumn(
@@ -122,6 +116,7 @@ private fun DeviceList(
         ) { device ->
             DeviceCard(
                 device = device,
+                actionState = actionStates[device.id],
                 onActionClick = { onDeviceActionClick(device) }
             )
         }
@@ -131,6 +126,7 @@ private fun DeviceList(
 @Composable
 private fun DeviceCard(
     device: Device,
+    actionState: DeviceActionUiState?,
     onActionClick: () -> Unit
 ) {
     Card(
@@ -147,9 +143,37 @@ private fun DeviceCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
-                onClick = onActionClick
+                onClick = onActionClick,
+                enabled = actionState !is DeviceActionUiState.Loading
             ) {
-                Text(device.actionLabel)
+                Text(
+                    if (actionState is DeviceActionUiState.Loading) {
+                        "Wird ausgeführt..."
+                    } else {
+                        device.actionLabel
+                    }
+                )
+            }
+
+            when (actionState) {
+                is DeviceActionUiState.Success -> {
+                    Text(
+                        text = actionState.message,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                is DeviceActionUiState.Error -> {
+                    Text(
+                        text = actionState.message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                DeviceActionUiState.Loading,
+                null -> Unit
             }
         }
     }

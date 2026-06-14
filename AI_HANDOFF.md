@@ -1,132 +1,133 @@
 # AI Handoff
 
-Stand: 13. Juni 2026
+Stand: 14. Juni 2026
 
-## Abgeschlossene Arbeit
+## Aktuelle Arbeit
 
-Issue 010 "HTTP API Call Service" ist vollständig implementiert, geprüft,
-veröffentlicht und nach `main` gemergt.
+Issue 011 "Device Action With WiFi Fallback" ist auf dem Feature-Branch
+`device-action-with-wifi-fallback` implementiert und im Container geprüft.
 
-- GitHub-Issue: #19
-- Issue-URL: https://github.com/spi43984/SwitchWerk/issues/19
-- Pull Request: #20
-- PR-URL: https://github.com/spi43984/SwitchWerk/pull/20
-- Merge-Commit: `557ae168d96eedd01b1a74f5b084d82312781294`
-- Merge-Methode: Squash
-- Commit-Titel: `feat: implement http api call service (#20)`
+- GitHub-Issue: #21
+- Issue-URL: https://github.com/spi43984/SwitchWerk/issues/21
+- lokales Issue: `docs/issues/011-device-action-with-wifi-fallback.md`
+- kein Commit
+- kein Push
+- kein Pull Request
+- lokale Issue-Datei noch nicht abgehakt
 
-Der Feature-Branch `http-api-call-service` wurde lokal und remote gelöscht.
+Die Veröffentlichung und der Abschluss dürfen erst nach ausdrücklicher
+Anforderung des Benutzers gemäß Phase 2 aus `AGENTS.md` erfolgen.
 
 ## Implementierter Umfang
 
-- suspendierendes `HttpApiCallService`-Interface
-- GET- und POST-Aufrufe über OkHttp 5.4.0
-- optionaler POST-Body und konfigurierbarer Content-Type
-- standardmäßiger und pro Aufruf konfigurierbarer Timeout
-- Coroutine-Abbruch beendet den OkHttp-Call
-- optionale Bindung an ein `android.net.Network`
-- DNS und Socket-Erzeugung über das ausgewählte Android-Netzwerk
-- strukturierte erfolgreiche Responses mit Statuscode, Headern und Body
-- strukturierte HTTP-, Timeout-, Netzwerk- und Validierungsfehler
-- keine automatischen Retries oder Redirects
-- Koin-Registrierung
-- `INTERNET`-Berechtigung
-- Klartext-HTTP für lokale Geräteendpunkte
-- MockWebServer-Tests
+- das aktuell verbundene WLAN wird nicht bestimmt oder berücksichtigt
+- kein SSID-Abgleich und kein direkter API-Aufruf über das aktive WLAN
+- Geräteaktionen verwenden ausschließlich explizit über
+  `WifiConnectionService` angeforderte WLAN-Verbindungen
+- Verarbeitung aller zugeordneten Profile in der gespeicherten Reihenfolge
+- Profile mit identischer SSID bleiben getrennte Verbindungsversuche
+- HTTP-Aufrufe verwenden ausschließlich das von
+  `WifiConnectionResult.Success` gelieferte `Network`
+- gebundene lokale GET-/POST-Aufrufe verwenden wie die funktionierende
+  ShellyPulse-Referenz `Network.openConnection()` statt OkHttp mit
+  `Network.socketFactory` und eigener DNS-Auflösung
+- `AndroidWifiConnectionService` liefert das angeforderte `Network` bei
+  `onAvailable()`
+- `NEARBY_WIFI_DEVICES` wird ab Android 13 zur Laufzeit angefordert
+- `CHANGE_WIFI_STATE`, `ACCESS_WIFI_STATE` und `ACCESS_NETWORK_STATE` sind im
+  Manifest ergänzt
+- keine Standortberechtigung eingeführt
+- Passwortzugriff über den bestehenden verschlüsselten Credential Store
+- GET- und POST-Aufrufe über den bestehenden `HttpApiCallService`
+- Host-/Pfad-Zusammenführung mit OkHttp `HttpUrl`
+- nächstes WLAN nur nach fehlgeschlagenem WLAN-Aufbau oder eindeutigem DNS-,
+  Verbindungs- bzw. Routingfehler
+- kein weiterer Schaltversuch nach HTTP-Fehler, ungültigem Request, generischem
+  Netzwerkfehler oder API-Timeout
+- Freigabe jeder angeforderten WLAN-Verbindung in `finally`
+- Coroutine-Abbruch wird weitergereicht und gibt das WLAN frei
+- globale Serialisierung der Aktionsorchestrierung zum Schutz des
+  zustandsbehafteten WLAN-Verbindungsdienstes
+- pro Gerät strukturierter Lade-, Erfolgs- und Fehlerzustand im
+  `MainViewModel`
+- wiederholte Klicks desselben Geräts starten keine parallele zweite Aktion
+- verständliche Statusanzeige direkt in der Dashboard-Gerätekarte
+- Koin-Registrierung aller neuen Services
+- keine Logs für SSIDs, Passwörter, URLs oder Payloads
 
-Zusätzlich wurde `AI_SESSION_PROMPT.md` im Repository-Root eingeführt.
-`AGENTS.md` und `ai-context.md` schreiben die Lektüre dieser Datei und des
-Handoffs für neue Sessions vor.
+## Tests und Verifikation
 
-## Verifikation
-
-Vom Benutzer auf dem Host erfolgreich bestätigt:
+Im Container erfolgreich:
 
 ```bash
 ./gradlew testDebugUnitTest
-./gradlew clean assembleDebug
+./gradlew lintDebug
+./gradlew assembleDebug
+git diff --check
+```
+
+Die neuen Tests decken ab:
+
+- ausschließlich explizit angeforderte WLAN-Verbindungen
+- Verwendung des vom Verbindungsdienst gelieferten `Network`
+- gebundener HTTP-Aufruf über `Network.openConnection()`
+- exakte Shelly-GET-URL
+  `http://192.168.33.1/rpc/Switch.Set?id=0&on=true&toggle_after=1`
+- geordnete Verarbeitung der zugeordneten WLAN-Profile
+- getrennte Verarbeitung mehrerer Profile mit derselben SSID
+- GET und POST einschließlich Payload-Weitergabe
+- nächstes WLAN nach eindeutigem DNS-Fehler
+- kein Retry nach HTTP-Fehler oder Timeout
+- WLAN-Freigabe bei Coroutine-Abbruch
+- Schutz vor wiederholtem Button-Klick desselben Geräts
+
+Lint meldet 0 Fehler. Verbleibende Warnungen betreffen überwiegend bereits
+bekannte veraltete Abhängigkeiten, ungenutzte Template-Ressourcen und
+Projektversionen. Der bekannte Room-Schemaexport-Hinweis sowie die
+Deprecation-Warnungen für `EncryptedSharedPreferences` und `MasterKey` bestehen
+weiterhin.
+
+Der Container-Build ist erfolgreich. Gemäß Projektregel gilt der Build erst
+nach erfolgreicher Rückmeldung des Benutzers für Build, Installation und
+manuelle Tests auf dem Host als bestätigt.
+
+## Ausstehende Host-Prüfung
+
+Mindestens auszuführen:
+
+```bash
+cd /workspace
+./gradlew clean testDebugUnitTest lintDebug assembleDebug
 ./gradlew installDebug
 ```
 
-Ergebnis:
+Manuell insbesondere prüfen:
 
-- alle neun JVM-Tests erfolgreich
-- Debug-Build erfolgreich
-- Installation erfolgreich
-- manuelle Regressionstests der installierten App erfolgreich
-- `git diff --check` erfolgreich
+- Schalten über das erste zugeordnete Geräte-WLAN
+- Fallback auf das zweite zugeordnete WLAN
+- auch bei bereits passender aktiver SSID wird eine explizite Verbindung
+  angefordert
+- Erfolgsmeldung im Dashboard
+- Fehleranzeige bei nicht erreichbarem Gerät
+- Timeout führt zu keinem zweiten Schaltversuch
+- schneller Doppelklick startet nur eine Aktion
+- Rückkehr ins vorherige WLAN nach Abschluss der angeforderten Verbindung
 
-Eine echte Shelly-Schaltaktion ist weiterhin nicht möglich. Die Verbindung von
-Dashboard, Geräteaktion, WLAN-Verbindungsdienst und HTTP-Dienst gehört zu Issue
-011.
+## Nächste Schritte
 
-## Bekannte Warnungen
+Nach erfolgreicher Host-Rückmeldung kann der Benutzer ausdrücklich die
+Veröffentlichung von Issue 011 anfordern. Erst dann committen, pushen und einen
+Pull Request erstellen. Merge, Abhaken der lokalen Issue-Datei, Schließen von
+GitHub-Issue #21 und Löschen des Branches benötigen die in `AGENTS.md`
+vorgesehenen ausdrücklichen Freigaben.
 
-- Room-Schemaexport ist nicht konfiguriert.
-- `EncryptedSharedPreferences` und `MasterKey` sind veraltet.
-
-Diese Punkte waren nicht Bestandteil von Issue 010.
-
-## Entwicklungsumgebung
-
-Die Docker-Entwicklungsumgebung speichert folgende Verzeichnisse persistent auf
-dem Host:
-
-- `/home/ubuntu/.gradle`
-- `/opt/android-sdk`
-- `/home/ubuntu/.android`
-
-Verifiziert wurden:
-
-- Gradle 9.4.1 und Maven-Abhängigkeiten im persistenten Gradle-Cache
-- Android-Plattformen 36 und 36.1
-- Android Build Tools 36.0.0
-- persistente Platform Tools mit ADB 37.0.0
-- persistenter Debug-Keystore
-- korrektes `local.properties` mit `sdk.dir=/opt/android-sdk`
-
-Der Offline-Test war erfolgreich:
-
-```bash
-./gradlew --offline testDebugUnitTest
-```
-
-Damit sind für den aktuellen Build keine erneuten Downloads erforderlich.
-ADB-Geräteschlüssel werden bei Bedarf erzeugt und anschließend ebenfalls über
-`/home/ubuntu/.android` persistent gespeichert.
-
-## Nächster fachlicher Schritt
-
-Das nächste offene Issue ist:
+Das nächste fachliche Issue nach Abschluss von Issue 011 ist:
 
 ```text
-docs/issues/011-device-action-with-wifi-fallback.md
+docs/issues/012-import-export.md
 ```
 
-Issue 011 verbindet die bestehenden Bausteine:
-
-- gespeichertes Gerät und API-Konfiguration
-- Abgleich des aktuellen WLANs mit den zugeordneten WLAN-Profilen
-- pragmatische Zuordnung über übereinstimmende SSID
-- direkter, an das konkrete WLAN-`Network` gebundener HTTP-Aufruf nur in einem
-  zugeordneten aktuellen WLAN
-- andernfalls WLAN-Fallback in gespeicherter Reihenfolge
-- WLAN-Verbindungsdienst
-- HTTP-Aufruf über das gelieferte `Network`
-- nächstes WLAN nach API-Fehler nur bei eindeutigem DNS- oder
-  Verbindungsfehler vor Ausführung der Aktion
-- kein erneuter Schaltversuch nach API-Timeout
-- strukturierte Status- und Fehleranzeige
-
-Vor Beginn einer neuen Implementierung müssen `AGENTS.md`, `ai-context.md`,
-`AI_SESSION_PROMPT.md`, diese Datei sowie die dort vorgeschriebenen
-Projektdokumente vollständig gelesen werden.
-
-Zusätzlich sind die zukünftigen Issue-Dokumente 019 und 020 vorhanden:
-
-- Issue 019 zur konfigurierbaren Sortierung der WLAN-Verwaltungsliste und zur
-  festen alphabetischen Sortierung der Geräteverwaltungsliste
-- Issue 020 zur manuellen Sortierung der einem Gerät zugewiesenen WLANs in der
-  Verbindungsreihenfolge
-
-Die manuelle Dashboard-Reihenfolge aus Issue 014 bleibt davon unberührt.
+Vor jeder weiteren Analyse, Planung oder Implementierung müssen `AGENTS.md`,
+`ai-context.md`, `AI_SESSION_PROMPT.md`, diese Datei sowie die in
+`AI_SESSION_PROMPT.md` vorgeschriebenen Projektdokumente vollständig gelesen
+werden.

@@ -1,10 +1,20 @@
 package de.piecha.switchwerk.data.network
 
 import android.net.Network
+import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.io.InterruptedIOException
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.resume
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
@@ -22,11 +32,23 @@ class OkHttpApiCallService(
         url: String,
         network: Network?,
         timeoutMillis: Long
-    ): HttpApiCallResult = execute(
-        requestBuilder = { Request.Builder().url(url).get().build() },
-        network = network,
-        timeoutMillis = timeoutMillis
-    )
+    ): HttpApiCallResult {
+        return if (network == null) {
+            execute(
+                requestBuilder = { Request.Builder().url(url).get().build() },
+                timeoutMillis = timeoutMillis
+            )
+        } else {
+            executeOnNetwork(
+                url = url,
+                method = "GET",
+                body = null,
+                contentType = null,
+                network = network,
+                timeoutMillis = timeoutMillis
+            )
+        }
+    }
 
     override suspend fun post(
         url: String,
@@ -34,20 +56,31 @@ class OkHttpApiCallService(
         contentType: String,
         network: Network?,
         timeoutMillis: Long
-    ): HttpApiCallResult = execute(
-        requestBuilder = {
-            Request.Builder()
-                .url(url)
-                .post((body ?: "").toRequestBody(contentType.toMediaType()))
-                .build()
-        },
-        network = network,
-        timeoutMillis = timeoutMillis
-    )
+    ): HttpApiCallResult {
+        return if (network == null) {
+            execute(
+                requestBuilder = {
+                    Request.Builder()
+                        .url(url)
+                        .post((body ?: "").toRequestBody(contentType.toMediaType()))
+                        .build()
+                },
+                timeoutMillis = timeoutMillis
+            )
+        } else {
+            executeOnNetwork(
+                url = url,
+                method = "POST",
+                body = body ?: "",
+                contentType = contentType,
+                network = network,
+                timeoutMillis = timeoutMillis
+            )
+        }
+    }
 
     private suspend fun execute(
         requestBuilder: () -> Request,
-        network: Network?,
         timeoutMillis: Long
     ): HttpApiCallResult {
         if (timeoutMillis <= 0) {
@@ -63,27 +96,131 @@ class OkHttpApiCallService(
         }
 
         val call = try {
-            clientFor(network, timeoutMillis).newCall(request)
+            clientFor(timeoutMillis).newCall(request)
         } catch (exception: IllegalArgumentException) {
             return HttpApiCallResult.InvalidRequest(exception)
         }
         return executeCall(call)
     }
 
-    private fun clientFor(network: Network?, timeoutMillis: Long): OkHttpClient {
-        val builder = baseClient.newBuilder()
+    private fun clientFor(timeoutMillis: Long): OkHttpClient {
+        return baseClient.newBuilder()
             .callTimeout(timeoutMillis, TimeUnit.MILLISECONDS)
             .retryOnConnectionFailure(false)
             .followRedirects(false)
             .followSslRedirects(false)
+            .build()
+    }
 
-        if (network != null) {
-            builder
-                .socketFactory(network.socketFactory)
-                .dns { hostname -> network.getAllByName(hostname).toList() }
+    private suspend fun executeOnNetwork(
+        url: String,
+        method: String,
+        body: String?,
+        contentType: String?,
+        network: Network,
+        timeoutMillis: Long
+    ): HttpApiCallResult {
+        if (timeoutMillis <= 0) {
+            return HttpApiCallResult.InvalidRequest(
+                IllegalArgumentException("Timeout must be greater than zero")
+            )
         }
 
-        return builder.build()
+        val parsedUrl = try {
+            URL(url)
+        } catch (exception: IllegalArgumentException) {
+            return HttpApiCallResult.InvalidRequest(exception)
+        }
+
+        return suspendCancellableCoroutine { continuation ->
+            val connectionReference = AtomicReference<HttpURLConnection?>()
+
+            continuation.invokeOnCancellation {
+                connectionReference.get()?.disconnect()
+            }
+
+            CoroutineScope(continuation.context).launch(Dispatchers.IO) {
+                val result = try {
+                    val connection = network.openConnection(parsedUrl) as? HttpURLConnection
+                        ?: return@launch continuation.resume(
+                            HttpApiCallResult.InvalidRequest(
+                                IllegalArgumentException("URL is not an HTTP endpoint")
+                            )
+                        )
+                    connectionReference.set(connection)
+                    connection.toCallResult(
+                        method = method,
+                        body = body,
+                        contentType = contentType,
+                        timeoutMillis = timeoutMillis
+                    )
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: InterruptedIOException) {
+                    HttpApiCallResult.Timeout
+                } catch (exception: IOException) {
+                    HttpApiCallResult.NetworkError(exception)
+                } catch (exception: IllegalArgumentException) {
+                    HttpApiCallResult.InvalidRequest(exception)
+                } finally {
+                    connectionReference.getAndSet(null)?.disconnect()
+                }
+
+                if (continuation.isActive) {
+                    continuation.resume(result)
+                }
+            }
+        }
+    }
+
+    private fun HttpURLConnection.toCallResult(
+        method: String,
+        body: String?,
+        contentType: String?,
+        timeoutMillis: Long
+    ): HttpApiCallResult {
+        val timeout = timeoutMillis.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+        instanceFollowRedirects = false
+        requestMethod = method
+        connectTimeout = timeout
+        readTimeout = timeout
+
+        if (method == "POST") {
+            doOutput = true
+            setRequestProperty("Content-Type", contentType)
+            outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
+                writer.write(body.orEmpty())
+            }
+        }
+
+        val statusCode = responseCode
+        val response = HttpApiResponse(
+            statusCode = statusCode,
+            headers = headerFields
+                .filterKeys { it != null }
+                .mapKeys { it.key.orEmpty() },
+            body = responseStream(statusCode).readText()
+        )
+        return if (statusCode in 200..299) {
+            HttpApiCallResult.Success(response)
+        } else {
+            HttpApiCallResult.HttpError(response)
+        }
+    }
+
+    private fun HttpURLConnection.responseStream(statusCode: Int): InputStream? {
+        return if (statusCode in 200..399) {
+            inputStream
+        } else {
+            errorStream
+        }
+    }
+
+    private fun InputStream?.readText(): String {
+        if (this == null) {
+            return ""
+        }
+        return BufferedReader(InputStreamReader(this, Charsets.UTF_8)).use { it.readText() }
     }
 
     private suspend fun executeCall(call: Call): HttpApiCallResult =

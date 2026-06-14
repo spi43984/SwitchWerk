@@ -3,6 +3,8 @@ package de.piecha.switchwerk.di
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.room.Room
+import de.piecha.switchwerk.data.action.DefaultDeviceActionService
+import de.piecha.switchwerk.data.action.DeviceActionService
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
 import de.piecha.switchwerk.data.network.HttpApiCallService
@@ -72,8 +74,19 @@ val appModule = module {
         )
     }
 
+    single<DeviceActionService> {
+        DefaultDeviceActionService(
+            wifiProfileRepository = get(),
+            wifiConnectionService = get(),
+            httpApiCallService = get()
+        )
+    }
+
     viewModel {
-        MainViewModel(get())
+        MainViewModel(
+            repository = get(),
+            deviceActionService = get()
+        )
     }
 
     viewModel {
