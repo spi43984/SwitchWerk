@@ -19,3 +19,5 @@
 018 Adaptive WiFi Security Fallback
 019 Configurable WiFi List Sorting
 020 Device Assigned WiFi Order
+021 HTTP/HTTPS Device Actions
+022 Request Body And Content-Type Support
