@@ -1,5 +1,9 @@
 package de.piecha.switchwerk.data.network
 
+import android.net.Network
+import java.io.ByteArrayInputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
@@ -10,6 +14,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 
 class OkHttpApiCallServiceTest {
 
@@ -66,6 +73,33 @@ class OkHttpApiCallServiceTest {
         assertEquals("POST", request.method)
         assertEquals("application/json; charset=utf-8", request.headers["Content-Type"])
         assertEquals("""{"id":0,"on":true}""", request.body?.utf8())
+    }
+
+    @Test
+    fun boundGetUsesAndroidNetworkOpenConnection() = runBlocking {
+        val network = mock(Network::class.java)
+        val connection = mock(HttpURLConnection::class.java)
+        val url = "http://192.168.33.1/rpc/Switch.Set?id=0&on=true&toggle_after=1"
+        `when`(network.openConnection(URL(url))).thenReturn(connection)
+        `when`(connection.responseCode).thenReturn(200)
+        `when`(connection.headerFields).thenReturn(emptyMap())
+        `when`(connection.inputStream).thenReturn(
+            ByteArrayInputStream("""{"was_on":false}""".toByteArray())
+        )
+
+        val result = service.get(
+            url = url,
+            network = network,
+            timeoutMillis = 5_000
+        )
+
+        assertTrue(result is HttpApiCallResult.Success)
+        assertEquals("""{"was_on":false}""", (result as HttpApiCallResult.Success).response.body)
+        verify(network).openConnection(URL(url))
+        verify(connection).requestMethod = "GET"
+        verify(connection).connectTimeout = 5_000
+        verify(connection).readTimeout = 5_000
+        verify(connection).disconnect()
     }
 
     @Test

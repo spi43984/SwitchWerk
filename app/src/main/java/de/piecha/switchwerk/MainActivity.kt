@@ -1,7 +1,10 @@
 package de.piecha.switchwerk
 
 import android.graphics.Color
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -23,6 +26,7 @@ private enum class AppScreen {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestNearbyWifiPermission()
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 scrim = Color.TRANSPARENT,
@@ -39,6 +43,23 @@ class MainActivity : ComponentActivity() {
                 SwitchWerkAppContent()
             }
         }
+    }
+
+    private fun requestNearbyWifiPermission() {
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.NEARBY_WIFI_DEVICES) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.NEARBY_WIFI_DEVICES),
+                NEARBY_WIFI_PERMISSION_REQUEST
+            )
+        }
+    }
+
+    private companion object {
+        const val NEARBY_WIFI_PERMISSION_REQUEST = 1001
     }
 }
 
