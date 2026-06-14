@@ -10,12 +10,16 @@ import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
 import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.OkHttpApiCallService
 import de.piecha.switchwerk.data.network.WifiConnectionService
+import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
+import de.piecha.switchwerk.data.repository.DefaultConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.RoomDeviceRepository
 import de.piecha.switchwerk.data.repository.RoomWifiProfileRepository
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.security.EncryptedWifiCredentialStore
 import de.piecha.switchwerk.data.security.WifiCredentialStore
+import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
+import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -48,6 +52,9 @@ val appModule = module {
 
     single { OkHttpClient() }
 
+    single { ConfigurationJsonCodec() }
+    single { ConfigurationImportValidator() }
+
     single<HttpApiCallService> {
         OkHttpApiCallService(
             baseClient = get()
@@ -74,6 +81,20 @@ val appModule = module {
         )
     }
 
+    single<ConfigurationTransferRepository> {
+        DefaultConfigurationTransferRepository(
+            contentResolver = androidContext().contentResolver,
+            database = get(),
+            deviceDao = get(),
+            deviceConnectionDao = get(),
+            wifiProfileDao = get(),
+            credentialStore = get(),
+            httpClient = get(),
+            jsonCodec = get(),
+            validator = get()
+        )
+    }
+
     single<DeviceActionService> {
         DefaultDeviceActionService(
             wifiProfileRepository = get(),
@@ -92,7 +113,8 @@ val appModule = module {
     viewModel {
         SettingsViewModel(
             wifiProfileRepository = get(),
-            deviceRepository = get()
+            deviceRepository = get(),
+            configurationTransferRepository = get()
         )
     }
 }

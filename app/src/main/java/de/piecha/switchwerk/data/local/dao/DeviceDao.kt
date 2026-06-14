@@ -20,6 +20,12 @@ interface DeviceDao {
     @Upsert
     suspend fun upsert(device: DeviceEntity)
 
+    @Upsert
+    suspend fun upsertAll(devices: List<DeviceEntity>)
+
     @Query("DELETE FROM devices WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM devices")
+    suspend fun deleteAll()
 }

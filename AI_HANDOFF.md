@@ -2,82 +2,115 @@
 
 Stand: 14. Juni 2026
 
-## Abgeschlossene Arbeit
+## Aktuelle Arbeit
 
-Issue 011 "Device Action With WiFi Fallback" ist implementiert, geprüft,
-veröffentlicht und nach `main` gemergt.
+GitHub-Issue #25 "Import / Export" ist auf dem vorhandenen Feature-Branch
+`import-export` implementiert.
 
-- GitHub-Issue: #21
-- Pull Request: #23
-- Merge-Commit: `39f18e026605c93f51414d22550dd3e6f60a0755`
+Es wurde noch nichts committet, gepusht oder veröffentlicht.
 
-## Aktuelle Dokumentationsänderung
+## Implementierter Scope
 
-Dieser Branch aktualisiert ausschließlich Markdown-Dokumentation, um den
-Kontextverbrauch von Codex zu reduzieren.
+- versioniertes JSON-Austauschformat mit `schemaVersion = 1`
+- Export von WLAN-Profilen, Geräten, Geräteaktionen, Button-Beschriftungen,
+  WLAN-Zuordnungen und deren Reihenfolge
+- Standardexport ohne Passwortfelder
+- optionaler Klartext-Passwortexport nach Warnung
+- Import aus Android-Dateiauswahl
+- Import ausschließlich aus HTTPS-URLs
+- öffentliche Nextcloud-Dateifreigaben werden bei einer HTML-Vorschauseite
+  automatisch über den HTTPS-Endpunkt `<Freigabelink>/download` geladen
+- öffentliche Google-Drive-Dateilinks im Format `/file/d/<id>/view` werden in
+  den direkten HTTPS-Download umgewandelt
+- nicht öffentlich freigegebene Google-Drive-Dateien zeigen einen Hinweis auf
+  die Freigabeoption "Jeder mit dem Link"
+- Importmodus "Ergänzen / überschreiben"
+- Importmodus "Alles ersetzen"
+- Zusammenfassung vor jedem Import
+- zusätzliche Sicherheitswarnung bei enthaltenen Passwortänderungen
+- fehlendes Passwortfeld lässt ein gespeichertes Passwort unverändert
+- leeres Passwortfeld löscht das gespeicherte Passwort
+- importierte Passwörter werden über den bestehenden `WifiCredentialStore`
+  gespeichert
+- Room-Schreibvorgänge erfolgen innerhalb einer Datenbanktransaktion
+- bestehende Geräte-Sortierwerte bleiben beim Zusammenführen erhalten
+- Importgröße ist auf 1 MiB begrenzt
+- ungültige Versionen, IDs, Referenzen, Methoden und Sicherheitstypen werden
+  abgelehnt
 
-Branch:
-
-```text
-docs-codex-cost-optimization
-```
-
-Ziele:
-
-- zentrale Markdown-Dateien im Repository-Root belassen
-- Verweise auf Root-Dateien konsistent halten
-- pauschale Pflichtlektüre für Codex reduzieren
-- Rollen von ChatGPT Browser, Codex CLI, GitHub und Ubuntu-Host klarer trennen
-- dauerhaftes Projektwissen dokumentieren, statt es nur in Codex-Sessions zu halten
-
-Es wurden keine App-Code-Dateien geändert.
-
-## Geänderte Root-Markdown-Dateien
-
-```text
-AGENTS.md
-AI_HANDOFF.md
-AI_SESSION_PROMPT.md
-GITHUB_WORKFLOW.md
-README.md
-ai-context.md
-```
-
-## Wichtige Dokumentationsentscheidungen
-
-- `AGENTS.md` bleibt die verbindliche Regeldatei für KI-Agenten.
-- `ai-context.md` bleibt dauerhafter Projektkontext.
-- `AI_SESSION_PROMPT.md` bleibt die wiederverwendbare Startvorlage für neue AI-Sessions.
-- `AI_HANDOFF.md` bleibt der aktuelle Übergabestand.
-- Alle diese Dateien bleiben im Hauptverzeichnis des Repositorys.
-- Dateien unter `docs/issues` bleiben weiterhin die fachliche Issue-Planung.
-
-## Codex-Minimalkontext
-
-Für neue Codex-Aufgaben gilt:
-
-1. zuerst `AGENTS.md` und `AI_HANDOFF.md` lesen
-2. bei Issue-Arbeiten zusätzlich `docs/issues/overview.txt` und die konkrete Issue-Datei lesen
-3. danach nur gezielt weitere Dateien lesen, wenn sie für die konkrete Aufgabe nötig sind
-4. keine vollständige Repository-Analyse ohne ausdrücklichen Auftrag
-
-## Umgebung und Rollen
-
-- ChatGPT Browser: Planung, Architekturfragen, Issue-Zuschnitt, Dokumentations-Review
-- Codex CLI im Docker-Container: konkrete Codeänderungen mit minimalem Kontext
-- Ubuntu-Host: Android Studio, Gradle-Builds, ADB, Installation und Gerätetests
-- GitHub: Issues, Branches, Pull Requests und Review
-
-## Nächster fachlicher App-Schritt
-
-Das nächste offene fachliche App-Issue ist:
+## Neue Hauptklassen
 
 ```text
-docs/issues/012-import-export.md
+data/transfer/ConfigurationDocument.kt
+data/transfer/ConfigurationJsonCodec.kt
+data/transfer/ConfigurationImportValidator.kt
+data/repository/ConfigurationTransferRepository.kt
+data/repository/DefaultConfigurationTransferRepository.kt
 ```
 
-Vor Beginn einer neuen Implementierung `AGENTS.md`, `AI_HANDOFF.md` und bei Issue-Arbeiten die konkrete Issue-Datei lesen. `AI_SESSION_PROMPT.md` bleibt die wiederverwendbare Startvorlage für neue Sessions.
+## Prüfungen im Container
 
-## Nicht erneut analysieren
+Erfolgreich:
 
-Für das nächste fachliche App-Issue muss diese Dokumentationsoptimierung nicht erneut vollständig analysiert werden. Relevant ist nur, dass Codex künftig weniger pauschal lesen und stärker vom konkreten Issue ausgehen soll.
+```text
+./gradlew compileDebugKotlin
+./gradlew testDebugUnitTest
+git diff --check
+```
+
+Nach der Korrektur des Nextcloud-URL-Imports erneut erfolgreich:
+
+```text
+./gradlew testDebugUnitTest
+git diff --check
+```
+
+Der Container-Build ersetzt nicht die maßgebliche Prüfung auf dem Ubuntu-Host.
+
+## Prüfung auf dem Ubuntu-Host
+
+Vom Benutzer am 14. Juni 2026 erfolgreich bestätigt:
+
+```text
+./gradlew clean assembleDebug
+./gradlew installDebug
+adb shell am force-stop de.piecha.switchwerk
+adb shell monkey -p de.piecha.switchwerk 1
+```
+
+Das APK wurde erfolgreich auf einem Pixel 10 Pro XL mit Android 16 installiert
+und die App anschließend gestartet.
+
+Nicht blockierende Warnungen:
+
+- `local.properties` verweist zusätzlich auf ein nicht vorhandenes SDK-Verzeichnis
+- Room-Schema-Exportpfad ist nicht konfiguriert
+- der bestehende `EncryptedWifiCredentialStore` verwendet inzwischen als
+  deprecated markierte AndroidX-Security-APIs
+- `libandroidx.graphics.path.so` wurde ungestrippt paketiert
+
+## Manuelle Prüfung
+
+Der Benutzer hat die Implementierung am 14. Juni 2026 erfolgreich geprüft.
+
+Bestätigt:
+
+- Export und Dateiimport funktionieren
+- öffentlicher Nextcloud-Freigabelink funktioniert
+- öffentlich freigegebener Google-Drive-Link funktioniert
+- Host-Build, Installation und App-Start funktionieren
+
+Issue #25 kann aus fachlicher Sicht veröffentlicht und abgeschlossen werden.
+
+## Veröffentlichung
+
+Erst nach erfolgreicher Rückmeldung des Benutzers und ausdrücklicher
+Veröffentlichungsfreigabe:
+
+1. Änderungen committen
+2. Branch pushen
+3. Pull Request erstellen
+4. nach Freigabe mergen
+5. lokale Issue-Datei abhaken
+6. GitHub-Issue #25 schließen
+7. Feature-Branch lokal und remote löschen
