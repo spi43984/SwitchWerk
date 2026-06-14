@@ -10,33 +10,51 @@ Ziel ist eine einfache, robuste, sichere und cloudfreie Lösung.
 
 ---
 
-## Zwingend zu lesende Dateien
+## Zweck dieser Datei
 
-Vor jeder Analyse, Planung oder Implementierung zuerst lesen:
+`ai-context.md` enthält dauerhaften Projektkontext, der über einzelne Sessions hinaus gültig bleibt.
 
-- ai-context.md
-- AGENTS.md
-- AI_SESSION_PROMPT.md
-- AI_HANDOFF.md
-- GITHUB_WORKFLOW.md
-- ARCHITECTURE.md
-- CODE_STYLE.md
-- TESTING.md
-- SECURITY.md
-- README.md
+Diese Datei ist nicht als vollständiger Startprompt für Codex gedacht. Codex liest sie nur, wenn dauerhafter Projektkontext, Issue-Status oder Projektentscheidungen für die konkrete Aufgabe benötigt werden.
 
-Bei Build- oder Android-Konfiguration zusätzlich lesen:
+---
 
-- settings.gradle.kts
-- build.gradle.kts
-- app/build.gradle.kts
-- gradle/libs.versions.toml
-- gradle.properties
+## KI-Arbeitsmodell
+
+- ChatGPT Browser: Planung, Architekturfragen, Issue-Zuschnitt, Dokumentations-Review und größere Analysen.
+- Codex CLI im Docker-Container: konkrete, abgegrenzte Codeänderungen mit minimalem Kontext.
+- Ubuntu-Host: Android Studio, Gradle-Builds, ADB, Installation und Gerätetests.
+- GitHub: zentrale Quellcodeverwaltung, Issues, Branches und Pull Requests.
+
+Projektwissen soll dauerhaft in Markdown-Dateien dokumentiert werden und nicht nur in Codex-Sessions liegen.
+
+---
+
+## Kontextdateien im Repository-Root
+
+Die zentralen Markdown-Dateien bleiben im Hauptverzeichnis des Repositorys:
+
+- `AGENTS.md`: verbindliche Regeln für KI-Agenten
+- `AI_HANDOFF.md`: aktueller Übergabestand für die nächste Session
+- `AI_SESSION_PROMPT.md`: wiederverwendbare Startvorlage
+- `GITHUB_WORKFLOW.md`: GitHub-, Branch-, Issue- und PR-Ablauf
+- `ARCHITECTURE.md`: Architektur und Schichten
+- `CODE_STYLE.md`: Kotlin- und Compose-Stil
+- `TESTING.md`: Teststrategie
+- `SECURITY.md`: Sicherheits- und Datenschutzregeln
+- `README.md`: Einstieg für Menschen
 
 Bei Issue-Arbeiten zusätzlich lesen:
 
-- docs/issues/overview.txt
-- relevante Dateien unter docs/issues
+- `docs/issues/overview.txt`
+- die konkrete relevante Datei unter `docs/issues`
+
+Bei Build- oder Android-Konfiguration zusätzlich lesen:
+
+- `settings.gradle.kts`
+- `build.gradle.kts`
+- `app/build.gradle.kts`
+- `gradle/libs.versions.toml`
+- `gradle.properties`
 
 ---
 
@@ -69,48 +87,19 @@ Bei Issue-Arbeiten zusätzlich lesen:
 
 ## Entwicklungsworkflow
 
-Für jedes neue Issue:
+Der verbindliche Workflow steht in `AGENTS.md` und `GITHUB_WORKFLOW.md`.
 
-1. Auf main wechseln
+Kurzfassung:
 
-       git switch main
-
-2. Aktuellen Stand holen
-
-       git pull
-
-3. Passendes Issue unter docs/issues bestimmen
-
-4. GitHub-Issue aus der Datei erzeugen
-
-       gh issue create \
-         --title "Titel" \
-         --body-file docs/issues/xxx.md
-
-5. Eigenen Branch anlegen
-
-       git switch -c fachlicher-branch-name
-
-6. Implementieren
-
-7. Build ausführen
-
-       ./gradlew clean assembleDebug
-       ./gradlew installDebug
-
-8. Committen
-
-9. Branch pushen
-
-10. Pull Request erstellen
-
-11. Nach main mergen
-
-12. Lokale Issue-Datei abhaken
-
-13. GitHub-Issue schließen
-
-14. Branch lokal und remote löschen
+1. Nicht direkt auf `main` implementieren.
+2. Passendes Issue unter `docs/issues` bestimmen.
+3. Prüfen, ob GitHub-Issue oder Feature-Branch bereits existiert.
+4. Nur bei Bedarf ein GitHub-Issue aus der lokalen Issue-Datei erzeugen.
+5. Eigenen fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
+6. Scope eng halten.
+7. Änderungen prüfen.
+8. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
+9. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
 
 ---
 
@@ -127,16 +116,22 @@ Abgeschlossen:
 - 007 WiFi Profile Management
 - 008 Device Management
 - 009 WiFi Connection Service
+- 010 HTTP/API Call Service
 
 Offen:
 
-- 010 HTTP/API Call Service
 - 011 Device Action With WiFi Fallback
 - 012 Import/Export
 - 013 QR Code Import
 - 014 Dashboard Device Reordering
 - 015 WiFi Profile Dialog Management
 - 016 Edit Items By Name Click
+- 017 Unique WiFi Profile Name
+- 018 Adaptive WiFi Security Fallback
+- 019 Configurable WiFi List Sorting
+- 020 Device Assigned WiFi Order
+- 021 HTTP/HTTPS Device Actions
+- 022 Request Body And Content-Type Support
 
 ---
 
