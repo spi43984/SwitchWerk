@@ -10,33 +10,51 @@ Ziel ist eine einfache, robuste, sichere und cloudfreie Lösung.
 
 ---
 
-## Zwingend zu lesende Dateien
+## Zweck dieser Datei
 
-Vor jeder Analyse, Planung oder Implementierung zuerst lesen:
+`ai-context.md` enthält dauerhaften Projektkontext, der über einzelne Sessions hinaus gültig bleibt.
 
-- ai-context.md
-- AGENTS.md
-- AI_SESSION_PROMPT.md
-- AI_HANDOFF.md
-- GITHUB_WORKFLOW.md
-- ARCHITECTURE.md
-- CODE_STYLE.md
-- TESTING.md
-- SECURITY.md
-- README.md
+Diese Datei ist nicht als vollständiger Startprompt für Codex gedacht. Codex liest sie nur, wenn dauerhafter Projektkontext, Issue-Status oder Projektentscheidungen für die konkrete Aufgabe benötigt werden.
 
-Bei Build- oder Android-Konfiguration zusätzlich lesen:
+---
 
-- settings.gradle.kts
-- build.gradle.kts
-- app/build.gradle.kts
-- gradle/libs.versions.toml
-- gradle.properties
+## KI-Arbeitsmodell
+
+- ChatGPT Browser: Planung, Architekturfragen, Issue-Zuschnitt, Dokumentations-Review und größere Analysen.
+- Codex CLI im Docker-Container: konkrete, abgegrenzte Codeänderungen mit minimalem Kontext.
+- Ubuntu-Host: Android Studio, Gradle-Builds, ADB, Installation und Gerätetests.
+- GitHub: zentrale Quellcodeverwaltung, Issues, Branches und Pull Requests.
+
+Projektwissen soll dauerhaft in Markdown-Dateien dokumentiert werden und nicht nur in Codex-Sessions liegen.
+
+---
+
+## Kontextdateien im Repository-Root
+
+Die zentralen Markdown-Dateien bleiben im Hauptverzeichnis des Repositorys:
+
+- `AGENTS.md`: verbindliche Regeln für KI-Agenten
+- `AI_HANDOFF.md`: aktueller Übergabestand für die nächste Session
+- `AI_SESSION_PROMPT.md`: wiederverwendbare Startvorlage
+- `GITHUB_WORKFLOW.md`: GitHub-, Branch-, Issue- und PR-Ablauf
+- `ARCHITECTURE.md`: Architektur und Schichten
+- `CODE_STYLE.md`: Kotlin- und Compose-Stil
+- `TESTING.md`: Teststrategie
+- `SECURITY.md`: Sicherheits- und Datenschutzregeln
+- `README.md`: Einstieg für Menschen
 
 Bei Issue-Arbeiten zusätzlich lesen:
 
-- docs/issues/overview.txt
-- relevante Dateien unter docs/issues
+- `docs/issues/overview.txt`
+- die konkrete relevante Datei unter `docs/issues`
+
+Bei Build- oder Android-Konfiguration zusätzlich lesen:
+
+- `settings.gradle.kts`
+- `build.gradle.kts`
+- `app/build.gradle.kts`
+- `gradle/libs.versions.toml`
+- `gradle.properties`
 
 ---
 
@@ -69,51 +87,19 @@ Bei Issue-Arbeiten zusätzlich lesen:
 
 ## Entwicklungsworkflow
 
-Für jedes neue Issue:
+Der verbindliche Workflow steht in `AGENTS.md` und `GITHUB_WORKFLOW.md`.
 
-1. Auf main wechseln
+Kurzfassung:
 
-       git switch main
-
-2. Aktuellen Stand holen
-
-       git pull
-
-3. Passendes Issue unter docs/issues bestimmen
-
-4. Prüfen, ob bereits ein passendes GitHub-Issue oder ein Feature-Branch
-   existiert
-
-5. GitHub-Issue nur dann aus der Datei erzeugen, wenn noch keines existiert
-
-       gh issue create \
-         --title "Titel" \
-         --body-file docs/issues/xxx.md
-
-6. Eigenen Branch anlegen oder vorhandenen passenden Branch verwenden
-
-       git switch -c fachlicher-branch-name
-
-7. Implementieren
-
-8. Build ausführen
-
-       ./gradlew clean assembleDebug
-       ./gradlew installDebug
-
-9. Ohne ausdrücklichen Auftrag nicht committen, pushen oder einen Pull Request
-   erstellen.
-
-10. Erst nach ausdrücklicher Veröffentlichungsanforderung committen, Branch
-   pushen und Pull Request erstellen.
-
-11. Erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
-
-12. Nach dem Merge die lokale Issue-Datei abhaken.
-
-13. Zugehöriges GitHub-Issue schließen.
-
-14. Feature-Branch lokal und remote löschen.
+1. Nicht direkt auf `main` implementieren.
+2. Passendes Issue unter `docs/issues` bestimmen.
+3. Prüfen, ob GitHub-Issue oder Feature-Branch bereits existiert.
+4. Nur bei Bedarf ein GitHub-Issue aus der lokalen Issue-Datei erzeugen.
+5. Eigenen fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
+6. Scope eng halten.
+7. Änderungen prüfen.
+8. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
+9. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
 
 ---
 
@@ -131,10 +117,10 @@ Abgeschlossen:
 - 008 Device Management
 - 009 WiFi Connection Service
 - 010 HTTP/API Call Service
+- 011 Device Action With WiFi Fallback
 
 Offen:
 
-- 011 Device Action With WiFi Fallback
 - 012 Import/Export
 - 013 QR Code Import
 - 014 Dashboard Device Reordering
@@ -144,6 +130,8 @@ Offen:
 - 018 Adaptive WiFi Security Fallback
 - 019 Configurable WiFi List Sorting
 - 020 Device Assigned WiFi Order
+- 021 HTTP/HTTPS Device Actions
+- 022 Request Body And Content-Type Support
 
 ---
 
