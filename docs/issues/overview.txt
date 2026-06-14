@@ -21,3 +21,4 @@
 020 Device Assigned WiFi Order
 021 HTTP/HTTPS Device Actions
 022 Request Body And Content-Type Support
+023 Settings Display And Action Details
