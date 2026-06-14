@@ -45,20 +45,61 @@ Beim Erstellen oder Ändern von Code:
 
 Lieber eine kleine, stabile App als eine überarchitektierte App.
 
+## Codex-Kostensparregeln
+
+Codex soll möglichst wenig Kontingent verbrauchen und keine unnötigen
+Repository-Analysen durchführen.
+
+Für jede Aufgabe gilt:
+
+1. Zuerst nur lesen:
+   - `AGENTS.md`
+   - `AI_HANDOFF.md`
+   - bei Issue-Arbeiten die konkrete Datei unter `docs/issues`
+2. Danach nur gezielt weitere Dateien lesen:
+   - `ai-context.md`, wenn dauerhafter Projektkontext oder Issue-Status nötig ist
+   - `ARCHITECTURE.md`, wenn Architektur, Packages oder Schichten betroffen sind
+   - `CODE_STYLE.md`, wenn Code geändert wird
+   - `TESTING.md`, wenn Tests geplant oder bewertet werden
+   - `SECURITY.md`, wenn Berechtigungen, Netzwerk, Speicherung oder sensible Daten betroffen sind
+   - Gradle-Dateien nur bei Build-, Dependency- oder Android-Konfigurationsfragen
+3. Keine vollständige Repository-Analyse ohne ausdrücklichen Auftrag.
+4. Keine pauschale Suche über alle Dateien, wenn die betroffenen Pfade aus Issue,
+   Handoff oder Fehlermeldung ableitbar sind.
+5. Große Planungs-, Architektur- und Dokumentationsfragen bevorzugt im ChatGPT
+   Browser vorbereiten.
+6. Codex primär für konkrete, abgegrenzte Codeänderungen verwenden.
+7. Projektwissen dauerhaft in Markdown-Dateien dokumentieren, nicht nur in
+   Codex-Sessions.
+
+## Arbeitsmodell ChatGPT, Codex und Host
+
+- ChatGPT Browser: Analyse, Planung, Architekturfragen, Issue-Zuschnitt,
+  Dokumentations-Review.
+- Codex CLI im Docker-Container: konkrete Codeänderungen mit minimalem Kontext.
+- Ubuntu-Host: Android Studio, Gradle-Builds, ADB, Installation und Gerätetests.
+
+Codex darf nur Prüfungen im Container ausführen, die dort verfügbar und für die
+aktuelle Aufgabe sinnvoll sind. Die maßgebliche Bestätigung für Build,
+Installation und manuelle Gerätetests erfolgt durch den Benutzer auf dem
+Ubuntu-Host.
+
 ## UI-Regel für Sicherheitsabfragen
 
 Bei Sicherheitsabfragen steht die sichere Abbruchaktion immer rechts.
 
 Beispiel:
+
 - links: Ja / Löschen / Bestätigen
 - rechts: Nein / Abbrechen
 
 Damit ist „Nein“ bei Lösch- oder Sicherheitsabfragen immer auf der rechten Seite.
 
-
 ## Branch- und Issue-Workflow
 
 Implementierungen und größere Änderungen werden nie direkt auf `main` begonnen.
+
+Der vollständige GitHub-Workflow ist in `GITHUB_WORKFLOW.md` dokumentiert.
 
 ### Phase 1: Vorbereitung und Implementierung
 
@@ -74,15 +115,11 @@ Für jedes fachliche Issue gilt zunächst:
    vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
 6. Ausschließlich den vereinbarten Issue-Scope implementieren.
 7. Änderungen und Diff prüfen.
-8. Verfügbare statische Prüfungen und Tests im Container ausführen.
+8. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
 9. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
    auf dem Host ausgeben.
 
-Der Codex-Container enthält ein persistent eingebundenes Android-SDK und einen
-persistenten Gradle-Cache. Verfügbare Tests und Builds sollen deshalb auch im
-Container ausgeführt werden. Die maßgebliche Bestätigung für Build,
-Installation und manuelle Tests erfolgt weiterhin durch den Benutzer auf dem
-Host, insbesondere mit:
+Mindestens auf dem Host zu prüfen:
 
     ./gradlew clean assembleDebug
     ./gradlew installDebug
@@ -129,8 +166,7 @@ Die Datei `AI_HANDOFF.md` wird immer direkt im Hauptverzeichnis des
 Repositories abgelegt und aktualisiert.
 
 Die wiederverwendbare Startvorlage liegt als `AI_SESSION_PROMPT.md` ebenfalls
-im Hauptverzeichnis. Vor jeder Analyse, Planung oder Implementierung müssen
-`AI_SESSION_PROMPT.md` und `AI_HANDOFF.md` vollständig gelesen werden.
+im Hauptverzeichnis.
 
 Bei Widersprüchen gilt folgende Priorität:
 
