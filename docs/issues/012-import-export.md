@@ -77,21 +77,21 @@ Beispiele:
 
 ## Akzeptanzkriterien
 
-- [ ] Export ohne WLAN-Passwörter ist möglich und Standard
-- [ ] Optionaler unverschlüsselter Export mit WLAN-Passwörtern ist möglich
-- [ ] Vor Export mit WLAN-Passwörtern wird deutlich gewarnt
-- [ ] Import aus Datei ist möglich
-- [ ] Import aus URL ist möglich
-- [ ] Import akzeptiert Dateien mit und ohne WLAN-Passwörter
-- [ ] Vor Import einer Datei mit WLAN-Passwörtern wird deutlich gewarnt
-- [ ] Importierte WLAN-Passwörter werden sicher gespeichert
-- [ ] Geräte-Button-Beschriftung wird exportiert und importiert
-- [ ] Geräteaktion wird exportiert und importiert
-- [ ] Zugewiesene WLAN-Profile pro Gerät werden exportiert und importiert
-- [ ] Reihenfolge der WLAN-Profile pro Gerät bleibt erhalten
-- [ ] Exportformat ist versioniert
-- [ ] Ungültige oder inkompatible Importdateien werden verständlich abgelehnt
-- [ ] Sichere Abbruchaktion steht in Warn- und Sicherheitsdialogen rechts
+- [x] Export ohne WLAN-Passwörter ist möglich und Standard
+- [x] Optionaler unverschlüsselter Export mit WLAN-Passwörtern ist möglich
+- [x] Vor Export mit WLAN-Passwörtern wird deutlich gewarnt
+- [x] Import aus Datei ist möglich
+- [x] Import aus URL ist möglich
+- [x] Import akzeptiert Dateien mit und ohne WLAN-Passwörter
+- [x] Vor Import einer Datei mit WLAN-Passwörtern wird deutlich gewarnt
+- [x] Importierte WLAN-Passwörter werden sicher gespeichert
+- [x] Geräte-Button-Beschriftung wird exportiert und importiert
+- [x] Geräteaktion wird exportiert und importiert
+- [x] Zugewiesene WLAN-Profile pro Gerät werden exportiert und importiert
+- [x] Reihenfolge der WLAN-Profile pro Gerät bleibt erhalten
+- [x] Exportformat ist versioniert
+- [x] Ungültige oder inkompatible Importdateien werden verständlich abgelehnt
+- [x] Sichere Abbruchaktion steht in Warn- und Sicherheitsdialogen rechts
 
 ## Testhinweise
 
