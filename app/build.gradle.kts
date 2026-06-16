@@ -63,6 +63,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.security.crypto)
     implementation(libs.okhttp)
+    implementation(libs.zxing.android.embedded)
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.mockito.core)
     testImplementation(libs.kotlinx.coroutines.test)

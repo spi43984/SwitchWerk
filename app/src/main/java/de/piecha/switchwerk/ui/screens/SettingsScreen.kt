@@ -1,5 +1,7 @@
 package de.piecha.switchwerk.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,9 +48,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
@@ -60,9 +66,12 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var pendingFileImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
+    var pendingQrImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     var showFileImportModeDialog by remember { mutableStateOf(false) }
+    var showQrImportModeDialog by remember { mutableStateOf(false) }
     var showUrlImportDialog by remember { mutableStateOf(false) }
     var showPasswordExportWarning by remember { mutableStateOf(false) }
 
@@ -80,6 +89,33 @@ fun SettingsScreen(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let { viewModel.prepareImportFromFile(it, pendingFileImportMode) }
+    }
+    val qrScanLauncher = rememberLauncherForActivityResult(
+        contract = ScanContract()
+    ) { result ->
+        val content = result.contents
+        if (content == null) {
+            viewModel.reportQrScanCancelled()
+        } else {
+            viewModel.prepareImportFromQrCode(content, pendingQrImportMode)
+        }
+    }
+    fun launchQrScanner() {
+        val options = ScanOptions()
+            .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+            .setPrompt("QR-Code scannen")
+            .setBeepEnabled(false)
+            .setOrientationLocked(false)
+        qrScanLauncher.launch(options)
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            launchQrScanner()
+        } else {
+            viewModel.reportQrCameraPermissionDenied()
+        }
     }
 
     BackHandler(enabled = uiState.isEditingWifiProfile) {
@@ -173,6 +209,9 @@ fun SettingsScreen(
             },
             onImportUrlClick = {
                 showUrlImportDialog = true
+            },
+            onScanQrCodeClick = {
+                showQrImportModeDialog = true
             }
         )
 
@@ -199,6 +238,7 @@ fun SettingsScreen(
 
     if (showFileImportModeDialog) {
         ImportModeDialog(
+            continueText = "Datei auswählen",
             onContinue = { mode ->
                 pendingFileImportMode = mode
                 showFileImportModeDialog = false
@@ -206,6 +246,27 @@ fun SettingsScreen(
             },
             onCancel = {
                 showFileImportModeDialog = false
+            }
+        )
+    }
+
+    if (showQrImportModeDialog) {
+        ImportModeDialog(
+            continueText = "QR-Code scannen",
+            onContinue = { mode ->
+                pendingQrImportMode = mode
+                showQrImportModeDialog = false
+                if (
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    launchQrScanner()
+                } else {
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            onCancel = {
+                showQrImportModeDialog = false
             }
         )
     }
@@ -547,7 +608,8 @@ private fun ImportExportSection(
     onExportClick: () -> Unit,
     onExportWithPasswordsClick: () -> Unit,
     onImportFileClick: () -> Unit,
-    onImportUrlClick: () -> Unit
+    onImportUrlClick: () -> Unit,
+    onScanQrCodeClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -592,6 +654,11 @@ private fun ImportExportSection(
                             Text("URL importieren")
                         }
                     }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = onScanQrCodeClick) {
+                            Text("QR-Code scannen")
+                        }
+                    }
                 }
             }
         }
@@ -627,6 +694,7 @@ private fun PasswordExportWarningDialog(
 
 @Composable
 private fun ImportModeDialog(
+    continueText: String,
     onContinue: (ConfigurationImportMode) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -647,7 +715,7 @@ private fun ImportModeDialog(
         },
         dismissButton = {
             Button(onClick = { onContinue(mode) }) {
-                Text("Datei auswählen")
+                Text(continueText)
             }
         }
     )

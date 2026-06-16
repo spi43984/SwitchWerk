@@ -14,6 +14,7 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
+import java.net.URI
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -251,6 +252,32 @@ class SettingsViewModel(
                 mode = mode
             )
         }
+    }
+
+    fun prepareImportFromQrCode(content: String, mode: ConfigurationImportMode) {
+        val url = content.trim()
+        if (!url.isValidImportUrl()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "QR-Code enthält keine gültige HTTPS-URL",
+                statusMessage = null
+            )
+            return
+        }
+
+        prepareImportFromUrl(url, mode)
+    }
+
+    fun reportQrCameraPermissionDenied() {
+        _uiState.value = _uiState.value.copy(
+            errorMessage = "Kamera-Berechtigung wird zum Scannen des QR-Codes benötigt",
+            statusMessage = null
+        )
+    }
+
+    fun reportQrScanCancelled() {
+        _uiState.value = _uiState.value.copy(
+            statusMessage = null
+        )
     }
 
     fun confirmImportSummary() {
@@ -654,6 +681,11 @@ class SettingsViewModel(
             deviceForm = update(_uiState.value.deviceForm),
             errorMessage = null
         )
+    }
+
+    private fun String.isValidImportUrl(): Boolean {
+        val uri = runCatching { URI(this) }.getOrNull() ?: return false
+        return uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()
     }
 
     private companion object {
