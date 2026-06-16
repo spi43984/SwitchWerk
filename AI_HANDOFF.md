@@ -1,6 +1,6 @@
 # AI Handoff
 
-Stand: 14. Juni 2026
+Stand: 16. Juni 2026
 
 ## Abgeschlossene Arbeit
 
@@ -49,4 +49,34 @@ separate Planung liegt unter:
 
 ```text
 docs/issues/024-authenticated-import-sources.md
+```
+
+## Aktuelle Arbeit
+
+Issue 013 "QR Code Import" wurde auf Branch `qr-code-import` lokal
+implementiert, aber noch nicht veröffentlicht.
+
+Umgesetzter Scope:
+
+- Button "QR-Code scannen" in Einstellungen / Import / Export
+- Importmodus-Auswahl vor dem QR-Scan
+- Kamera-Berechtigung wird erst für den QR-Scan angefragt
+- QR-Code-Scan über ZXing Android Embedded
+- QR-Inhalt wird als HTTPS-URL validiert
+- gültige QR-URL nutzt den bestehenden URL-Importpfad
+- JSON-Importformat unverändert
+- keine Authentifizierung, Cookies oder Tokens ergänzt
+
+Lokal im Container erfolgreich geprüft:
+
+```text
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+```
+
+Host-Prüfung steht noch aus:
+
+```text
+./gradlew clean assembleDebug
+./gradlew installDebug
 ```
