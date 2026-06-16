@@ -24,3 +24,4 @@
 023 Settings Display And Action Details
 024 Authenticated Import Sources Backlog
 025 Dashboard Widget Layout
+026 Settings UI Rework
