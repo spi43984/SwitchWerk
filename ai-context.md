@@ -105,7 +105,7 @@ Kurzfassung:
 
 ## Aktueller Stand
 
-Abgeschlossen:
+### Abgeschlossen
 
 - 001 Configuration Domain Foundation
 - 002 Dashboard Device List
@@ -118,11 +118,11 @@ Abgeschlossen:
 - 009 WiFi Connection Service
 - 010 HTTP/API Call Service
 - 011 Device Action With WiFi Fallback
-
-Offen:
-
 - 012 Import/Export
 - 013 QR Code Import
+
+### Offen
+
 - 014 Dashboard Device Reordering
 - 015 WiFi Profile Dialog Management
 - 016 Edit Items By Name Click
@@ -132,6 +132,21 @@ Offen:
 - 020 Device Assigned WiFi Order
 - 021 HTTP/HTTPS Device Actions
 - 022 Request Body And Content-Type Support
+- 023 Settings Display And Action Details
+- 025 Dashboard Widget Layout
+- 026 Settings UI Rework
+
+### Zurückgestellt / Backlog
+
+- 024 Authenticated Import Sources Backlog
+
+### Nächstes Issue
+
+- 014 Dashboard Device Reordering
+
+### Pflegehinweis
+
+Die Listen "Abgeschlossen", "Offen", "Zurückgestellt / Backlog" und "Nächstes Issue" sind nach jedem abgeschlossenen oder neu angelegten Issue in `ai-context.md` zu aktualisieren.
 
 ---
 
