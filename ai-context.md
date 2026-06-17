@@ -120,10 +120,10 @@ Kurzfassung:
 - 011 Device Action With WiFi Fallback
 - 012 Import/Export
 - 013 QR Code Import
+- 014 Dashboard Device Reordering
 
 ### Offen
 
-- 014 Dashboard Device Reordering
 - 015 WiFi Profile Dialog Management
 - 016 Edit Items By Name Click
 - 017 Unique WiFi Profile Name
@@ -142,7 +142,7 @@ Kurzfassung:
 
 ### Nächstes Issue
 
-- 014 Dashboard Device Reordering
+- 015 WiFi Profile Dialog Management
 
 ### Pflegehinweis
 
