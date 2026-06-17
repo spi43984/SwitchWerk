@@ -28,3 +28,4 @@
 027 WiFi Timeout Analysis And Stabilization
 028 Theme Mode Setting
 029 Language Setting
+030 WiFi Profile Deletion Safety
