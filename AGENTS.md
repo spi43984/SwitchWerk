@@ -88,11 +88,69 @@ Ubuntu-Host.
 
 Bei Sicherheitsabfragen steht die sichere Abbruchaktion immer rechts.
 
+Beispiel:
+
+- links: Ja / Löschen / Bestätigen
+- rechts: Nein / Abbrechen
+
+Damit ist „Nein“ bei Lösch- oder Sicherheitsabfragen immer auf der rechten Seite.
+
 ## Branch- und Issue-Workflow
 
-[... bestehender Inhalt unverändert ...]
+Implementierungen und größere Änderungen werden nie direkt auf `main` begonnen.
 
-## Verbindliche Issue-Abschluss-Checkliste
+Der vollständige GitHub-Workflow ist in `GITHUB_WORKFLOW.md` dokumentiert.
+
+### Phase 1: Vorbereitung und Implementierung
+
+Für jedes fachliche Issue gilt zunächst:
+
+1. Auf `main` wechseln.
+2. Aktuellen Stand holen.
+3. Prüfen, ob zur passenden Datei unter `docs/issues/*.md` bereits ein
+   GitHub-Issue oder Feature-Branch existiert.
+4. Nur falls noch kein GitHub-Issue existiert, dieses aus der lokalen
+   Issue-Datei erzeugen.
+5. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
+   vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
+6. Ausschließlich den vereinbarten Issue-Scope implementieren.
+7. Änderungen und Diff prüfen.
+8. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
+9. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
+   auf dem Host ausgeben.
+
+Mindestens auf dem Host zu prüfen:
+
+    ./gradlew clean assembleDebug
+    ./gradlew installDebug
+
+Codex meldet den Build nicht als erfolgreich, solange der Benutzer kein
+erfolgreiches Ergebnis vom Host zurückgemeldet hat.
+
+### Phase 2: Veröffentlichung und Abschluss
+
+Erst wenn die Implementierung geprüft wurde und der Benutzer ausdrücklich die
+Veröffentlichung oder den Abschluss anfordert, dürfen folgende Schritte
+ausgeführt werden:
+
+1. Änderungen committen.
+2. Feature-Branch pushen.
+3. Pull Request erstellen.
+4. Pull Request prüfen und nach ausdrücklicher Freigabe nach `main` mergen.
+5. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+6. Lokale Issue-Datei unter `docs/issues` abhaken.
+7. `docs/issues/overview.txt` aktualisieren.
+8. `ai-context.md` aktualisieren:
+   - abgeschlossenes Issue in `Abgeschlossen` verschieben
+   - abgeschlossenes Issue aus `Offen` entfernen
+   - `Nächstes Issue` auf das nächste offene Issue setzen
+9. Prüfen, dass `docs/issues/overview.txt`, die lokale Issue-Datei und
+   `ai-context.md` denselben Status zeigen.
+10. Dokumentationsänderungen committen und pushen.
+11. Zugehöriges GitHub-Issue erst danach schließen.
+12. Feature-Branch lokal und remote löschen.
+
+### Verbindliche Issue-Abschluss-Checkliste
 
 Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wurden:
 
@@ -104,7 +162,36 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 - [ ] Status der Dokumentationsdateien ist konsistent
 - [ ] GitHub-Issue geschlossen
 
+Ohne ausdrückliche Nachfrage des Benutzers gilt:
+
+- nicht committen
+- nicht pushen
+- keinen Pull Request erstellen
+- nicht mergen
+- kein GitHub-Issue schließen
+- keinen Branch löschen
+
+Beispiel:
+
+    git switch main
+    git pull
+    gh issue create --title "WiFi Connection Service" --body-file docs/issues/009-wifi-connection-service.md
+    git switch -c wifi-connection-service
+
+Der Assistent gibt für alle vom Benutzer lokal auszuführenden Schritte immer die
+vollständigen Copy-&-Paste-Befehle aus.
+
 ## AI-Handoff
 
 Die Datei `AI_HANDOFF.md` wird immer direkt im Hauptverzeichnis des
 Repositories abgelegt und aktualisiert.
+
+Die wiederverwendbare Startvorlage liegt als `AI_SESSION_PROMPT.md` ebenfalls
+im Hauptverzeichnis.
+
+Bei Widersprüchen gilt folgende Priorität:
+
+1. `AGENTS.md`
+2. `ai-context.md`
+3. `AI_SESSION_PROMPT.md`
+4. `AI_HANDOFF.md`
