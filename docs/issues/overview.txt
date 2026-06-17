@@ -1,17 +1,17 @@
 # aktualisiert
-001 Configuration Domain Foundation
-002 Dashboard Device List
-003 Settings Navigation Foundation
-004 UI Foundation Cleanup
-005 Local Persistence Foundation
-006 Encrypted WiFi Password Storage
-007 WiFi Profile Management
-008 Device Management
-009 WiFi Connection Service
-010 HTTP/API Call Service
-011 Device Action With WiFi Fallback
-012 Import/Export
-013 QR Code Import
+001 Configuration Domain Foundation - abgeschlossen
+002 Dashboard Device List - abgeschlossen
+003 Settings Navigation Foundation - abgeschlossen
+004 UI Foundation Cleanup - abgeschlossen
+005 Local Persistence Foundation - abgeschlossen
+006 Encrypted WiFi Password Storage - abgeschlossen
+007 WiFi Profile Management - abgeschlossen
+008 Device Management - abgeschlossen
+009 WiFi Connection Service - abgeschlossen
+010 HTTP/API Call Service - abgeschlossen
+011 Device Action With WiFi Fallback - abgeschlossen
+012 Import/Export - abgeschlossen
+013 QR Code Import - abgeschlossen
 014 Dashboard Device Reordering - abgeschlossen
 015 WiFi Profile Dialog Management - abgeschlossen
 016 Edit Items By Name Click
