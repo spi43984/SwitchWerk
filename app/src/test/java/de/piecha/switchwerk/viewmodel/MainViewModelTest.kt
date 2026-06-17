@@ -10,7 +10,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -39,10 +39,10 @@ class MainViewModelTest {
 
     @Test
     fun repeatedClickDoesNotStartSecondActionForSameDevice() = runTest(dispatcher) {
-        val device = device()
+        val device = device(id = "device-1", sortOrder = 0)
         val actionService = WaitingDeviceActionService()
         val viewModel = MainViewModel(
-            repository = FakeDeviceRepository(device),
+            repository = FakeDeviceRepository(listOf(device)),
             deviceActionService = actionService
         )
         runCurrent()
@@ -60,14 +60,35 @@ class MainViewModelTest {
         assertTrue(viewModel.uiState.value.deviceActionStates[device.id] is DeviceActionUiState.Success)
     }
 
-    private fun device(): Device {
+    @Test
+    fun moveDeviceDownPersistsReorderedDeviceIds() = runTest(dispatcher) {
+        val repository = FakeDeviceRepository(
+            listOf(
+                device(id = "device-1", sortOrder = 0),
+                device(id = "device-2", sortOrder = 1),
+                device(id = "device-3", sortOrder = 2)
+            )
+        )
+        val viewModel = MainViewModel(
+            repository = repository,
+            deviceActionService = WaitingDeviceActionService()
+        )
+        runCurrent()
+
+        viewModel.moveDeviceDown("device-1")
+        runCurrent()
+
+        assertEquals(listOf("device-2", "device-1", "device-3"), repository.lastDeviceOrder)
+    }
+
+    private fun device(id: String, sortOrder: Int): Device {
         return Device(
-            id = "device-1",
+            id = id,
             name = "Device",
             actionLabel = "Switch",
             apiCall = ApiCall(ApiMethod.GET, "/rpc/action"),
             connections = emptyList(),
-            sortOrder = 0
+            sortOrder = sortOrder
         )
     }
 
@@ -82,13 +103,24 @@ class MainViewModelTest {
     }
 
     private class FakeDeviceRepository(
-        private val device: Device
+        devices: List<Device>
     ) : DeviceRepository {
-        override fun observeDevices(): Flow<List<Device>> = flowOf(listOf(device))
+        private val devicesFlow = MutableStateFlow(devices)
+        var lastDeviceOrder: List<String> = emptyList()
 
-        override suspend fun getDevices(): List<Device> = listOf(device)
+        override fun observeDevices(): Flow<List<Device>> = devicesFlow
+
+        override suspend fun getDevices(): List<Device> = devicesFlow.value
 
         override suspend fun saveDevice(device: Device) = Unit
+
+        override suspend fun updateDeviceOrder(deviceIds: List<String>) {
+            lastDeviceOrder = deviceIds
+            val devicesById = devicesFlow.value.associateBy { it.id }
+            devicesFlow.value = deviceIds.mapIndexedNotNull { index, deviceId ->
+                devicesById[deviceId]?.copy(sortOrder = index)
+            }
+        }
 
         override suspend fun deleteDevice(deviceId: String) = Unit
     }

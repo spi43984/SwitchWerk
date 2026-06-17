@@ -33,7 +33,9 @@ val appModule = module {
             context = androidContext(),
             klass = AppDatabase::class.java,
             name = "switchwerk.db"
-        ).build()
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build()
     }
 
     single { get<AppDatabase>().deviceDao() }

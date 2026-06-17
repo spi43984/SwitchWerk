@@ -1,6 +1,25 @@
 # AI Handoff
 
-Stand: 16. Juni 2026
+Stand: 17. Juni 2026
+
+## Aktuelle Arbeit
+
+Issue 014 "Dashboard Device Reordering" ist im Branch
+`dashboard-device-reordering` implementiert und auf dem Host gebaut, aber noch
+nicht committet und nicht veröffentlicht.
+
+- GitHub-Issue: #30
+- Dashboard-Geräte können per Hoch-/Runter-Aktion umsortiert werden
+- Drag & Drop wurde nicht umgesetzt; die Bedienung erfolgt bewusst über Pfeile
+- Reihenfolge wird über `sortOrder` in Room gespeichert
+- Room-Datenbankversion wurde auf 2 erhöht und Migration 1 -> 2 ergänzt
+- Container-Prüfungen: `./gradlew testDebugUnitTest`, `git diff --check`
+- Host-Prüfung laut Benutzer erfolgreich:
+
+```text
+./gradlew clean assembleDebug
+./gradlew installDebug
+```
 
 ## Abgeschlossene Arbeit
 

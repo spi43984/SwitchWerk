@@ -7,5 +7,6 @@ interface DeviceRepository {
     fun observeDevices(): Flow<List<Device>>
     suspend fun getDevices(): List<Device>
     suspend fun saveDevice(device: Device)
+    suspend fun updateDeviceOrder(deviceIds: List<String>)
     suspend fun deleteDevice(deviceId: String)
 }

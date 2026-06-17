@@ -76,6 +76,38 @@ class MainViewModel(
         }
     }
 
+    fun moveDeviceUp(deviceId: String) {
+        moveDevice(deviceId = deviceId, offset = -1)
+    }
+
+    fun moveDeviceDown(deviceId: String) {
+        moveDevice(deviceId = deviceId, offset = 1)
+    }
+
+    private fun moveDevice(deviceId: String, offset: Int) {
+        val devices = _uiState.value.devices.sortedBy { it.sortOrder }
+        val currentIndex = devices.indexOfFirst { it.id == deviceId }
+        val targetIndex = currentIndex + offset
+
+        if (currentIndex !in devices.indices || targetIndex !in devices.indices) {
+            return
+        }
+
+        val reorderedDevices = devices.toMutableList().apply {
+            add(targetIndex, removeAt(currentIndex))
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                repository.updateDeviceOrder(reorderedDevices.map { it.id })
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = error.message ?: "Gerätereihenfolge konnte nicht geändert werden"
+                )
+            }
+        }
+    }
+
     private fun updateDeviceActionState(deviceId: String, state: DeviceActionUiState) {
         _uiState.value = _uiState.value.copy(
             deviceActionStates = _uiState.value.deviceActionStates + (deviceId to state)

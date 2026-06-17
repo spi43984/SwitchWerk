@@ -9,10 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -81,7 +87,9 @@ fun StartScreen(
             DeviceList(
                 devices = devices,
                 actionStates = uiState.deviceActionStates,
-                onDeviceActionClick = viewModel::executeDeviceAction
+                onDeviceActionClick = viewModel::executeDeviceAction,
+                onMoveUpClick = viewModel::moveDeviceUp,
+                onMoveDownClick = viewModel::moveDeviceDown
             )
         }
     }
@@ -105,7 +113,9 @@ private fun EmptyDeviceList() {
 private fun DeviceList(
     devices: List<Device>,
     actionStates: Map<String, DeviceActionUiState>,
-    onDeviceActionClick: (Device) -> Unit
+    onDeviceActionClick: (Device) -> Unit,
+    onMoveUpClick: (String) -> Unit,
+    onMoveDownClick: (String) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -117,7 +127,11 @@ private fun DeviceList(
             DeviceCard(
                 device = device,
                 actionState = actionStates[device.id],
-                onActionClick = { onDeviceActionClick(device) }
+                canMoveUp = devices.indexOf(device) > 0,
+                canMoveDown = devices.indexOf(device) < devices.lastIndex,
+                onActionClick = { onDeviceActionClick(device) },
+                onMoveUpClick = { onMoveUpClick(device.id) },
+                onMoveDownClick = { onMoveDownClick(device.id) }
             )
         }
     }
@@ -127,7 +141,11 @@ private fun DeviceList(
 private fun DeviceCard(
     device: Device,
     actionState: DeviceActionUiState?,
-    onActionClick: () -> Unit
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onActionClick: () -> Unit,
+    onMoveUpClick: () -> Unit,
+    onMoveDownClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -144,7 +162,8 @@ private fun DeviceCard(
 
             Button(
                 onClick = onActionClick,
-                enabled = actionState !is DeviceActionUiState.Loading
+                enabled = actionState !is DeviceActionUiState.Loading,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     if (actionState is DeviceActionUiState.Loading) {
@@ -153,6 +172,36 @@ private fun DeviceCard(
                         device.actionLabel
                     }
                 )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onMoveUpClick,
+                    enabled = canMoveUp,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Gerät nach oben verschieben"
+                    )
+                }
+
+                IconButton(
+                    onClick = onMoveDownClick,
+                    enabled = canMoveDown,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Gerät nach unten verschieben"
+                    )
+                }
             }
 
             when (actionState) {

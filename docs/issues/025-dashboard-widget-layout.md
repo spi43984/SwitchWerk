@@ -77,6 +77,40 @@ Import:
 - Widgets bleiben auch bei langen Geraetenamen nutzbar
 - Bestehende Geraeteaktionen bleiben unveraendert
 
+## Erweiterung
+
+### Drag & Drop
+
+Die in Issue 014 umgesetzte Pfeil-Sortierung bleibt bestehen.
+
+Für das Dashboard-Layout soll zusätzlich geprüft werden:
+
+- Drag & Drop für Widgets/Geräte
+- freie Positionierung innerhalb des Dashboard-Layouts
+- Speicherung der Layout-Positionen
+
+### Getrennte Sortierungen pro Sicht
+
+Die Reihenfolge soll nicht global gespeichert werden.
+
+Jede Sicht verwaltet ihre eigene Reihenfolge bzw. ihr eigenes Layout:
+
+- Dashboard-Sicht
+- zukünftige alternative Ansichten
+
+Beispiel:
+
+- Dashboard: Tor 1, Tor 2, Licht
+- Andere Sicht: Licht, Tor 2, Tor 1
+
+Änderungen in einer Sicht dürfen die Reihenfolge anderer Sichten nicht beeinflussen.
+
+### Architektur
+
+Die aktuelle sortOrder aus Issue 014 ist die Dashboard-Reihenfolge.
+
+Für spätere Layouts ist ein separates Layout-/View-abhängiges Positionsmodell vorzusehen, damit mehrere Ansichten unabhängig gespeichert werden können.
+
 ## Beispiel
 
 Ein Widget enthaelt oben den Geraetenamen, in der Mitte den Aktionsbutton und unten eine kurze Statuszeile.
