@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +25,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
@@ -74,6 +74,7 @@ fun SettingsScreen(
     var showQrImportModeDialog by remember { mutableStateOf(false) }
     var showUrlImportDialog by remember { mutableStateOf(false) }
     var showPasswordExportWarning by remember { mutableStateOf(false) }
+    var openSwipeItemId by remember { mutableStateOf<String?>(null) }
 
     val exportWithoutPasswordsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -117,6 +118,13 @@ fun SettingsScreen(
             viewModel.reportQrCameraPermissionDenied()
         }
     }
+    fun runAfterClosingSwipe(action: () -> Unit) {
+        if (openSwipeItemId != null) {
+            openSwipeItemId = null
+        } else {
+            action()
+        }
+    }
 
     BackHandler(enabled = uiState.isEditingWifiProfile) {
         viewModel.cancelWifiProfileEdit()
@@ -134,6 +142,12 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
+            .clickable(
+                enabled = openSwipeItemId != null,
+                onClick = {
+                    openSwipeItemId = null
+                }
+            )
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -161,7 +175,16 @@ fun SettingsScreen(
 
         WifiProfileManagementSection(
             profiles = uiState.wifiProfiles,
-            onAddClick = viewModel::startNewWifiProfile,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = { itemId ->
+                openSwipeItemId = itemId
+            },
+            onCloseSwipeItem = {
+                openSwipeItemId = null
+            },
+            onAddClick = {
+                runAfterClosingSwipe(viewModel::startNewWifiProfile)
+            },
             onEditClick = viewModel::startEditWifiProfile,
             onDeleteClick = viewModel::deleteWifiProfile
         )
@@ -171,7 +194,16 @@ fun SettingsScreen(
             wifiProfiles = uiState.wifiProfiles,
             isEditing = uiState.isEditingDevice,
             form = uiState.deviceForm,
-            onAddClick = viewModel::startNewDevice,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = { itemId ->
+                openSwipeItemId = itemId
+            },
+            onCloseSwipeItem = {
+                openSwipeItemId = null
+            },
+            onAddClick = {
+                runAfterClosingSwipe(viewModel::startNewDevice)
+            },
             onEditClick = viewModel::startEditDevice,
             onDeleteClick = viewModel::deleteDevice,
             onNameChange = viewModel::updateDeviceName,
@@ -188,27 +220,39 @@ fun SettingsScreen(
         ImportExportSection(
             isTransferInProgress = uiState.isTransferInProgress,
             onExportClick = {
-                viewModel.clearStatusMessage()
-                exportWithoutPasswordsLauncher.launch(EXPORT_FILE_NAME)
+                runAfterClosingSwipe {
+                    viewModel.clearStatusMessage()
+                    exportWithoutPasswordsLauncher.launch(EXPORT_FILE_NAME)
+                }
             },
             onExportWithPasswordsClick = {
-                showPasswordExportWarning = true
+                runAfterClosingSwipe {
+                    showPasswordExportWarning = true
+                }
             },
             onImportFileClick = {
-                showFileImportModeDialog = true
+                runAfterClosingSwipe {
+                    showFileImportModeDialog = true
+                }
             },
             onImportUrlClick = {
-                showUrlImportDialog = true
+                runAfterClosingSwipe {
+                    showUrlImportDialog = true
+                }
             },
             onScanQrCodeClick = {
-                showQrImportModeDialog = true
+                runAfterClosingSwipe {
+                    showQrImportModeDialog = true
+                }
             }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
-            onClick = onNavigateBack
+            onClick = {
+                runAfterClosingSwipe(onNavigateBack)
+            }
         ) {
             Text("Zurück zum Dashboard")
         }
@@ -308,6 +352,9 @@ fun SettingsScreen(
 @Composable
 private fun WifiProfileManagementSection(
     profiles: List<WifiProfile>,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onAddClick: () -> Unit,
     onEditClick: (WifiProfile) -> Unit,
     onDeleteClick: (String) -> Unit
@@ -316,8 +363,8 @@ private fun WifiProfileManagementSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(start = 12.dp, top = 12.dp, end = 6.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(start = 12.dp, top = 6.dp, end = 6.dp, bottom = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -342,6 +389,9 @@ private fun WifiProfileManagementSection(
 
             WifiProfileList(
                 profiles = profiles,
+                openSwipeItemId = openSwipeItemId,
+                onOpenSwipeItem = onOpenSwipeItem,
+                onCloseSwipeItem = onCloseSwipeItem,
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick
             )
@@ -352,21 +402,22 @@ private fun WifiProfileManagementSection(
 @Composable
 private fun WifiProfileList(
     profiles: List<WifiProfile>,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onEditClick: (WifiProfile) -> Unit,
     onDeleteClick: (String) -> Unit
 ) {
     if (profiles.isEmpty()) {
-        Text(
-            text = "Keine WLAN-Profile konfiguriert.",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        EmptyWifiProfileListArea()
         return
     }
 
     val listState = rememberLazyListState()
-
     Column(
-        modifier = Modifier.height(172.dp),
+        modifier = Modifier
+            .height(172.dp)
+            .background(MaterialTheme.colorScheme.surface),
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Box(
@@ -387,14 +438,34 @@ private fun WifiProfileList(
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier.height(140.dp)
+            modifier = Modifier
+                .height(140.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable(
+                    enabled = openSwipeItemId != null,
+                    onClick = onCloseSwipeItem
+                )
         ) {
             items(
                 items = profiles,
                 key = { profile -> profile.id }
             ) { profile ->
+                val swipeItemId = "wifi:${profile.id}"
                 WifiProfileRow(
                     profile = profile,
+                    isOpen = openSwipeItemId == swipeItemId,
+                    isAnyItemOpen = openSwipeItemId != null,
+                    onOpen = {
+                        onOpenSwipeItem(swipeItemId)
+                    },
+                    onClose = onCloseSwipeItem,
+                    onContentClick = {
+                        if (openSwipeItemId == null) {
+                            onEditClick(profile)
+                        } else {
+                            onCloseSwipeItem()
+                        }
+                    },
                     onEditClick = { onEditClick(profile) },
                     onDeleteClick = { onDeleteClick(profile.id) }
                 )
@@ -419,8 +490,29 @@ private fun WifiProfileList(
 }
 
 @Composable
+private fun EmptyWifiProfileListArea() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(172.dp)
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(
+            text = "Keine WLAN-Profile konfiguriert.",
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
 private fun WifiProfileRow(
     profile: WifiProfile,
+    isOpen: Boolean,
+    isAnyItemOpen: Boolean,
+    onOpen: () -> Unit,
+    onClose: () -> Unit,
+    onContentClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -459,45 +551,28 @@ private fun WifiProfileRow(
         )
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
-        verticalAlignment = Alignment.CenterVertically
+    SwipeRevealItem(
+        isOpen = isOpen,
+        isAnyItemOpen = isAnyItemOpen,
+        onOpen = onOpen,
+        onClose = onClose,
+        onContentClick = onContentClick,
+        onEditClick = onEditClick,
+        onDeleteClick = {
+            pendingDeleteProfile = profile
+        }
     ) {
-        Text(
-            text = profile.ssid,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 4.dp, bottom = 4.dp)
-        )
-
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onEditClick,
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "WLAN-Profil bearbeiten"
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    pendingDeleteProfile = profile
-                },
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "WLAN-Profil löschen"
-                )
-            }
+            Text(
+                text = profile.ssid,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+            )
         }
     }
 }
