@@ -29,6 +29,28 @@ festen hellen oder dunklen Design betrieben werden können.
 - Schalter zum Ein-/Ausschalten der Detailanzeige
 - Einstellung wird dauerhaft gespeichert
 
+### Zeitstempel in Diagnosemeldungen
+
+Alle Diagnosemeldungen sollen einen Zeitstempel im Format `HH:mm:ss.SSS`
+erhalten.
+
+Beispiel:
+
+12:00:01.123 Aktion gestartet
+12:00:01.456 WLAN "Shelly-AP" angefordert
+12:00:03.012 WLAN verbunden
+12:00:03.987 IP-Adresse erhalten
+12:00:04.102 HTTP GET gestartet
+12:00:04.284 HTTP GET erfolgreich
+
+Ziel:
+
+- Analyse von Verbindungsproblemen
+- Erkennen von Verzögerungen beim WLAN-Wechsel
+- Erkennen von DHCP-Problemen
+- Erkennen von HTTP-Timeouts
+- Nachvollziehbarkeit für Anwender und Entwickler
+
 ### Detailbereich im Dashboard
 
 - Optionaler Detailbereich am unteren Rand des Dashboards
