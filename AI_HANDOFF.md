@@ -62,4 +62,8 @@ Host-Build und Installation wurden vom Benutzer als erfolgreich gemeldet.
 023 Settings Display And Action Details
 025 Dashboard Widget Layout
 026 Settings UI Rework
+027 WiFi Timeout Analysis And Stabilization
+028 Theme Mode Setting
+029 Language Setting
+030 WiFi Profile Deletion Safety
 ```
