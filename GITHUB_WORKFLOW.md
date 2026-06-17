@@ -96,13 +96,21 @@ Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`,
 12. Feature-Branch pushen.
 13. Pull Request erstellen.
 14. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
-15. Lokale Issue-Datei unter `docs/issues` abhaken.
-16. Änderung an der Issue-Datei committen und pushen.
-17. Zugehöriges GitHub-Issue schließen.
-18. Branch lokal und remote löschen.
+15. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+16. Lokale Issue-Datei unter `docs/issues` abhaken.
+17. `docs/issues/overview.txt` aktualisieren.
+18. `ai-context.md` aktualisieren:
+    - abgeschlossenes Issue in `Abgeschlossen` verschieben
+    - abgeschlossenes Issue aus `Offen` entfernen
+    - `Nächstes Issue` auf das nächste offene Issue setzen
+19. Prüfen, dass `docs/issues/overview.txt`, die lokale Issue-Datei und `ai-context.md` denselben Status zeigen.
+20. Dokumentationsänderungen committen und pushen.
+21. Zugehöriges GitHub-Issue erst danach schließen.
+22. Branch lokal und remote löschen.
 
 Beispiel nach Merge:
 
     git switch main
     git pull
+    git status
     git branch -d wifi-connection-service
