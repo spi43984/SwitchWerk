@@ -9,95 +9,75 @@ Keine aktive Implementierung.
 Nächstes geplantes Issue laut `ai-context.md`:
 
 ```text
-015 WiFi Profile Dialog Management
+017 Unique WiFi Profile Name
 ```
 
-## Abgeschlossene Arbeit
+## Zuletzt abgeschlossene Arbeit
 
-Issue 012 "Import / Export" ist implementiert, geprüft, veröffentlicht und nach
-`main` gemergt.
+Issue 016 "Edit Items by Name Click and Swipe Actions" ist implementiert, geprüft,
+veröffentlicht, nach `main` gemergt und abgeschlossen.
 
-- GitHub-Issue: #25
-- Pull Request: #26
-- Implementierungs-Commit: `a67232db728808aadedb62bba6a88e69bcf790a2`
-- Merge-Commit: `0f4fd413323d33e0a1fe8a12537f78d5491e43c8`
+- GitHub-Issue: #37
+- Pull Request: #38
+- Branch: `edit-items-by-name-click`
+- Implementierungs-Commit: `5f73093d19c36d17d7bce0530b420f1a66738015`
+- Merge-Commit: `4468498f7d783bbad2b329778613198fd03ce26c`
 
-Issue 013 "QR Code Import" ist implementiert, geprüft, veröffentlicht und nach
-`main` gemergt.
+## Umgesetzter Scope Issue 016
 
-- Pull Request: #28
-- Implementierungs-Commit: `30a736ee7a8a8e1129148694f64d9263700cb471`
-- Merge-Commit: `1fe04e6e152048919c69afeaa144736c11d57c78`
+- Geräte und WLAN-Profile werden in den Einstellungen durch kurzen Klick auf den
+  Namen bzw. Eintrag bearbeitet, solange kein Swipe-Eintrag offen ist.
+- Geräte- und WLAN-Profilzeilen haben keine dauerhaft sichtbaren Bearbeiten- oder
+  Löschen-Icons mehr.
+- Swipe nach links oder rechts legt Aktionssymbole frei.
+- Der Swipe selbst führt keine Aktion aus.
+- Bearbeiten erfolgt nur über Tipp auf das freigelegte Bleistift-Symbol.
+- Löschen erfolgt nur über Tipp auf das freigelegte Mülleimer-Symbol.
+- Tippen außerhalb der freigelegten Symbole schließt einen offenen Swipe ohne
+  weitere Aktion.
+- Ein neuer Swipe schließt andere offene Swipes.
+- Die Geräteliste in den Einstellungen zeigt nur noch den Gerätenamen.
+- Listenflächen behalten auch bei wenigen oder keinen Einträgen ihre Höhe und
+  Hintergrundfläche.
 
-Issue 014 "Dashboard Device Reordering" ist implementiert, geprüft,
-veröffentlicht und abgeschlossen.
+## Technische Umsetzung Issue 016
 
-- GitHub-Issue: #30
-- Branch: `dashboard-device-reordering`
-- Dashboard-Geräte können per Hoch-/Runter-Aktion umsortiert werden
-- Drag & Drop wurde nicht umgesetzt; die Bedienung erfolgt bewusst über Pfeile
-- Drag & Drop und getrennte Sortierungen/Layout-Positionen pro Sicht bleiben für Issue 025 vorgesehen
-- Reihenfolge wird über `sortOrder` in Room gespeichert
-- Room-Datenbankversion wurde auf 2 erhöht und Migration 1 -> 2 ergänzt
-- Container-Prüfungen: `./gradlew testDebugUnitTest`, `git diff --check`
-- Host-Prüfung laut Benutzer erfolgreich:
-
-```text
-./gradlew clean assembleDebug
-./gradlew installDebug
-```
-
-## Implementierter Scope
-
-- versioniertes JSON-Austauschformat mit `schemaVersion = 1`
-- Export ohne Passwörter sowie optionaler Klartext-Passwortexport mit Warnung
-- Dateiimport und Import aus direkten HTTPS-URLs
-- öffentliche Nextcloud- und Google-Drive-Freigabelinks
-- Importmodi "Ergänzen / überschreiben" und "Alles ersetzen"
-- Importzusammenfassung und zusätzliche Passwortwarnung
-- sichere Ablage importierter Passwörter im bestehenden Credential Store
-- Erhalt der WLAN-Zuordnungsreihenfolge
-- strikte Importvalidierung und Größenlimit
-- QR-Code-Import für HTTPS-Importquellen
-- Dashboard-Sortierung per Pfeilaktionen
-- persistente Dashboard-Reihenfolge über Room `sortOrder`
+- Keine externe Swipe-Library.
+- Keine neue Dependency.
+- Keine Verwendung von `SwipeToDismissBox`.
+- Kleine lokale Compose-Helper-Composable `SwipeRevealItem`.
+- Umsetzung mit `AnchoredDraggableState`, `DraggableAnchors` und
+  `Modifier.anchoredDraggable`.
+- Bestehende ViewModel-Callbacks wurden wiederverwendet.
+- Keine Datenmodell-, Repository-, Passwort-, WLAN-Verbindungs- oder
+  Geräteaktionsänderungen.
 
 ## Bestätigte Prüfungen
 
 ```text
+git diff --check
 ./gradlew testDebugUnitTest
+./gradlew assembleDebug
 ./gradlew clean assembleDebug
 ./gradlew installDebug
-git diff --check
 ```
 
-Zusätzlich erfolgreich manuell geprüft:
+Host-Build und Installation wurden vom Benutzer als erfolgreich gemeldet.
 
-- Export und Dateiimport
-- Nextcloud-Import
-- öffentlich freigegebener Google-Drive-Import
-- QR-Code-Import
-- Installation und Start auf Pixel 10 Pro XL mit Android 16
-- Dashboard-Sortierung per Pfeile
-- Erhalt der Dashboard-Reihenfolge nach App-Neustart
-- Schalten nach Dashboard-Sortierung weiterhin erfolgreich
+## Wichtige Hinweise für die nächste Session
 
-GitHub Actions "Android Build" für PR #26 und PR #28 waren erfolgreich.
-
-## Offener Folgeschritt
-
-Authentifizierte Importquellen sind nicht Bestandteil von Issue #25. Die
-separate Planung liegt unter:
-
-```text
-docs/issues/024-authenticated-import-sources.md
-```
+- Die lokalen Statusdateien wurden nach Issue 016 aktualisiert:
+  - `docs/issues/016-edit-items-by-name-click.md`
+  - `docs/issues/overview.txt`
+  - `ai-context.md`
+  - `AI_HANDOFF.md`
+- GitHub-Issue #37 ist geschlossen.
+- PR #38 ist gemergt.
+- Nächstes fachliches Issue ist 017 "Unique WiFi Profile Name".
 
 ## Nächste geplante Themen
 
 ```text
-015 WiFi Profile Dialog Management
-016 Edit Items By Name Click
 017 Unique WiFi Profile Name
 018 Adaptive WiFi Security Fallback
 019 Configurable WiFi List Sorting
