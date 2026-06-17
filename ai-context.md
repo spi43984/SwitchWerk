@@ -93,14 +93,19 @@ Kurzfassung:
 
 1. Nicht direkt auf `main` implementieren.
 2. Passendes Issue unter `docs/issues` bestimmen.
-3. Prüfen, ob GitHub-Issue oder Feature-Branch bereits existiert.
-4. Nur bei Bedarf ein GitHub-Issue aus der lokalen Issue-Datei erzeugen.
-5. Eigenen fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
-6. Scope eng halten.
-7. Änderungen prüfen.
-8. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
-9. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
-10. Nach erfolgreichem Merge immer `docs/issues/overview.txt` und `ai-context.md` aktualisieren, bevor das GitHub-Issue geschlossen wird.
+3. Lokale Issue-Dateien dürfen als Planung angelegt werden, ohne sofort ein
+   GitHub-Issue zu erstellen.
+4. Erst wenn ein konkretes Issue implementiert werden soll, prüfen, ob dafür
+   bereits ein GitHub-Issue oder Feature-Branch existiert.
+5. Nur vor Beginn dieser Implementierung und nur falls noch kein passendes
+   GitHub-Issue existiert, ein GitHub-Issue aus der lokalen Issue-Datei
+   erzeugen.
+6. Eigenen fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
+7. Scope eng halten.
+8. Änderungen prüfen.
+9. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
+10. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
+11. Nach erfolgreichem Merge immer `docs/issues/overview.txt` und `ai-context.md` aktualisieren, bevor das GitHub-Issue geschlossen wird.
 
 ---
 
@@ -140,6 +145,8 @@ Kurzfassung:
 - 028 Theme Mode Setting
 - 029 Language Setting
 - 030 WiFi Profile Deletion Safety
+- 031 Import Enforces Unique WiFi Profile Names
+- 032 Room Schema And Migration Test Coverage
 
 ### Zurückgestellt / Backlog
 

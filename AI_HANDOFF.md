@@ -66,4 +66,6 @@ Host-Build und Installation wurden vom Benutzer als erfolgreich gemeldet.
 028 Theme Mode Setting
 029 Language Setting
 030 WiFi Profile Deletion Safety
+031 Import Enforces Unique WiFi Profile Names
+032 Room Schema And Migration Test Coverage
 ```
