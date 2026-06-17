@@ -1,5 +1,7 @@
 package de.piecha.switchwerk.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +53,9 @@ fun DeviceManagementSection(
     wifiProfiles: List<WifiProfile>,
     isEditing: Boolean,
     form: DeviceFormState,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onAddClick: () -> Unit,
     onEditClick: (Device) -> Unit,
     onDeleteClick: (String) -> Unit,
@@ -84,8 +89,8 @@ fun DeviceManagementSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(start = 12.dp, top = 12.dp, end = 6.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(start = 12.dp, top = 6.dp, end = 6.dp, bottom = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -110,6 +115,9 @@ fun DeviceManagementSection(
 
             DeviceList(
                 devices = devices,
+                openSwipeItemId = openSwipeItemId,
+                onOpenSwipeItem = onOpenSwipeItem,
+                onCloseSwipeItem = onCloseSwipeItem,
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick
             )
@@ -192,21 +200,22 @@ private fun DeviceEditDialog(
 @Composable
 private fun DeviceList(
     devices: List<Device>,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onEditClick: (Device) -> Unit,
     onDeleteClick: (String) -> Unit
 ) {
     if (devices.isEmpty()) {
-        Text(
-            text = "Keine Geräte konfiguriert.",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        EmptyListArea(text = "Keine Geräte konfiguriert.")
         return
     }
 
     val listState = rememberLazyListState()
-
     Column(
-        modifier = Modifier.height(172.dp),
+        modifier = Modifier
+            .height(172.dp)
+            .background(MaterialTheme.colorScheme.surface),
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Box(
@@ -227,14 +236,34 @@ private fun DeviceList(
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier.height(140.dp)
+            modifier = Modifier
+                .height(140.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable(
+                    enabled = openSwipeItemId != null,
+                    onClick = onCloseSwipeItem
+                )
         ) {
             items(
                 items = devices,
                 key = { device -> device.id }
             ) { device ->
+                val swipeItemId = "device:${device.id}"
                 DeviceRow(
                     device = device,
+                    isOpen = openSwipeItemId == swipeItemId,
+                    isAnyItemOpen = openSwipeItemId != null,
+                    onOpen = {
+                        onOpenSwipeItem(swipeItemId)
+                    },
+                    onClose = onCloseSwipeItem,
+                    onContentClick = {
+                        if (openSwipeItemId == null) {
+                            onEditClick(device)
+                        } else {
+                            onCloseSwipeItem()
+                        }
+                    },
                     onEditClick = { onEditClick(device) },
                     onDeleteClick = { onDeleteClick(device.id) }
                 )
@@ -259,8 +288,29 @@ private fun DeviceList(
 }
 
 @Composable
+private fun EmptyListArea(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(172.dp)
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
 private fun DeviceRow(
     device: Device,
+    isOpen: Boolean,
+    isAnyItemOpen: Boolean,
+    onOpen: () -> Unit,
+    onClose: () -> Unit,
+    onContentClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -279,61 +329,31 @@ private fun DeviceRow(
         )
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 4.dp, bottom = 4.dp)
-        ) {
-            Text(
-                text = device.name,
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Text(
-                text = device.actionLabel,
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Text(
-                text = "${device.apiCall.method} ${device.apiCall.path}",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Text(
-                text = "${device.connections.size} WLAN-Zuordnung(en)",
-                style = MaterialTheme.typography.bodySmall
-            )
+    SwipeRevealItem(
+        isOpen = isOpen,
+        isAnyItemOpen = isAnyItemOpen,
+        onOpen = onOpen,
+        onClose = onClose,
+        onContentClick = onContentClick,
+        onEditClick = onEditClick,
+        onDeleteClick = {
+            pendingDeleteDevice = device
         }
-
+    ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onEditClick,
-                modifier = Modifier.size(26.dp)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = 4.dp, bottom = 4.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Gerät bearbeiten"
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    pendingDeleteDevice = device
-                },
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "Gerät löschen"
+                Text(
+                    text = device.name,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
