@@ -150,6 +150,18 @@ ausgeführt werden:
 11. Zugehöriges GitHub-Issue erst danach schließen.
 12. Feature-Branch lokal und remote löschen.
 
+### Verbindliche Issue-Abschluss-Checkliste
+
+Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wurden:
+
+- [ ] `docs/issues/<issue>.md` aktualisiert
+- [ ] `docs/issues/overview.txt` aktualisiert
+- [ ] `ai-context.md` aktualisiert
+- [ ] `AI_HANDOFF.md` aktualisiert
+- [ ] nächstes offenes Issue festgelegt
+- [ ] Status der Dokumentationsdateien ist konsistent
+- [ ] GitHub-Issue geschlossen
+
 Ohne ausdrückliche Nachfrage des Benutzers gilt:
 
 - nicht committen
