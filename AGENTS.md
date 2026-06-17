@@ -137,9 +137,18 @@ ausgeführt werden:
 2. Feature-Branch pushen.
 3. Pull Request erstellen.
 4. Pull Request prüfen und nach ausdrücklicher Freigabe nach `main` mergen.
-5. Lokale Issue-Datei abhaken.
-6. Zugehöriges GitHub-Issue schließen.
-7. Feature-Branch lokal und remote löschen.
+5. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+6. Lokale Issue-Datei unter `docs/issues` abhaken.
+7. `docs/issues/overview.txt` aktualisieren.
+8. `ai-context.md` aktualisieren:
+   - abgeschlossenes Issue in `Abgeschlossen` verschieben
+   - abgeschlossenes Issue aus `Offen` entfernen
+   - `Nächstes Issue` auf das nächste offene Issue setzen
+9. Prüfen, dass `docs/issues/overview.txt`, die lokale Issue-Datei und
+   `ai-context.md` denselben Status zeigen.
+10. Dokumentationsänderungen committen und pushen.
+11. Zugehöriges GitHub-Issue erst danach schließen.
+12. Feature-Branch lokal und remote löschen.
 
 Ohne ausdrückliche Nachfrage des Benutzers gilt:
 
