@@ -17,9 +17,14 @@ class ConfigurationImportValidator {
             ids = document.devices.map { it.id },
             type = "Gerät"
         )
+        requireUniqueNames(
+            names = document.wifiProfiles.map { it.name },
+            type = "WLAN-Profilname"
+        )
 
         document.wifiProfiles.forEach { profile ->
             requireNotBlank(profile.id, "WLAN-Profil-ID")
+            requireNotBlank(profile.name, "WLAN-Profilname")
             requireNotBlank(profile.ssid, "SSID")
             requireNotBlank(profile.securityType, "WLAN-Sicherheitstyp")
             require(profile.securityType == SUPPORTED_SECURITY_TYPE) {
@@ -61,6 +66,13 @@ class ConfigurationImportValidator {
     private fun requireNotBlank(value: String, fieldName: String) {
         require(value.isNotBlank()) {
             "$fieldName darf nicht leer sein"
+        }
+    }
+
+    private fun requireUniqueNames(names: List<String>, type: String) {
+        val normalizedNames = names.map { it.trim().lowercase() }
+        require(normalizedNames.size == normalizedNames.toSet().size) {
+            "Doppelte Namen für $type"
         }
     }
 

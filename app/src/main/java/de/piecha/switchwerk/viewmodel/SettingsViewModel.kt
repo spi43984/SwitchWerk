@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 
 data class WifiProfileFormState(
     val id: String? = null,
+    val name: String = "",
     val ssid: String = "",
     val password: String = "",
     val hasSavedPassword: Boolean = false,
@@ -32,6 +33,7 @@ data class WifiProfileFormState(
 
 data class DeviceConnectionFormState(
     val wifiProfileId: String,
+    val wifiProfileName: String,
     val ssid: String,
     val host: String = ""
 )
@@ -86,7 +88,11 @@ class SettingsViewModel(
 
     fun startEditWifiProfile(profile: WifiProfile) {
         _uiState.value = _uiState.value.copy(
-            form = WifiProfileFormState(id = profile.id, ssid = profile.ssid),
+            form = WifiProfileFormState(
+                id = profile.id,
+                name = profile.name,
+                ssid = profile.ssid
+            ),
             isEditingWifiProfile = true,
             isEditingDevice = false,
             errorMessage = null
@@ -115,9 +121,22 @@ class SettingsViewModel(
         )
     }
 
-    fun updateWifiProfileSsid(ssid: String) {
+    fun updateWifiProfileName(name: String) {
         _uiState.value = _uiState.value.copy(
-            form = _uiState.value.form.copy(ssid = ssid),
+            form = _uiState.value.form.copy(name = name),
+            errorMessage = null
+        )
+    }
+
+    fun updateWifiProfileSsid(ssid: String) {
+        val form = _uiState.value.form
+        val shouldSuggestName = form.id == null &&
+            (form.name.isBlank() || form.name.trim() == form.ssid.trim())
+        _uiState.value = _uiState.value.copy(
+            form = form.copy(
+                ssid = ssid,
+                name = if (shouldSuggestName) uniqueWifiProfileName(ssid.trim()) else form.name
+            ),
             errorMessage = null
         )
     }
@@ -180,10 +199,21 @@ class SettingsViewModel(
 
     fun saveWifiProfile() {
         val form = _uiState.value.form
+        val trimmedName = form.name.trim()
         val trimmedSsid = form.ssid.trim()
+
+        if (trimmedName.isBlank()) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Profilname darf nicht leer sein")
+            return
+        }
 
         if (trimmedSsid.isBlank()) {
             _uiState.value = _uiState.value.copy(errorMessage = "SSID darf nicht leer sein")
+            return
+        }
+
+        if (isWifiProfileNameUsed(trimmedName, form.id)) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Profilname ist bereits vergeben")
             return
         }
 
@@ -191,6 +221,7 @@ class SettingsViewModel(
             runCatching {
                 val profile = WifiProfile(
                     id = form.id ?: UUID.randomUUID().toString(),
+                    name = trimmedName,
                     ssid = trimmedSsid
                 )
 
@@ -331,10 +362,13 @@ class SettingsViewModel(
                 apiMethod = device.apiCall.method.name,
                 apiPath = device.apiCall.path,
                 connections = device.connections.map { connection ->
+                    val profile = _uiState.value.wifiProfiles.firstOrNull {
+                        it.id == connection.wifiProfileId
+                    }
                     DeviceConnectionFormState(
                         wifiProfileId = connection.wifiProfileId,
-                        ssid = _uiState.value.wifiProfiles.firstOrNull { it.id == connection.wifiProfileId }?.ssid
-                            ?: "Unbekanntes WLAN",
+                        wifiProfileName = profile?.name ?: "Unbekanntes WLAN",
+                        ssid = profile?.ssid ?: "Unbekanntes WLAN",
                         host = connection.host
                     )
                 }
@@ -388,6 +422,7 @@ class SettingsViewModel(
             it.copy(
                 connections = it.connections + DeviceConnectionFormState(
                     wifiProfileId = profile.id,
+                    wifiProfileName = profile.name,
                     ssid = profile.ssid,
                     host = trimmedHost
                 )
@@ -420,6 +455,7 @@ class SettingsViewModel(
                     if (connection.wifiProfileId == oldWifiProfileId) {
                         DeviceConnectionFormState(
                             wifiProfileId = profile.id,
+                            wifiProfileName = profile.name,
                             ssid = profile.ssid,
                             host = trimmedHost
                         )
@@ -560,7 +596,10 @@ class SettingsViewModel(
                         connections = current.deviceForm.connections.mapNotNull { connection ->
                             val profile = profiles.firstOrNull { it.id == connection.wifiProfileId }
                             profile?.let {
-                                connection.copy(ssid = it.ssid)
+                                connection.copy(
+                                    wifiProfileName = it.name,
+                                    ssid = it.ssid
+                                )
                             }
                         }
                     ),
@@ -685,6 +724,26 @@ class SettingsViewModel(
     private fun String.isValidImportUrl(): Boolean {
         val uri = runCatching { URI(this) }.getOrNull() ?: return false
         return uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()
+    }
+
+    private fun isWifiProfileNameUsed(name: String, currentProfileId: String?): Boolean {
+        return _uiState.value.wifiProfiles.any { profile ->
+            profile.id != currentProfileId && profile.name.equals(name, ignoreCase = true)
+        }
+    }
+
+    private fun uniqueWifiProfileName(baseName: String): String {
+        if (baseName.isBlank()) {
+            return ""
+        }
+
+        var candidate = baseName
+        var suffix = 2
+        while (isWifiProfileNameUsed(candidate, currentProfileId = null)) {
+            candidate = "$baseName ($suffix)"
+            suffix += 1
+        }
+        return candidate
     }
 
     private companion object {

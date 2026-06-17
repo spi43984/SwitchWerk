@@ -623,12 +623,12 @@ private fun DeviceConnectionRow(
                 .padding(top = 4.dp, bottom = 4.dp)
         ) {
             Text(
-                text = connection.ssid,
+                text = connection.wifiProfileName,
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
-                text = connection.host,
+                text = "SSID: ${connection.ssid} | ${connection.host}",
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -723,10 +723,17 @@ private fun ConnectionEditDialog(
                                     }
                                 )
 
-                                Text(
-                                    text = profile.ssid,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                                Column {
+                                    Text(
+                                        text = profile.name,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+
+                                    Text(
+                                        text = "SSID: ${profile.ssid}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
                         }
 

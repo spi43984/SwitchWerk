@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "wifi_profiles")
 data class WifiProfileEntity(
     @PrimaryKey val id: String,
+    val name: String,
     val ssid: String,
     val securityType: String
 )

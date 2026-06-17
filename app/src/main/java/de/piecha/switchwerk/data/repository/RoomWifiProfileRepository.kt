@@ -28,6 +28,20 @@ class RoomWifiProfileRepository(
         password: String?,
         shouldUpdatePassword: Boolean
     ) {
+        require(profile.name.isNotBlank()) {
+            "Profilname darf nicht leer sein"
+        }
+        require(profile.ssid.isNotBlank()) {
+            "SSID darf nicht leer sein"
+        }
+        require(
+            wifiProfileDao.getAll().none {
+                it.id != profile.id && it.name.equals(profile.name, ignoreCase = true)
+            }
+        ) {
+            "Profilname ist bereits vergeben"
+        }
+
         wifiProfileDao.upsert(profile.toEntity())
 
         if (shouldUpdatePassword) {
@@ -62,13 +76,15 @@ class RoomWifiProfileRepository(
     private fun WifiProfileEntity.toDomain(): WifiProfile {
         return WifiProfile(
             id = id,
-            ssid = ssid
+            ssid = ssid,
+            name = name
         )
     }
 
     private fun WifiProfile.toEntity(): WifiProfileEntity {
         return WifiProfileEntity(
             id = id,
+            name = name,
             ssid = ssid,
             securityType = DEFAULT_SECURITY_TYPE
         )

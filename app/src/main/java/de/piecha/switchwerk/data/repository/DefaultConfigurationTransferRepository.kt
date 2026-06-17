@@ -123,6 +123,7 @@ class DefaultConfigurationTransferRepository(
             wifiProfiles = profiles.map { profile ->
                 ConfigurationWifiProfile(
                     id = profile.id,
+                    name = profile.name,
                     ssid = profile.ssid,
                     securityType = profile.securityType,
                     password = if (includePasswords) {
@@ -254,6 +255,7 @@ class DefaultConfigurationTransferRepository(
     private fun ConfigurationWifiProfile.toEntity(): WifiProfileEntity {
         return WifiProfileEntity(
             id = id,
+            name = name,
             ssid = ssid,
             securityType = securityType
         )

@@ -11,10 +11,12 @@ class FakeWifiProfileRepository : WifiProfileRepository {
         listOf(
             WifiProfile(
                 id = "garage-ap",
+                name = "Garage",
                 ssid = "Shelly-Garage"
             ),
             WifiProfile(
                 id = "home-wifi",
+                name = "Zuhause",
                 ssid = "Home-WLAN"
             )
         )
@@ -41,7 +43,7 @@ class FakeWifiProfileRepository : WifiProfileRepository {
         profiles.value = profiles.value
             .filterNot { it.id == profile.id }
             .plus(profile)
-            .sortedBy { it.ssid }
+            .sortedBy { it.name }
 
         if (shouldUpdatePassword) {
             if (password == null) {
