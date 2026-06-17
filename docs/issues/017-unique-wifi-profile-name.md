@@ -1,5 +1,7 @@
 # Issue #17: Unique WiFi Profile Name
 
+Status: abgeschlossen
+
 ## Ziel
 WLAN-Profile erhalten zusätzlich zu SSID und Passwort einen eindeutigen, frei wählbaren Namen.
 
@@ -20,9 +22,9 @@ Dadurch können mehrere WLAN-Profile mit identischer SSID eindeutig unterschiede
 - Änderung des WLAN-Verbindungsdienstes
 
 ## Akzeptanzkriterien
-- [ ] Jedes WLAN-Profil besitzt einen nicht leeren Namen
-- [ ] Profilnamen sind eindeutig
-- [ ] Mehrere Profile dürfen dieselbe SSID verwenden
-- [ ] Name, SSID und Passwort können bearbeitet werden
-- [ ] Bestehende Profile bleiben nach der Datenbankmigration erhalten
-- [ ] WLAN-Profile sind in Listen und Gerätezuordnungen eindeutig erkennbar
+- [x] Jedes WLAN-Profil besitzt einen nicht leeren Namen
+- [x] Profilnamen sind eindeutig
+- [x] Mehrere Profile dürfen dieselbe SSID verwenden
+- [x] Name, SSID und Passwort können bearbeitet werden
+- [x] Bestehende Profile bleiben nach der Datenbankmigration erhalten
+- [x] WLAN-Profile sind in Listen und Gerätezuordnungen eindeutig erkennbar
