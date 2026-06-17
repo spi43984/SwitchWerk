@@ -161,19 +161,9 @@ fun SettingsScreen(
 
         WifiProfileManagementSection(
             profiles = uiState.wifiProfiles,
-            isEditing = uiState.isEditingWifiProfile,
-            ssid = uiState.form.ssid,
-            password = uiState.form.password,
-            isPasswordVisible = uiState.form.isPasswordVisible,
             onAddClick = viewModel::startNewWifiProfile,
             onEditClick = viewModel::startEditWifiProfile,
-            onDeleteClick = viewModel::deleteWifiProfile,
-            onSsidChange = viewModel::updateWifiProfileSsid,
-            onPasswordChange = viewModel::updateWifiProfilePassword,
-            onClearPasswordClick = viewModel::clearWifiProfilePassword,
-            onTogglePasswordVisibility = viewModel::toggleWifiPasswordVisibility,
-            onSaveClick = viewModel::saveWifiProfile,
-            onCancelClick = viewModel::cancelWifiProfileEdit
+            onDeleteClick = viewModel::deleteWifiProfile
         )
 
         DeviceManagementSection(
@@ -233,6 +223,21 @@ fun SettingsScreen(
             onCancel = {
                 showPasswordExportWarning = false
             }
+        )
+    }
+
+    if (uiState.isEditingWifiProfile) {
+        WifiProfileDialog(
+            isNewProfile = uiState.form.id == null,
+            ssid = uiState.form.ssid,
+            password = uiState.form.password,
+            isPasswordVisible = uiState.form.isPasswordVisible,
+            onSsidChange = viewModel::updateWifiProfileSsid,
+            onPasswordChange = viewModel::updateWifiProfilePassword,
+            onClearPasswordClick = viewModel::clearWifiProfilePassword,
+            onTogglePasswordVisibility = viewModel::toggleWifiPasswordVisibility,
+            onSaveClick = viewModel::saveWifiProfile,
+            onCancelClick = viewModel::cancelWifiProfileEdit
         )
     }
 
@@ -303,19 +308,9 @@ fun SettingsScreen(
 @Composable
 private fun WifiProfileManagementSection(
     profiles: List<WifiProfile>,
-    isEditing: Boolean,
-    ssid: String,
-    password: String,
-    isPasswordVisible: Boolean,
     onAddClick: () -> Unit,
     onEditClick: (WifiProfile) -> Unit,
-    onDeleteClick: (String) -> Unit,
-    onSsidChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onClearPasswordClick: () -> Unit,
-    onTogglePasswordVisibility: () -> Unit,
-    onSaveClick: () -> Unit,
-    onCancelClick: () -> Unit
+    onDeleteClick: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -334,38 +329,22 @@ private fun WifiProfileManagementSection(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                if (!isEditing) {
-                    IconButton(
-                        onClick = onAddClick,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "WLAN-Profil hinzufügen"
-                        )
-                    }
+                IconButton(
+                    onClick = onAddClick,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "WLAN-Profil hinzufügen"
+                    )
                 }
             }
 
-            if (isEditing) {
-                WifiProfileForm(
-                    ssid = ssid,
-                    password = password,
-                    isPasswordVisible = isPasswordVisible,
-                    onSsidChange = onSsidChange,
-                    onPasswordChange = onPasswordChange,
-                    onClearPasswordClick = onClearPasswordClick,
-                    onTogglePasswordVisibility = onTogglePasswordVisibility,
-                    onSaveClick = onSaveClick,
-                    onCancelClick = onCancelClick
-                )
-            } else {
-                WifiProfileList(
-                    profiles = profiles,
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick
-                )
-            }
+            WifiProfileList(
+                profiles = profiles,
+                onEditClick = onEditClick,
+                onDeleteClick = onDeleteClick
+            )
         }
     }
 }
@@ -524,7 +503,8 @@ private fun WifiProfileRow(
 }
 
 @Composable
-private fun WifiProfileForm(
+private fun WifiProfileDialog(
+    isNewProfile: Boolean,
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
@@ -535,7 +515,55 @@ private fun WifiProfileForm(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
+    AlertDialog(
+        onDismissRequest = onCancelClick,
+        title = {
+            Text(
+                if (isNewProfile) {
+                    "WLAN-Profil anlegen"
+                } else {
+                    "WLAN-Profil bearbeiten"
+                }
+            )
+        },
+        text = {
+            WifiProfileForm(
+                ssid = ssid,
+                password = password,
+                isPasswordVisible = isPasswordVisible,
+                onSsidChange = onSsidChange,
+                onPasswordChange = onPasswordChange,
+                onClearPasswordClick = onClearPasswordClick,
+                onTogglePasswordVisibility = onTogglePasswordVisibility,
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            )
+        },
+        confirmButton = {
+            Button(onClick = onSaveClick) {
+                Text("Speichern")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onCancelClick) {
+                Text("Abbrechen")
+            }
+        }
+    )
+}
+
+@Composable
+private fun WifiProfileForm(
+    ssid: String,
+    password: String,
+    isPasswordVisible: Boolean,
+    onSsidChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onClearPasswordClick: () -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedTextField(
@@ -578,26 +606,10 @@ private fun WifiProfileForm(
             style = MaterialTheme.typography.bodySmall
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        OutlinedButton(
+            onClick = onClearPasswordClick
         ) {
-            Button(
-                onClick = onSaveClick
-            ) {
-                Text("Speichern")
-            }
-
-            OutlinedButton(
-                onClick = onCancelClick
-            ) {
-                Text("Abbrechen")
-            }
-
-            OutlinedButton(
-                onClick = onClearPasswordClick
-            ) {
-                Text("Passwort leeren")
-            }
+            Text("Passwort leeren")
         }
     }
 }
