@@ -43,6 +43,32 @@ class ConfigurationImportValidatorTest {
     }
 
     @Test
+    fun duplicateWifiProfileNamesAreRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument(
+                    wifiProfiles = listOf(
+                        wifiProfile(id = "wifi-1", name = "Home"),
+                        wifiProfile(id = "wifi-2", name = " home ")
+                    )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun duplicateWifiProfileSsidsAreAcceptedWhenNamesAreUnique() {
+        validator.validate(
+            validDocument(
+                wifiProfiles = listOf(
+                    wifiProfile(id = "wifi-1", name = "Garage", ssid = "Shelly"),
+                    wifiProfile(id = "wifi-2", name = "Keller", ssid = "Shelly")
+                )
+            )
+        )
+    }
+
+    @Test
     fun connectionToUnknownWifiProfileIsRejected() {
         val device = validDocument().devices.single().copy(
             connections = listOf(
@@ -84,12 +110,16 @@ class ConfigurationImportValidatorTest {
     }
 
     private fun wifiProfile(
+        id: String = "wifi-1",
+        name: String = "Home",
+        ssid: String = "Home",
         password: String? = null,
         isPasswordPresent: Boolean = false
     ): ConfigurationWifiProfile {
         return ConfigurationWifiProfile(
-            id = "wifi-1",
-            ssid = "Home",
+            id = id,
+            name = name,
+            ssid = ssid,
             securityType = "WPA2_PSK",
             password = password,
             isPasswordPresent = isPasswordPresent

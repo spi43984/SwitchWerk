@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WifiProfileDao {
-    @Query("SELECT * FROM wifi_profiles ORDER BY ssid")
+    @Query("SELECT * FROM wifi_profiles ORDER BY name, ssid")
     fun observeAll(): Flow<List<WifiProfileEntity>>
 
-    @Query("SELECT * FROM wifi_profiles ORDER BY ssid")
+    @Query("SELECT * FROM wifi_profiles ORDER BY name, ssid")
     suspend fun getAll(): List<WifiProfileEntity>
 
     @Query("SELECT * FROM wifi_profiles WHERE id = :id")

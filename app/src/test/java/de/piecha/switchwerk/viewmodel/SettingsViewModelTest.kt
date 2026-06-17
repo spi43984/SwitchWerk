@@ -76,26 +76,101 @@ class SettingsViewModelTest {
         assertEquals("QR-Code enthält keine gültige HTTPS-URL", viewModel.uiState.value.errorMessage)
     }
 
+    @Test
+    fun blankWifiProfileNameIsRejected() = runTest(dispatcher) {
+        val wifiRepository = FakeWifiProfileRepository()
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = wifiRepository
+        )
+        runCurrent()
+
+        viewModel.startNewWifiProfile()
+        viewModel.updateWifiProfileSsid("Home")
+        viewModel.updateWifiProfileName("")
+        viewModel.saveWifiProfile()
+        runCurrent()
+
+        assertEquals("Profilname darf nicht leer sein", viewModel.uiState.value.errorMessage)
+        assertTrue(wifiRepository.savedProfiles.isEmpty())
+    }
+
+    @Test
+    fun newWifiProfileNameIsSuggestedFromSsid() = runTest(dispatcher) {
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(
+                profiles = listOf(
+                    WifiProfile(
+                        id = "wifi-1",
+                        name = "Shelly Garage",
+                        ssid = "Shelly Garage"
+                    )
+                )
+            )
+        )
+        runCurrent()
+
+        viewModel.startNewWifiProfile()
+        viewModel.updateWifiProfileSsid(" Shelly Garage ")
+
+        assertEquals("Shelly Garage (2)", viewModel.uiState.value.form.name)
+    }
+
+    @Test
+    fun duplicateWifiProfileNameIsRejected() = runTest(dispatcher) {
+        val wifiRepository = FakeWifiProfileRepository(
+            profiles = listOf(
+                WifiProfile(
+                    id = "wifi-1",
+                    name = "Zuhause",
+                    ssid = "Home"
+                )
+            )
+        )
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = wifiRepository
+        )
+        runCurrent()
+
+        viewModel.startNewWifiProfile()
+        viewModel.updateWifiProfileName(" zuhause ")
+        viewModel.updateWifiProfileSsid("Home 2")
+        viewModel.saveWifiProfile()
+        runCurrent()
+
+        assertEquals("Profilname ist bereits vergeben", viewModel.uiState.value.errorMessage)
+        assertTrue(wifiRepository.savedProfiles.isEmpty())
+    }
+
     private fun settingsViewModel(
-        transferRepository: ConfigurationTransferRepository
+        transferRepository: ConfigurationTransferRepository,
+        wifiProfileRepository: WifiProfileRepository = FakeWifiProfileRepository()
     ): SettingsViewModel {
         return SettingsViewModel(
-            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProfileRepository = wifiProfileRepository,
             deviceRepository = FakeDeviceRepository(),
             configurationTransferRepository = transferRepository
         )
     }
 
-    private class FakeWifiProfileRepository : WifiProfileRepository {
-        override fun observeWifiProfiles(): Flow<List<WifiProfile>> = flowOf(emptyList())
+    private class FakeWifiProfileRepository(
+        private val profiles: List<WifiProfile> = emptyList()
+    ) : WifiProfileRepository {
+        val savedProfiles = mutableListOf<WifiProfile>()
 
-        override suspend fun getWifiProfiles(): List<WifiProfile> = emptyList()
+        override fun observeWifiProfiles(): Flow<List<WifiProfile>> = flowOf(profiles)
+
+        override suspend fun getWifiProfiles(): List<WifiProfile> = profiles
 
         override suspend fun saveWifiProfile(
             profile: WifiProfile,
             password: String?,
             shouldUpdatePassword: Boolean
-        ) = Unit
+        ) {
+            savedProfiles += profile
+        }
 
         override suspend fun getPassword(id: String): String? = null
 

@@ -273,9 +273,12 @@ fun SettingsScreen(
     if (uiState.isEditingWifiProfile) {
         WifiProfileDialog(
             isNewProfile = uiState.form.id == null,
+            name = uiState.form.name,
             ssid = uiState.form.ssid,
             password = uiState.form.password,
             isPasswordVisible = uiState.form.isPasswordVisible,
+            errorMessage = uiState.errorMessage,
+            onNameChange = viewModel::updateWifiProfileName,
             onSsidChange = viewModel::updateWifiProfileSsid,
             onPasswordChange = viewModel::updateWifiProfilePassword,
             onClearPasswordClick = viewModel::clearWifiProfilePassword,
@@ -372,7 +375,7 @@ private fun WifiProfileManagementSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "WLAN-Profile (SSID)",
+                    text = "WLAN-Profile",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -527,7 +530,7 @@ private fun WifiProfileRow(
                 Text("WLAN-Profil löschen")
             },
             text = {
-                Text("SSID ${profileToDelete.ssid} wirklich löschen?")
+                Text("WLAN-Profil ${profileToDelete.name} wirklich löschen?")
             },
             confirmButton = {
                 OutlinedButton(
@@ -568,11 +571,19 @@ private fun WifiProfileRow(
                 .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = profile.ssid,
-                style = MaterialTheme.typography.bodyMedium,
+            Column(
                 modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-            )
+            ) {
+                Text(
+                    text = profile.name,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "SSID: ${profile.ssid}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
@@ -580,9 +591,12 @@ private fun WifiProfileRow(
 @Composable
 private fun WifiProfileDialog(
     isNewProfile: Boolean,
+    name: String,
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
+    errorMessage: String?,
+    onNameChange: (String) -> Unit,
     onSsidChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onClearPasswordClick: () -> Unit,
@@ -603,9 +617,12 @@ private fun WifiProfileDialog(
         },
         text = {
             WifiProfileForm(
+                name = name,
                 ssid = ssid,
                 password = password,
                 isPasswordVisible = isPasswordVisible,
+                errorMessage = errorMessage,
+                onNameChange = onNameChange,
                 onSsidChange = onSsidChange,
                 onPasswordChange = onPasswordChange,
                 onClearPasswordClick = onClearPasswordClick,
@@ -628,9 +645,12 @@ private fun WifiProfileDialog(
 
 @Composable
 private fun WifiProfileForm(
+    name: String,
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
+    errorMessage: String?,
+    onNameChange: (String) -> Unit,
     onSsidChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onClearPasswordClick: () -> Unit,
@@ -685,6 +705,22 @@ private fun WifiProfileForm(
             onClick = onClearPasswordClick
         ) {
             Text("Passwort leeren")
+        }
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = onNameChange,
+            label = { Text("Name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        errorMessage?.let { message ->
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }

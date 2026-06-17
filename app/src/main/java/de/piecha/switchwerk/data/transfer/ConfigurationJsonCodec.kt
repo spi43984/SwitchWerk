@@ -19,6 +19,7 @@ class ConfigurationJsonCodec {
                 document.wifiProfiles.forEach { profile ->
                     writer.beginObject()
                     writer.name("id").value(profile.id)
+                    writer.name("name").value(profile.name)
                     writer.name("ssid").value(profile.ssid)
                     writer.name("securityType").value(profile.securityType)
                     if (profile.isPasswordPresent) {
@@ -87,6 +88,7 @@ class ConfigurationJsonCodec {
         beginArray()
         while (hasNext()) {
             var id: String? = null
+            var name: String? = null
             var ssid: String? = null
             var securityType: String? = null
             var password: String? = null
@@ -96,6 +98,7 @@ class ConfigurationJsonCodec {
             while (hasNext()) {
                 when (nextName()) {
                     "id" -> id = nextString()
+                    "name" -> name = nextString()
                     "ssid" -> ssid = nextString()
                     "securityType" -> securityType = nextString()
                     "password" -> {
@@ -111,9 +114,11 @@ class ConfigurationJsonCodec {
             }
             endObject()
 
+            val requiredSsid = requireField(ssid, "wifiProfiles.ssid")
             profiles += ConfigurationWifiProfile(
                 id = requireField(id, "wifiProfiles.id"),
-                ssid = requireField(ssid, "wifiProfiles.ssid"),
+                name = name ?: requiredSsid,
+                ssid = requiredSsid,
                 securityType = requireField(securityType, "wifiProfiles.securityType"),
                 password = password,
                 isPasswordPresent = isPasswordPresent

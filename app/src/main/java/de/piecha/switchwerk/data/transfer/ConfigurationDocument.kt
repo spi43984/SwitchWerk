@@ -8,6 +8,7 @@ data class ConfigurationDocument(
 
 data class ConfigurationWifiProfile(
     val id: String,
+    val name: String,
     val ssid: String,
     val securityType: String,
     val password: String? = null,

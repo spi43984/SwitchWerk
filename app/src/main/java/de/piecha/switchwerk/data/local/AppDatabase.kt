@@ -17,7 +17,7 @@ import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
         WifiProfileEntity::class,
         DeviceConnectionEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -80,7 +80,45 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
         }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                if (!db.hasColumn(tableName = "wifi_profiles", columnName = "name")) {
+                    db.execSQL("ALTER TABLE wifi_profiles ADD COLUMN name TEXT NOT NULL DEFAULT ''")
+
+                    val usedNames = mutableSetOf<String>()
+                    val cursor = db.query("SELECT id, ssid FROM wifi_profiles ORDER BY rowid")
+                    cursor.use {
+                        while (it.moveToNext()) {
+                            val id = it.getString(0)
+                            val ssid = it.getString(1).trim()
+                            val name = uniqueProfileName(
+                                baseName = ssid.ifBlank { "WLAN-Profil" },
+                                usedNames = usedNames
+                            )
+                            db.execSQL(
+                                "UPDATE wifi_profiles SET name = ? WHERE id = ?",
+                                arrayOf(name, id)
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
+}
+
+private fun uniqueProfileName(
+    baseName: String,
+    usedNames: MutableSet<String>
+): String {
+    var candidate = baseName
+    var suffix = 2
+    while (!usedNames.add(candidate.lowercase())) {
+        candidate = "$baseName ($suffix)"
+        suffix += 1
+    }
+    return candidate
 }
 
 private fun SupportSQLiteDatabase.hasColumn(
