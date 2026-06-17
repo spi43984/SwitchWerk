@@ -108,6 +108,20 @@ Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`,
 21. Zugehöriges GitHub-Issue erst danach schließen.
 22. Branch lokal und remote löschen.
 
+## Verbindliche Issue-Abschluss-Checkliste
+
+Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wurden:
+
+* [ ] `docs/issues/<issue>.md` aktualisiert
+* [ ] `docs/issues/overview.txt` aktualisiert
+* [ ] `ai-context.md` aktualisiert
+* [ ] `AI_HANDOFF.md` aktualisiert
+* [ ] nächstes offenes Issue festgelegt
+* [ ] Status der Dokumentationsdateien ist konsistent
+* [ ] GitHub-Issue geschlossen
+* [ ] Feature-Branch lokal gelöscht
+* [ ] Feature-Branch remote gelöscht
+
 Beispiel nach Merge:
 
     git switch main
