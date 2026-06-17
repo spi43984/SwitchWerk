@@ -100,6 +100,7 @@ Kurzfassung:
 7. Änderungen prüfen.
 8. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
 9. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
+10. Nach erfolgreichem Merge immer `docs/issues/overview.txt` und `ai-context.md` aktualisieren, bevor das GitHub-Issue geschlossen wird.
 
 ---
 
@@ -121,10 +122,10 @@ Kurzfassung:
 - 012 Import/Export
 - 013 QR Code Import
 - 014 Dashboard Device Reordering
+- 015 WiFi Profile Dialog Management
 
 ### Offen
 
-- 015 WiFi Profile Dialog Management
 - 016 Edit Items By Name Click
 - 017 Unique WiFi Profile Name
 - 018 Adaptive WiFi Security Fallback
@@ -142,11 +143,13 @@ Kurzfassung:
 
 ### Nächstes Issue
 
-- 015 WiFi Profile Dialog Management
+- 016 Edit Items By Name Click
 
 ### Pflegehinweis
 
 Die Listen "Abgeschlossen", "Offen", "Zurückgestellt / Backlog" und "Nächstes Issue" sind nach jedem abgeschlossenen oder neu angelegten Issue in `ai-context.md` zu aktualisieren.
+
+Nach erfolgreichem Build, Installation, Merge und vor dem Schließen des GitHub-Issues müssen außerdem `docs/issues/overview.txt` und die passende Datei unter `docs/issues` aktualisiert werden.
 
 ---
 
