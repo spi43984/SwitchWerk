@@ -536,13 +536,12 @@ class SettingsViewModel(
             return
         }
 
-        val currentDevice = devices[currentIndex]
-        val targetDevice = devices[targetIndex]
-
         viewModelScope.launch {
             runCatching {
-                deviceRepository.saveDevice(currentDevice.copy(sortOrder = targetDevice.sortOrder))
-                deviceRepository.saveDevice(targetDevice.copy(sortOrder = currentDevice.sortOrder))
+                val reorderedDevices = devices.toMutableList().apply {
+                    add(targetIndex, removeAt(currentIndex))
+                }
+                deviceRepository.updateDeviceOrder(reorderedDevices.map { it.id })
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
                     errorMessage = error.message ?: "Gerätereihenfolge konnte nicht geändert werden"

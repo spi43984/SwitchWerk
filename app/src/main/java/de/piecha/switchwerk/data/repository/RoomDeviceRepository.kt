@@ -52,6 +52,21 @@ class RoomDeviceRepository(
         )
     }
 
+    override suspend fun updateDeviceOrder(deviceIds: List<String>) {
+        val existingDevices = deviceDao.getAll()
+        val existingDeviceIds = existingDevices.map { it.id }.toSet()
+        val orderedDeviceIds = deviceIds.filter { it in existingDeviceIds } +
+            existingDevices.map { it.id }.filterNot { it in deviceIds }
+
+        orderedDeviceIds
+            .forEachIndexed { index, deviceId ->
+                deviceDao.updateSortOrder(
+                    id = deviceId,
+                    sortOrder = index
+                )
+            }
+    }
+
     override suspend fun deleteDevice(deviceId: String) {
         deviceConnectionDao.deleteForDevice(deviceId)
         deviceDao.deleteById(deviceId)

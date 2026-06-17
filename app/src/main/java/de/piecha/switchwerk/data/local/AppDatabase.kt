@@ -2,6 +2,8 @@ package de.piecha.switchwerk.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import de.piecha.switchwerk.data.local.dao.DeviceConnectionDao
 import de.piecha.switchwerk.data.local.dao.DeviceDao
 import de.piecha.switchwerk.data.local.dao.WifiProfileDao
@@ -15,7 +17,7 @@ import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
         WifiProfileEntity::class,
         DeviceConnectionEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -25,4 +27,74 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun wifiProfileDao(): WifiProfileDao
 
     abstract fun deviceConnectionDao(): DeviceConnectionDao
+
+    companion object {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                if (!db.hasColumn(tableName = "devices", columnName = "sortOrder")) {
+                    db.execSQL(
+                        """
+                        CREATE TABLE devices_new (
+                            id TEXT NOT NULL,
+                            name TEXT NOT NULL,
+                            actionLabel TEXT NOT NULL,
+                            apiMethod TEXT NOT NULL,
+                            apiPath TEXT NOT NULL,
+                            sortOrder INTEGER NOT NULL,
+                            PRIMARY KEY(id)
+                        )
+                        """.trimIndent()
+                    )
+
+                    val cursor = db.query(
+                        "SELECT id, name, actionLabel, apiMethod, apiPath FROM devices ORDER BY rowid"
+                    )
+                    cursor.use {
+                        var sortOrder = 0
+                        while (it.moveToNext()) {
+                            db.execSQL(
+                                """
+                                INSERT INTO devices_new (
+                                    id,
+                                    name,
+                                    actionLabel,
+                                    apiMethod,
+                                    apiPath,
+                                    sortOrder
+                                ) VALUES (?, ?, ?, ?, ?, ?)
+                                """.trimIndent(),
+                                arrayOf(
+                                    it.getString(0),
+                                    it.getString(1),
+                                    it.getString(2),
+                                    it.getString(3),
+                                    it.getString(4),
+                                    sortOrder
+                                )
+                            )
+                            sortOrder += 1
+                        }
+                    }
+                    db.execSQL("DROP TABLE devices")
+                    db.execSQL("ALTER TABLE devices_new RENAME TO devices")
+                }
+            }
+        }
+    }
+}
+
+private fun SupportSQLiteDatabase.hasColumn(
+    tableName: String,
+    columnName: String
+): Boolean {
+    val cursor = query("PRAGMA table_info($tableName)")
+    cursor.use {
+        val nameIndex = it.getColumnIndex("name")
+        while (it.moveToNext()) {
+            if (it.getString(nameIndex) == columnName) {
+                return true
+            }
+        }
+    }
+    return false
 }

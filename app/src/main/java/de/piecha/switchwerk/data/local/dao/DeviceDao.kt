@@ -23,6 +23,9 @@ interface DeviceDao {
     @Upsert
     suspend fun upsertAll(devices: List<DeviceEntity>)
 
+    @Query("UPDATE devices SET sortOrder = :sortOrder WHERE id = :id")
+    suspend fun updateSortOrder(id: String, sortOrder: Int)
+
     @Query("DELETE FROM devices WHERE id = :id")
     suspend fun deleteById(id: String)
 
