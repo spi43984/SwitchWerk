@@ -2,6 +2,18 @@
 
 Stand: 18. Juni 2026
 
+## Kontext für neue Codex-Sessions
+
+Vor einer Implementierung zuerst lesen:
+
+* AGENTS.md
+* AI_HANDOFF.md
+* die aktuelle Issue-Datei unter `docs/issues`
+
+Danach nur gezielt die für das Issue benötigten Dateien suchen und öffnen.
+
+Keine vollständige Repository-Analyse durchführen, sofern dies nicht ausdrücklich erforderlich ist.
+
 ## Aktuelle Arbeit
 
 Keine aktive Implementierung.
