@@ -1,6 +1,10 @@
 # Issue #31: Import Enforces Unique WiFi Profile Names
 
-Status: offen
+## Metadaten
+
+- Status: Offen
+- Priorität: P2
+- Typ: Import / WLAN-Verwaltung
 
 ## Ziel
 
