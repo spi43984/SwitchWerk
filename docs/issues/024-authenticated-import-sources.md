@@ -1,8 +1,10 @@
 # Issue #24: Authenticated Import Sources Backlog
 
-## Status
+## Metadaten
 
-Zurückgestellt / Backlog
+- Status: Backlog
+- Priorität: P4
+- Typ: Backlog / Import
 
 ## Ziel
 
@@ -18,19 +20,11 @@ Unterstützt werden:
 - öffentliche Nextcloud-Freigabelinks
 - Google-Drive-Links mit Freigabe „Jeder mit dem Link“
 
-Nicht unterstützt werden Quellen, die eine Authentifizierung erfordern.
+Nicht unterstützt werden Quellen, die eine Anmeldung oder sitzungsgebundene Freigabe erfordern.
 
 ## Bewusste Einschränkung
 
-Aktuell sendet die App keine:
-
-- Benutzernamen
-- Passwörter
-- HTTP-Basic-Auth-Daten
-- OAuth-Tokens
-- API-Tokens
-- Cookies
-- Browser-Sitzungen
+Die App bleibt bewusst einfach und sendet beim Import keine Anmelde- oder Sitzungsdaten an externe Dienste.
 
 Dadurch bleiben Architektur und Sicherheitsmodell einfach und nachvollziehbar.
 
@@ -50,8 +44,8 @@ Die Unterstützung authentifizierter Quellen würde zusätzliche Anforderungen v
 
 ### Sicherheit
 
-- sichere Speicherung von Zugangsdaten
-- Token-Management
+- sichere Speicherung zusätzlicher Geheimnisse
+- Verwaltung von Zugriffsmitteln
 - Datenschutzbetrachtung
 - Risikoanalyse
 
@@ -59,11 +53,11 @@ Die Unterstützung authentifizierter Quellen würde zusätzliche Anforderungen v
 
 - Erweiterung der Import-Schnittstellen
 - Authentifizierungs-Framework
-- Fehlerbehandlung für Login- und Token-Abläufe
+- Fehlerbehandlung für Login- und Zugriffsabläufe
 
 ### Wartungsaufwand
 
-- OAuth-Flows ändern sich regelmäßig
+- Drittanbieter-Abläufe ändern sich regelmäßig
 - API-Abhängigkeiten zu Drittanbietern
 - zusätzlicher Testaufwand
 
@@ -85,10 +79,6 @@ Für die aktuelle Version:
 - Öffentliche Nextcloud-Links funktionieren weiterhin.
 - Öffentliche Google-Drive-Links funktionieren weiterhin.
 - Benutzer erhält eine verständliche Fehlermeldung.
-
-## Priorität
-
-Niedrig
 
 ## Abhängigkeiten
 

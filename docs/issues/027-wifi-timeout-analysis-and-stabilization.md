@@ -1,5 +1,11 @@
 # Issue #27: WiFi Timeout Analysis And Stabilization
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P0
+- Typ: WLAN / Stabilität
+
 ## Ziel
 
 Gelegentlich schlägt eine Schaltaktion mit Timeout fehl, obwohl das
@@ -17,6 +23,16 @@ HTTP/RPC-Aufruf.
 Der Fehler tritt nicht dauerhaft auf und deutet auf zeitliche
 Abhängigkeiten zwischen Android-WLAN-Management, DHCP und HTTP-Kommunikation
 hin.
+
+## Fachliche Abhängigkeit
+
+Issue 027 hängt fachlich an Issue 023, weil die WLAN-Timeout-Analyse die dort
+geplante Detailanzeige mit Zeitstempeln nutzen soll.
+
+Deshalb soll Issue 023 vor Issue 027 umgesetzt werden. Issue 023 kann dafür
+bei Bedarf enger geschnitten werden: zuerst nur Diagnose, Detailanzeige und
+Zeitstempel umsetzen. Die Theme-Umschaltung kann anschließend separat über
+Issue 028 umgesetzt werden.
 
 ## Mögliche Ursachen
 

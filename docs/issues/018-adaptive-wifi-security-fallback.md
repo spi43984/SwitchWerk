@@ -1,5 +1,11 @@
 # Issue #18: Adaptive WiFi Security Fallback
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P0
+- Typ: WLAN / Stabilität
+
 ## Ziel
 Der WLAN-Verbindungsdienst soll Geräte-WLANs mit WPA2 oder WPA3 verbinden,
 ohne dass der Sicherheitstyp bei jeder Änderung manuell angepasst werden muss.

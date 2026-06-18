@@ -1,5 +1,11 @@
 # Issue #19: Configurable WiFi List Sorting
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P2
+- Typ: GUI / WLAN-Verwaltung
+
 ## Ziel
 
 WLAN-Profile können nach einem vom Anwender ausgewählten Kriterium sortiert

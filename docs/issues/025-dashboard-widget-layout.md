@@ -1,5 +1,11 @@
 # Issue #25: Dashboard Widget Layout
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P1
+- Typ: GUI / Dashboard
+
 ## Ziel
 
 Das Dashboard soll alternativ zur bisherigen Listenansicht eine kompakte Widget-Ansicht unterstuetzen.

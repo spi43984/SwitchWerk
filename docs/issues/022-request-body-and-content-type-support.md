@@ -1,5 +1,11 @@
 # Issue #22: Request Body And Content-Type Support
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P2
+- Typ: Geräteaktion / API
+
 ## Ziel
 
 Geräteaktionen sollen neben einfachen GET- und POST-Aufrufen auch

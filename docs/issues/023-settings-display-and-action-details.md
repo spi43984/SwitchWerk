@@ -1,5 +1,11 @@
 # Issue #23: Settings Display And Action Details
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P0
+- Typ: GUI / Diagnose
+
 ## Ziel
 
 Die App soll konfigurierbare Darstellungsoptionen erhalten und auf Wunsch
@@ -88,7 +94,7 @@ Während einer Geräteaktion werden verständliche Statusmeldungen angezeigt, z.
 
 Es dürfen niemals angezeigt oder gespeichert werden:
 
-- WLAN-Passwörter
+- WLAN-Zugangsdaten
 - Tokens
 - API-Keys
 - vollständige Authorization-Header
@@ -120,4 +126,4 @@ Die Meldungen müssen für normale Benutzer verständlich formuliert sein.
 - Erfolgreiche Geräteaktion beobachten
 - Fehlerhafte WLAN-Verbindung beobachten
 - Fehlerhaften HTTP-Aufruf beobachten
-- Prüfen, dass keine Passwörter oder Tokens sichtbar sind
+- Prüfen, dass keine Zugangsdaten oder Tokens sichtbar sind
