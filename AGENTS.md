@@ -105,18 +105,19 @@ Der vollständige GitHub-Workflow ist in `GITHUB_WORKFLOW.md` dokumentiert.
 
 Für jedes fachliche Issue gilt zunächst:
 
-1. Auf `main` wechseln.
-2. Aktuellen Stand holen.
-3. Prüfen, ob zur passenden Datei unter `docs/issues/*.md` bereits ein
+1. Nächstes Issue nach `docs/issues/overview.txt` bestimmen: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
+2. Auf `main` wechseln.
+3. Aktuellen Stand holen.
+4. Prüfen, ob zur passenden Datei unter `docs/issues/*.md` bereits ein
    GitHub-Issue oder Feature-Branch existiert.
-4. Nur falls noch kein GitHub-Issue existiert, dieses aus der lokalen
+5. Nur falls noch kein GitHub-Issue existiert, dieses aus der lokalen
    Issue-Datei erzeugen.
-5. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
+6. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
    vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
-6. Ausschließlich den vereinbarten Issue-Scope implementieren.
-7. Änderungen und Diff prüfen.
-8. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
-9. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
+7. Ausschließlich den vereinbarten Issue-Scope implementieren.
+8. Änderungen und Diff prüfen.
+9. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
+10. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
    auf dem Host ausgeben.
 
 Mindestens auf dem Host zu prüfen:

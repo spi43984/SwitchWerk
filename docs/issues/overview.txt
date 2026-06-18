@@ -1,6 +1,16 @@
 # Issue-Übersicht
 
-Sortierung für die Umsetzung: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
+## Priorisierung
+
+Die nächste Umsetzung wird nach folgender Reihenfolge bestimmt:
+
+1. Status `offen`
+2. Priorität `P0` bis `P4`
+3. Issue-ID aufsteigend
+
+Abgeschlossene Issues bleiben zur Dokumentation erhalten und werden nicht für die nächste Umsetzung berücksichtigt.
+
+Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktiviert werden.
 
 | ID | Prio | Status | Titel |
 |---:|:----:|--------|-------|

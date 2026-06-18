@@ -33,6 +33,9 @@ refactor: simplify device repository
 
 Jede größere Änderung bekommt ein GitHub Issue.
 
+Die nächste Umsetzung wird über `docs/issues/overview.txt` priorisiert:
+zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
+
 Issue sollte enthalten:
 
 - Ziel
@@ -78,7 +81,7 @@ Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`,
 
 ## Vollständiger Issue-Workflow
 
-1. Nächstes offenes Issue unter `docs/issues` bestimmen.
+1. Nächstes offenes Issue nach `docs/issues/overview.txt` bestimmen: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
 2. Auf `main` wechseln.
 3. `git pull` ausführen.
 4. Prüfen, ob bereits ein passendes GitHub-Issue oder ein Feature-Branch existiert.
