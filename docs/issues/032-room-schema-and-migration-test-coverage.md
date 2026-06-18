@@ -1,6 +1,10 @@
 # Issue #32: Room Schema And Migration Test Coverage
 
-Status: offen
+## Metadaten
+
+- Status: Offen
+- Priorität: P2
+- Typ: Tests / Datenbank
 
 ## Ziel
 
