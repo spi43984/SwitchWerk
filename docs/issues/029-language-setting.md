@@ -1,5 +1,11 @@
 # Issue #29: Language Setting
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P1
+- Typ: GUI / Einstellungen
+
 ## Ziel
 
 SwitchWerk soll mehrsprachig werden. Initial werden Deutsch, Englisch und Systemsprache unterstützt.
@@ -14,9 +20,9 @@ SwitchWerk soll mehrsprachig werden. Initial werden Deutsch, Englisch und System
 
 Android-Standardressourcen verwenden:
 
-- res/values/strings.xml als Default
-- res/values-de/strings.xml für Deutsch
-- res/values-en/strings.xml für Englisch
+- `res/values/strings.xml` als Default
+- `res/values-de/strings.xml` für Deutsch
+- `res/values-en/strings.xml` für Englisch
 
 UI-Texte sollen schrittweise aus fest codierten Strings in String-Ressourcen verschoben werden.
 
@@ -28,27 +34,20 @@ Sprache und Theme sollen möglichst über dieselbe Einstellungs-Infrastruktur ge
 
 Vorgeschlagene Struktur:
 
-```text
-domain/
-  SettingsRepository
-
-data/
-  AppSettingsStorage
-
-ui/
-  SettingsScreen
-```
+- `domain/SettingsRepository`
+- `data/AppSettingsStorage`
+- `ui/SettingsScreen`
 
 Die UI liest die aktuelle Spracheinstellung aus dem Settings-State. Änderungen werden über das ViewModel an das Repository weitergegeben und dauerhaft gespeichert.
 
-Benutzerdaten wie Gerätenamen, WLAN-Namen, URLs und HTTP-Befehle werden nicht übersetzt.
+Benutzerdaten wie Gerätenamen, WLAN-Namen und technische Eingaben werden nicht übersetzt.
 
 ## Anforderungen
 
 - Sprachauswahl in den Einstellungen
 - Standardwert: System
 - Deutsch und Englisch initial unterstützen
-- Keine Übersetzung von Benutzerdaten wie Gerätenamen, WLAN-Namen oder URLs
+- Keine Übersetzung von Benutzerdaten wie Gerätenamen, WLAN-Namen oder technischen Eingaben
 - Keine externe Übersetzungsbibliothek erforderlich
 - Gemeinsame Einstellungs-Infrastruktur mit dem Theme-Mode-Issue bevorzugen
 
