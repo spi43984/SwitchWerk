@@ -1,5 +1,11 @@
 # Issue #27: WiFi Timeout Analysis And Stabilization
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P0
+- Typ: WLAN / Stabilität
+
 ## Ziel
 
 Gelegentlich schlägt eine Schaltaktion mit Timeout fehl, obwohl das
