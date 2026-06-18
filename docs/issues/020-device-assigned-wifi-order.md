@@ -1,5 +1,11 @@
 # Issue #20: Device Assigned WiFi Order
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P1
+- Typ: WLAN / Gerätezuordnung
+
 ## Ziel
 
 Die einem Gerät zugewiesenen WLAN-Profile können vom Anwender manuell in die
@@ -23,7 +29,7 @@ WLAN-Profile beim Verbinden genau in dieser Reihenfolge durchprobiert werden.
 - Änderung der globalen WLAN-Liste aus Issue 019
 - Änderung der Geräte-Reihenfolge im Dashboard aus Issue 014
 - automatische Sortierung nach SSID oder Profilname
-- Änderung von SSID, Profilname oder Passwort
+- Änderung von SSID, Profilname oder gespeicherten Zugangsdaten
 - neue Berechtigungen
 - Cloud-Synchronisation
 
@@ -45,7 +51,7 @@ WLAN-Profile beim Verbinden genau in dieser Reihenfolge durchprobiert werden.
 - [ ] Der Schaltvorgang verwendet die gespeicherte Zuordnungsreihenfolge
 - [ ] Die Änderung betrifft nur die Gerätezuordnung, nicht die globale WLAN-Liste
 - [ ] Die manuelle Dashboard-Reihenfolge aus Issue 014 wird nicht beeinflusst
-- [ ] Die Sortierung beeinflusst nicht SSID, Profilname oder Passwort
+- [ ] Die Sortierung beeinflusst nicht SSID, Profilname oder gespeicherte Zugangsdaten
 - [ ] Es werden keine sensiblen WLAN-Daten geloggt
 
 ## Testhinweise
