@@ -46,6 +46,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 030 | P1 | offen | WiFi Profile Deletion Safety |
 | 031 | P2 | offen | Import Enforces Unique WiFi Profile Names |
 | 032 | P2 | offen | Room Schema And Migration Test Coverage |
+| 033 | P1 | offen | Android-managed WiFi networks |
 
 ## Empfohlene Umsetzungsreihenfolge
 
@@ -57,10 +58,10 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 6. 028 Theme Mode Setting
 7. 029 Language Setting
 8. 030 WiFi Profile Deletion Safety
-9. 019 Configurable WiFi List Sorting
-10. 021 HTTP/HTTPS Device Actions
-11. 022 Request Body And Content-Type Support
-12. 031 Import Enforces Unique WiFi Profile Names
-13. 032 Room Schema And Migration Test Coverage
-14. 024 Authenticated Import Sources Backlog
-033 | P1 | Android-managed WiFi networks | Open | Support Android-system-managed WiFi credentials including 802.1X/EAP.
+9. 033 Android-managed WiFi networks
+10. 019 Configurable WiFi List Sorting
+11. 021 HTTP/HTTPS Device Actions
+12. 022 Request Body And Content-Type Support
+13. 031 Import Enforces Unique WiFi Profile Names
+14. 032 Room Schema And Migration Test Coverage
+15. 024 Authenticated Import Sources Backlog
