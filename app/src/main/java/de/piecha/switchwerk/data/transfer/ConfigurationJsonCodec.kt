@@ -21,7 +21,9 @@ class ConfigurationJsonCodec {
                     writer.name("id").value(profile.id)
                     writer.name("name").value(profile.name)
                     writer.name("ssid").value(profile.ssid)
-                    writer.name("securityType").value(profile.securityType)
+                    profile.securityType?.let { securityType ->
+                        writer.name("securityType").value(securityType)
+                    }
                     if (profile.isPasswordPresent) {
                         writer.name("password").value(profile.password.orEmpty())
                     }
@@ -100,7 +102,14 @@ class ConfigurationJsonCodec {
                     "id" -> id = nextString()
                     "name" -> name = nextString()
                     "ssid" -> ssid = nextString()
-                    "securityType" -> securityType = nextString()
+                    "securityType" -> {
+                        securityType = if (peek() == JsonToken.NULL) {
+                            nextNull()
+                            null
+                        } else {
+                            nextString()
+                        }
+                    }
                     "password" -> {
                         isPasswordPresent = true
                         if (peek() == JsonToken.NULL) {
@@ -119,7 +128,7 @@ class ConfigurationJsonCodec {
                 id = requireField(id, "wifiProfiles.id"),
                 name = name ?: requiredSsid,
                 ssid = requiredSsid,
-                securityType = requireField(securityType, "wifiProfiles.securityType"),
+                securityType = securityType,
                 password = password,
                 isPasswordPresent = isPasswordPresent
             )

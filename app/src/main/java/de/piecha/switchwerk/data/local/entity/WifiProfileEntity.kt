@@ -8,5 +8,5 @@ data class WifiProfileEntity(
     @PrimaryKey val id: String,
     val name: String,
     val ssid: String,
-    val securityType: String
+    val securityType: String?
 )

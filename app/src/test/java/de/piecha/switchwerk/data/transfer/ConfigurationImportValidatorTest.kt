@@ -69,6 +69,24 @@ class ConfigurationImportValidatorTest {
     }
 
     @Test
+    fun wpa3SecurityTypeIsAccepted() {
+        validator.validate(
+            validDocument(
+                wifiProfiles = listOf(wifiProfile(securityType = "WPA3_SAE"))
+            )
+        )
+    }
+
+    @Test
+    fun missingSecurityTypeIsAcceptedAsUnknown() {
+        validator.validate(
+            validDocument(
+                wifiProfiles = listOf(wifiProfile(securityType = null))
+            )
+        )
+    }
+
+    @Test
     fun connectionToUnknownWifiProfileIsRejected() {
         val device = validDocument().devices.single().copy(
             connections = listOf(
@@ -113,6 +131,7 @@ class ConfigurationImportValidatorTest {
         id: String = "wifi-1",
         name: String = "Home",
         ssid: String = "Home",
+        securityType: String? = "WPA2_PSK",
         password: String? = null,
         isPasswordPresent: Boolean = false
     ): ConfigurationWifiProfile {
@@ -120,7 +139,7 @@ class ConfigurationImportValidatorTest {
             id = id,
             name = name,
             ssid = ssid,
-            securityType = "WPA2_PSK",
+            securityType = securityType,
             password = password,
             isPasswordPresent = isPasswordPresent
         )

@@ -219,10 +219,14 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             runCatching {
+                val existingProfile = form.id?.let { id ->
+                    _uiState.value.wifiProfiles.firstOrNull { it.id == id }
+                }
                 val profile = WifiProfile(
                     id = form.id ?: UUID.randomUUID().toString(),
                     name = trimmedName,
-                    ssid = trimmedSsid
+                    ssid = trimmedSsid,
+                    lastSuccessfulSecurityType = existingProfile?.lastSuccessfulSecurityType
                 )
 
                 wifiProfileRepository.saveWifiProfile(

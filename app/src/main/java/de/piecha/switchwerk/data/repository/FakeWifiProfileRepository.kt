@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.data.repository
 
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,6 +61,19 @@ class FakeWifiProfileRepository : WifiProfileRepository {
 
     override suspend fun hasPassword(id: String): Boolean {
         return passwords.containsKey(id)
+    }
+
+    override suspend fun updateLastSuccessfulSecurityType(
+        id: String,
+        securityType: WifiSecurityType
+    ) {
+        profiles.value = profiles.value.map { profile ->
+            if (profile.id == id) {
+                profile.copy(lastSuccessfulSecurityType = securityType)
+            } else {
+                profile
+            }
+        }
     }
 
     override suspend fun deletePassword(id: String) {
