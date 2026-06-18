@@ -1,6 +1,10 @@
 # Issue #30: WiFi Profile Deletion Safety
 
-Status: offen
+## Metadaten
+
+- Status: Offen
+- Priorität: P1
+- Typ: WLAN / Sicherheit
 
 ## Ziel
 
