@@ -1,5 +1,11 @@
 # Issue #28: Theme Mode Setting
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P1
+- Typ: GUI / Einstellungen
+
 ## Ziel
 
 In den Einstellungen soll auswählbar sein, ob SwitchWerk im hellen Design, dunklen Design oder gemäß Systemeinstellung angezeigt wird.
