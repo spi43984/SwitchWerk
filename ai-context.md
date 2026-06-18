@@ -143,6 +143,7 @@ Kurzfassung:
 - 030 WiFi Profile Deletion Safety
 - 031 Import Enforces Unique WiFi Profile Names
 - 032 Room Schema And Migration Test Coverage
+- 033 Android-managed WiFi networks
 
 ### Zurückgestellt / Backlog
 

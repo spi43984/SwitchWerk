@@ -48,6 +48,7 @@ erfolgreich gemeldet.
 
 ## Wichtige Hinweise für die nächste Session
 
+- Wiederverwendbare Startvorlage: `AI_SESSION_PROMPT.md`
 - Die lokalen Statusdateien wurden nach Issue 018 aktualisiert:
   - `docs/issues/018-adaptive-wifi-security-fallback.md`
   - `docs/issues/overview.txt`
@@ -67,6 +68,7 @@ erfolgreich gemeldet.
 028 Theme Mode Setting
 029 Language Setting
 030 WiFi Profile Deletion Safety
+033 Android-managed WiFi networks
 019 Configurable WiFi List Sorting
 021 HTTP/HTTPS Device Actions
 022 Request Body And Content-Type Support
