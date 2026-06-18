@@ -1,4 +1,4 @@
-# Issue 024: Android-managed WiFi networks
+# Issue 033: Android-managed WiFi networks
 
 Priority: P1
 
