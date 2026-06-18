@@ -92,14 +92,10 @@ Der verbindliche Workflow steht in `AGENTS.md` und `GITHUB_WORKFLOW.md`.
 Kurzfassung:
 
 1. Nicht direkt auf `main` implementieren.
-2. Passendes Issue unter `docs/issues` bestimmen.
-3. Lokale Issue-Dateien dürfen als Planung angelegt werden, ohne sofort ein
-   GitHub-Issue zu erstellen.
-4. Erst wenn ein konkretes Issue implementiert werden soll, prüfen, ob dafür
-   bereits ein GitHub-Issue oder Feature-Branch existiert.
-5. Nur vor Beginn dieser Implementierung und nur falls noch kein passendes
-   GitHub-Issue existiert, ein GitHub-Issue aus der lokalen Issue-Datei
-   erzeugen.
+2. Passendes Issue nach `docs/issues/overview.txt` bestimmen: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
+3. Lokale Issue-Dateien dürfen als Planung angelegt werden, ohne sofort ein GitHub-Issue zu erstellen.
+4. Erst wenn ein konkretes Issue implementiert werden soll, prüfen, ob dafür bereits ein GitHub-Issue oder Feature-Branch existiert.
+5. Nur vor Beginn dieser Implementierung und nur falls noch kein passendes GitHub-Issue existiert, ein GitHub-Issue aus der lokalen Issue-Datei erzeugen.
 6. Eigenen fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
 7. Scope eng halten.
 8. Änderungen prüfen.
