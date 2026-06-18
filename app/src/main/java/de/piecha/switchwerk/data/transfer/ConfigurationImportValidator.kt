@@ -26,9 +26,11 @@ class ConfigurationImportValidator {
             requireNotBlank(profile.id, "WLAN-Profil-ID")
             requireNotBlank(profile.name, "WLAN-Profilname")
             requireNotBlank(profile.ssid, "SSID")
-            requireNotBlank(profile.securityType, "WLAN-Sicherheitstyp")
-            require(profile.securityType == SUPPORTED_SECURITY_TYPE) {
-                "Nicht unterstützter WLAN-Sicherheitstyp: ${profile.securityType}"
+            profile.securityType?.let { securityType ->
+                requireNotBlank(securityType, "WLAN-Sicherheitstyp")
+                require(securityType in SUPPORTED_SECURITY_TYPES) {
+                    "Nicht unterstützter WLAN-Sicherheitstyp: $securityType"
+                }
             }
         }
 
@@ -77,6 +79,6 @@ class ConfigurationImportValidator {
     }
 
     private companion object {
-        const val SUPPORTED_SECURITY_TYPE = "WPA2_PSK"
+        val SUPPORTED_SECURITY_TYPES = setOf("WPA2_PSK", "WPA3_SAE")
     }
 }

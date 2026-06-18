@@ -4,6 +4,7 @@ import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -42,7 +43,8 @@ class RoomWifiProfileRepository(
             "Profilname ist bereits vergeben"
         }
 
-        wifiProfileDao.upsert(profile.toEntity())
+        val existingSecurityType = wifiProfileDao.getById(profile.id)?.securityType
+        wifiProfileDao.upsert(profile.toEntity(existingSecurityType))
 
         if (shouldUpdatePassword) {
             if (password == null) {
@@ -64,6 +66,16 @@ class RoomWifiProfileRepository(
         return getPassword(id) != null
     }
 
+    override suspend fun updateLastSuccessfulSecurityType(
+        id: String,
+        securityType: WifiSecurityType
+    ) {
+        val entity = wifiProfileDao.getById(id) ?: return
+        wifiProfileDao.upsert(
+            entity.copy(securityType = securityType.storageValue)
+        )
+    }
+
     override suspend fun deletePassword(id: String) {
         credentialStore.deletePassword(id)
     }
@@ -77,20 +89,17 @@ class RoomWifiProfileRepository(
         return WifiProfile(
             id = id,
             ssid = ssid,
-            name = name
+            name = name,
+            lastSuccessfulSecurityType = WifiSecurityType.fromStorageValue(securityType)
         )
     }
 
-    private fun WifiProfile.toEntity(): WifiProfileEntity {
+    private fun WifiProfile.toEntity(existingSecurityType: String?): WifiProfileEntity {
         return WifiProfileEntity(
             id = id,
             name = name,
             ssid = ssid,
-            securityType = DEFAULT_SECURITY_TYPE
+            securityType = lastSuccessfulSecurityType?.storageValue ?: existingSecurityType
         )
-    }
-
-    private companion object {
-        const val DEFAULT_SECURITY_TYPE = "WPA2_PSK"
     }
 }

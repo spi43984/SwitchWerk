@@ -11,6 +11,7 @@ import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -175,6 +176,11 @@ class SettingsViewModelTest {
         override suspend fun getPassword(id: String): String? = null
 
         override suspend fun hasPassword(id: String): Boolean = false
+
+        override suspend fun updateLastSuccessfulSecurityType(
+            id: String,
+            securityType: WifiSecurityType
+        ) = Unit
 
         override suspend fun deletePassword(id: String) = Unit
 

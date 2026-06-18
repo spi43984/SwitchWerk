@@ -8,6 +8,7 @@ import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CancellationException
@@ -24,6 +25,7 @@ class AndroidWifiConnectionService(
     override suspend fun connect(
         ssid: String,
         password: String?,
+        securityType: WifiSecurityType,
         timeoutMillis: Long
     ): WifiConnectionResult {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
@@ -47,7 +49,8 @@ class AndroidWifiConnectionService(
             withTimeoutOrNull(timeoutMillis) {
                 requestNetwork(
                     ssid = ssid,
-                    password = password
+                    password = password,
+                    securityType = securityType
                 )
             } ?: WifiConnectionResult.Timeout
         } catch (_: SecurityException) {
@@ -73,13 +76,17 @@ class AndroidWifiConnectionService(
     @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun requestNetwork(
         ssid: String,
-        password: String?
+        password: String?,
+        securityType: WifiSecurityType
     ): WifiConnectionResult {
         val specifierBuilder = WifiNetworkSpecifier.Builder()
             .setSsid(ssid)
 
         if (!password.isNullOrEmpty()) {
-            specifierBuilder.setWpa2Passphrase(password)
+            when (securityType) {
+                WifiSecurityType.WPA2 -> specifierBuilder.setWpa2Passphrase(password)
+                WifiSecurityType.WPA3 -> specifierBuilder.setWpa3Passphrase(password)
+            }
         }
 
         val request = NetworkRequest.Builder()

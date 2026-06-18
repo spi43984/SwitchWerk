@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.data.repository
 
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlinx.coroutines.flow.Flow
 
 interface WifiProfileRepository {
@@ -17,6 +18,8 @@ interface WifiProfileRepository {
     suspend fun getPassword(id: String): String?
 
     suspend fun hasPassword(id: String): Boolean
+
+    suspend fun updateLastSuccessfulSecurityType(id: String, securityType: WifiSecurityType)
 
     suspend fun deletePassword(id: String)
 

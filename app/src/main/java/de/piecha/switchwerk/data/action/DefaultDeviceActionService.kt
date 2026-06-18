@@ -4,6 +4,7 @@ import android.net.Network
 import android.util.Log
 import de.piecha.switchwerk.data.network.HttpApiCallResult
 import de.piecha.switchwerk.data.network.HttpApiCallService
+import de.piecha.switchwerk.data.network.SecurityAttemptFailure
 import de.piecha.switchwerk.data.network.WifiConnectionResult
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
@@ -12,6 +13,7 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiSecurityType
 import java.net.ConnectException
 import java.net.NoRouteToHostException
 import java.net.SocketException
@@ -59,15 +61,10 @@ class DefaultDeviceActionService(
         var lastFailure: DeviceActionResult = DeviceActionResult.WifiConnectionFailed
         for ((index, connectionWithProfile) in availableConnections.withIndex()) {
             val password = wifiProfileRepository.getPassword(connectionWithProfile.profile.id)
-            logInfo("Starting explicit WiFi attempt ${index + 1}/${availableConnections.size}")
+            logInfo("Starting explicit WiFi profile attempt ${index + 1}/${availableConnections.size}")
 
             try {
-                when (
-                    val connectionResult = wifiConnectionService.connect(
-                        ssid = connectionWithProfile.profile.ssid,
-                        password = password
-                    )
-                ) {
+                when (val connectionResult = connectWifiProfile(connectionWithProfile.profile, password)) {
                     is WifiConnectionResult.Success -> {
                         logInfo("Requested WiFi network available; starting bound HTTP call")
                         when (
@@ -95,6 +92,7 @@ class DefaultDeviceActionService(
 
                     WifiConnectionResult.Timeout,
                     WifiConnectionResult.Unavailable,
+                    is WifiConnectionResult.SecurityTypesFailed,
                     is WifiConnectionResult.Error -> {
                         logWarning("Explicit WiFi attempt failed: ${connectionResult.logName()}")
                         lastFailure = DeviceActionResult.WifiConnectionFailed
@@ -107,6 +105,91 @@ class DefaultDeviceActionService(
         }
 
         return lastFailure
+    }
+
+    private suspend fun connectWifiProfile(
+        profile: WifiProfile,
+        password: String?
+    ): WifiConnectionResult {
+        val startedAtNanos = System.nanoTime()
+        val securityTypes = securityAttemptOrder(profile.lastSuccessfulSecurityType)
+        val failures = mutableListOf<SecurityAttemptFailure>()
+        var lastResult: WifiConnectionResult = WifiConnectionResult.Timeout
+
+        securityTypes.forEachIndexed { index, securityType ->
+            val remainingTimeout = remainingTimeoutMillis(startedAtNanos)
+            if (remainingTimeout <= 0L) {
+                return securityFailureResult(failures, lastResult)
+            }
+
+            logInfo("Starting explicit WiFi security attempt ${index + 1}/${securityTypes.size}")
+            val connectionResult = wifiConnectionService.connect(
+                ssid = profile.ssid,
+                password = password,
+                securityType = securityType,
+                timeoutMillis = perAttemptTimeoutMillis(
+                    remainingTimeout = remainingTimeout,
+                    attemptsLeftAfterThis = securityTypes.lastIndex - index
+                )
+            )
+            lastResult = connectionResult
+
+            when (connectionResult) {
+                is WifiConnectionResult.Success -> {
+                    wifiProfileRepository.updateLastSuccessfulSecurityType(profile.id, securityType)
+                    return connectionResult
+                }
+
+                WifiConnectionResult.PermissionDenied,
+                WifiConnectionResult.UnsupportedAndroidVersion -> return connectionResult
+
+                WifiConnectionResult.Timeout,
+                WifiConnectionResult.Unavailable,
+                is WifiConnectionResult.SecurityTypesFailed,
+                is WifiConnectionResult.Error -> {
+                    failures += SecurityAttemptFailure(securityType, connectionResult)
+                    if (index == securityTypes.lastIndex || !connectionResult.allowsSecurityFallback()) {
+                        return securityFailureResult(failures, connectionResult)
+                    }
+                    logWarning("Explicit WiFi security attempt failed; trying fallback type")
+                }
+            }
+        }
+
+        return lastResult
+    }
+
+    private fun securityFailureResult(
+        failures: List<SecurityAttemptFailure>,
+        fallbackResult: WifiConnectionResult
+    ): WifiConnectionResult {
+        return if (failures.size >= 2) {
+            WifiConnectionResult.SecurityTypesFailed(failures)
+        } else {
+            fallbackResult
+        }
+    }
+
+    private fun securityAttemptOrder(
+        preferredSecurityType: WifiSecurityType?
+    ): List<WifiSecurityType> {
+        val first = preferredSecurityType ?: WifiSecurityType.WPA2
+        return listOf(first, first.fallback())
+    }
+
+    private fun remainingTimeoutMillis(startedAtNanos: Long): Long {
+        val elapsedMillis = (System.nanoTime() - startedAtNanos) / NANOS_PER_MILLISECOND
+        return WifiConnectionService.DEFAULT_TIMEOUT_MILLIS - elapsedMillis
+    }
+
+    private fun perAttemptTimeoutMillis(
+        remainingTimeout: Long,
+        attemptsLeftAfterThis: Int
+    ): Long {
+        if (attemptsLeftAfterThis <= 0) {
+            return remainingTimeout
+        }
+        return remainingTimeout.coerceAtMost(FIRST_SECURITY_ATTEMPT_TIMEOUT_MILLIS)
     }
 
     private suspend fun callApi(
@@ -203,11 +286,26 @@ class DefaultDeviceActionService(
     private fun WifiConnectionResult.logName(): String {
         return when (this) {
             is WifiConnectionResult.Success -> "Success"
+            is WifiConnectionResult.SecurityTypesFailed -> "SecurityTypesFailed"
             WifiConnectionResult.Timeout -> "Timeout"
             WifiConnectionResult.Unavailable -> "Unavailable"
             WifiConnectionResult.PermissionDenied -> "PermissionDenied"
             WifiConnectionResult.UnsupportedAndroidVersion -> "UnsupportedAndroidVersion"
             is WifiConnectionResult.Error -> "Error(${cause.javaClass.simpleName})"
+        }
+    }
+
+    private fun WifiConnectionResult.allowsSecurityFallback(): Boolean {
+        return when (this) {
+            WifiConnectionResult.Timeout,
+            WifiConnectionResult.Unavailable -> true
+
+            is WifiConnectionResult.Error -> cause !is IllegalArgumentException
+
+            is WifiConnectionResult.Success,
+            is WifiConnectionResult.SecurityTypesFailed,
+            WifiConnectionResult.PermissionDenied,
+            WifiConnectionResult.UnsupportedAndroidVersion -> false
         }
     }
 
@@ -234,5 +332,7 @@ class DefaultDeviceActionService(
 
     private companion object {
         const val LOG_TAG = "SwitchWerkNetwork"
+        const val NANOS_PER_MILLISECOND = 1_000_000L
+        const val FIRST_SECURITY_ATTEMPT_TIMEOUT_MILLIS = 10_000L
     }
 }
