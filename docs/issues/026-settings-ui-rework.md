@@ -1,5 +1,11 @@
 # Issue #26: Settings UI Rework
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P0
+- Typ: GUI / Einstellungen
+
 ## Ziel
 
 Die Einstellungen sollen übersichtlicher, moderner und konsistenter gestaltet werden.
@@ -144,4 +150,3 @@ ViewModels und Repositories sollen möglichst unverändert bleiben.
 * Darstellung auf kleinem Display prüfen
 * Darstellung im Dark Mode prüfen
 * Darstellung im Light Mode prüfen
-
