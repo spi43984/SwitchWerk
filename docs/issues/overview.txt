@@ -1,33 +1,56 @@
-# aktualisiert
-001 Configuration Domain Foundation - abgeschlossen
-002 Dashboard Device List - abgeschlossen
-003 Settings Navigation Foundation - abgeschlossen
-004 UI Foundation Cleanup - abgeschlossen
-005 Local Persistence Foundation - abgeschlossen
-006 Encrypted WiFi Password Storage - abgeschlossen
-007 WiFi Profile Management - abgeschlossen
-008 Device Management - abgeschlossen
-009 WiFi Connection Service - abgeschlossen
-010 HTTP/API Call Service - abgeschlossen
-011 Device Action With WiFi Fallback - abgeschlossen
-012 Import/Export - abgeschlossen
-013 QR Code Import - abgeschlossen
-014 Dashboard Device Reordering - abgeschlossen
-015 WiFi Profile Dialog Management - abgeschlossen
-016 Edit Items By Name Click - abgeschlossen
-017 Unique WiFi Profile Name - abgeschlossen
-018 Adaptive WiFi Security Fallback
-019 Configurable WiFi List Sorting
-020 Device Assigned WiFi Order
-021 HTTP/HTTPS Device Actions
-022 Request Body And Content-Type Support
-023 Settings Display And Action Details
-024 Authenticated Import Sources Backlog
-025 Dashboard Widget Layout
-026 Settings UI Rework
-027 WiFi Timeout Analysis And Stabilization
-028 Theme Mode Setting
-029 Language Setting
-030 WiFi Profile Deletion Safety
-031 Import Enforces Unique WiFi Profile Names
-032 Room Schema And Migration Test Coverage
+# Issue-Übersicht
+
+Sortierung für die Umsetzung: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
+
+| ID | Prio | Status | Titel |
+|---:|:----:|--------|-------|
+| 001 | -- | abgeschlossen | Configuration Domain Foundation |
+| 002 | -- | abgeschlossen | Dashboard Device List |
+| 003 | -- | abgeschlossen | Settings Navigation Foundation |
+| 004 | -- | abgeschlossen | UI Foundation Cleanup |
+| 005 | -- | abgeschlossen | Local Persistence Foundation |
+| 006 | -- | abgeschlossen | Encrypted WiFi Password Storage |
+| 007 | -- | abgeschlossen | WiFi Profile Management |
+| 008 | -- | abgeschlossen | Device Management |
+| 009 | -- | abgeschlossen | WiFi Connection Service |
+| 010 | -- | abgeschlossen | HTTP/API Call Service |
+| 011 | -- | abgeschlossen | Device Action With WiFi Fallback |
+| 012 | -- | abgeschlossen | Import/Export |
+| 013 | -- | abgeschlossen | QR Code Import |
+| 014 | -- | abgeschlossen | Dashboard Device Reordering |
+| 015 | -- | abgeschlossen | WiFi Profile Dialog Management |
+| 016 | -- | abgeschlossen | Edit Items By Name Click |
+| 017 | -- | abgeschlossen | Unique WiFi Profile Name |
+| 018 | P0 | offen | Adaptive WiFi Security Fallback |
+| 019 | P2 | offen | Configurable WiFi List Sorting |
+| 020 | P1 | offen | Device Assigned WiFi Order |
+| 021 | P2 | offen | HTTP/HTTPS Device Actions |
+| 022 | P2 | offen | Request Body And Content-Type Support |
+| 023 | P0 | offen | Settings Display And Action Details |
+| 024 | P4 | Backlog | Authenticated Import Sources Backlog |
+| 025 | P1 | offen | Dashboard Widget Layout |
+| 026 | P0 | offen | Settings UI Rework |
+| 027 | P0 | offen | WiFi Timeout Analysis And Stabilization |
+| 028 | P1 | offen | Theme Mode Setting |
+| 029 | P1 | offen | Language Setting |
+| 030 | P1 | offen | WiFi Profile Deletion Safety |
+| 031 | P2 | offen | Import Enforces Unique WiFi Profile Names |
+| 032 | P2 | offen | Room Schema And Migration Test Coverage |
+
+## Empfohlene Umsetzungsreihenfolge
+
+1. 018 Adaptive WiFi Security Fallback
+2. 023 Settings Display And Action Details
+3. 026 Settings UI Rework
+4. 027 WiFi Timeout Analysis And Stabilization
+5. 020 Device Assigned WiFi Order
+6. 025 Dashboard Widget Layout
+7. 028 Theme Mode Setting
+8. 029 Language Setting
+9. 030 WiFi Profile Deletion Safety
+10. 019 Configurable WiFi List Sorting
+11. 021 HTTP/HTTPS Device Actions
+12. 022 Request Body And Content-Type Support
+13. 031 Import Enforces Unique WiFi Profile Names
+14. 032 Room Schema And Migration Test Coverage
+15. 024 Authenticated Import Sources Backlog
