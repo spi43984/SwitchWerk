@@ -63,3 +63,4 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 12. 031 Import Enforces Unique WiFi Profile Names
 13. 032 Room Schema And Migration Test Coverage
 14. 024 Authenticated Import Sources Backlog
+033 | P1 | Android-managed WiFi networks | Open | Support Android-system-managed WiFi credentials including 802.1X/EAP.
