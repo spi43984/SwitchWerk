@@ -1,4 +1,4 @@
-# Issue 032: Room Schema And Migration Test Coverage
+# Issue #32: Room Schema And Migration Test Coverage
 
 Status: offen
 

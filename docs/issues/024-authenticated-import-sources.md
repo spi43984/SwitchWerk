@@ -1,4 +1,4 @@
-# Issue 024 – Unterstützung authentifizierter Import-Quellen (Backlog)
+# Issue #24: Authenticated Import Sources Backlog
 
 ## Status
 

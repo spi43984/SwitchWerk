@@ -1,4 +1,4 @@
-# Issue 029 – Language Setting
+# Issue #29: Language Setting
 
 ## Ziel
 

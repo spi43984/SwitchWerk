@@ -1,4 +1,4 @@
-# Issue 028 – Theme Mode Setting
+# Issue #28: Theme Mode Setting
 
 ## Ziel
 

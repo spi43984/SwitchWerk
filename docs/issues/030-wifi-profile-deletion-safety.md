@@ -1,4 +1,4 @@
-# Issue 030: WiFi Profile Deletion Safety
+# Issue #30: WiFi Profile Deletion Safety
 
 Status: offen
 

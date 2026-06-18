@@ -1,4 +1,4 @@
-# Issue 027 – WLAN-Timeouts analysieren und stabilisieren
+# Issue #27: WiFi Timeout Analysis And Stabilization
 
 ## Ziel
 

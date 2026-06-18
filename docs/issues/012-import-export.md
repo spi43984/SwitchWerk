@@ -1,4 +1,4 @@
-# Issue #12: Import / Export
+# Issue #12: Import/Export
 
 ## Ziel
 

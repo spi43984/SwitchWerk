@@ -1,4 +1,4 @@
-# Issue 031: Import Enforces Unique WiFi Profile Names
+# Issue #31: Import Enforces Unique WiFi Profile Names
 
 Status: offen
 

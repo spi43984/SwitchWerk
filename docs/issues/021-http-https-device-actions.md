@@ -1,4 +1,4 @@
-# Issue 021: HTTP/HTTPS Device Actions
+# Issue #21: HTTP/HTTPS Device Actions
 
 ## Ziel
 

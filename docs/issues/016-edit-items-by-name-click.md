@@ -1,4 +1,4 @@
-# Issue #16: Edit Items by Name Click and Swipe Actions
+# Issue #16: Edit Items By Name Click
 
 Status: abgeschlossen
 
