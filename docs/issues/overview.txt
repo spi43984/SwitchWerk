@@ -31,7 +31,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 015 | -- | abgeschlossen | WiFi Profile Dialog Management |
 | 016 | -- | abgeschlossen | Edit Items By Name Click |
 | 017 | -- | abgeschlossen | Unique WiFi Profile Name |
-| 018 | P0 | offen | Adaptive WiFi Security Fallback |
+| 018 | -- | abgeschlossen | Adaptive WiFi Security Fallback |
 | 019 | P2 | offen | Configurable WiFi List Sorting |
 | 020 | P1 | offen | Device Assigned WiFi Order |
 | 021 | P2 | offen | HTTP/HTTPS Device Actions |
@@ -49,18 +49,17 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 018 Adaptive WiFi Security Fallback
-2. 023 Settings Display And Action Details
-3. 026 Settings UI Rework
-4. 027 WiFi Timeout Analysis And Stabilization
-5. 020 Device Assigned WiFi Order
-6. 025 Dashboard Widget Layout
-7. 028 Theme Mode Setting
-8. 029 Language Setting
-9. 030 WiFi Profile Deletion Safety
-10. 019 Configurable WiFi List Sorting
-11. 021 HTTP/HTTPS Device Actions
-12. 022 Request Body And Content-Type Support
-13. 031 Import Enforces Unique WiFi Profile Names
-14. 032 Room Schema And Migration Test Coverage
-15. 024 Authenticated Import Sources Backlog
+1. 023 Settings Display And Action Details
+2. 026 Settings UI Rework
+3. 027 WiFi Timeout Analysis And Stabilization
+4. 020 Device Assigned WiFi Order
+5. 025 Dashboard Widget Layout
+6. 028 Theme Mode Setting
+7. 029 Language Setting
+8. 030 WiFi Profile Deletion Safety
+9. 019 Configurable WiFi List Sorting
+10. 021 HTTP/HTTPS Device Actions
+11. 022 Request Body And Content-Type Support
+12. 031 Import Enforces Unique WiFi Profile Names
+13. 032 Room Schema And Migration Test Coverage
+14. 024 Authenticated Import Sources Backlog

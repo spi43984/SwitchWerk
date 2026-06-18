@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: WLAN / Stabilität
 
@@ -68,25 +68,43 @@ SSID 2: anderer Sicherheitstyp -> nur bei geeignetem WLAN-Verbindungsfehler vers
 - wiederholte Security-Fallback-Schleifen über mehr als zwei Versuche
 
 ## Akzeptanzkriterien
-- [ ] Ohne gespeicherten Sicherheitstyp wird WPA2 zuerst versucht
-- [ ] Nach WPA2-Timeout oder `Unavailable` wird einmalig WPA3 versucht
-- [ ] Nach WPA3-Timeout oder `Unavailable` wird einmalig WPA2 versucht, wenn WPA3 zuerst verwendet wurde
-- [ ] WLAN-Verbindungsfehler, die auf einen ungeeigneten Sicherheitstyp hindeuten können, lösen den Security-Fallback aus
-- [ ] HTTP-, DNS-, Geräte- oder App-Fehler lösen keinen Security-Fallback aus
-- [ ] Es werden maximal zwei Security-Versuche pro WLAN-Profil durchgeführt
-- [ ] Der zuletzt erfolgreiche Sicherheitstyp wird pro WLAN-Profil gespeichert
-- [ ] Bei späteren Verbindungen wird der zuletzt erfolgreiche Typ zuerst verwendet
-- [ ] Eine Umstellung eines WLANs von WPA2 auf WPA3 oder umgekehrt wird durch den Fallback erkannt
-- [ ] Beide Versuche teilen sich ein begrenztes Gesamt-Timeout
-- [ ] Andere Fehler lösen keinen Security-Fallback aus
-- [ ] Wenn beide Versuche scheitern, wird ein strukturiertes Fehlerergebnis geliefert
-- [ ] Das Fehlerergebnis nach zwei fehlgeschlagenen Security-Versuchen erlaubt
+- [x] Ohne gespeicherten Sicherheitstyp wird WPA2 zuerst versucht
+- [x] Nach WPA2-Timeout oder `Unavailable` wird einmalig WPA3 versucht
+- [x] Nach WPA3-Timeout oder `Unavailable` wird einmalig WPA2 versucht, wenn WPA3 zuerst verwendet wurde
+- [x] WLAN-Verbindungsfehler, die auf einen ungeeigneten Sicherheitstyp hindeuten können, lösen den Security-Fallback aus
+- [x] HTTP-, DNS-, Geräte- oder App-Fehler lösen keinen Security-Fallback aus
+- [x] Es werden maximal zwei Security-Versuche pro WLAN-Profil durchgeführt
+- [x] Der zuletzt erfolgreiche Sicherheitstyp wird pro WLAN-Profil gespeichert
+- [x] Bei späteren Verbindungen wird der zuletzt erfolgreiche Typ zuerst verwendet
+- [x] Eine Umstellung eines WLANs von WPA2 auf WPA3 oder umgekehrt wird durch den Fallback erkannt
+- [x] Beide Versuche teilen sich ein begrenztes Gesamt-Timeout
+- [x] Andere Fehler lösen keinen Security-Fallback aus
+- [x] Wenn beide Versuche scheitern, wird ein strukturiertes Fehlerergebnis geliefert
+- [x] Das Fehlerergebnis nach zwei fehlgeschlagenen Security-Versuchen erlaubt
   der übergeordneten Geräteaktion, mit der nächsten zugewiesenen SSID
   fortzufahren
-- [ ] Ein fehlgeschlagener WPA2/WPA3-Durchlauf für eine SSID beendet nicht die
+- [x] Ein fehlgeschlagener WPA2/WPA3-Durchlauf für eine SSID beendet nicht die
   gesamte Verbindungsfolge eines Geräts
-- [ ] Bestehende WLAN-Profile bleiben nach der Room-Migration erhalten
-- [ ] Es werden keine sensiblen WLAN-Daten geloggt
+- [x] Bestehende WLAN-Profile bleiben nach der Room-Migration erhalten
+- [x] Es werden keine sensiblen WLAN-Daten geloggt
+
+## Umsetzung
+- `WifiSecurityType` bildet WPA2 und WPA3 als klaren Modelltyp ab.
+- WLAN-Profile speichern den zuletzt erfolgreichen Sicherheitstyp nullable:
+  `null` bedeutet unbekannt, `WPA2_PSK` und `WPA3_SAE` bleiben erhalten.
+- Der WLAN-Verbindungsablauf versucht pro Profil höchstens zwei Typen und
+  teilt sich ein gemeinsames begrenztes Timeout.
+- Bei Erfolg wird der funktionierende Typ pro Profil gespeichert.
+- Import/Export erhält `null`, `WPA2_PSK` und `WPA3_SAE` ohne Umwandlung.
+- Bestehende Room-Daten werden per Migration übernommen.
+
+## Prüfung
+- `git diff --check`
+- `./gradlew testDebugUnitTest`
+- `./gradlew assembleDebug`
+- Host: `./gradlew clean assembleDebug`
+- Host: `./gradlew installDebug`
+- Manueller Gerätetest: WPA2-Export/Import und Schalten erfolgreich.
 
 ## Testhinweise
 - WLAN-Profil ohne gespeicherten Typ verbindet sich direkt per WPA2

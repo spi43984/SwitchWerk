@@ -126,10 +126,10 @@ Kurzfassung:
 - 015 WiFi Profile Dialog Management
 - 016 Edit Items By Name Click
 - 017 Unique WiFi Profile Name
+- 018 Adaptive WiFi Security Fallback
 
 ### Offen
 
-- 018 Adaptive WiFi Security Fallback
 - 019 Configurable WiFi List Sorting
 - 020 Device Assigned WiFi Order
 - 021 HTTP/HTTPS Device Actions
@@ -150,7 +150,7 @@ Kurzfassung:
 
 ### Nächstes Issue
 
-- 018 Adaptive WiFi Security Fallback
+- 023 Settings Display And Action Details
 
 ### Pflegehinweis
 
