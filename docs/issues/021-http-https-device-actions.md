@@ -1,5 +1,11 @@
 # Issue #21: HTTP/HTTPS Device Actions
 
+## Metadaten
+
+- Status: Offen
+- Priorität: P2
+- Typ: Geräteaktion / Netzwerk
+
 ## Ziel
 
 Geräteaktionen sollen unabhängig vom verwendeten Transportprotokoll
