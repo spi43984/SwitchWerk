@@ -9,10 +9,16 @@ Verbindungsaufbau bevorzugt. Schlägt dieser Versuch fehl, wird einmalig WPA3
 versucht. Der zuletzt erfolgreiche Sicherheitstyp wird für folgende
 Verbindungen bevorzugt.
 
+Der gespeicherte Sicherheitstyp ist die primäre Verbindungsstrategie. WPA2 wird
+nur verwendet, wenn für das WLAN-Profil noch kein erfolgreicher
+Sicherheitstyp bekannt ist.
+
 ## Scope
 - unterstützte Sicherheitstypen als klaren Modelltyp abbilden
-- WPA2 beim ersten Verbindungsversuch bevorzugen
-- bei `Unavailable` oder Timeout einmalig den jeweils anderen Typ versuchen
+- WPA2 beim ersten Verbindungsversuch bevorzugen, wenn noch kein erfolgreicher Sicherheitstyp gespeichert ist
+- bei WLAN-Verbindungsfehlern, die auf einen ungeeigneten Sicherheitstyp hindeuten können, einmalig den jeweils anderen Typ versuchen
+- hierzu zählen insbesondere `Unavailable`, Verbindungs-Timeouts sowie vom Android-WLAN-Stack gemeldete Verbindungs- oder Authentifizierungsfehler
+- andere Fehler lösen keinen Security-Fallback aus
 - zuletzt erfolgreichen Sicherheitstyp pro WLAN-Profil speichern
 - zuletzt erfolgreichen Typ bei späteren Verbindungen zuerst verwenden
 - Gesamt-Timeout über beide Verbindungsversuche begrenzen
@@ -27,13 +33,13 @@ Verbindungen bevorzugt.
 ## Verbindungsstrategie
 1. Ist ein zuletzt erfolgreicher Typ gespeichert, wird dieser zuerst versucht.
 2. Ist kein Typ gespeichert, wird zuerst WPA2 versucht.
-3. Nur bei `Unavailable` oder Timeout wird einmalig der andere Typ versucht.
-4. Bei Erfolg wird der funktionierende Typ für das WLAN-Profil gespeichert.
-5. Das gemeinsame Zeitlimit darf durch den zweiten Versuch nicht neu beginnen.
-6. Scheitern WPA2 und WPA3 für dieselbe SSID, ist dieses WLAN-Profil
-   abgeschlossen. Der Dienst liefert ein strukturiertes Endergebnis zurück.
-7. Die übergeordnete Geräteaktion behandelt dieses Ergebnis als fehlgeschlagene
-   Verbindung und versucht anschließend die nächste dem Gerät zugewiesene SSID.
+3. Nur bei WLAN-Verbindungsfehlern, die plausibel durch einen ungeeigneten Sicherheitstyp verursacht werden können, wird einmalig der andere Typ versucht.
+4. Hierzu zählen insbesondere `Unavailable`, Verbindungs-Timeouts sowie vom Android-WLAN-Stack gemeldete Verbindungs- oder Authentifizierungsfehler.
+5. Andere Fehler lösen keinen Security-Fallback aus.
+6. Bei Erfolg wird der funktionierende Typ für das WLAN-Profil gespeichert.
+7. Das gemeinsame Zeitlimit darf durch den zweiten Versuch nicht neu beginnen.
+8. Scheitern WPA2 und WPA3 für dieselbe SSID, ist dieses WLAN-Profil abgeschlossen. Der Dienst liefert ein strukturiertes Endergebnis zurück.
+9. Die übergeordnete Geräteaktion behandelt dieses Ergebnis als fehlgeschlagene Verbindung und versucht anschließend die nächste dem Gerät zugewiesene SSID.
 
 Beispiel bei zwei einem Gerät zugewiesenen WLAN-Profilen:
 
@@ -41,7 +47,7 @@ Beispiel bei zwei einem Gerät zugewiesenen WLAN-Profilen:
 SSID 1: WPA2 -> fehlgeschlagen
 SSID 1: WPA3 -> fehlgeschlagen
 SSID 2: bevorzugter oder gespeicherter Sicherheitstyp -> versuchen
-SSID 2: anderer Sicherheitstyp -> nur bei Unavailable oder Timeout versuchen
+SSID 2: anderer Sicherheitstyp -> nur bei geeignetem WLAN-Verbindungsfehler versuchen
 ```
 
 ## Nicht im Scope
@@ -52,11 +58,16 @@ SSID 2: anderer Sicherheitstyp -> nur bei Unavailable oder Timeout versuchen
 - Wiederholung nach HTTP-, DNS- oder Gerätefehlern
 - WPA3 Enterprise, WPA2 Enterprise oder andere Enterprise-Verfahren
 - automatische Änderung oder Speicherung von WLAN-Passwörtern
+- automatische Erkennung des Sicherheitstyps über WLAN-Scans
+- wiederholte Security-Fallback-Schleifen über mehr als zwei Versuche
 
 ## Akzeptanzkriterien
 - [ ] Ohne gespeicherten Sicherheitstyp wird WPA2 zuerst versucht
 - [ ] Nach WPA2-Timeout oder `Unavailable` wird einmalig WPA3 versucht
 - [ ] Nach WPA3-Timeout oder `Unavailable` wird einmalig WPA2 versucht, wenn WPA3 zuerst verwendet wurde
+- [ ] WLAN-Verbindungsfehler, die auf einen ungeeigneten Sicherheitstyp hindeuten können, lösen den Security-Fallback aus
+- [ ] HTTP-, DNS-, Geräte- oder App-Fehler lösen keinen Security-Fallback aus
+- [ ] Es werden maximal zwei Security-Versuche pro WLAN-Profil durchgeführt
 - [ ] Der zuletzt erfolgreiche Sicherheitstyp wird pro WLAN-Profil gespeichert
 - [ ] Bei späteren Verbindungen wird der zuletzt erfolgreiche Typ zuerst verwendet
 - [ ] Eine Umstellung eines WLANs von WPA2 auf WPA3 oder umgekehrt wird durch den Fallback erkannt
@@ -81,6 +92,7 @@ SSID 2: anderer Sicherheitstyp -> nur bei Unavailable oder Timeout versuchen
   setzt mit der zweiten zugewiesenen SSID fort
 - WPA2 und WPA3 aller zugewiesenen SSIDs schlagen fehl; erst danach wird die
   gesamte Geräteverbindung als fehlgeschlagen gemeldet
+- HTTP-, DNS- oder Gerätefehler nach erfolgreicher WLAN-Verbindung lösen keinen Security-Fallback aus
 - Coroutine wird während des ersten und während des zweiten Versuchs abgebrochen
 - Gesamt-Timeout wird auch beim zweiten Versuch nicht überschritten
 - bestehende Room-Daten werden ohne Datenverlust migriert
