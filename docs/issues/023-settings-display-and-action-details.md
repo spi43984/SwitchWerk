@@ -34,6 +34,13 @@ festen hellen oder dunklen Design betrieben werden können.
 
 - Schalter zum Ein-/Ausschalten der Detailanzeige
 - Einstellung wird dauerhaft gespeichert
+- Sortierung auswählbar:
+  - Neueste Meldung oben
+  - Neueste Meldung unten
+- Standard ist „Neueste Meldung oben“
+- Sortierung wird dauerhaft gespeichert
+- Aktionsprotokoll kann über einen Mülleimer-Button geleert werden
+- Diagnosemeldungen bleiben ausschließlich im Arbeitsspeicher
 
 ### Zeitstempel in Diagnosemeldungen
 
@@ -65,21 +72,42 @@ Ziel:
   - 30 %
   - 40 %
 - Bereich ist scrollbar
+- Bei neuen Meldungen wird automatisch zum neuesten Eintrag gescrollt
+- Sortierreihenfolge kann auch direkt im Detailbereich umgeschaltet werden
+- Neue Geräteaktionen werden durch einen optischen Trenner voneinander getrennt
 
 ### Ereignisanzeige
 
 Während einer Geräteaktion werden verständliche Statusmeldungen angezeigt, z. B.
 
-- Geräteaktion gestartet
+- Geräteaktion „Gerätename“ gestartet
 - WLAN-Profil „Shelly AP“ wird verbunden
 - WLAN-Verbindung erfolgreich
 - WLAN-Verbindung fehlgeschlagen
-- HTTP GET wird ausgeführt
-- HTTP POST wird ausgeführt
+- konfigurierte Geräteadresse als IP-Adresse oder DNS-Name
+- HTTP GET wird an der Geräteadresse ausgeführt
+- HTTP POST wird an der Geräteadresse ausgeführt
+- HTTP-Antwort mit Statuscode
+- DNS-Name konnte nicht aufgelöst werden
+- IP-Adresse ist nicht erreichbar
 - Gerät erfolgreich geschaltet
 - Verbindung nicht möglich
 - Anfrage fehlgeschlagen
 - Geräteaktion abgeschlossen
+
+### Import und Export der App-Einstellungen
+
+Folgende App-Einstellungen werden mit der Konfiguration exportiert und beim
+Import übernommen:
+
+- Darstellung
+- Detailanzeige ein/aus
+- Höhe des Detailbereichs
+- Sortierreihenfolge
+
+Das Exportformat verwendet dafür Schema-Version 2. Schema-Version 1 bleibt
+importierbar. Fehlt der App-Einstellungsblock in einer Importdatei, bleiben die
+aktuellen lokalen App-Einstellungen unverändert.
 
 ## Nicht im Scope
 
@@ -113,6 +141,15 @@ Die Meldungen müssen für normale Benutzer verständlich formuliert sein.
 - [ ] Höhe des Detailbereichs ist konfigurierbar
 - [ ] Statusmeldungen werden während einer Geräteaktion angezeigt
 - [ ] Bereich ist scrollbar
+- [ ] Neue Geräteaktionen sind optisch getrennt
+- [ ] Gerätename, Geräteadresse, HTTP-Methode und HTTP-Status werden verständlich angezeigt
+- [ ] DNS-Auflösungsfehler und nicht erreichbare IP-Adressen sind unterscheidbar
+- [ ] Sortierung Neueste oben/unten ist auswählbar und dauerhaft gespeichert
+- [ ] Neueste oben ist die Standardeinstellung
+- [ ] Detailbereich scrollt automatisch zur neuesten Meldung
+- [ ] Aktionsprotokoll kann im UI geleert werden
+- [ ] App-Einstellungen werden exportiert und importiert
+- [ ] Importdateien ohne App-Einstellungen überschreiben lokale Einstellungen nicht
 - [ ] Keine sensiblen Daten werden angezeigt
 - [ ] Build erfolgreich
 
