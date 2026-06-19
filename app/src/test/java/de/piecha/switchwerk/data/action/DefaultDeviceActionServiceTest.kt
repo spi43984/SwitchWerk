@@ -13,6 +13,7 @@ import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiSecurityType
+import java.net.ConnectException
 import java.net.SocketException
 import java.net.UnknownHostException
 import kotlinx.coroutines.awaitCancellation
@@ -44,11 +45,13 @@ class DefaultDeviceActionServiceTest {
             httpService = httpService
         )
 
+        val diagnosticEvents = mutableListOf<DeviceActionDiagnosticEvent>()
         val result = service.execute(
             device(
                 method = ApiMethod.GET,
                 connections = listOf(DeviceConnection("wifi-1", "192.168.1.10"))
-            )
+            ),
+            diagnosticEvents::add
         )
 
         assertEquals(DeviceActionResult.Success, result)
@@ -58,6 +61,22 @@ class DefaultDeviceActionServiceTest {
         assertSame(requestedNetwork, httpService.calls.single().network)
         assertEquals(listOf("Device WiFi"), wifiService.requestedSsids)
         assertEquals(1, wifiService.disconnectCount)
+        assertTrue(
+            diagnosticEvents.contains(
+                DeviceActionDiagnosticEvent.DeviceAddress("192.168.1.10")
+            )
+        )
+        assertTrue(
+            diagnosticEvents.contains(
+                DeviceActionDiagnosticEvent.HttpRequestStarted(
+                    method = ApiMethod.GET,
+                    address = "192.168.1.10"
+                )
+            )
+        )
+        assertTrue(
+            diagnosticEvents.contains(DeviceActionDiagnosticEvent.HttpResponseReceived(200))
+        )
     }
 
     @Test
@@ -309,13 +328,15 @@ class DefaultDeviceActionServiceTest {
             httpService = httpService
         )
 
+        val diagnosticEvents = mutableListOf<DeviceActionDiagnosticEvent>()
         val result = service.execute(
             device(
                 connections = listOf(
                     DeviceConnection("wifi-1", "first.local"),
                     DeviceConnection("wifi-2", "second.local")
                 )
-            )
+            ),
+            diagnosticEvents::add
         )
 
         assertEquals(DeviceActionResult.Success, result)
@@ -324,6 +345,35 @@ class DefaultDeviceActionServiceTest {
         assertSame(firstNetwork, httpService.calls[0].network)
         assertSame(secondNetwork, httpService.calls[1].network)
         assertEquals(2, wifiService.disconnectCount)
+        assertTrue(
+            diagnosticEvents.contains(DeviceActionDiagnosticEvent.DnsResolutionFailed)
+        )
+    }
+
+    @Test
+    fun connectionFailureReportsDeviceAddressAsNotReachable() = runBlocking {
+        val network = mock(Network::class.java)
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(network)))
+            ),
+            httpService = FakeHttpApiCallService(
+                ArrayDeque(listOf(HttpApiCallResult.NetworkError(ConnectException())))
+            )
+        )
+        val diagnosticEvents = mutableListOf<DeviceActionDiagnosticEvent>()
+
+        service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "192.168.1.20"))
+            ),
+            diagnosticEvents::add
+        )
+
+        assertTrue(
+            diagnosticEvents.contains(DeviceActionDiagnosticEvent.DeviceNotReachable)
+        )
     }
 
     @Test

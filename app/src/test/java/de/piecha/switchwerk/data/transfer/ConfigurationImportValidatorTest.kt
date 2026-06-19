@@ -25,10 +25,50 @@ class ConfigurationImportValidatorTest {
     @Test
     fun unsupportedSchemaVersionIsRejected() {
         val error = assertThrows(IllegalArgumentException::class.java) {
-            validator.validate(validDocument().copy(schemaVersion = 2))
+            validator.validate(validDocument().copy(schemaVersion = 3))
         }
 
         assertTrue(error.message.orEmpty().contains("schemaVersion"))
+    }
+
+    @Test
+    fun schemaVersionOneWithoutAppSettingsRemainsSupported() {
+        validator.validate(
+            validDocument().copy(
+                schemaVersion = 1,
+                appSettings = null
+            )
+        )
+    }
+
+    @Test
+    fun validAppSettingsAreAccepted() {
+        validator.validate(
+            validDocument().copy(
+                appSettings = ConfigurationAppSettings(
+                    themeMode = "DARK",
+                    showActionDetails = true,
+                    detailPanelHeight = "FORTY_PERCENT",
+                    diagnosticsNewestFirst = false
+                )
+            )
+        )
+    }
+
+    @Test
+    fun unsupportedAppThemeIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument().copy(
+                    appSettings = ConfigurationAppSettings(
+                        themeMode = "BLUE",
+                        showActionDetails = true,
+                        detailPanelHeight = "THIRTY_PERCENT",
+                        diagnosticsNewestFirst = true
+                    )
+                )
+            )
+        }
     }
 
     @Test

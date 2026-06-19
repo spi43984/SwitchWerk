@@ -1,16 +1,45 @@
 # AI Handoff
 
-Stand: 18. Juni 2026
+Stand: 19. Juni 2026
 
 ## Aktuelle Arbeit
 
-Keine aktive Implementierung.
+Issue 023 "Settings Display And Action Details" ist auf Branch
+`settings-display-action-details` implementiert. Veröffentlichung und
+Host-Prüfung stehen noch aus.
 
-Nächstes geplantes Issue laut `ai-context.md`:
+Umgesetzt:
 
 ```text
-023 Settings Display And Action Details
+- persistente Auswahl Systemvorgabe/Hell/Dunkel
+- persistenter Schalter für Aktionsdetails
+- persistente Detailbereich-Höhe 20/30/40 Prozent
+- optionaler, scrollbarer Detailbereich im Dashboard
+- verständliche In-Memory-Diagnosemeldungen mit HH:mm:ss.SSS-Zeitstempel
+- Startmeldung enthält den Gerätenamen
+- optischer Trenner zwischen Geräteaktionen
+- umrandeter Sortier-Button für neueste Meldung oben/unten mit automatischem Scrollen
+- Mülleimer-Button zum Leeren des In-Memory-Aktionsprotokolls
+- persistente Sortierauswahl in den Einstellungen; Standard ist „Neueste oben“
+- Diagnose zeigt Geräteadresse, HTTP-Methode und HTTP-Statuscode
+- DNS-Auflösungsfehler und nicht erreichbare Geräte-IP werden getrennt angezeigt
+- verdichteter Darstellungs-/Aktionsdetails-Rahmen mit 36-dp-Auswahlzeilen
+- Exportformat Version 2 enthält Darstellung, Aktionsdetails, Höhe und Sortierung
+- Import unterstützt Version 1 weiterhin und übernimmt Version-2-App-Einstellungen
+- keine Anzeige von Zugangsdaten, Headern, Payloads, URL-Pfaden oder Query-Parametern
 ```
+
+Container-Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew assembleDebug
+```
+
+Der Host-Build und die bisherigen Tests wurden vom Benutzer als erfolgreich
+gemeldet. Nach den anschließenden Detailanzeige-Nachbesserungen stehen erneuter
+Host-Build, Installation und Gerätetest noch aus.
 
 ## Zuletzt abgeschlossene Arbeit
 

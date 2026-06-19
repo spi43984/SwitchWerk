@@ -3,7 +3,15 @@ package de.piecha.switchwerk.data.transfer
 data class ConfigurationDocument(
     val schemaVersion: Int,
     val wifiProfiles: List<ConfigurationWifiProfile>,
-    val devices: List<ConfigurationDevice>
+    val devices: List<ConfigurationDevice>,
+    val appSettings: ConfigurationAppSettings? = null
+)
+
+data class ConfigurationAppSettings(
+    val themeMode: String,
+    val showActionDetails: Boolean,
+    val detailPanelHeight: String,
+    val diagnosticsNewestFirst: Boolean
 )
 
 data class ConfigurationWifiProfile(
@@ -33,4 +41,4 @@ data class ConfigurationDeviceConnection(
     val host: String
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 1
+const val CONFIGURATION_SCHEMA_VERSION = 2

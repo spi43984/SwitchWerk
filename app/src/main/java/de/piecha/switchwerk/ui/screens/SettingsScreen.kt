@@ -36,11 +36,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +61,8 @@ import com.journeyapps.barcodescanner.ScanOptions
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -172,6 +177,17 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+
+        DisplaySettingsSection(
+            themeMode = uiState.appSettings.themeMode,
+            showActionDetails = uiState.appSettings.showActionDetails,
+            detailPanelHeight = uiState.appSettings.detailPanelHeight,
+            diagnosticsNewestFirst = uiState.appSettings.diagnosticsNewestFirst,
+            onThemeModeChange = viewModel::setThemeMode,
+            onShowActionDetailsChange = viewModel::setShowActionDetails,
+            onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
+            onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
+        )
 
         WifiProfileManagementSection(
             profiles = uiState.wifiProfiles,
@@ -349,6 +365,110 @@ fun SettingsScreen(
             onImport = viewModel::confirmPasswordImport,
             onCancel = viewModel::cancelPendingImport
         )
+    }
+}
+
+@Composable
+private fun DisplaySettingsSection(
+    themeMode: AppThemeMode,
+    showActionDetails: Boolean,
+    detailPanelHeight: DetailPanelHeight,
+    diagnosticsNewestFirst: Boolean,
+    onThemeModeChange: (AppThemeMode) -> Unit,
+    onShowActionDetailsChange: (Boolean) -> Unit,
+    onDetailPanelHeightChange: (DetailPanelHeight) -> Unit,
+    onDiagnosticsNewestFirstChange: (Boolean) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
+            Column(
+                modifier = Modifier.padding(
+                    start = 12.dp,
+                    top = 4.dp,
+                    end = 6.dp,
+                    bottom = 4.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
+            ) {
+                Text("Darstellung", style = MaterialTheme.typography.titleMedium)
+                AppThemeMode.entries.forEach { option ->
+                    RadioOptionRow(
+                        label = when (option) {
+                            AppThemeMode.SYSTEM -> "Systemvorgabe"
+                            AppThemeMode.LIGHT -> "Hell"
+                            AppThemeMode.DARK -> "Dunkel"
+                        },
+                        selected = themeMode == option,
+                        onClick = { onThemeModeChange(option) }
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                        .clickable { onShowActionDetailsChange(!showActionDetails) },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Aktionsdetails anzeigen")
+                    Switch(
+                        checked = showActionDetails,
+                        onCheckedChange = onShowActionDetailsChange
+                    )
+                }
+
+                Text("Höhe des Detailbereichs", style = MaterialTheme.typography.titleSmall)
+                DetailPanelHeight.entries.forEach { option ->
+                    RadioOptionRow(
+                        label = when (option) {
+                            DetailPanelHeight.TWENTY_PERCENT -> "20 %"
+                            DetailPanelHeight.THIRTY_PERCENT -> "30 %"
+                            DetailPanelHeight.FORTY_PERCENT -> "40 %"
+                        },
+                        selected = detailPanelHeight == option,
+                        onClick = { onDetailPanelHeightChange(option) },
+                        enabled = showActionDetails
+                    )
+                }
+
+                Text("Sortierung Aktionsdetails", style = MaterialTheme.typography.titleSmall)
+                RadioOptionRow(
+                    label = "Neueste oben",
+                    selected = diagnosticsNewestFirst,
+                    onClick = { onDiagnosticsNewestFirstChange(true) }
+                )
+                RadioOptionRow(
+                    label = "Neueste unten",
+                    selected = !diagnosticsNewestFirst,
+                    onClick = { onDiagnosticsNewestFirstChange(false) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RadioOptionRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(36.dp)
+            .clickable(enabled = enabled, onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            modifier = Modifier.size(32.dp),
+            selected = selected,
+            onClick = onClick,
+            enabled = enabled
+        )
+        Text(text = label)
     }
 }
 

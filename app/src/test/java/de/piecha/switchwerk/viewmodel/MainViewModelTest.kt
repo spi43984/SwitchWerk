@@ -1,8 +1,10 @@
 package de.piecha.switchwerk.viewmodel
 
 import de.piecha.switchwerk.data.action.DeviceActionResult
+import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
 import de.piecha.switchwerk.data.repository.DeviceRepository
+import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
@@ -43,7 +45,8 @@ class MainViewModelTest {
         val actionService = WaitingDeviceActionService()
         val viewModel = MainViewModel(
             repository = FakeDeviceRepository(listOf(device)),
-            deviceActionService = actionService
+            deviceActionService = actionService,
+            appSettingsRepository = FakeAppSettingsRepository()
         )
         runCurrent()
 
@@ -58,6 +61,35 @@ class MainViewModelTest {
         runCurrent()
 
         assertTrue(viewModel.uiState.value.deviceActionStates[device.id] is DeviceActionUiState.Success)
+        assertTrue(
+            viewModel.uiState.value.diagnosticItems
+                .filterIsInstance<DiagnosticListItem.Message>()
+                .all {
+                    it.text.matches(Regex("\\d{2}:\\d{2}:\\d{2}\\.\\d{3} .+"))
+                }
+        )
+        assertTrue(
+            viewModel.uiState.value.diagnosticItems
+                .filterIsInstance<DiagnosticListItem.Message>()
+                .first()
+                .text
+                .endsWith("Geräteaktion „Device“ gestartet")
+        )
+
+        viewModel.executeDeviceAction(device)
+        runCurrent()
+
+        assertEquals(2, actionService.callCount)
+        assertEquals(
+            1,
+            viewModel.uiState.value.diagnosticItems.count {
+                it == DiagnosticListItem.Separator
+            }
+        )
+
+        viewModel.clearDiagnosticMessages()
+
+        assertTrue(viewModel.uiState.value.diagnosticItems.isEmpty())
     }
 
     @Test
@@ -71,7 +103,8 @@ class MainViewModelTest {
         )
         val viewModel = MainViewModel(
             repository = repository,
-            deviceActionService = WaitingDeviceActionService()
+            deviceActionService = WaitingDeviceActionService(),
+            appSettingsRepository = FakeAppSettingsRepository()
         )
         runCurrent()
 
@@ -99,6 +132,20 @@ class MainViewModelTest {
         override suspend fun execute(device: Device): DeviceActionResult {
             callCount += 1
             return result.await()
+        }
+
+        override suspend fun execute(
+            device: Device,
+            onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
+        ): DeviceActionResult {
+            callCount += 1
+            onDiagnosticEvent(DeviceActionDiagnosticEvent.ActionStarted)
+            val actionResult = result.await()
+            if (actionResult == DeviceActionResult.Success) {
+                onDiagnosticEvent(DeviceActionDiagnosticEvent.RequestSucceeded)
+            }
+            onDiagnosticEvent(DeviceActionDiagnosticEvent.ActionCompleted)
+            return actionResult
         }
     }
 

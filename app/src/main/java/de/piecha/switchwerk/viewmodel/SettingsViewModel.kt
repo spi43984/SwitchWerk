@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
+import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
@@ -11,8 +12,11 @@ import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import java.net.URI
 import java.util.UUID
@@ -59,22 +63,43 @@ data class SettingsUiState(
     val isTransferInProgress: Boolean = false,
     val importSummary: ConfigurationImportSummary? = null,
     val importMode: ConfigurationImportMode? = null,
-    val showImportPasswordWarning: Boolean = false
+    val showImportPasswordWarning: Boolean = false,
+    val appSettings: AppSettings = AppSettings()
 )
 
 class SettingsViewModel(
     private val wifiProfileRepository: WifiProfileRepository,
     private val deviceRepository: DeviceRepository,
-    private val configurationTransferRepository: ConfigurationTransferRepository
+    private val configurationTransferRepository: ConfigurationTransferRepository,
+    private val appSettingsRepository: AppSettingsRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingsUiState())
+    private val _uiState = MutableStateFlow(
+        SettingsUiState(appSettings = appSettingsRepository.settings.value)
+    )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
     private var pendingImport: PreparedConfigurationImport? = null
 
     init {
         observeWifiProfiles()
         observeDevices()
+        observeAppSettings()
+    }
+
+    fun setThemeMode(themeMode: AppThemeMode) {
+        appSettingsRepository.setThemeMode(themeMode)
+    }
+
+    fun setShowActionDetails(showActionDetails: Boolean) {
+        appSettingsRepository.setShowActionDetails(showActionDetails)
+    }
+
+    fun setDetailPanelHeight(detailPanelHeight: DetailPanelHeight) {
+        appSettingsRepository.setDetailPanelHeight(detailPanelHeight)
+    }
+
+    fun setDiagnosticsNewestFirst(diagnosticsNewestFirst: Boolean) {
+        appSettingsRepository.setDiagnosticsNewestFirst(diagnosticsNewestFirst)
     }
 
     fun startNewWifiProfile() {
@@ -714,6 +739,14 @@ class SettingsViewModel(
                     devices = devices.sortedBy { it.sortOrder },
                     errorMessage = null
                 )
+            }
+        }
+    }
+
+    private fun observeAppSettings() {
+        viewModelScope.launch {
+            appSettingsRepository.settings.collect { settings ->
+                _uiState.value = _uiState.value.copy(appSettings = settings)
             }
         }
     }

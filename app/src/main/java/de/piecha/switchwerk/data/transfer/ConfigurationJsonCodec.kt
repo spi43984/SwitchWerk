@@ -14,6 +14,15 @@ class ConfigurationJsonCodec {
                 writer.setIndent("  ")
                 writer.beginObject()
                 writer.name("schemaVersion").value(document.schemaVersion.toLong())
+                document.appSettings?.let { settings ->
+                    writer.name("appSettings")
+                    writer.beginObject()
+                    writer.name("themeMode").value(settings.themeMode)
+                    writer.name("showActionDetails").value(settings.showActionDetails)
+                    writer.name("detailPanelHeight").value(settings.detailPanelHeight)
+                    writer.name("diagnosticsNewestFirst").value(settings.diagnosticsNewestFirst)
+                    writer.endObject()
+                }
                 writer.name("wifiProfiles")
                 writer.beginArray()
                 document.wifiProfiles.forEach { profile ->
@@ -65,11 +74,13 @@ class ConfigurationJsonCodec {
             var schemaVersion: Int? = null
             var wifiProfiles: List<ConfigurationWifiProfile>? = null
             var devices: List<ConfigurationDevice>? = null
+            var appSettings: ConfigurationAppSettings? = null
 
             reader.beginObject()
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     "schemaVersion" -> schemaVersion = reader.nextInt()
+                    "appSettings" -> appSettings = reader.readAppSettings()
                     "wifiProfiles" -> wifiProfiles = reader.readWifiProfiles()
                     "devices" -> devices = reader.readDevices()
                     else -> reader.skipValue()
@@ -80,9 +91,45 @@ class ConfigurationJsonCodec {
             ConfigurationDocument(
                 schemaVersion = requireField(schemaVersion, "schemaVersion"),
                 wifiProfiles = requireField(wifiProfiles, "wifiProfiles"),
-                devices = requireField(devices, "devices")
+                devices = requireField(devices, "devices"),
+                appSettings = appSettings
             )
         }
+    }
+
+    private fun JsonReader.readAppSettings(): ConfigurationAppSettings {
+        var themeMode: String? = null
+        var showActionDetails: Boolean? = null
+        var detailPanelHeight: String? = null
+        var diagnosticsNewestFirst: Boolean? = null
+
+        beginObject()
+        while (hasNext()) {
+            when (nextName()) {
+                "themeMode" -> themeMode = nextString()
+                "showActionDetails" -> showActionDetails = nextBoolean()
+                "detailPanelHeight" -> detailPanelHeight = nextString()
+                "diagnosticsNewestFirst" -> diagnosticsNewestFirst = nextBoolean()
+                else -> skipValue()
+            }
+        }
+        endObject()
+
+        return ConfigurationAppSettings(
+            themeMode = requireField(themeMode, "appSettings.themeMode"),
+            showActionDetails = requireField(
+                showActionDetails,
+                "appSettings.showActionDetails"
+            ),
+            detailPanelHeight = requireField(
+                detailPanelHeight,
+                "appSettings.detailPanelHeight"
+            ),
+            diagnosticsNewestFirst = requireField(
+                diagnosticsNewestFirst,
+                "appSettings.diagnosticsNewestFirst"
+            )
+        )
     }
 
     private fun JsonReader.readWifiProfiles(): List<ConfigurationWifiProfile> {
