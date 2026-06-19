@@ -32,18 +32,34 @@ class DefaultDeviceActionService(
     private val actionMutex = Mutex()
 
     override suspend fun execute(device: Device): DeviceActionResult {
+        return execute(device) { }
+    }
+
+    override suspend fun execute(
+        device: Device,
+        onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
+    ): DeviceActionResult {
         return actionMutex.withLock {
-            try {
-                executeSerially(device)
+            emitDiagnostic(onDiagnosticEvent, DeviceActionDiagnosticEvent.ActionStarted)
+            val result = try {
+                executeSerially(device, onDiagnosticEvent)
             } catch (exception: CancellationException) {
                 throw exception
             } catch (_: Exception) {
                 DeviceActionResult.UnexpectedError
             }
+            if (result != DeviceActionResult.Success) {
+                emitDiagnostic(onDiagnosticEvent, DeviceActionDiagnosticEvent.RequestFailed)
+            }
+            emitDiagnostic(onDiagnosticEvent, DeviceActionDiagnosticEvent.ActionCompleted)
+            result
         }
     }
 
-    private suspend fun executeSerially(device: Device): DeviceActionResult {
+    private suspend fun executeSerially(
+        device: Device,
+        onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
+    ): DeviceActionResult {
         if (device.connections.isEmpty()) {
             return DeviceActionResult.NoConnections
         }
@@ -61,20 +77,43 @@ class DefaultDeviceActionService(
         var lastFailure: DeviceActionResult = DeviceActionResult.WifiConnectionFailed
         for ((index, connectionWithProfile) in availableConnections.withIndex()) {
             val password = wifiProfileRepository.getPassword(connectionWithProfile.profile.id)
+            emitDiagnostic(
+                onDiagnosticEvent,
+                DeviceActionDiagnosticEvent.WifiProfileConnecting(
+                    connectionWithProfile.profile.name
+                )
+            )
             logInfo("Starting explicit WiFi profile attempt ${index + 1}/${availableConnections.size}")
 
             try {
                 when (val connectionResult = connectWifiProfile(connectionWithProfile.profile, password)) {
                     is WifiConnectionResult.Success -> {
+                        emitDiagnostic(
+                            onDiagnosticEvent,
+                            DeviceActionDiagnosticEvent.WifiConnectionSucceeded
+                        )
+                        emitDiagnostic(
+                            onDiagnosticEvent,
+                            DeviceActionDiagnosticEvent.DeviceAddress(
+                                diagnosticAddress(connectionWithProfile.connection.host)
+                            )
+                        )
                         logInfo("Requested WiFi network available; starting bound HTTP call")
                         when (
                             val outcome = callApi(
                                 connection = connectionWithProfile.connection,
                                 apiCall = device.apiCall,
-                                network = connectionResult.network
+                                network = connectionResult.network,
+                                onDiagnosticEvent = onDiagnosticEvent
                             )
                         ) {
-                            ApiCallOutcome.Success -> return DeviceActionResult.Success
+                            ApiCallOutcome.Success -> {
+                                emitDiagnostic(
+                                    onDiagnosticEvent,
+                                    DeviceActionDiagnosticEvent.RequestSucceeded
+                                )
+                                return DeviceActionResult.Success
+                            }
                             is ApiCallOutcome.Terminal -> return outcome.result
                             is ApiCallOutcome.TryNextNetwork -> {
                                 lastFailure = DeviceActionResult.NetworkError(outcome.reason)
@@ -94,6 +133,10 @@ class DefaultDeviceActionService(
                     WifiConnectionResult.Unavailable,
                     is WifiConnectionResult.SecurityTypesFailed,
                     is WifiConnectionResult.Error -> {
+                        emitDiagnostic(
+                            onDiagnosticEvent,
+                            DeviceActionDiagnosticEvent.WifiConnectionFailed
+                        )
                         logWarning("Explicit WiFi attempt failed: ${connectionResult.logName()}")
                         lastFailure = DeviceActionResult.WifiConnectionFailed
                     }
@@ -195,10 +238,19 @@ class DefaultDeviceActionService(
     private suspend fun callApi(
         connection: DeviceConnection,
         apiCall: ApiCall,
-        network: Network
+        network: Network,
+        onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
     ): ApiCallOutcome {
         val url = buildUrl(connection.host, apiCall.path)
             ?: return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
+
+        emitDiagnostic(
+            onDiagnosticEvent,
+            DeviceActionDiagnosticEvent.HttpRequestStarted(
+                method = apiCall.method,
+                address = diagnosticAddress(connection.host)
+            )
+        )
 
         val result = when (apiCall.method) {
             ApiMethod.GET -> httpApiCallService.get(
@@ -214,8 +266,22 @@ class DefaultDeviceActionService(
         }
 
         return when (result) {
-            is HttpApiCallResult.Success -> ApiCallOutcome.Success
+            is HttpApiCallResult.Success -> {
+                emitDiagnostic(
+                    onDiagnosticEvent,
+                    DeviceActionDiagnosticEvent.HttpResponseReceived(
+                        result.response.statusCode
+                    )
+                )
+                ApiCallOutcome.Success
+            }
             is HttpApiCallResult.HttpError -> {
+                emitDiagnostic(
+                    onDiagnosticEvent,
+                    DeviceActionDiagnosticEvent.HttpResponseReceived(
+                        result.response.statusCode
+                    )
+                )
                 logWarning("Bound HTTP call returned status ${result.response.statusCode}")
                 ApiCallOutcome.Terminal(DeviceActionResult.HttpError(result.response.statusCode))
             }
@@ -231,6 +297,19 @@ class DefaultDeviceActionService(
 
             is HttpApiCallResult.NetworkError -> {
                 val reason = result.cause.toNetworkFailureReason()
+                when (reason) {
+                    NetworkFailureReason.DNS -> emitDiagnostic(
+                        onDiagnosticEvent,
+                        DeviceActionDiagnosticEvent.DnsResolutionFailed
+                    )
+                    NetworkFailureReason.CONNECTION,
+                    NetworkFailureReason.NO_ROUTE -> emitDiagnostic(
+                        onDiagnosticEvent,
+                        DeviceActionDiagnosticEvent.DeviceNotReachable
+                    )
+                    NetworkFailureReason.VPN_BLOCKED,
+                    NetworkFailureReason.OTHER -> Unit
+                }
                 logWarning(
                     "Bound HTTP call failed: ${result.cause.javaClass.simpleName}; reason=$reason"
                 )
@@ -257,6 +336,19 @@ class DefaultDeviceActionService(
         }
         val baseUrl = "${normalizedHost.trimEnd('/')}/".toHttpUrlOrNull() ?: return null
         return baseUrl.resolve(path.trim().trimStart('/'))?.toString()
+    }
+
+    private fun diagnosticAddress(host: String): String {
+        val normalizedHost = host.trim().let {
+            if (it.startsWith("http://") || it.startsWith("https://")) {
+                it
+            } else {
+                "http://$it"
+            }
+        }
+        val url = normalizedHost.toHttpUrlOrNull() ?: return "ungültige Geräteadresse"
+        val defaultPort = if (url.isHttps) 443 else 80
+        return if (url.port == defaultPort) url.host else "${url.host}:${url.port}"
     }
 
     private fun Throwable.toNetworkFailureReason(): NetworkFailureReason {
@@ -315,6 +407,13 @@ class DefaultDeviceActionService(
 
     private fun logWarning(message: String) {
         runCatching { Log.w(LOG_TAG, message) }
+    }
+
+    private fun emitDiagnostic(
+        callback: (DeviceActionDiagnosticEvent) -> Unit,
+        event: DeviceActionDiagnosticEvent
+    ) {
+        runCatching { callback(event) }
     }
 
     private data class ConnectionWithProfile(

@@ -1,12 +1,23 @@
 package de.piecha.switchwerk.data.transfer
 
 import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DetailPanelHeight
 
 class ConfigurationImportValidator {
 
     fun validate(document: ConfigurationDocument) {
-        require(document.schemaVersion == CONFIGURATION_SCHEMA_VERSION) {
+        require(document.schemaVersion in 1..CONFIGURATION_SCHEMA_VERSION) {
             "Nicht unterstützte schemaVersion: ${document.schemaVersion}"
+        }
+
+        document.appSettings?.let { settings ->
+            require(AppThemeMode.entries.any { it.name == settings.themeMode }) {
+                "Nicht unterstützte App-Darstellung: ${settings.themeMode}"
+            }
+            require(DetailPanelHeight.entries.any { it.name == settings.detailPanelHeight }) {
+                "Nicht unterstützte Detailbereich-Höhe: ${settings.detailPanelHeight}"
+            }
         }
 
         requireUniqueIds(

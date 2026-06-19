@@ -15,14 +15,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -30,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
+import de.piecha.switchwerk.viewmodel.DiagnosticListItem
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -81,24 +85,45 @@ fun StartScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (devices.isEmpty()) {
-            EmptyDeviceList()
-        } else {
-            DeviceList(
-                devices = devices,
-                actionStates = uiState.deviceActionStates,
-                onDeviceActionClick = viewModel::executeDeviceAction,
-                onMoveUpClick = viewModel::moveDeviceUp,
-                onMoveDownClick = viewModel::moveDeviceDown
-            )
+        Column(modifier = Modifier.weight(1f)) {
+            val detailHeight = uiState.appSettings.detailPanelHeight.fraction
+            val deviceAreaWeight = if (uiState.appSettings.showActionDetails) {
+                1f - detailHeight
+            } else {
+                1f
+            }
+
+            if (devices.isEmpty()) {
+                EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
+            } else {
+                DeviceList(
+                    devices = devices,
+                    actionStates = uiState.deviceActionStates,
+                    onDeviceActionClick = viewModel::executeDeviceAction,
+                    onMoveUpClick = viewModel::moveDeviceUp,
+                    onMoveDownClick = viewModel::moveDeviceDown,
+                    modifier = Modifier.weight(deviceAreaWeight)
+                )
+            }
+
+            if (uiState.appSettings.showActionDetails) {
+                Spacer(modifier = Modifier.height(12.dp))
+                DiagnosticPanel(
+                    items = uiState.diagnosticItems,
+                    newestFirst = uiState.appSettings.diagnosticsNewestFirst,
+                    onClear = viewModel::clearDiagnosticMessages,
+                    onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
+                    modifier = Modifier.weight(detailHeight)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun EmptyDeviceList() {
+private fun EmptyDeviceList(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -115,9 +140,11 @@ private fun DeviceList(
     actionStates: Map<String, DeviceActionUiState>,
     onDeviceActionClick: (Device) -> Unit,
     onMoveUpClick: (String) -> Unit,
-    onMoveDownClick: (String) -> Unit
+    onMoveDownClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(
@@ -133,6 +160,80 @@ private fun DeviceList(
                 onMoveUpClick = { onMoveUpClick(device.id) },
                 onMoveDownClick = { onMoveDownClick(device.id) }
             )
+        }
+    }
+}
+
+@Composable
+private fun DiagnosticPanel(
+    items: List<DiagnosticListItem>,
+    newestFirst: Boolean,
+    onClear: () -> Unit,
+    onToggleSortOrder: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val displayedItems = if (newestFirst) items.asReversed() else items
+
+    LaunchedEffect(items.size, newestFirst) {
+        if (displayedItems.isNotEmpty()) {
+            listState.scrollToItem(if (newestFirst) 0 else displayedItems.lastIndex)
+        }
+    }
+
+    Card(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Aktionsdetails",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = onClear,
+                        enabled = items.isNotEmpty()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Aktionsprotokoll löschen"
+                        )
+                    }
+                    OutlinedButton(onClick = onToggleSortOrder) {
+                        Text(if (newestFirst) "Neueste oben" else "Neueste unten")
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (displayedItems.isEmpty()) {
+                    item {
+                        Text(
+                            text = "Noch keine Geräteaktion ausgeführt",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                } else {
+                    items(displayedItems) { item ->
+                        when (item) {
+                            is DiagnosticListItem.Message -> Text(
+                                text = item.text,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            DiagnosticListItem.Separator -> HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

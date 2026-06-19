@@ -11,10 +11,12 @@ import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.OkHttpApiCallService
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
+import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.DefaultConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.RoomDeviceRepository
 import de.piecha.switchwerk.data.repository.RoomWifiProfileRepository
+import de.piecha.switchwerk.data.repository.SharedPreferencesAppSettingsRepository
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.security.EncryptedWifiCredentialStore
 import de.piecha.switchwerk.data.security.WifiCredentialStore
@@ -59,6 +61,10 @@ val appModule = module {
     single { ConfigurationJsonCodec() }
     single { ConfigurationImportValidator() }
 
+    single<AppSettingsRepository> {
+        SharedPreferencesAppSettingsRepository(androidContext())
+    }
+
     single<HttpApiCallService> {
         OkHttpApiCallService(
             baseClient = get()
@@ -95,7 +101,8 @@ val appModule = module {
             credentialStore = get(),
             httpClient = get(),
             jsonCodec = get(),
-            validator = get()
+            validator = get(),
+            appSettingsRepository = get()
         )
     }
 
@@ -110,7 +117,8 @@ val appModule = module {
     viewModel {
         MainViewModel(
             repository = get(),
-            deviceActionService = get()
+            deviceActionService = get(),
+            appSettingsRepository = get()
         )
     }
 
@@ -118,7 +126,8 @@ val appModule = module {
         SettingsViewModel(
             wifiProfileRepository = get(),
             deviceRepository = get(),
-            configurationTransferRepository = get()
+            configurationTransferRepository = get(),
+            appSettingsRepository = get()
         )
     }
 }

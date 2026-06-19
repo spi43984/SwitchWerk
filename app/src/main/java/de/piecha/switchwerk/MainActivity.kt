@@ -10,6 +10,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,8 @@ import androidx.compose.runtime.setValue
 import de.piecha.switchwerk.ui.screens.SettingsScreen
 import de.piecha.switchwerk.ui.screens.StartScreen
 import de.piecha.switchwerk.ui.theme.SwitchWerkTheme
+import de.piecha.switchwerk.viewmodel.MainViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 private enum class AppScreen {
     Dashboard,
@@ -39,8 +42,10 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            SwitchWerkTheme {
-                SwitchWerkAppContent()
+            val mainViewModel: MainViewModel = koinViewModel()
+            val uiState by mainViewModel.uiState.collectAsState()
+            SwitchWerkTheme(themeMode = uiState.appSettings.themeMode) {
+                SwitchWerkAppContent(mainViewModel)
             }
         }
     }
@@ -64,11 +69,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun SwitchWerkAppContent() {
+private fun SwitchWerkAppContent(mainViewModel: MainViewModel) {
     var currentScreen by remember { mutableStateOf(AppScreen.Dashboard) }
 
     when (currentScreen) {
         AppScreen.Dashboard -> StartScreen(
+            viewModel = mainViewModel,
             onNavigateToSettings = {
                 currentScreen = AppScreen.Settings
             }

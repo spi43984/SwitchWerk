@@ -12,6 +12,7 @@ import de.piecha.switchwerk.data.local.entity.DeviceEntity
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
+import de.piecha.switchwerk.data.transfer.ConfigurationAppSettings
 import de.piecha.switchwerk.data.transfer.ConfigurationDevice
 import de.piecha.switchwerk.data.transfer.ConfigurationDeviceAction
 import de.piecha.switchwerk.data.transfer.ConfigurationDeviceConnection
@@ -19,6 +20,8 @@ import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
 import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
 import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
+import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
@@ -37,7 +40,8 @@ class DefaultConfigurationTransferRepository(
     private val credentialStore: WifiCredentialStore,
     private val httpClient: OkHttpClient,
     private val jsonCodec: ConfigurationJsonCodec,
-    private val validator: ConfigurationImportValidator
+    private val validator: ConfigurationImportValidator,
+    private val appSettingsRepository: AppSettingsRepository
 ) : ConfigurationTransferRepository {
 
     override suspend fun exportToUri(uri: Uri, includePasswords: Boolean) {
@@ -110,6 +114,7 @@ class DefaultConfigurationTransferRepository(
                 oldWifiProfileIds.forEach { credentialStore.deletePassword(it) }
             }
             applyImportedPasswords(preparedImport.document)
+            applyImportedAppSettings(preparedImport.document)
         }
     }
 
@@ -120,6 +125,14 @@ class DefaultConfigurationTransferRepository(
 
         return ConfigurationDocument(
             schemaVersion = CONFIGURATION_SCHEMA_VERSION,
+            appSettings = appSettingsRepository.settings.value.let { settings ->
+                ConfigurationAppSettings(
+                    themeMode = settings.themeMode.name,
+                    showActionDetails = settings.showActionDetails,
+                    detailPanelHeight = settings.detailPanelHeight.name,
+                    diagnosticsNewestFirst = settings.diagnosticsNewestFirst
+                )
+            },
             wifiProfiles = profiles.map { profile ->
                 ConfigurationWifiProfile(
                     id = profile.id,
@@ -250,6 +263,16 @@ class DefaultConfigurationTransferRepository(
                     credentialStore.savePassword(profile.id, password)
                 }
             }
+    }
+
+    private fun applyImportedAppSettings(document: ConfigurationDocument) {
+        val settings = document.appSettings ?: return
+        appSettingsRepository.setThemeMode(AppThemeMode.valueOf(settings.themeMode))
+        appSettingsRepository.setShowActionDetails(settings.showActionDetails)
+        appSettingsRepository.setDetailPanelHeight(
+            DetailPanelHeight.valueOf(settings.detailPanelHeight)
+        )
+        appSettingsRepository.setDiagnosticsNewestFirst(settings.diagnosticsNewestFirst)
     }
 
     private fun ConfigurationWifiProfile.toEntity(): WifiProfileEntity {

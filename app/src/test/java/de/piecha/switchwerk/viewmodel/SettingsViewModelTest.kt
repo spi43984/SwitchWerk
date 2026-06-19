@@ -5,11 +5,14 @@ import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
+import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
 import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlinx.coroutines.Dispatchers
@@ -145,14 +148,40 @@ class SettingsViewModelTest {
         assertTrue(wifiRepository.savedProfiles.isEmpty())
     }
 
+    @Test
+    fun displaySettingsAreUpdatedThroughRepository() = runTest(dispatcher) {
+        val appSettingsRepository = FakeAppSettingsRepository()
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            appSettingsRepository = appSettingsRepository
+        )
+        runCurrent()
+
+        viewModel.setThemeMode(AppThemeMode.DARK)
+        viewModel.setShowActionDetails(true)
+        viewModel.setDetailPanelHeight(DetailPanelHeight.FORTY_PERCENT)
+        viewModel.setDiagnosticsNewestFirst(false)
+        runCurrent()
+
+        assertEquals(AppThemeMode.DARK, viewModel.uiState.value.appSettings.themeMode)
+        assertTrue(viewModel.uiState.value.appSettings.showActionDetails)
+        assertEquals(
+            DetailPanelHeight.FORTY_PERCENT,
+            viewModel.uiState.value.appSettings.detailPanelHeight
+        )
+        assertFalse(viewModel.uiState.value.appSettings.diagnosticsNewestFirst)
+    }
+
     private fun settingsViewModel(
         transferRepository: ConfigurationTransferRepository,
-        wifiProfileRepository: WifiProfileRepository = FakeWifiProfileRepository()
+        wifiProfileRepository: WifiProfileRepository = FakeWifiProfileRepository(),
+        appSettingsRepository: FakeAppSettingsRepository = FakeAppSettingsRepository()
     ): SettingsViewModel {
         return SettingsViewModel(
             wifiProfileRepository = wifiProfileRepository,
             deviceRepository = FakeDeviceRepository(),
-            configurationTransferRepository = transferRepository
+            configurationTransferRepository = transferRepository,
+            appSettingsRepository = appSettingsRepository
         )
     }
 
