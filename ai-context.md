@@ -127,6 +127,7 @@ Kurzfassung:
 - 016 Edit Items By Name Click
 - 017 Unique WiFi Profile Name
 - 018 Adaptive WiFi Security Fallback
+- 023 Settings Display And Action Details
 
 ### Offen
 
@@ -134,7 +135,6 @@ Kurzfassung:
 - 020 Device Assigned WiFi Order
 - 021 HTTP/HTTPS Device Actions
 - 022 Request Body And Content-Type Support
-- 023 Settings Display And Action Details
 - 025 Dashboard Widget Layout
 - 026 Settings UI Rework
 - 027 WiFi Timeout Analysis And Stabilization
@@ -151,7 +151,7 @@ Kurzfassung:
 
 ### Nächstes Issue
 
-- 023 Settings Display And Action Details
+- 026 Settings UI Rework
 
 ### Pflegehinweis
 

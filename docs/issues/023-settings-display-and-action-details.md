@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: GUI / Diagnose
 
@@ -132,26 +132,26 @@ Die Meldungen müssen für normale Benutzer verständlich formuliert sein.
 
 ## Akzeptanzkriterien
 
-- [ ] Auswahl Systemvorgabe/Hell/Dunkel vorhanden
-- [ ] Auswahl wird dauerhaft gespeichert
-- [ ] Theme wird beim App-Start korrekt angewendet
-- [ ] Schalter für Detailanzeige vorhanden
-- [ ] Einstellung wird dauerhaft gespeichert
-- [ ] Dashboard zeigt Detailbereich nur bei aktivierter Option
-- [ ] Höhe des Detailbereichs ist konfigurierbar
-- [ ] Statusmeldungen werden während einer Geräteaktion angezeigt
-- [ ] Bereich ist scrollbar
-- [ ] Neue Geräteaktionen sind optisch getrennt
-- [ ] Gerätename, Geräteadresse, HTTP-Methode und HTTP-Status werden verständlich angezeigt
-- [ ] DNS-Auflösungsfehler und nicht erreichbare IP-Adressen sind unterscheidbar
-- [ ] Sortierung Neueste oben/unten ist auswählbar und dauerhaft gespeichert
-- [ ] Neueste oben ist die Standardeinstellung
-- [ ] Detailbereich scrollt automatisch zur neuesten Meldung
-- [ ] Aktionsprotokoll kann im UI geleert werden
-- [ ] App-Einstellungen werden exportiert und importiert
-- [ ] Importdateien ohne App-Einstellungen überschreiben lokale Einstellungen nicht
-- [ ] Keine sensiblen Daten werden angezeigt
-- [ ] Build erfolgreich
+- [x] Auswahl Systemvorgabe/Hell/Dunkel vorhanden
+- [x] Auswahl wird dauerhaft gespeichert
+- [x] Theme wird beim App-Start korrekt angewendet
+- [x] Schalter für Detailanzeige vorhanden
+- [x] Einstellung wird dauerhaft gespeichert
+- [x] Dashboard zeigt Detailbereich nur bei aktivierter Option
+- [x] Höhe des Detailbereichs ist konfigurierbar
+- [x] Statusmeldungen werden während einer Geräteaktion angezeigt
+- [x] Bereich ist scrollbar
+- [x] Neue Geräteaktionen sind optisch getrennt
+- [x] Gerätename, Geräteadresse, HTTP-Methode und HTTP-Status werden verständlich angezeigt
+- [x] DNS-Auflösungsfehler und nicht erreichbare IP-Adressen sind unterscheidbar
+- [x] Sortierung Neueste oben/unten ist auswählbar und dauerhaft gespeichert
+- [x] Neueste oben ist die Standardeinstellung
+- [x] Detailbereich scrollt automatisch zur neuesten Meldung
+- [x] Aktionsprotokoll kann im UI geleert werden
+- [x] App-Einstellungen werden exportiert und importiert
+- [x] Importdateien ohne App-Einstellungen überschreiben lokale Einstellungen nicht
+- [x] Keine sensiblen Daten werden angezeigt
+- [x] Build erfolgreich
 
 ## Testhinweise
 

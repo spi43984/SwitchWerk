@@ -4,63 +4,32 @@ Stand: 19. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 023 "Settings Display And Action Details" ist auf Branch
-`settings-display-action-details` implementiert. Veröffentlichung und
-Host-Prüfung stehen noch aus.
+Keine aktive Implementierung.
 
-Umgesetzt:
+Nächstes geplantes Issue laut `ai-context.md`:
 
 ```text
-- persistente Auswahl Systemvorgabe/Hell/Dunkel
-- persistenter Schalter für Aktionsdetails
-- persistente Detailbereich-Höhe 20/30/40 Prozent
-- optionaler, scrollbarer Detailbereich im Dashboard
-- verständliche In-Memory-Diagnosemeldungen mit HH:mm:ss.SSS-Zeitstempel
-- Startmeldung enthält den Gerätenamen
-- optischer Trenner zwischen Geräteaktionen
-- umrandeter Sortier-Button für neueste Meldung oben/unten mit automatischem Scrollen
-- Mülleimer-Button zum Leeren des In-Memory-Aktionsprotokolls
-- persistente Sortierauswahl in den Einstellungen; Standard ist „Neueste oben“
-- Diagnose zeigt Geräteadresse, HTTP-Methode und HTTP-Statuscode
-- DNS-Auflösungsfehler und nicht erreichbare Geräte-IP werden getrennt angezeigt
-- verdichteter Darstellungs-/Aktionsdetails-Rahmen mit 36-dp-Auswahlzeilen
-- Exportformat Version 2 enthält Darstellung, Aktionsdetails, Höhe und Sortierung
-- Import unterstützt Version 1 weiterhin und übernimmt Version-2-App-Einstellungen
-- keine Anzeige von Zugangsdaten, Headern, Payloads, URL-Pfaden oder Query-Parametern
+026 Settings UI Rework
 ```
-
-Container-Prüfungen:
-
-```text
-git diff --check
-./gradlew testDebugUnitTest
-./gradlew assembleDebug
-```
-
-Der Host-Build und die bisherigen Tests wurden vom Benutzer als erfolgreich
-gemeldet. Nach den anschließenden Detailanzeige-Nachbesserungen stehen erneuter
-Host-Build, Installation und Gerätetest noch aus.
 
 ## Zuletzt abgeschlossene Arbeit
 
-Issue 018 "Adaptive WiFi Security Fallback" ist implementiert, geprüft,
-veröffentlicht, nach `main` gemergt und lokal dokumentiert.
+Issue 023 "Settings Display And Action Details" ist implementiert, geprüft,
+veröffentlicht und nach `main` gemergt.
 
-- GitHub-Issue: #48
-- Pull Request: #50
+- GitHub-Issue: #54
+- Pull Request: #55
+- Merge-Commit: `09b55fcc7df99c823a5e88c7b247b23ff0308c64`
 
-## Umgesetzter Scope Issue 018
+## Umgesetzter Scope Issue 023
 
-- WLAN-Sicherheitstypen werden als `WifiSecurityType` modelliert.
-- Pro WLAN-Profil wird der zuletzt erfolgreiche Sicherheitstyp gespeichert.
-- Ohne bekannten Typ wird WPA2 zuerst versucht.
-- Mit bekanntem Typ wird der gespeicherte Typ zuerst versucht.
-- Bei plausiblen WLAN-Verbindungsfehlern wird einmalig der andere Typ versucht.
-- Beide Security-Versuche teilen sich ein begrenztes Gesamt-Timeout.
-- Nach erfolgreicher Verbindung wird der funktionierende Typ gespeichert.
-- Import/Export erhält die drei Zustände `null`, `WPA2_PSK` und `WPA3_SAE`.
-- Bestehende WLAN-Profile werden per Room-Migration übernommen.
-- HTTP-, DNS-, Geräte- und App-Fehler lösen keinen Security-Fallback aus.
+- Persistente Auswahl Systemvorgabe/Hell/Dunkel
+- Persistente Detailanzeige mit Höhe 20/30/40 Prozent
+- Sortierbares, scrollbares In-Memory-Aktionsprotokoll
+- Zeitgestempelte WLAN-/HTTP-Diagnosen ohne sensible Request-Daten
+- Geräteadresse, HTTP-Methode, Statuscode sowie DNS-/IP-Fehleranzeige
+- Optische Aktionstrenner und Löschfunktion
+- Export und Import der UI-Einstellungen mit rückwärtskompatiblem Schema 2
 
 ## Bestätigte Prüfungen
 
@@ -70,26 +39,25 @@ git diff --check
 ./gradlew assembleDebug
 ./gradlew clean assembleDebug
 ./gradlew installDebug
+GitHub Actions: Android Build #176
 ```
 
-Host-Build, Installation und manuelle Gerätetests wurden vom Benutzer als
-erfolgreich gemeldet.
+Host-Build, Installation und manuelle Tests wurden vom Benutzer als erfolgreich
+gemeldet. GitHub Actions Lauf #176 war erfolgreich.
 
 ## Wichtige Hinweise für die nächste Session
 
 - Wiederverwendbare Startvorlage: `AI_SESSION_PROMPT.md`
-- Die lokalen Statusdateien wurden nach Issue 018 aktualisiert:
-  - `docs/issues/018-adaptive-wifi-security-fallback.md`
+- Die Statusdateien wurden nach Issue 023 aktualisiert:
+  - `docs/issues/023-settings-display-and-action-details.md`
   - `docs/issues/overview.txt`
   - `ai-context.md`
   - `AI_HANDOFF.md`
-- GitHub-Issue #48 ist abgeschlossen bzw. kann geschlossen werden.
-- Nächstes fachliches Issue ist 023 "Settings Display And Action Details".
+- Nächstes fachliches Issue ist 026 "Settings UI Rework".
 
 ## Nächste geplante Themen
 
 ```text
-023 Settings Display And Action Details
 026 Settings UI Rework
 027 WiFi Timeout Analysis And Stabilization
 020 Device Assigned WiFi Order
