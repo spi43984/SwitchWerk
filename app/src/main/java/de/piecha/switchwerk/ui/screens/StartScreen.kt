@@ -32,6 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.ui.components.AppMenuLayout
+import de.piecha.switchwerk.ui.components.AppOverflowMenu
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.DiagnosticListItem
 import de.piecha.switchwerk.viewmodel.MainViewModel
@@ -40,81 +42,85 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun StartScreen(
     onNavigateToSettings: () -> Unit,
+    onNavigateToHelp: () -> Unit,
     viewModel: MainViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val devices = uiState.devices.sortedBy { it.sortOrder }
 
-    Column(
+    AppMenuLayout(
+        onOpenSettings = onNavigateToSettings,
+        onOpenHelp = onNavigateToHelp,
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .padding(24.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            .padding(24.dp),
+        rightEdgeExtension = 24.dp
+    ) { openMenu ->
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "SwitchWerk",
-                style = MaterialTheme.typography.headlineLarge
-            )
-
-            OutlinedButton(
-                onClick = onNavigateToSettings
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Einstellungen")
+                Text(
+                    text = "SwitchWerk",
+                    style = MaterialTheme.typography.headlineLarge
+                )
+
+                AppOverflowMenu(onClick = openMenu)
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "${devices.size} Geräte gefunden",
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        uiState.errorMessage?.let { message ->
             Text(
-                text = message,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 16.dp)
+                text = "${devices.size} Geräte gefunden",
+                style = MaterialTheme.typography.bodyLarge
             )
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            val detailHeight = uiState.appSettings.detailPanelHeight.fraction
-            val deviceAreaWeight = if (uiState.appSettings.showActionDetails) {
-                1f - detailHeight
-            } else {
-                1f
-            }
-
-            if (devices.isEmpty()) {
-                EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
-            } else {
-                DeviceList(
-                    devices = devices,
-                    actionStates = uiState.deviceActionStates,
-                    onDeviceActionClick = viewModel::executeDeviceAction,
-                    onMoveUpClick = viewModel::moveDeviceUp,
-                    onMoveDownClick = viewModel::moveDeviceDown,
-                    modifier = Modifier.weight(deviceAreaWeight)
+            uiState.errorMessage?.let { message ->
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
 
-            if (uiState.appSettings.showActionDetails) {
-                Spacer(modifier = Modifier.height(12.dp))
-                DiagnosticPanel(
-                    items = uiState.diagnosticItems,
-                    newestFirst = uiState.appSettings.diagnosticsNewestFirst,
-                    onClear = viewModel::clearDiagnosticMessages,
-                    onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
-                    modifier = Modifier.weight(detailHeight)
-                )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                val detailHeight = uiState.appSettings.detailPanelHeight.fraction
+                val deviceAreaWeight = if (uiState.appSettings.showActionDetails) {
+                    1f - detailHeight
+                } else {
+                    1f
+                }
+
+                if (devices.isEmpty()) {
+                    EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
+                } else {
+                    DeviceList(
+                        devices = devices,
+                        actionStates = uiState.deviceActionStates,
+                        onDeviceActionClick = viewModel::executeDeviceAction,
+                        onMoveUpClick = viewModel::moveDeviceUp,
+                        onMoveDownClick = viewModel::moveDeviceDown,
+                        modifier = Modifier.weight(deviceAreaWeight)
+                    )
+                }
+
+                if (uiState.appSettings.showActionDetails) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    DiagnosticPanel(
+                        items = uiState.diagnosticItems,
+                        newestFirst = uiState.appSettings.diagnosticsNewestFirst,
+                        onClear = viewModel::clearDiagnosticMessages,
+                        onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
+                        modifier = Modifier.weight(detailHeight)
+                    )
+                }
             }
         }
     }

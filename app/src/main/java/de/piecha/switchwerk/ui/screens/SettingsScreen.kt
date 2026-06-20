@@ -5,13 +5,11 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,20 +22,18 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -63,12 +59,18 @@ import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.ui.components.SettingsSectionTabs
+import de.piecha.switchwerk.ui.components.StandardActionButton
+import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingsScreen(
+    selectedSection: SettingsSection,
+    onSectionSelected: (SettingsSection) -> Unit,
     onNavigateBack: () -> Unit,
+    onNavigateToHelp: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -182,14 +184,24 @@ fun SettingsScreen(
                     openSwipeItemId = null
                 }
             )
-            .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Einstellungen",
-            style = MaterialTheme.typography.headlineLarge
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Zurück zum Dashboard"
+                )
+            }
+            Text(
+                text = "Einstellungen",
+                style = MaterialTheme.typography.headlineLarge
+            )
+        }
 
         uiState.errorMessage?.let { message ->
             Text(
@@ -207,99 +219,106 @@ fun SettingsScreen(
             )
         }
 
-        DisplaySettingsSection(
-            themeMode = uiState.appSettings.themeMode,
-            showActionDetails = uiState.appSettings.showActionDetails,
-            detailPanelHeight = uiState.appSettings.detailPanelHeight,
-            diagnosticsNewestFirst = uiState.appSettings.diagnosticsNewestFirst,
-            onThemeModeChange = viewModel::setThemeMode,
-            onShowActionDetailsChange = viewModel::setShowActionDetails,
-            onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
-            onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
-        )
-
-        WifiProfileManagementSection(
-            profiles = uiState.wifiProfiles,
-            openSwipeItemId = openSwipeItemId,
-            onOpenSwipeItem = { itemId ->
-                openSwipeItemId = itemId
-            },
-            onCloseSwipeItem = {
+        SettingsSectionTabs(
+            sections = SettingsSection.entries.map(SettingsSection::title),
+            selectedIndex = selectedSection.ordinal,
+            onSectionSelected = { index ->
                 openSwipeItemId = null
-            },
-            onAddClick = {
-                runAfterClosingSwipe(viewModel::startNewWifiProfile)
-            },
-            onEditClick = viewModel::startEditWifiProfile,
-            onDeleteClick = viewModel::deleteWifiProfile
-        )
-
-        DeviceManagementSection(
-            devices = uiState.devices,
-            wifiProfiles = uiState.wifiProfiles,
-            isEditing = uiState.isEditingDevice,
-            form = uiState.deviceForm,
-            openSwipeItemId = openSwipeItemId,
-            onOpenSwipeItem = { itemId ->
-                openSwipeItemId = itemId
-            },
-            onCloseSwipeItem = {
-                openSwipeItemId = null
-            },
-            onAddClick = {
-                runAfterClosingSwipe(viewModel::startNewDevice)
-            },
-            onEditClick = viewModel::startEditDevice,
-            onDeleteClick = viewModel::deleteDevice,
-            onNameChange = viewModel::updateDeviceName,
-            onActionLabelChange = viewModel::updateDeviceActionLabel,
-            onApiMethodChange = viewModel::updateDeviceApiMethod,
-            onApiPathChange = viewModel::updateDeviceApiPath,
-            onAddConnection = viewModel::addDeviceConnection,
-            onUpdateConnection = viewModel::updateDeviceConnection,
-            onDeleteConnection = viewModel::deleteDeviceConnection,
-            onSaveClick = viewModel::saveDevice,
-            onCancelClick = viewModel::cancelDeviceEdit
-        )
-
-        ImportExportSection(
-            isTransferInProgress = uiState.isTransferInProgress,
-            onExportClick = {
-                runAfterClosingSwipe {
-                    viewModel.clearStatusMessage()
-                    exportWithoutPasswordsLauncher.launch(EXPORT_FILE_NAME)
-                }
-            },
-            onExportWithPasswordsClick = {
-                runAfterClosingSwipe {
-                    showPasswordExportWarning = true
-                }
-            },
-            onImportFileClick = {
-                runAfterClosingSwipe {
-                    showFileImportModeDialog = true
-                }
-            },
-            onImportUrlClick = {
-                runAfterClosingSwipe {
-                    showUrlImportDialog = true
-                }
-            },
-            onScanQrCodeClick = {
-                runAfterClosingSwipe {
-                    showQrImportModeDialog = true
-                }
+                onSectionSelected(SettingsSection.entries[index])
             }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                runAfterClosingSwipe(onNavigateBack)
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            Text("Zurück zum Dashboard")
+            when (selectedSection) {
+                SettingsSection.WIFI_PROFILES -> WifiProfileManagementSection(
+                    profiles = uiState.wifiProfiles,
+                    openSwipeItemId = openSwipeItemId,
+                    onOpenSwipeItem = { openSwipeItemId = it },
+                    onCloseSwipeItem = { openSwipeItemId = null },
+                    onAddClick = { runAfterClosingSwipe(viewModel::startNewWifiProfile) },
+                    onEditClick = viewModel::startEditWifiProfile,
+                    onDeleteClick = viewModel::deleteWifiProfile,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                SettingsSection.DEVICES -> DeviceManagementSection(
+                    devices = uiState.devices,
+                    wifiProfiles = uiState.wifiProfiles,
+                    isEditing = uiState.isEditingDevice,
+                    form = uiState.deviceForm,
+                    openSwipeItemId = openSwipeItemId,
+                    onOpenSwipeItem = { openSwipeItemId = it },
+                    onCloseSwipeItem = { openSwipeItemId = null },
+                    onAddClick = { runAfterClosingSwipe(viewModel::startNewDevice) },
+                    onEditClick = viewModel::startEditDevice,
+                    onDeleteClick = viewModel::deleteDevice,
+                    onNameChange = viewModel::updateDeviceName,
+                    onActionLabelChange = viewModel::updateDeviceActionLabel,
+                    onApiMethodChange = viewModel::updateDeviceApiMethod,
+                    onApiPathChange = viewModel::updateDeviceApiPath,
+                    onAddConnection = viewModel::addDeviceConnection,
+                    onUpdateConnection = viewModel::updateDeviceConnection,
+                    onDeleteConnection = viewModel::deleteDeviceConnection,
+                    onSaveClick = viewModel::saveDevice,
+                    onCancelClick = viewModel::cancelDeviceEdit,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                SettingsSection.SYSTEM -> Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    DisplaySettingsSection(
+                        themeMode = uiState.appSettings.themeMode,
+                        onThemeModeChange = viewModel::setThemeMode
+                    )
+                    HorizontalDivider()
+                    ActionDetailsSettingsSection(
+                        showActionDetails = uiState.appSettings.showActionDetails,
+                        detailPanelHeight = uiState.appSettings.detailPanelHeight,
+                        diagnosticsNewestFirst = uiState.appSettings.diagnosticsNewestFirst,
+                        onShowActionDetailsChange = viewModel::setShowActionDetails,
+                        onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
+                        onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
+                    )
+                    HorizontalDivider()
+                    SystemHelpSection(onOpenHelp = onNavigateToHelp)
+                }
+
+                SettingsSection.BACKUP -> Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    ImportExportSection(
+                        isTransferInProgress = uiState.isTransferInProgress,
+                        onExportClick = {
+                            runAfterClosingSwipe {
+                                viewModel.clearStatusMessage()
+                                exportWithoutPasswordsLauncher.launch(EXPORT_FILE_NAME)
+                            }
+                        },
+                        onExportWithPasswordsClick = {
+                            runAfterClosingSwipe { showPasswordExportWarning = true }
+                        },
+                        onImportFileClick = {
+                            runAfterClosingSwipe { showFileImportModeDialog = true }
+                        },
+                        onImportUrlClick = {
+                            runAfterClosingSwipe { showUrlImportDialog = true }
+                        },
+                        onScanQrCodeClick = {
+                            runAfterClosingSwipe { showQrImportModeDialog = true }
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -403,82 +422,120 @@ fun SettingsScreen(
     }
 }
 
+enum class SettingsSection(val title: String) {
+    WIFI_PROFILES("WLAN-Profile"),
+    DEVICES("Geräte"),
+    SYSTEM("System"),
+    BACKUP("Backup")
+}
+
+@Composable
+private fun SystemHelpSection(onOpenHelp: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text("Hilfe", style = MaterialTheme.typography.titleMedium)
+        Text("App-Informationen, Version und Link zum GitHub-Projekt anzeigen.")
+        StandardActionButton(
+            text = "Hilfe anzeigen",
+            onClick = onOpenHelp,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
 @Composable
 private fun DisplaySettingsSection(
     themeMode: AppThemeMode,
+    onThemeModeChange: (AppThemeMode) -> Unit
+) {
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
+        ) {
+            Text("Darstellung", style = MaterialTheme.typography.titleMedium)
+            AppThemeMode.entries.forEach { option ->
+                RadioOptionRow(
+                    label = when (option) {
+                        AppThemeMode.SYSTEM -> "Systemvorgabe"
+                        AppThemeMode.LIGHT -> "Hell"
+                        AppThemeMode.DARK -> "Dunkel"
+                    },
+                    selected = themeMode == option,
+                    onClick = { onThemeModeChange(option) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActionDetailsSettingsSection(
     showActionDetails: Boolean,
     detailPanelHeight: DetailPanelHeight,
     diagnosticsNewestFirst: Boolean,
-    onThemeModeChange: (AppThemeMode) -> Unit,
     onShowActionDetailsChange: (Boolean) -> Unit,
     onDetailPanelHeightChange: (DetailPanelHeight) -> Unit,
     onDiagnosticsNewestFirstChange: (Boolean) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
-            Column(
-                modifier = Modifier.padding(
-                    start = 12.dp,
-                    top = 4.dp,
-                    end = 6.dp,
-                    bottom = 4.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
+        ) {
+            Text("Aktionsdetails", style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(36.dp)
+                    .clickable { onShowActionDetailsChange(!showActionDetails) },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Darstellung", style = MaterialTheme.typography.titleMedium)
-                AppThemeMode.entries.forEach { option ->
-                    RadioOptionRow(
-                        label = when (option) {
-                            AppThemeMode.SYSTEM -> "Systemvorgabe"
-                            AppThemeMode.LIGHT -> "Hell"
-                            AppThemeMode.DARK -> "Dunkel"
-                        },
-                        selected = themeMode == option,
-                        onClick = { onThemeModeChange(option) }
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(36.dp)
-                        .clickable { onShowActionDetailsChange(!showActionDetails) },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Aktionsdetails anzeigen")
-                    Switch(
-                        checked = showActionDetails,
-                        onCheckedChange = onShowActionDetailsChange
-                    )
-                }
-
-                Text("Höhe des Detailbereichs", style = MaterialTheme.typography.titleSmall)
-                DetailPanelHeight.entries.forEach { option ->
-                    RadioOptionRow(
-                        label = when (option) {
-                            DetailPanelHeight.TWENTY_PERCENT -> "20 %"
-                            DetailPanelHeight.THIRTY_PERCENT -> "30 %"
-                            DetailPanelHeight.FORTY_PERCENT -> "40 %"
-                        },
-                        selected = detailPanelHeight == option,
-                        onClick = { onDetailPanelHeightChange(option) },
-                        enabled = showActionDetails
-                    )
-                }
-
-                Text("Sortierung Aktionsdetails", style = MaterialTheme.typography.titleSmall)
-                RadioOptionRow(
-                    label = "Neueste oben",
-                    selected = diagnosticsNewestFirst,
-                    onClick = { onDiagnosticsNewestFirstChange(true) }
-                )
-                RadioOptionRow(
-                    label = "Neueste unten",
-                    selected = !diagnosticsNewestFirst,
-                    onClick = { onDiagnosticsNewestFirstChange(false) }
+                Text("Aktionsdetails anzeigen")
+                Switch(
+                    checked = showActionDetails,
+                    onCheckedChange = onShowActionDetailsChange
                 )
             }
+
+            Text("Höhe des Detailbereichs", style = MaterialTheme.typography.titleSmall)
+            DetailPanelHeight.entries.forEach { option ->
+                RadioOptionRow(
+                    label = when (option) {
+                        DetailPanelHeight.TWENTY_PERCENT -> "20 %"
+                        DetailPanelHeight.THIRTY_PERCENT -> "30 %"
+                        DetailPanelHeight.FORTY_PERCENT -> "40 %"
+                    },
+                    selected = detailPanelHeight == option,
+                    onClick = { onDetailPanelHeightChange(option) },
+                    enabled = showActionDetails
+                )
+            }
+
+            Text(
+                text = "Sortierung Aktionsdetails",
+                color = if (showActionDetails) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                },
+                style = MaterialTheme.typography.titleSmall
+            )
+            RadioOptionRow(
+                label = "Neueste oben",
+                selected = diagnosticsNewestFirst,
+                onClick = { onDiagnosticsNewestFirstChange(true) },
+                enabled = showActionDetails
+            )
+            RadioOptionRow(
+                label = "Neueste unten",
+                selected = !diagnosticsNewestFirst,
+                onClick = { onDiagnosticsNewestFirstChange(false) },
+                enabled = showActionDetails
+            )
         }
     }
 }
@@ -503,7 +560,14 @@ private fun RadioOptionRow(
             onClick = onClick,
             enabled = enabled
         )
-        Text(text = label)
+        Text(
+            text = label,
+            color = if (enabled) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+            }
+        )
     }
 }
 
@@ -515,45 +579,45 @@ private fun WifiProfileManagementSection(
     onCloseSwipeItem: () -> Unit,
     onAddClick: () -> Unit,
     onEditClick: (WifiProfile) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(start = 12.dp, top = 6.dp, end = 6.dp, bottom = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "WLAN-Profile",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                IconButton(
-                    onClick = onAddClick,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "WLAN-Profil hinzufügen"
-                    )
-                }
-            }
-
-            WifiProfileList(
-                profiles = profiles,
-                openSwipeItemId = openSwipeItemId,
-                onOpenSwipeItem = onOpenSwipeItem,
-                onCloseSwipeItem = onCloseSwipeItem,
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick
+            Text(
+                text = "Name\nSSID",
+                style = MaterialTheme.typography.titleSmall
             )
+
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "WLAN-Profil hinzufügen"
+                )
+            }
         }
+
+        WifiProfileList(
+            profiles = profiles,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = onOpenSwipeItem,
+            onCloseSwipeItem = onCloseSwipeItem,
+            onEditClick = onEditClick,
+            onDeleteClick = onDeleteClick,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -564,18 +628,17 @@ private fun WifiProfileList(
     onOpenSwipeItem: (String) -> Unit,
     onCloseSwipeItem: () -> Unit,
     onEditClick: (WifiProfile) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (profiles.isEmpty()) {
-        EmptyWifiProfileListArea()
+        EmptyWifiProfileListArea(modifier)
         return
     }
 
     val listState = rememberLazyListState()
     Column(
-        modifier = Modifier
-            .height(172.dp)
-            .background(MaterialTheme.colorScheme.surface),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Box(
@@ -597,8 +660,7 @@ private fun WifiProfileList(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
-                .height(140.dp)
-                .background(MaterialTheme.colorScheme.surface)
+                .weight(1f)
                 .clickable(
                     enabled = openSwipeItemId != null,
                     onClick = onCloseSwipeItem
@@ -648,12 +710,10 @@ private fun WifiProfileList(
 }
 
 @Composable
-private fun EmptyWifiProfileListArea() {
+private fun EmptyWifiProfileListArea(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(172.dp)
-            .background(MaterialTheme.colorScheme.surface),
+        modifier = modifier
+            .fillMaxWidth(),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
@@ -677,36 +737,18 @@ private fun WifiProfileRow(
     var pendingDeleteProfile by remember { mutableStateOf<WifiProfile?>(null) }
 
     pendingDeleteProfile?.let { profileToDelete ->
-        AlertDialog(
-            onDismissRequest = {
+        StandardConfigurationDialog(
+            title = "WLAN-Profil löschen",
+            onDismissRequest = { pendingDeleteProfile = null },
+            actionText = "Ja",
+            onAction = {
                 pendingDeleteProfile = null
+                onDeleteClick()
             },
-            title = {
-                Text("WLAN-Profil löschen")
-            },
-            text = {
-                Text("WLAN-Profil ${profileToDelete.name} wirklich löschen?")
-            },
-            confirmButton = {
-                OutlinedButton(
-                    onClick = {
-                        pendingDeleteProfile = null
-                    }
-                ) {
-                    Text("Nein")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = {
-                        pendingDeleteProfile = null
-                        onDeleteClick()
-                    }
-                ) {
-                    Text("Ja")
-                }
-            }
-        )
+            cancelText = "Nein"
+        ) {
+            Text("WLAN-Profil ${profileToDelete.name} wirklich löschen?")
+        }
     }
 
     SwipeRevealItem(
@@ -759,43 +801,25 @@ private fun WifiProfileDialog(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    AlertDialog(
+    StandardConfigurationDialog(
+        title = if (isNewProfile) "WLAN-Profil anlegen" else "WLAN-Profil bearbeiten",
         onDismissRequest = onCancelClick,
-        title = {
-            Text(
-                if (isNewProfile) {
-                    "WLAN-Profil anlegen"
-                } else {
-                    "WLAN-Profil bearbeiten"
-                }
-            )
-        },
-        text = {
-            WifiProfileForm(
-                name = name,
-                ssid = ssid,
-                password = password,
-                isPasswordVisible = isPasswordVisible,
-                errorMessage = errorMessage,
-                onNameChange = onNameChange,
-                onSsidChange = onSsidChange,
-                onPasswordChange = onPasswordChange,
-                onClearPasswordClick = onClearPasswordClick,
-                onTogglePasswordVisibility = onTogglePasswordVisibility,
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            )
-        },
-        confirmButton = {
-            Button(onClick = onSaveClick) {
-                Text("Speichern")
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onCancelClick) {
-                Text("Abbrechen")
-            }
-        }
-    )
+        actionText = "Speichern",
+        onAction = onSaveClick
+    ) {
+        WifiProfileForm(
+            name = name,
+            ssid = ssid,
+            password = password,
+            isPasswordVisible = isPasswordVisible,
+            errorMessage = errorMessage,
+            onNameChange = onNameChange,
+            onSsidChange = onSsidChange,
+            onPasswordChange = onPasswordChange,
+            onClearPasswordClick = onClearPasswordClick,
+            onTogglePasswordVisibility = onTogglePasswordVisibility
+        )
+    }
 }
 
 @Composable
@@ -856,11 +880,11 @@ private fun WifiProfileForm(
             style = MaterialTheme.typography.bodySmall
         )
 
-        OutlinedButton(
-            onClick = onClearPasswordClick
-        ) {
-            Text("Passwort leeren")
-        }
+        StandardActionButton(
+            text = "Passwort leeren",
+            onClick = onClearPasswordClick,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         OutlinedTextField(
             value = name,
@@ -889,55 +913,57 @@ private fun ImportExportSection(
     onImportUrlClick: () -> Unit,
     onScanQrCodeClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Import / Export", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Konfigurationen als JSON-Datei sichern oder aus einer vertrauenswürdigen Quelle importieren.",
+            style = MaterialTheme.typography.bodyMedium
+        )
 
-            Spacer(modifier = Modifier.height(8.dp))
+        if (isTransferInProgress) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                Text("Konfiguration wird verarbeitet …")
+            }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Export", style = MaterialTheme.typography.titleSmall)
+                StandardActionButton(
+                    text = "Exportieren",
+                    onClick = onExportClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                StandardActionButton(
+                    text = "Exportieren mit Passwörtern",
+                    onClick = onExportWithPasswordsClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Text(
-                text = "Konfigurationen als JSON-Datei sichern oder aus einer vertrauenswürdigen Quelle importieren.",
-                style = MaterialTheme.typography.bodyMedium
-            )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            if (isTransferInProgress) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                    Text("Konfiguration wird verarbeitet …")
-                }
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = onExportClick) {
-                            Text("Exportieren")
-                        }
-                        OutlinedButton(onClick = onExportWithPasswordsClick) {
-                            Text("Mit Passwörtern")
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = onImportFileClick) {
-                            Text("Datei importieren")
-                        }
-                        OutlinedButton(onClick = onImportUrlClick) {
-                            Text("URL importieren")
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = onScanQrCodeClick) {
-                            Text("QR-Code scannen")
-                        }
-                    }
-                }
+                Text("Import", style = MaterialTheme.typography.titleSmall)
+                StandardActionButton(
+                    text = "Datei importieren",
+                    onClick = onImportFileClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                StandardActionButton(
+                    text = "URL importieren",
+                    onClick = onImportUrlClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                StandardActionButton(
+                    text = "QR-Code importieren",
+                    onClick = onScanQrCodeClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -948,26 +974,17 @@ private fun PasswordExportWarningDialog(
     onExport: () -> Unit,
     onCancel: () -> Unit
 ) {
-    AlertDialog(
+    StandardConfigurationDialog(
+        title = "Passwörter unverschlüsselt exportieren?",
         onDismissRequest = onCancel,
-        title = { Text("Passwörter unverschlüsselt exportieren?") },
-        text = {
-            Text(
-                "Die Exportdatei enthält WLAN-Passwörter im Klartext. " +
-                    "Teile sie nur mit Personen, die diese Passwörter kennen dürfen."
-            )
-        },
-        confirmButton = {
-            OutlinedButton(onClick = onCancel) {
-                Text("Abbrechen")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onExport) {
-                Text("Passwörter exportieren")
-            }
-        }
-    )
+        actionText = "Passwörter exportieren",
+        onAction = onExport
+    ) {
+        Text(
+            "Die Exportdatei enthält WLAN-Passwörter im Klartext. " +
+                "Teile sie nur mit Personen, die diese Passwörter kennen dürfen."
+        )
+    }
 }
 
 @Composable
@@ -977,26 +994,17 @@ private fun ImportModeDialog(
     onCancel: () -> Unit
 ) {
     var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
-    AlertDialog(
+    StandardConfigurationDialog(
+        title = "Importmodus wählen",
         onDismissRequest = onCancel,
-        title = { Text("Importmodus wählen") },
-        text = {
-            ImportModeSelection(
-                mode = mode,
-                onModeChange = { mode = it }
-            )
-        },
-        confirmButton = {
-            OutlinedButton(onClick = onCancel) {
-                Text("Abbrechen")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onContinue(mode) }) {
-                Text(continueText)
-            }
-        }
-    )
+        actionText = continueText,
+        onAction = { onContinue(mode) }
+    ) {
+        ImportModeSelection(
+            mode = mode,
+            onModeChange = { mode = it }
+        )
+    }
 }
 
 @Composable
@@ -1006,38 +1014,25 @@ private fun UrlImportDialog(
 ) {
     var url by remember { mutableStateOf("") }
     var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
-    AlertDialog(
+    StandardConfigurationDialog(
+        title = "Aus HTTPS-URL importieren",
         onDismissRequest = onCancel,
-        title = { Text("Aus HTTPS-URL importieren") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = url,
-                    onValueChange = { url = it },
-                    label = { Text("HTTPS-URL") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                ImportModeSelection(
-                    mode = mode,
-                    onModeChange = { mode = it }
-                )
-            }
-        },
-        confirmButton = {
-            OutlinedButton(onClick = onCancel) {
-                Text("Abbrechen")
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = { onImport(url, mode) },
-                enabled = url.isNotBlank()
-            ) {
-                Text("Import prüfen")
-            }
-        }
-    )
+        actionText = "Import prüfen",
+        onAction = { onImport(url, mode) },
+        actionEnabled = url.isNotBlank()
+    ) {
+        OutlinedTextField(
+            value = url,
+            onValueChange = { url = it },
+            label = { Text("HTTPS-URL") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        ImportModeSelection(
+            mode = mode,
+            onModeChange = { mode = it }
+        )
+    }
 }
 
 @Composable
@@ -1099,21 +1094,14 @@ private fun ImportSummaryDialog(
             append("${summary.localDevicesDeleted} lokale Geräte werden gelöscht.")
         }
     }
-    AlertDialog(
+    StandardConfigurationDialog(
+        title = "Import-Zusammenfassung",
         onDismissRequest = onCancel,
-        title = { Text("Import-Zusammenfassung") },
-        text = { Text(text) },
-        confirmButton = {
-            OutlinedButton(onClick = onCancel) {
-                Text("Abbrechen")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onImport) {
-                Text("Importieren")
-            }
-        }
-    )
+        actionText = "Importieren",
+        onAction = onImport
+    ) {
+        Text(text)
+    }
 }
 
 @Composable
@@ -1121,26 +1109,17 @@ private fun PasswordImportWarningDialog(
     onImport: () -> Unit,
     onCancel: () -> Unit
 ) {
-    AlertDialog(
+    StandardConfigurationDialog(
+        title = "Import enthält Passwörter",
         onDismissRequest = onCancel,
-        title = { Text("Import enthält Passwörter") },
-        text = {
-            Text(
-                "Die Importdatei enthält WLAN-Passwörter im Klartext oder löscht gespeicherte Passwörter. " +
-                    "Importiere sie nur aus einer vertrauenswürdigen Quelle."
-            )
-        },
-        confirmButton = {
-            OutlinedButton(onClick = onCancel) {
-                Text("Abbrechen")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onImport) {
-                Text("Importieren")
-            }
-        }
-    )
+        actionText = "Importieren",
+        onAction = onImport
+    ) {
+        Text(
+            "Die Importdatei enthält WLAN-Passwörter im Klartext oder löscht gespeicherte Passwörter. " +
+                "Importiere sie nur aus einer vertrauenswürdigen Quelle."
+        )
+    }
 }
 
 private const val EXPORT_FILE_NAME = "switchwerk-config.json"

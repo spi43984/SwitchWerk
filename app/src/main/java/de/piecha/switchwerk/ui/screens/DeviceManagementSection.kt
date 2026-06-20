@@ -1,6 +1,5 @@
 package de.piecha.switchwerk.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,11 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -22,8 +18,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,12 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
 import de.piecha.switchwerk.viewmodel.DeviceFormState
 
@@ -67,7 +60,8 @@ fun DeviceManagementSection(
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
     onSaveClick: () -> Unit,
-    onCancelClick: () -> Unit
+    onCancelClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (isEditing) {
         DeviceEditDialog(
@@ -85,43 +79,42 @@ fun DeviceManagementSection(
         )
     }
 
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(start = 12.dp, top = 6.dp, end = 6.dp, bottom = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Geräte",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                IconButton(
-                    onClick = onAddClick,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Gerät hinzufügen"
-                    )
-                }
-            }
-
-            DeviceList(
-                devices = devices,
-                openSwipeItemId = openSwipeItemId,
-                onOpenSwipeItem = onOpenSwipeItem,
-                onCloseSwipeItem = onCloseSwipeItem,
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick
+            Text(
+                text = "Name",
+                style = MaterialTheme.typography.titleSmall
             )
+
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Gerät hinzufügen"
+                )
+            }
         }
+
+        DeviceList(
+            devices = devices,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = onOpenSwipeItem,
+            onCloseSwipeItem = onCloseSwipeItem,
+            onEditClick = onEditClick,
+            onDeleteClick = onDeleteClick,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -139,61 +132,23 @@ private fun DeviceEditDialog(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Dialog(
+    StandardConfigurationDialog(
+        title = if (form.id == null) "Gerät hinzufügen" else "Gerät bearbeiten",
         onDismissRequest = onCancelClick,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        actionText = "Speichern",
+        onAction = onSaveClick
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = if (form.id == null) "Gerät hinzufügen" else "Gerät bearbeiten",
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 600.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    DeviceForm(
-                        form = form,
-                        wifiProfiles = wifiProfiles,
-                        onNameChange = onNameChange,
-                        onActionLabelChange = onActionLabelChange,
-                        onApiMethodChange = onApiMethodChange,
-                        onApiPathChange = onApiPathChange,
-                        onAddConnection = onAddConnection,
-                        onUpdateConnection = onUpdateConnection,
-                        onDeleteConnection = onDeleteConnection
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = onSaveClick
-                    ) {
-                        Text("Speichern")
-                    }
-
-                    OutlinedButton(
-                        onClick = onCancelClick
-                    ) {
-                        Text("Abbrechen")
-                    }
-                }
-            }
-        }
+        DeviceForm(
+            form = form,
+            wifiProfiles = wifiProfiles,
+            onNameChange = onNameChange,
+            onActionLabelChange = onActionLabelChange,
+            onApiMethodChange = onApiMethodChange,
+            onApiPathChange = onApiPathChange,
+            onAddConnection = onAddConnection,
+            onUpdateConnection = onUpdateConnection,
+            onDeleteConnection = onDeleteConnection
+        )
     }
 }
 
@@ -204,18 +159,17 @@ private fun DeviceList(
     onOpenSwipeItem: (String) -> Unit,
     onCloseSwipeItem: () -> Unit,
     onEditClick: (Device) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (devices.isEmpty()) {
-        EmptyListArea(text = "Keine Geräte konfiguriert.")
+        EmptyListArea(text = "Keine Geräte konfiguriert.", modifier = modifier)
         return
     }
 
     val listState = rememberLazyListState()
     Column(
-        modifier = Modifier
-            .height(172.dp)
-            .background(MaterialTheme.colorScheme.surface),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Box(
@@ -237,8 +191,7 @@ private fun DeviceList(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
-                .height(140.dp)
-                .background(MaterialTheme.colorScheme.surface)
+                .weight(1f)
                 .clickable(
                     enabled = openSwipeItemId != null,
                     onClick = onCloseSwipeItem
@@ -288,12 +241,10 @@ private fun DeviceList(
 }
 
 @Composable
-private fun EmptyListArea(text: String) {
+private fun EmptyListArea(text: String, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(172.dp)
-            .background(MaterialTheme.colorScheme.surface),
+        modifier = modifier
+            .fillMaxWidth(),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
@@ -366,43 +317,14 @@ private fun ConfirmDeviceDeleteDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    Dialog(
+    StandardConfigurationDialog(
+        title = "Gerät löschen",
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        actionText = "Ja",
+        onAction = onConfirm,
+        cancelText = "Nein"
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Gerät löschen",
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Text("Gerät ${device.name} wirklich löschen?")
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onConfirm
-                    ) {
-                        Text("Ja")
-                    }
-
-                    OutlinedButton(
-                        onClick = onDismiss
-                    ) {
-                        Text("Nein")
-                    }
-                }
-            }
-        }
+        Text("Gerät ${device.name} wirklich löschen?")
     }
 }
 
@@ -683,93 +605,46 @@ private fun ConnectionEditDialog(
         mutableStateOf(initialConnection?.host.orEmpty())
     }
 
-    Dialog(
+    StandardConfigurationDialog(
+        title = title,
         onDismissRequest = onCancel,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        actionText = "Speichern",
+        onAction = { onSave(selectedWifiProfileId, host) },
+        actionEnabled = selectedWifiProfileId.isNotBlank() && host.isNotBlank()
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 480.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+        if (selectableProfiles.isEmpty()) {
+            Text("Es sind keine weiteren WLAN-Profile verfügbar.")
+        } else {
+            selectableProfiles.forEach { profile ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (selectableProfiles.isEmpty()) {
-                        Text("Es sind keine weiteren WLAN-Profile verfügbar.")
-                    } else {
-                        selectableProfiles.forEach { profile ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = selectedWifiProfileId == profile.id,
-                                    onClick = {
-                                        selectedWifiProfileId = profile.id
-                                    }
-                                )
+                    RadioButton(
+                        selected = selectedWifiProfileId == profile.id,
+                        onClick = { selectedWifiProfileId = profile.id }
+                    )
 
-                                Column {
-                                    Text(
-                                        text = profile.name,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-
-                                    Text(
-                                        text = "SSID: ${profile.ssid}",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-                        }
-
-                        OutlinedTextField(
-                            value = host,
-                            onValueChange = {
-                                host = it
-                            },
-                            label = {
-                                Text("Hostname/IP")
-                            },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
+                    Column {
+                        Text(
+                            text = profile.name,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "SSID: ${profile.ssid}",
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            onSave(selectedWifiProfileId, host)
-                        },
-                        enabled = selectedWifiProfileId.isNotBlank() && host.isNotBlank()
-                    ) {
-                        Text("Speichern")
-                    }
-
-                    OutlinedButton(
-                        onClick = onCancel
-                    ) {
-                        Text("Abbrechen")
-                    }
-                }
             }
+
+            OutlinedTextField(
+                value = host,
+                onValueChange = { host = it },
+                label = { Text("Hostname/IP") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
