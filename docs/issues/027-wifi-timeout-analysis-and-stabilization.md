@@ -2,9 +2,12 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: WLAN / Stabilität
+- GitHub-Issue: #57
+- Pull Request: #58
+- Merge-Commit: `7779e1d`
 
 ## Ziel
 
@@ -143,12 +146,72 @@ Mögliche Maßnahmen:
 
 - Änderung der bestehenden Gerätekonfiguration
 - Unterstützung zusätzlicher WLAN-Typen
-- Änderungen an Import/Export
+- Änderung des JSON-Exportformats
+
+## Ergebnis der Analyse
+
+Die Gerätemitschnitte zeigten mehrere voneinander unabhängige Wartephasen:
+
+- Android konnte einen `NetworkRequest` annehmen, ohne zeitnah
+  `onAvailable()` zu liefern.
+- `onAvailable()` allein garantiert noch keine abgeschlossene IP-Konfiguration.
+- DNS-Auflösung war bisher Teil des HTTP-Aufrufs und dadurch nicht separat
+  messbar.
+- Ein importierter, auf dem aktuellen Gerät noch nicht bestätigter
+  Sicherheitstyp konnte einen irreführenden Android-Systemdialog auslösen,
+  bevor der WPA2/WPA3-Fallback erfolgreich war.
+- Bei deaktiviertem WLAN wurde zuvor nur ein allgemeiner Timeout sichtbar.
+
+## Umgesetzte Stabilisierung
+
+- vollständige Diagnoseereignisse für Aktion, WLAN-Anforderung, gefundenes
+  WLAN, Verbindung, IP-Adresse, DNS sowie HTTP/RPC
+- monotone Zeitdifferenz zwischen den einzelnen Diagnoseereignissen
+- WLAN-Erfolg erst nach WiFi-Transport und gültiger Link-IP
+- robustes Handling verspäteter, mehrfacher und verlorener NetworkCallbacks
+- getrennte Klassifizierung von WLAN-Anforderungs-, DHCP/IP-, DNS- und
+  HTTP-Timeouts
+- netzgebundene DNS-Auflösung vor dem HTTP/RPC-Aufruf
+- verständliche Sofortmeldung bei deaktiviertem WLAN
+- gemeinsames 30-Sekunden-Budget für WPA2/WPA3-Fallback
+- kein automatischer HTTP-Retry bei potenziell nicht-idempotenten
+  Geräteaktionen
+
+## Freigegebene Scope-Erweiterung
+
+Die Erweiterung wurde während der Gerätetests ausdrücklich freigegeben:
+
+- importierte Sicherheitstypen werden lokal als ungeprüft markiert
+- vor der ersten Aktion eines importierten WLAN-Profils werden vorhandene
+  Scan-Ergebnisse ausgewertet oder höchstens acht Sekunden auf einen
+  Vordergrund-Scan gewartet
+- der erkannte oder erfolgreich verwendete Sicherheitstyp wird lokal bestätigt
+  und für spätere Aktionen gespeichert
+- spätere Aktionen benötigen keinen erneuten Vorab-Scan
+- Room-Datenbankversion 5 mit Migration 4 nach 5
+- bestehende lokale WLAN-Profile gelten nach der Migration als geprüft
+- `ACCESS_FINE_LOCATION` wird nur beim Import von WLAN-Profilen angefragt
+- Scan-Ergebnisse und SSIDs werden weder zusätzlich gespeichert noch geloggt
+- das JSON-Exportformat bleibt unverändert
+
+## Bestätigte Prüfungen
+
+- `git diff --check`
+- `./gradlew testDebugUnitTest`
+- `./gradlew clean assembleDebug`
+- `./gradlew installDebug`
+- bestehende Installation und Room-Migration erfolgreich
+- Geräteaktion nach App-Neustart und Force-Stop erfolgreich
+- Geräteaktion nach WLAN aus/an erfolgreich
+- deaktiviertes WLAN verständlich gemeldet
+- importiertes WPA3 für ein WPA2-WLAN wurde vor der ersten Aktion erkannt und
+  anschließend lokal korrigiert
+- weitere Geräteaktionen ohne erneuten Scan erfolgreich
 
 ## Akzeptanzkriterien
 
-- Diagnose zeigt den vollständigen Verbindungsablauf.
-- Zeitstempel sind sichtbar.
-- Fehlerursachen können eindeutig eingegrenzt werden.
-- Spontane WLAN-Timeouts treten deutlich seltener auf.
-- Bekannte Fehlerfälle werden verständlich angezeigt.
+- [x] Diagnose zeigt den vollständigen Verbindungsablauf.
+- [x] Zeitstempel und Zeitdifferenzen sind sichtbar.
+- [x] Fehlerursachen können eindeutig eingegrenzt werden.
+- [x] Spontane WLAN-Timeouts treten deutlich seltener auf.
+- [x] Bekannte Fehlerfälle werden verständlich angezeigt.

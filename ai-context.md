@@ -128,6 +128,7 @@ Kurzfassung:
 - 017 Unique WiFi Profile Name
 - 018 Adaptive WiFi Security Fallback
 - 023 Settings Display And Action Details
+- 027 WiFi Timeout Analysis And Stabilization
 
 ### Offen
 
@@ -137,13 +138,13 @@ Kurzfassung:
 - 022 Request Body And Content-Type Support
 - 025 Dashboard Widget Layout
 - 026 Settings UI Rework
-- 027 WiFi Timeout Analysis And Stabilization
 - 028 Theme Mode Setting
 - 029 Language Setting
 - 030 WiFi Profile Deletion Safety
 - 031 Import Enforces Unique WiFi Profile Names
 - 032 Room Schema And Migration Test Coverage
 - 033 Android-managed WiFi networks
+- 034 Collapsible Action Details Panel
 
 ### Zurückgestellt / Backlog
 
