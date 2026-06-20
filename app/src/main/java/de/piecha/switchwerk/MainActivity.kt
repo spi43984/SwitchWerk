@@ -15,15 +15,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import de.piecha.switchwerk.ui.screens.SettingsScreen
+import de.piecha.switchwerk.ui.screens.SettingsSection
 import de.piecha.switchwerk.ui.screens.StartScreen
+import de.piecha.switchwerk.ui.screens.HelpScreen
 import de.piecha.switchwerk.ui.theme.SwitchWerkTheme
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 private enum class AppScreen {
     Dashboard,
-    Settings
+    Settings,
+    Help
 }
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +52,12 @@ class MainActivity : ComponentActivity() {
             val mainViewModel: MainViewModel = koinViewModel()
             val uiState by mainViewModel.uiState.collectAsState()
             SwitchWerkTheme(themeMode = uiState.appSettings.themeMode) {
-                SwitchWerkAppContent(mainViewModel)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SwitchWerkAppContent(mainViewModel)
+                }
             }
         }
     }
@@ -71,18 +83,38 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun SwitchWerkAppContent(mainViewModel: MainViewModel) {
     var currentScreen by remember { mutableStateOf(AppScreen.Dashboard) }
+    var helpReturnScreen by remember { mutableStateOf(AppScreen.Dashboard) }
+    var selectedSettingsSection by remember {
+        mutableStateOf(SettingsSection.WIFI_PROFILES)
+    }
 
     when (currentScreen) {
         AppScreen.Dashboard -> StartScreen(
             viewModel = mainViewModel,
             onNavigateToSettings = {
                 currentScreen = AppScreen.Settings
+            },
+            onNavigateToHelp = {
+                helpReturnScreen = AppScreen.Dashboard
+                currentScreen = AppScreen.Help
             }
         )
 
         AppScreen.Settings -> SettingsScreen(
+            selectedSection = selectedSettingsSection,
+            onSectionSelected = { selectedSettingsSection = it },
             onNavigateBack = {
                 currentScreen = AppScreen.Dashboard
+            },
+            onNavigateToHelp = {
+                helpReturnScreen = AppScreen.Settings
+                currentScreen = AppScreen.Help
+            }
+        )
+
+        AppScreen.Help -> HelpScreen(
+            onNavigateBack = {
+                currentScreen = helpReturnScreen
             }
         )
     }
