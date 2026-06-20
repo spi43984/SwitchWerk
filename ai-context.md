@@ -145,6 +145,7 @@ Kurzfassung:
 - 032 Room Schema And Migration Test Coverage
 - 033 Android-managed WiFi networks
 - 034 Collapsible Action Details Panel
+- 035 App Identity, Help And Release Packaging
 
 ### Zurückgestellt / Backlog
 
