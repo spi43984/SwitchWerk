@@ -57,7 +57,8 @@ Für jede Aufgabe gilt:
    - `AI_HANDOFF.md`
    - bei Issue-Arbeiten die konkrete Datei unter `docs/issues`
 2. Danach nur gezielt weitere Dateien lesen:
-   - `ai-context.md`, wenn dauerhafter Projektkontext oder Issue-Status nötig ist
+   - `ai-context.md`, wenn dauerhafter Projektkontext oder Projektentscheidungen nötig sind
+   - `docs/issues/overview.txt`, wenn Issue-Status, Priorisierung oder Reihenfolge nötig sind
    - `ARCHITECTURE.md`, wenn Architektur, Packages oder Schichten betroffen sind
    - `CODE_STYLE.md`, wenn Code geändert wird
    - `TESTING.md`, wenn Tests geplant oder bewertet werden
@@ -141,12 +142,11 @@ ausgeführt werden:
 5. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
 6. Lokale Issue-Datei unter `docs/issues` abhaken.
 7. `docs/issues/overview.txt` aktualisieren.
-8. `ai-context.md` aktualisieren:
-   - abgeschlossenes Issue in `Abgeschlossen` verschieben
-   - abgeschlossenes Issue aus `Offen` entfernen
-   - `Nächstes Issue` auf das nächste offene Issue setzen
-9. Prüfen, dass `docs/issues/overview.txt`, die lokale Issue-Datei und
-   `ai-context.md` denselben Status zeigen.
+8. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben
+   Status zeigen. `docs/issues/overview.txt` ist die einzige Quelle für die Liste
+   und Reihenfolge offener, abgeschlossener und zurückgestellter Issues.
+9. `ai-context.md` nur aktualisieren, wenn sich dauerhafter Projektkontext oder
+   Projektentscheidungen geändert haben.
 10. Dokumentationsänderungen committen und pushen.
 11. Zugehöriges GitHub-Issue erst danach schließen.
 12. Feature-Branch lokal und remote löschen.
@@ -157,10 +157,10 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 
 - [ ] `docs/issues/<issue>.md` aktualisiert
 - [ ] `docs/issues/overview.txt` aktualisiert
-- [ ] `ai-context.md` aktualisiert
+- [ ] `ai-context.md` bei geändertem dauerhaftem Projektkontext aktualisiert
 - [ ] `AI_HANDOFF.md` aktualisiert
-- [ ] nächstes offenes Issue festgelegt
-- [ ] Status der Dokumentationsdateien ist konsistent
+- [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt
+- [ ] Status von Issue-Datei und `docs/issues/overview.txt` ist konsistent
 - [ ] GitHub-Issue geschlossen
 
 Ohne ausdrückliche Nachfrage des Benutzers gilt:

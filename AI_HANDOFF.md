@@ -4,13 +4,12 @@ Stand: 20. Juni 2026
 
 ## Aktuelle Arbeit
 
-Keine aktive Implementierung.
+Keine aktive Implementierung. Die Dokumentation wird derzeit so vereinheitlicht,
+dass Issue-Listen und Issue-Status nur noch in `docs/issues/overview.txt`
+gepflegt werden. Die Änderungen sind lokal und nicht veröffentlicht.
 
-Nächstes geplantes Issue laut `ai-context.md`:
-
-```text
-026 Settings UI Rework
-```
+Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
+in `docs/issues/overview.txt`.
 
 ## Zuletzt abgeschlossene Arbeit
 
@@ -51,30 +50,5 @@ bestätigt.
 ## Wichtige Hinweise für die nächste Session
 
 - Wiederverwendbare Startvorlage: `AI_SESSION_PROMPT.md`
-- Die Statusdateien wurden nach Issue 027 aktualisiert:
-  - `docs/issues/027-wifi-timeout-analysis-and-stabilization.md`
-  - `docs/issues/overview.txt`
-  - `ai-context.md`
-  - `AI_HANDOFF.md`
-- Nächstes fachliches Issue ist 026 "Settings UI Rework".
-- Issue 028 "Theme Mode Setting" ist dokumentarisch als durch Issue 023 erledigt markiert.
-
-## Nächste geplante Themen
-
-```text
-026 Settings UI Rework
-020 Device Assigned WiFi Order
-025 Dashboard Widget Layout
-029 Language Setting
-030 WiFi Profile Deletion Safety
-033 Android-managed WiFi networks
-034 Collapsible Action Details Panel
-019 Configurable WiFi List Sorting
-021 HTTP/HTTPS Device Actions
-022 Request Body And Content-Type Support
-031 Import Enforces Unique WiFi Profile Names
-032 Room Schema And Migration Test Coverage
-035 App Identity, Help And Release Packaging
-036 Device WiFi Proximity Indicator
-024 Authenticated Import Sources Backlog
-```
+- Die vollständige Issue-Liste einschließlich Status, Priorisierung und
+  Umsetzungsreihenfolge steht ausschließlich in `docs/issues/overview.txt`.

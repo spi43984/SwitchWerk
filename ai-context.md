@@ -14,7 +14,9 @@ Ziel ist eine einfache, robuste, sichere und cloudfreie Lösung.
 
 `ai-context.md` enthält dauerhaften Projektkontext, der über einzelne Sessions hinaus gültig bleibt.
 
-Diese Datei ist nicht als vollständiger Startprompt für Codex gedacht. Codex liest sie nur, wenn dauerhafter Projektkontext, Issue-Status oder Projektentscheidungen für die konkrete Aufgabe benötigt werden.
+Diese Datei ist nicht als vollständiger Startprompt für Codex gedacht. Codex liest sie nur, wenn dauerhafter Projektkontext oder Projektentscheidungen für die konkrete Aufgabe benötigt werden.
+
+Status, Priorisierung und Reihenfolge der Issues stehen ausschließlich in `docs/issues/overview.txt`.
 
 ---
 
@@ -101,66 +103,15 @@ Kurzfassung:
 8. Änderungen prüfen.
 9. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
 10. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
-11. Nach erfolgreichem Merge immer `docs/issues/overview.txt` und `ai-context.md` aktualisieren, bevor das GitHub-Issue geschlossen wird.
+11. Nach erfolgreichem Merge immer `docs/issues/overview.txt` aktualisieren, bevor das GitHub-Issue geschlossen wird. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext oder geänderten Projektentscheidungen anpassen.
 
 ---
 
-## Aktueller Stand
+## Issue-Status
 
-### Abgeschlossen
-
-- 001 Configuration Domain Foundation
-- 002 Dashboard Device List
-- 003 Settings Navigation Foundation
-- 004 UI Foundation Cleanup
-- 005 Local Persistence Foundation
-- 006 Encrypted WiFi Password Storage
-- 007 WiFi Profile Management
-- 008 Device Management
-- 009 WiFi Connection Service
-- 010 HTTP/API Call Service
-- 011 Device Action With WiFi Fallback
-- 012 Import/Export
-- 013 QR Code Import
-- 014 Dashboard Device Reordering
-- 015 WiFi Profile Dialog Management
-- 016 Edit Items By Name Click
-- 017 Unique WiFi Profile Name
-- 018 Adaptive WiFi Security Fallback
-- 023 Settings Display And Action Details
-- 027 WiFi Timeout Analysis And Stabilization
-- 028 Theme Mode Setting
-
-### Offen
-
-- 019 Configurable WiFi List Sorting
-- 020 Device Assigned WiFi Order
-- 021 HTTP/HTTPS Device Actions
-- 022 Request Body And Content-Type Support
-- 025 Dashboard Widget Layout
-- 026 Settings UI Rework
-- 029 Language Setting
-- 030 WiFi Profile Deletion Safety
-- 031 Import Enforces Unique WiFi Profile Names
-- 032 Room Schema And Migration Test Coverage
-- 033 Android-managed WiFi networks
-- 034 Collapsible Action Details Panel
-- 035 App Identity, Help And Release Packaging
-- 036 Device WiFi Proximity Indicator
-
-### Zurückgestellt / Backlog
-
-- 024 Authenticated Import Sources Backlog
-
-### Nächstes Issue
-
-- 026 Settings UI Rework
-
-### Pflegehinweis
-
-Die Listen "Abgeschlossen", "Offen", "Zurückgestellt / Backlog" und "Nächstes Issue" sind nach jedem abgeschlossenen oder neu angelegten Issue in `ai-context.md` zu aktualisieren.
-
-Nach erfolgreichem Build, Installation, Merge und vor dem Schließen des GitHub-Issues müssen außerdem `docs/issues/overview.txt` und die passende Datei unter `docs/issues` aktualisiert werden.
+Die vollständige Liste der offenen, abgeschlossenen und zurückgestellten Issues
+sowie ihre Priorisierung und empfohlene Umsetzungsreihenfolge steht in
+`docs/issues/overview.txt`. Sie wird nicht in dieser Datei dupliziert.
 
 ---
 

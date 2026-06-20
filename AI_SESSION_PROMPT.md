@@ -23,7 +23,8 @@ Bei Issue-Arbeiten zusätzlich lesen:
 
 Bei Bedarf zusätzlich lesen:
 
-* ai-context.md, wenn dauerhafter Projektkontext oder Issue-Status benötigt wird
+* ai-context.md, wenn dauerhafter Projektkontext oder Projektentscheidungen benötigt werden
+* docs/issues/overview.txt, wenn Issue-Status, Priorisierung oder Reihenfolge benötigt werden
 * GITHUB_WORKFLOW.md, wenn Branch-, Issue-, PR- oder Merge-Schritte betroffen sind
 * ARCHITECTURE.md, wenn Architektur, Packages oder Schichten betroffen sind
 * CODE_STYLE.md, wenn Code geändert wird
@@ -68,7 +69,7 @@ Bei der Implementierung eines neuen fachlichen Issues:
 1. Prüfe Git-Status, aktuellen Branch und vorhandene Änderungen.
 2. Wechsle auf main.
 3. Hole den aktuellen Stand mit git pull.
-4. Bestimme das nächste offene Issue aus docs/issues.
+4. Bestimme das nächste offene Issue aus docs/issues/overview.txt.
 5. Prüfe, ob das zugehörige GitHub-Issue oder der Feature-Branch bereits existiert.
 6. Erzeuge nur dann ein GitHub-Issue aus der lokalen Issue-Datei, wenn noch keines existiert.
 7. Lege danach einen eigenen fachlichen Branch an oder verwende den vorhandenen Branch.
@@ -117,6 +118,7 @@ Ohne ausdrückliche Anforderung des Benutzers:
 Veröffentlichung und Abschluss erfolgen ausschließlich nach ausdrücklicher
 Freigabe und gemäß Phase 2 in AGENTS.md.
 
-Aktualisiere ai-context.md nur, wenn sich dauerhafter Projektkontext oder der
-dokumentierte Issue-Status tatsächlich geändert hat.
+Aktualisiere ai-context.md nur, wenn sich dauerhafter Projektkontext oder
+Projektentscheidungen tatsächlich geändert haben. Status, Priorisierung und
+Reihenfolge der Issues werden ausschließlich in docs/issues/overview.txt gepflegt.
 ```
