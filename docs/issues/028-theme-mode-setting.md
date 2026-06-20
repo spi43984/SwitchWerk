@@ -2,13 +2,16 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: GUI / Einstellungen
 
 ## Ziel
 
 In den Einstellungen soll auswählbar sein, ob SwitchWerk im hellen Design, dunklen Design oder gemäß Systemeinstellung angezeigt wird.
+
+Dieses Issue ist durch Issue #23 "Settings Display And Action Details" bereits
+umgesetzt und wird nur dokumentarisch als abgeschlossen geführt.
 
 ## Optionen
 
@@ -27,9 +30,9 @@ In den Einstellungen soll auswählbar sein, ob SwitchWerk im hellen Design, dunk
 
 ## Akzeptanzkriterien
 
-- [ ] Einstellung "Design" ist sichtbar
-- [ ] System/Hell/Dunkel auswählbar
-- [ ] Auswahl bleibt nach App-Neustart erhalten
-- [ ] System folgt der Android-Systemeinstellung
-- [ ] Hell erzwingt helles Theme
-- [ ] Dunkel erzwingt dunkles Theme
+- [x] Einstellung "Design" ist sichtbar
+- [x] System/Hell/Dunkel auswählbar
+- [x] Auswahl bleibt nach App-Neustart erhalten
+- [x] System folgt der Android-Systemeinstellung
+- [x] Hell erzwingt helles Theme
+- [x] Dunkel erzwingt dunkles Theme

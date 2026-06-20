@@ -129,6 +129,7 @@ Kurzfassung:
 - 018 Adaptive WiFi Security Fallback
 - 023 Settings Display And Action Details
 - 027 WiFi Timeout Analysis And Stabilization
+- 028 Theme Mode Setting
 
 ### Offen
 
@@ -138,7 +139,6 @@ Kurzfassung:
 - 022 Request Body And Content-Type Support
 - 025 Dashboard Widget Layout
 - 026 Settings UI Rework
-- 028 Theme Mode Setting
 - 029 Language Setting
 - 030 WiFi Profile Deletion Safety
 - 031 Import Enforces Unique WiFi Profile Names

@@ -41,7 +41,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 025 | P1 | offen | Dashboard Widget Layout |
 | 026 | P0 | offen | Settings UI Rework |
 | 027 | P0 | abgeschlossen | WiFi Timeout Analysis And Stabilization |
-| 028 | P1 | offen | Theme Mode Setting |
+| 028 | P1 | abgeschlossen | Theme Mode Setting |
 | 029 | P1 | offen | Language Setting |
 | 030 | P1 | offen | WiFi Profile Deletion Safety |
 | 031 | P2 | offen | Import Enforces Unique WiFi Profile Names |
@@ -55,15 +55,14 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 1. 026 Settings UI Rework
 2. 020 Device Assigned WiFi Order
 3. 025 Dashboard Widget Layout
-4. 028 Theme Mode Setting
-5. 029 Language Setting
-6. 030 WiFi Profile Deletion Safety
-7. 033 Android-managed WiFi networks
-8. 034 Collapsible Action Details Panel
-9. 019 Configurable WiFi List Sorting
-10. 021 HTTP/HTTPS Device Actions
-11. 022 Request Body And Content-Type Support
-12. 031 Import Enforces Unique WiFi Profile Names
-13. 032 Room Schema And Migration Test Coverage
-14. 035 App Identity, Help And Release Packaging
-15. 024 Authenticated Import Sources Backlog
+4. 029 Language Setting
+5. 030 WiFi Profile Deletion Safety
+6. 033 Android-managed WiFi networks
+7. 034 Collapsible Action Details Panel
+8. 019 Configurable WiFi List Sorting
+9. 021 HTTP/HTTPS Device Actions
+10. 022 Request Body And Content-Type Support
+11. 031 Import Enforces Unique WiFi Profile Names
+12. 032 Room Schema And Migration Test Coverage
+13. 035 App Identity, Help And Release Packaging
+14. 024 Authenticated Import Sources Backlog

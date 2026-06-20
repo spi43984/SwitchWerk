@@ -57,6 +57,7 @@ bestätigt.
   - `ai-context.md`
   - `AI_HANDOFF.md`
 - Nächstes fachliches Issue ist 026 "Settings UI Rework".
+- Issue 028 "Theme Mode Setting" ist dokumentarisch als durch Issue 023 erledigt markiert.
 
 ## Nächste geplante Themen
 
@@ -64,7 +65,6 @@ bestätigt.
 026 Settings UI Rework
 020 Device Assigned WiFi Order
 025 Dashboard Widget Layout
-028 Theme Mode Setting
 029 Language Setting
 030 WiFi Profile Deletion Safety
 033 Android-managed WiFi networks
