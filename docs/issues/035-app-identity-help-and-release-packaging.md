@@ -2,7 +2,9 @@
 
 ## Status
 
-offen
+- Status: Offen
+- Priorität: P1
+- Typ: GUI / Dashboard
 
 ## Priorität
 
