@@ -124,8 +124,8 @@ fun SettingsScreen(
             viewModel.reportQrCameraPermissionDenied()
         }
     }
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+    val locationPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
     ) {
         pendingImportConfirmation?.invoke()
         pendingImportConfirmation = null
@@ -145,7 +145,12 @@ fun SettingsScreen(
             return
         }
         pendingImportConfirmation = confirmImport
-        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        locationPermissionsLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
     }
     fun runAfterClosingSwipe(action: () -> Unit) {
         if (openSwipeItemId != null) {
