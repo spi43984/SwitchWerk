@@ -4,5 +4,6 @@ data class WifiProfile(
     val id: String,
     val ssid: String,
     val name: String = ssid,
-    val lastSuccessfulSecurityType: WifiSecurityType? = null
+    val lastSuccessfulSecurityType: WifiSecurityType? = null,
+    val isSecurityTypeVerifiedLocally: Boolean = true
 )

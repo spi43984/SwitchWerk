@@ -2,9 +2,11 @@ package de.piecha.switchwerk.data.action
 
 import android.net.Network
 import android.util.Log
+import de.piecha.switchwerk.data.network.DnsResolutionResult
 import de.piecha.switchwerk.data.network.HttpApiCallResult
 import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.SecurityAttemptFailure
+import de.piecha.switchwerk.data.network.WifiConnectionProgress
 import de.piecha.switchwerk.data.network.WifiConnectionResult
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
@@ -77,21 +79,17 @@ class DefaultDeviceActionService(
         var lastFailure: DeviceActionResult = DeviceActionResult.WifiConnectionFailed
         for ((index, connectionWithProfile) in availableConnections.withIndex()) {
             val password = wifiProfileRepository.getPassword(connectionWithProfile.profile.id)
-            emitDiagnostic(
-                onDiagnosticEvent,
-                DeviceActionDiagnosticEvent.WifiProfileConnecting(
-                    connectionWithProfile.profile.name
-                )
-            )
             logInfo("Starting explicit WiFi profile attempt ${index + 1}/${availableConnections.size}")
 
             try {
-                when (val connectionResult = connectWifiProfile(connectionWithProfile.profile, password)) {
+                when (
+                    val connectionResult = connectWifiProfile(
+                        profile = connectionWithProfile.profile,
+                        password = password,
+                        onDiagnosticEvent = onDiagnosticEvent
+                    )
+                ) {
                     is WifiConnectionResult.Success -> {
-                        emitDiagnostic(
-                            onDiagnosticEvent,
-                            DeviceActionDiagnosticEvent.WifiConnectionSucceeded
-                        )
                         emitDiagnostic(
                             onDiagnosticEvent,
                             DeviceActionDiagnosticEvent.DeviceAddress(
@@ -125,11 +123,20 @@ class DefaultDeviceActionService(
                         return DeviceActionResult.WifiPermissionDenied
                     }
 
+                    WifiConnectionResult.WifiDisabled -> {
+                        emitDiagnostic(
+                            onDiagnosticEvent,
+                            DeviceActionDiagnosticEvent.WifiDisabled
+                        )
+                        return DeviceActionResult.WifiDisabled
+                    }
+
                     WifiConnectionResult.UnsupportedAndroidVersion -> {
                         return DeviceActionResult.UnsupportedAndroidVersion
                     }
 
                     WifiConnectionResult.Timeout,
+                    WifiConnectionResult.NetworkRequestTimeout,
                     WifiConnectionResult.Unavailable,
                     is WifiConnectionResult.SecurityTypesFailed,
                     is WifiConnectionResult.Error -> {
@@ -152,10 +159,32 @@ class DefaultDeviceActionService(
 
     private suspend fun connectWifiProfile(
         profile: WifiProfile,
-        password: String?
+        password: String?,
+        onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
     ): WifiConnectionResult {
+        val detectedSecurityTypes = if (profile.isSecurityTypeVerifiedLocally) {
+            null
+        } else {
+            emitDiagnostic(
+                onDiagnosticEvent,
+                DeviceActionDiagnosticEvent.WifiSecurityDetectionStarted
+            )
+            wifiConnectionService.detectedSecurityTypes(profile.ssid).also { detected ->
+                emitDiagnostic(
+                    onDiagnosticEvent,
+                    if (detected.isNullOrEmpty()) {
+                        DeviceActionDiagnosticEvent.WifiSecurityDetectionUnavailable
+                    } else {
+                        DeviceActionDiagnosticEvent.WifiSecurityDetectionSucceeded
+                    }
+                )
+            }
+        }
         val startedAtNanos = System.nanoTime()
-        val securityTypes = securityAttemptOrder(profile.lastSuccessfulSecurityType)
+        val securityTypes = securityAttemptOrder(
+            preferredSecurityType = profile.lastSuccessfulSecurityType,
+            detectedSecurityTypes = detectedSecurityTypes
+        )
         val failures = mutableListOf<SecurityAttemptFailure>()
         var lastResult: WifiConnectionResult = WifiConnectionResult.Timeout
 
@@ -173,7 +202,24 @@ class DefaultDeviceActionService(
                 timeoutMillis = perAttemptTimeoutMillis(
                     remainingTimeout = remainingTimeout,
                     attemptsLeftAfterThis = securityTypes.lastIndex - index
-                )
+                ),
+                onProgress = { progress ->
+                    val event = when (progress) {
+                        WifiConnectionProgress.RequestStarted -> {
+                            DeviceActionDiagnosticEvent.WifiRequestStarted(profile.name)
+                        }
+                        WifiConnectionProgress.NetworkFound -> {
+                            DeviceActionDiagnosticEvent.WifiFound
+                        }
+                        WifiConnectionProgress.Connected -> {
+                            DeviceActionDiagnosticEvent.WifiConnected
+                        }
+                        WifiConnectionProgress.IpAddressAvailable -> {
+                            DeviceActionDiagnosticEvent.IpAddressReceived
+                        }
+                    }
+                    emitDiagnostic(onDiagnosticEvent, event)
+                }
             )
             lastResult = connectionResult
 
@@ -184,14 +230,37 @@ class DefaultDeviceActionService(
                 }
 
                 WifiConnectionResult.PermissionDenied,
+                WifiConnectionResult.WifiDisabled,
                 WifiConnectionResult.UnsupportedAndroidVersion -> return connectionResult
 
                 WifiConnectionResult.Timeout,
+                WifiConnectionResult.NetworkRequestTimeout,
                 WifiConnectionResult.Unavailable,
                 is WifiConnectionResult.SecurityTypesFailed,
                 is WifiConnectionResult.Error -> {
+                    if (
+                        connectionResult == WifiConnectionResult.Timeout ||
+                        connectionResult == WifiConnectionResult.NetworkRequestTimeout
+                    ) {
+                        emitDiagnostic(
+                            onDiagnosticEvent,
+                            DeviceActionDiagnosticEvent.Timeout(
+                                if (
+                                    connectionResult ==
+                                    WifiConnectionResult.NetworkRequestTimeout
+                                ) {
+                                    DiagnosticStage.WIFI_REQUEST
+                                } else {
+                                    DiagnosticStage.WIFI
+                                }
+                            )
+                        )
+                    }
                     failures += SecurityAttemptFailure(securityType, connectionResult)
-                    if (index == securityTypes.lastIndex || !connectionResult.allowsSecurityFallback()) {
+                    if (
+                        index == securityTypes.lastIndex ||
+                        !connectionResult.allowsSecurityFallback()
+                    ) {
                         return securityFailureResult(failures, connectionResult)
                     }
                     logWarning("Explicit WiFi security attempt failed; trying fallback type")
@@ -214,10 +283,17 @@ class DefaultDeviceActionService(
     }
 
     private fun securityAttemptOrder(
-        preferredSecurityType: WifiSecurityType?
+        preferredSecurityType: WifiSecurityType?,
+        detectedSecurityTypes: Set<WifiSecurityType>?
     ): List<WifiSecurityType> {
         val first = preferredSecurityType ?: WifiSecurityType.WPA2
-        return listOf(first, first.fallback())
+        val configuredOrder = listOf(first, first.fallback())
+        if (detectedSecurityTypes.isNullOrEmpty()) {
+            return configuredOrder
+        }
+        return configuredOrder.sortedBy { securityType ->
+            securityType !in detectedSecurityTypes
+        }
     }
 
     private fun remainingTimeoutMillis(startedAtNanos: Long): Long {
@@ -243,6 +319,40 @@ class DefaultDeviceActionService(
     ): ApiCallOutcome {
         val url = buildUrl(connection.host, apiCall.path)
             ?: return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
+        val parsedUrl = url.toHttpUrlOrNull()
+            ?: return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
+
+        if (!parsedUrl.host.isIpAddress()) {
+            emitDiagnostic(
+                onDiagnosticEvent,
+                DeviceActionDiagnosticEvent.DnsResolutionStarted(
+                    diagnosticAddress(connection.host)
+                )
+            )
+            when (val dnsResult = httpApiCallService.resolveHost(parsedUrl.host, network)) {
+                DnsResolutionResult.Success -> emitDiagnostic(
+                    onDiagnosticEvent,
+                    DeviceActionDiagnosticEvent.DnsResolutionSucceeded
+                )
+                DnsResolutionResult.Timeout -> {
+                    emitDiagnostic(
+                        onDiagnosticEvent,
+                        DeviceActionDiagnosticEvent.Timeout(DiagnosticStage.DNS)
+                    )
+                    return ApiCallOutcome.TryNextNetwork(NetworkFailureReason.DNS)
+                }
+                is DnsResolutionResult.Error -> {
+                    emitDiagnostic(
+                        onDiagnosticEvent,
+                        DeviceActionDiagnosticEvent.DnsResolutionFailed
+                    )
+                    logWarning(
+                        "Bound DNS lookup failed: ${dnsResult.cause.javaClass.simpleName}"
+                    )
+                    return ApiCallOutcome.TryNextNetwork(NetworkFailureReason.DNS)
+                }
+            }
+        }
 
         emitDiagnostic(
             onDiagnosticEvent,
@@ -269,7 +379,7 @@ class DefaultDeviceActionService(
             is HttpApiCallResult.Success -> {
                 emitDiagnostic(
                     onDiagnosticEvent,
-                    DeviceActionDiagnosticEvent.HttpResponseReceived(
+                    DeviceActionDiagnosticEvent.HttpRequestSucceeded(
                         result.response.statusCode
                     )
                 )
@@ -287,6 +397,10 @@ class DefaultDeviceActionService(
             }
 
             HttpApiCallResult.Timeout -> {
+                emitDiagnostic(
+                    onDiagnosticEvent,
+                    DeviceActionDiagnosticEvent.Timeout(DiagnosticStage.HTTP)
+                )
                 logWarning("Bound HTTP call timed out")
                 ApiCallOutcome.Terminal(DeviceActionResult.Timeout)
             }
@@ -351,6 +465,17 @@ class DefaultDeviceActionService(
         return if (url.port == defaultPort) url.host else "${url.host}:${url.port}"
     }
 
+    private fun String.isIpAddress(): Boolean {
+        if (contains(':')) {
+            return true
+        }
+        val parts = split('.')
+        return parts.size == 4 && parts.all { part ->
+            part.isNotEmpty() && part.length <= 3 &&
+                part.all(Char::isDigit) && part.toIntOrNull() in 0..255
+        }
+    }
+
     private fun Throwable.toNetworkFailureReason(): NetworkFailureReason {
         var current: Throwable? = this
         while (current != null) {
@@ -380,8 +505,10 @@ class DefaultDeviceActionService(
             is WifiConnectionResult.Success -> "Success"
             is WifiConnectionResult.SecurityTypesFailed -> "SecurityTypesFailed"
             WifiConnectionResult.Timeout -> "Timeout"
+            WifiConnectionResult.NetworkRequestTimeout -> "NetworkRequestTimeout"
             WifiConnectionResult.Unavailable -> "Unavailable"
             WifiConnectionResult.PermissionDenied -> "PermissionDenied"
+            WifiConnectionResult.WifiDisabled -> "WifiDisabled"
             WifiConnectionResult.UnsupportedAndroidVersion -> "UnsupportedAndroidVersion"
             is WifiConnectionResult.Error -> "Error(${cause.javaClass.simpleName})"
         }
@@ -389,14 +516,17 @@ class DefaultDeviceActionService(
 
     private fun WifiConnectionResult.allowsSecurityFallback(): Boolean {
         return when (this) {
-            WifiConnectionResult.Timeout,
             WifiConnectionResult.Unavailable -> true
+
+            WifiConnectionResult.Timeout,
+            WifiConnectionResult.NetworkRequestTimeout -> true
 
             is WifiConnectionResult.Error -> cause !is IllegalArgumentException
 
             is WifiConnectionResult.Success,
             is WifiConnectionResult.SecurityTypesFailed,
             WifiConnectionResult.PermissionDenied,
+            WifiConnectionResult.WifiDisabled,
             WifiConnectionResult.UnsupportedAndroidVersion -> false
         }
     }
@@ -432,6 +562,6 @@ class DefaultDeviceActionService(
     private companion object {
         const val LOG_TAG = "SwitchWerkNetwork"
         const val NANOS_PER_MILLISECOND = 1_000_000L
-        const val FIRST_SECURITY_ATTEMPT_TIMEOUT_MILLIS = 10_000L
+        const val FIRST_SECURITY_ATTEMPT_TIMEOUT_MILLIS = 15_000L
     }
 }

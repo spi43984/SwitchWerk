@@ -3,6 +3,8 @@ package de.piecha.switchwerk.data.network
 import android.net.Network
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
+import java.net.InetAddress
+import java.net.UnknownHostException
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
@@ -100,6 +102,29 @@ class OkHttpApiCallServiceTest {
         verify(connection).connectTimeout = 5_000
         verify(connection).readTimeout = 5_000
         verify(connection).disconnect()
+    }
+
+    @Test
+    fun dnsResolutionUsesRequestedAndroidNetwork() = runBlocking {
+        val network = mock(Network::class.java)
+        val address = InetAddress.getByAddress(byteArrayOf(192.toByte(), 168.toByte(), 1, 20))
+        `when`(network.getAllByName("device.local")).thenReturn(arrayOf(address))
+
+        val result = service.resolveHost("device.local", network)
+
+        assertEquals(DnsResolutionResult.Success, result)
+        verify(network).getAllByName("device.local")
+        Unit
+    }
+
+    @Test
+    fun dnsResolutionReturnsStructuredError() = runBlocking {
+        val network = mock(Network::class.java)
+        `when`(network.getAllByName("missing.local")).thenThrow(UnknownHostException())
+
+        val result = service.resolveHost("missing.local", network)
+
+        assertTrue(result is DnsResolutionResult.Error)
     }
 
     @Test

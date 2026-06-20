@@ -65,7 +65,9 @@ class MainViewModelTest {
             viewModel.uiState.value.diagnosticItems
                 .filterIsInstance<DiagnosticListItem.Message>()
                 .all {
-                    it.text.matches(Regex("\\d{2}:\\d{2}:\\d{2}\\.\\d{3} .+"))
+                    it.text.matches(
+                        Regex("\\d{2}:\\d{2}:\\d{2}\\.\\d{3} \\(\\+\\d+ ms\\) .+")
+                    )
                 }
         )
         assertTrue(

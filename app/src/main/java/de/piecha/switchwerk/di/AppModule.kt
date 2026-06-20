@@ -2,6 +2,7 @@ package de.piecha.switchwerk.di
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.action.DefaultDeviceActionService
 import de.piecha.switchwerk.data.action.DeviceActionService
@@ -39,6 +40,7 @@ val appModule = module {
             .addMigrations(AppDatabase.MIGRATION_1_2)
             .addMigrations(AppDatabase.MIGRATION_2_3)
             .addMigrations(AppDatabase.MIGRATION_3_4)
+            .addMigrations(AppDatabase.MIGRATION_4_5)
             .build()
     }
 
@@ -50,9 +52,14 @@ val appModule = module {
         androidContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
+    single {
+        androidContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
+    }
+
     single<WifiConnectionService> {
         AndroidWifiConnectionService(
-            connectivityManager = get()
+            connectivityManager = get(),
+            wifiManager = get()
         )
     }
 

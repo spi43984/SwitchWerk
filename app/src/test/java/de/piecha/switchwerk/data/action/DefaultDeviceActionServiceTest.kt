@@ -1,9 +1,11 @@
 package de.piecha.switchwerk.data.action
 
 import android.net.Network
+import de.piecha.switchwerk.data.network.DnsResolutionResult
 import de.piecha.switchwerk.data.network.HttpApiCallResult
 import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.HttpApiResponse
+import de.piecha.switchwerk.data.network.WifiConnectionProgress
 import de.piecha.switchwerk.data.network.WifiConnectionResult
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
@@ -75,8 +77,87 @@ class DefaultDeviceActionServiceTest {
             )
         )
         assertTrue(
-            diagnosticEvents.contains(DeviceActionDiagnosticEvent.HttpResponseReceived(200))
+            diagnosticEvents.contains(DeviceActionDiagnosticEvent.HttpRequestSucceeded(200))
         )
+    }
+
+    @Test
+    fun diagnosticsShowCompleteWifiDnsAndHttpSequence() = runBlocking {
+        val network = mock(Network::class.java)
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(network)))
+            ),
+            httpService = FakeHttpApiCallService(
+                results = ArrayDeque(listOf(successResult()))
+            )
+        )
+        val events = mutableListOf<DeviceActionDiagnosticEvent>()
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "device.local"))
+            ),
+            events::add
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals(
+            listOf(
+                DeviceActionDiagnosticEvent.ActionStarted,
+                DeviceActionDiagnosticEvent.WifiRequestStarted("Device WiFi"),
+                DeviceActionDiagnosticEvent.WifiFound,
+                DeviceActionDiagnosticEvent.WifiConnected,
+                DeviceActionDiagnosticEvent.IpAddressReceived,
+                DeviceActionDiagnosticEvent.DeviceAddress("device.local"),
+                DeviceActionDiagnosticEvent.DnsResolutionStarted("device.local"),
+                DeviceActionDiagnosticEvent.DnsResolutionSucceeded,
+                DeviceActionDiagnosticEvent.HttpRequestStarted(
+                    ApiMethod.GET,
+                    "device.local"
+                ),
+                DeviceActionDiagnosticEvent.HttpRequestSucceeded(200),
+                DeviceActionDiagnosticEvent.RequestSucceeded,
+                DeviceActionDiagnosticEvent.ActionCompleted
+            ),
+            events
+        )
+    }
+
+    @Test
+    fun dnsTimeoutIsClassifiedAndDoesNotStartHttpCall() = runBlocking {
+        val network = mock(Network::class.java)
+        val httpService = FakeHttpApiCallService(
+            results = ArrayDeque(),
+            dnsResults = ArrayDeque(listOf(DnsResolutionResult.Timeout))
+        )
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(network)))
+            ),
+            httpService = httpService
+        )
+        val events = mutableListOf<DeviceActionDiagnosticEvent>()
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "device.local"))
+            ),
+            events::add
+        )
+
+        assertEquals(
+            DeviceActionResult.NetworkError(NetworkFailureReason.DNS),
+            result
+        )
+        assertTrue(
+            events.contains(
+                DeviceActionDiagnosticEvent.Timeout(DiagnosticStage.DNS)
+            )
+        )
+        assertTrue(httpService.calls.isEmpty())
     }
 
     @Test
@@ -185,8 +266,8 @@ class DefaultDeviceActionServiceTest {
         assertEquals(listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3), wifiService.requestedSecurityTypes)
         assertEquals(WifiSecurityType.WPA3, wifiRepository.savedSecurityTypes["wifi-1"])
         assertEquals(2, wifiService.requestedTimeouts.size)
-        assertEquals(10_000L, wifiService.requestedTimeouts.first())
-        assertTrue(wifiService.requestedTimeouts.last() >= 9_000L)
+        assertEquals(15_000L, wifiService.requestedTimeouts.first())
+        assertTrue(wifiService.requestedTimeouts.last() >= 14_000L)
         assertTrue(wifiService.requestedTimeouts.last() <= WifiConnectionService.DEFAULT_TIMEOUT_MILLIS)
     }
 
@@ -205,7 +286,7 @@ class DefaultDeviceActionServiceTest {
         val wifiService = FakeWifiConnectionService(
             results = ArrayDeque(
                 listOf(
-                    WifiConnectionResult.Timeout,
+                    WifiConnectionResult.Unavailable,
                     WifiConnectionResult.Success(network)
                 )
             )
@@ -259,6 +340,134 @@ class DefaultDeviceActionServiceTest {
         assertEquals(DeviceActionResult.Success, result)
         assertEquals(listOf("First WiFi", "Second WiFi"), wifiService.requestedSsids)
         assertEquals(listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA2), wifiService.requestedSecurityTypes)
+    }
+
+    @Test
+    fun knownSecurityTypeFallsBackWithinSharedTimeoutAfterRequestTimeout() = runBlocking {
+        val network = mock(Network::class.java)
+        val wifiService = FakeWifiConnectionService(
+            results = ArrayDeque(
+                listOf(
+                    WifiConnectionResult.NetworkRequestTimeout,
+                    WifiConnectionResult.Success(network)
+                )
+            )
+        )
+        val service = createService(
+            profiles = listOf(
+                WifiProfile(
+                    id = "wifi-1",
+                    ssid = "Device WiFi",
+                    lastSuccessfulSecurityType = WifiSecurityType.WPA3
+                )
+            ),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+        )
+        val events = mutableListOf<DeviceActionDiagnosticEvent>()
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "192.168.33.1"))
+            ),
+            events::add
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals(
+            listOf(WifiSecurityType.WPA3, WifiSecurityType.WPA2),
+            wifiService.requestedSecurityTypes
+        )
+        assertEquals(15_000L, wifiService.requestedTimeouts.first())
+        assertTrue(
+            events.contains(
+                DeviceActionDiagnosticEvent.Timeout(DiagnosticStage.WIFI_REQUEST)
+            )
+        )
+    }
+
+    @Test
+    fun detectedWpa2IsTriedBeforeImportedWpa3Preference() = runBlocking {
+        val network = mock(Network::class.java)
+        val wifiService = FakeWifiConnectionService(
+            results = ArrayDeque(listOf(WifiConnectionResult.Success(network))),
+            detectedSecurityTypes = setOf(WifiSecurityType.WPA2)
+        )
+        val service = createService(
+            profiles = listOf(
+                WifiProfile(
+                    id = "wifi-1",
+                    ssid = "Device WiFi",
+                    lastSuccessfulSecurityType = WifiSecurityType.WPA3,
+                    isSecurityTypeVerifiedLocally = false
+                )
+            ),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+        )
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "192.168.33.1"))
+            )
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals(listOf(WifiSecurityType.WPA2), wifiService.requestedSecurityTypes)
+    }
+
+    @Test
+    fun unknownSecurityTypeStillFallsBackAfterRequestTimeout() = runBlocking {
+        val network = mock(Network::class.java)
+        val wifiService = FakeWifiConnectionService(
+            results = ArrayDeque(
+                listOf(
+                    WifiConnectionResult.NetworkRequestTimeout,
+                    WifiConnectionResult.Success(network)
+                )
+            )
+        )
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+        )
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "192.168.33.1"))
+            )
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals(
+            listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3),
+            wifiService.requestedSecurityTypes
+        )
+    }
+
+    @Test
+    fun disabledWifiIsReportedWithoutHttpCall() = runBlocking {
+        val httpService = FakeHttpApiCallService(ArrayDeque())
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.WifiDisabled))
+            ),
+            httpService = httpService
+        )
+        val events = mutableListOf<DeviceActionDiagnosticEvent>()
+
+        val result = service.execute(
+            device(
+                connections = listOf(DeviceConnection("wifi-1", "192.168.33.1"))
+            ),
+            events::add
+        )
+
+        assertEquals(DeviceActionResult.WifiDisabled, result)
+        assertTrue(events.contains(DeviceActionDiagnosticEvent.WifiDisabled))
+        assertTrue(httpService.calls.isEmpty())
     }
 
     @Test
@@ -559,23 +768,36 @@ class DefaultDeviceActionServiceTest {
     }
 
     private class FakeWifiConnectionService(
-        private val results: ArrayDeque<WifiConnectionResult> = ArrayDeque()
+        private val results: ArrayDeque<WifiConnectionResult> = ArrayDeque(),
+        private val detectedSecurityTypes: Set<WifiSecurityType>? = null
     ) : WifiConnectionService {
         val requestedSsids = mutableListOf<String>()
         val requestedSecurityTypes = mutableListOf<WifiSecurityType>()
         val requestedTimeouts = mutableListOf<Long>()
         var disconnectCount = 0
 
+        override suspend fun detectedSecurityTypes(ssid: String): Set<WifiSecurityType>? {
+            return detectedSecurityTypes
+        }
+
         override suspend fun connect(
             ssid: String,
             password: String?,
             securityType: WifiSecurityType,
-            timeoutMillis: Long
+            timeoutMillis: Long,
+            onProgress: (WifiConnectionProgress) -> Unit
         ): WifiConnectionResult {
             requestedSsids += ssid
             requestedSecurityTypes += securityType
             requestedTimeouts += timeoutMillis
-            return results.removeFirst()
+            onProgress(WifiConnectionProgress.RequestStarted)
+            val result = results.removeFirst()
+            if (result is WifiConnectionResult.Success) {
+                onProgress(WifiConnectionProgress.NetworkFound)
+                onProgress(WifiConnectionProgress.Connected)
+                onProgress(WifiConnectionProgress.IpAddressAvailable)
+            }
+            return result
         }
 
         override fun disconnect() {
@@ -584,9 +806,22 @@ class DefaultDeviceActionServiceTest {
     }
 
     private class FakeHttpApiCallService(
-        private val results: ArrayDeque<HttpApiCallResult>
+        private val results: ArrayDeque<HttpApiCallResult>,
+        private val dnsResults: ArrayDeque<DnsResolutionResult> = ArrayDeque()
     ) : HttpApiCallService {
         val calls = mutableListOf<ApiCallRecord>()
+
+        override suspend fun resolveHost(
+            host: String,
+            network: Network,
+            timeoutMillis: Long
+        ): DnsResolutionResult {
+            return if (dnsResults.isEmpty()) {
+                DnsResolutionResult.Success
+            } else {
+                dnsResults.removeFirst()
+            }
+        }
 
         override suspend fun get(
             url: String,
@@ -610,6 +845,12 @@ class DefaultDeviceActionServiceTest {
     }
 
     private class SuspendingHttpApiCallService : HttpApiCallService {
+        override suspend fun resolveHost(
+            host: String,
+            network: Network,
+            timeoutMillis: Long
+        ): DnsResolutionResult = DnsResolutionResult.Success
+
         override suspend fun get(
             url: String,
             network: Network?,
