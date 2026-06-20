@@ -124,6 +124,13 @@ Beispiele:
 - links: Ja, Löschen, Bestätigen
 - rechts: Nein, Abbrechen
 
+Die Hauptnavigation wird über das rechte Hamburger-Menü im Dashboard geöffnet.
+
+Die Einstellungen sind in die exklusiv sichtbaren Bereiche WLAN-Profile,
+Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und
+Hilfe-Komponenten liegen unter `ui/components/`. Hamburger-Menü und
+System-Einstellungen öffnen dieselbe Hilfeansicht.
+
 ---
 
 ## Zielgeräte

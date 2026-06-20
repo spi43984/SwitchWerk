@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-* Status: Offen
+* Status: abgeschlossen
 * Priorität: P0
 * Typ: GUI / Einstellungen
 
@@ -229,25 +229,25 @@ Die Hilfe soll als wiederverwendbare UI-Komponente umgesetzt werden und sowohl v
 
 ## Akzeptanzkriterien
 
-* [ ] Hamburger-Menü vorhanden
-* [ ] Einstellungen über Menü erreichbar
-* [ ] Hilfe über Menü erreichbar
-* [ ] Hilfe über System-Bereich erreichbar
-* [ ] Beide Wege zeigen dieselbe Hilfeansicht
-* [ ] Bereichsauswahl mit WLAN-Profile, Geräte, System und Backup vorhanden
-* [ ] Es wird immer nur der ausgewählte Bereich angezeigt
-* [ ] System-Bereich enthält Darstellungsoptionen
-* [ ] System-Bereich enthält Aktionsdetail-Einstellungen
-* [ ] Backup-Bereich enthält Import und Export
-* [ ] WLAN-Dialoge verwenden ein einheitliches Layout
-* [ ] Geräte-Dialoge verwenden ein einheitliches Layout
-* [ ] Buttons haben einheitliche Darstellung
-* [ ] Import und Export sind optisch getrennt
-* [ ] Wiederverwendbare Dialogkomponenten vorhanden
-* [ ] Wiederverwendbare Bereichsauswahl vorhanden
-* [ ] Wiederverwendbare Hilfe-Komponente vorhanden
-* [ ] Alle Dialoge bleiben auf kleinen Displays nutzbar
-* [ ] Dark Mode funktioniert weiterhin
+* [x] Hamburger-Menü vorhanden
+* [x] Einstellungen über Menü erreichbar
+* [x] Hilfe über Menü erreichbar
+* [x] Hilfe über System-Bereich erreichbar
+* [x] Beide Wege zeigen dieselbe Hilfeansicht
+* [x] Bereichsauswahl mit WLAN-Profile, Geräte, System und Backup vorhanden
+* [x] Es wird immer nur der ausgewählte Bereich angezeigt
+* [x] System-Bereich enthält Darstellungsoptionen
+* [x] System-Bereich enthält Aktionsdetail-Einstellungen
+* [x] Backup-Bereich enthält Import und Export
+* [x] WLAN-Dialoge verwenden ein einheitliches Layout
+* [x] Geräte-Dialoge verwenden ein einheitliches Layout
+* [x] Buttons haben einheitliche Darstellung
+* [x] Import und Export sind optisch getrennt
+* [x] Wiederverwendbare Dialogkomponenten vorhanden
+* [x] Wiederverwendbare Bereichsauswahl vorhanden
+* [x] Wiederverwendbare Hilfe-Komponente vorhanden
+* [x] Alle Dialoge bleiben auf kleinen Displays nutzbar
+* [x] Dark Mode funktioniert weiterhin
 
 ## Testhinweise
 
@@ -266,4 +266,3 @@ Die Hilfe soll als wiederverwendbare UI-Komponente umgesetzt werden und sowohl v
 * Darstellung auf kleinem Display prüfen
 * Darstellung im Dark Mode prüfen
 * Darstellung im Light Mode prüfen
-

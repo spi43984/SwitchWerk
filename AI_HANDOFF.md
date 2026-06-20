@@ -4,42 +4,38 @@ Stand: 20. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue #59 / lokales Issue 026 "Settings UI Rework" ist auf dem Feature-Branch
-`settings-ui-rework` lokal implementiert und noch nicht veröffentlicht.
-
-- Dashboard-Navigation über Hamburger-Menü mit Einstellungen und Hilfe
-- Settings-Bereiche WLAN-Profile, Geräte, System und Backup als Tabs
-- wiederverwendbare Hilfeansicht mit Version und GitHub-Link
-- gemeinsame Compose-Komponenten für Dialoge, Dialogbuttons und Aktionen
-- WLAN-, Geräte- und Import-/Export-Dialoge auf das gemeinsame Layout umgestellt
-- Import und Export im Backup-Bereich optisch getrennt
-- Hamburger-Menü als schmales, bildschirmhohes Panel innerhalb des Dashboards
-  am rechten Rand, mit rechtsbündigen Einträgen
-- Menüfläche folgt den Dashboard-Innenkanten und Card-Rundungen; das X ersetzt
-  das Hamburger-Icon positionsgleich; nur die Menüfläche reicht rechts bündig
-  bis an den Bildschirmrand
-- Settings-Listen und Settings-Gruppen ohne umschließende Card-Rahmen
-- System optisch in Darstellung, Aktionsdetails und Hilfe getrennt
-- Sortierung der Aktionsdetails wird zusammen mit den Aktionsdetails deaktiviert
-- aktiver Settings-Tab bleibt beim Wechsel zur Hilfe erhalten
-- appweiter Theme-Hintergrund deckt auch den äußeren Screenbereich ab
-- erster Settings-Tab ohne zusätzlichen linken Standardabstand
-- keine Änderung an ViewModels, Repositories oder fachlicher Geräte-/WLAN-/Backup-Logik
-
-Im Container erfolgreich geprüft:
-
-```text
-git diff --check
-./gradlew testDebugUnitTest
-```
-
-Host-Build, Installation und manuelle UI-Prüfungen stehen noch aus. Die
-Änderungen sind nicht committet oder gepusht.
+Keine aktive Implementierung.
 
 Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
 in `docs/issues/overview.txt`.
 
+Nächstes offenes Issue: 020 "Device Assigned WiFi Order".
+
 ## Zuletzt abgeschlossene Arbeit
+
+Issue 026 "Settings UI Rework" ist implementiert, geprüft, veröffentlicht und
+nach `main` gemergt.
+
+- GitHub-Issue: #59
+- Pull Request: #62
+- Merge-Commit: `bf29768`
+- Hamburger-Menü mit Einstellungen und Hilfe
+- Settings-Tabs für WLAN-Profile, Geräte, System und Backup
+- wiederverwendbare Hilfe-, Dialog-, Button- und Tab-Komponenten
+- vereinheitlichte WLAN-, Geräte- und Import-/Export-Dialoge
+- Dark-Mode-Hintergrund und rahmenlose Settings-Bereiche
+- keine Änderung an fachlicher WLAN-, Geräteaktions-, Import-/Export- oder Passwortlogik
+
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+```
+
+## Zuvor abgeschlossene Arbeit
 
 Issue 027 "WiFi Timeout Analysis And Stabilization" ist implementiert,
 geprüft, veröffentlicht und nach `main` gemergt.
