@@ -36,11 +36,11 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 020 | P1 | offen | Device Assigned WiFi Order |
 | 021 | P2 | offen | HTTP/HTTPS Device Actions |
 | 022 | P2 | offen | Request Body And Content-Type Support |
-| 023 | -- | abgeschlossen | Settings Display And Action Details |
+| 023 | P0 | abgeschlossen | Settings Display And Action Details |
 | 024 | P4 | Backlog | Authenticated Import Sources Backlog |
 | 025 | P1 | offen | Dashboard Widget Layout |
 | 026 | P0 | offen | Settings UI Rework |
-| 027 | P0 | offen | WiFi Timeout Analysis And Stabilization |
+| 027 | P0 | abgeschlossen | WiFi Timeout Analysis And Stabilization |
 | 028 | P1 | offen | Theme Mode Setting |
 | 029 | P1 | offen | Language Setting |
 | 030 | P1 | offen | WiFi Profile Deletion Safety |
