@@ -146,6 +146,7 @@ Kurzfassung:
 - 033 Android-managed WiFi networks
 - 034 Collapsible Action Details Panel
 - 035 App Identity, Help And Release Packaging
+- 036 Device WiFi Proximity Indicator
 
 ### Zurückgestellt / Backlog
 
