@@ -80,6 +80,7 @@ fun SettingsScreen(
     var showUrlImportDialog by remember { mutableStateOf(false) }
     var showPasswordExportWarning by remember { mutableStateOf(false) }
     var openSwipeItemId by remember { mutableStateOf<String?>(null) }
+    var pendingImportConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     val exportWithoutPasswordsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -122,6 +123,29 @@ fun SettingsScreen(
         } else {
             viewModel.reportQrCameraPermissionDenied()
         }
+    }
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {
+        pendingImportConfirmation?.invoke()
+        pendingImportConfirmation = null
+    }
+    fun confirmImportWithOptionalScanPermission(
+        importsWifiProfiles: Boolean,
+        confirmImport: () -> Unit
+    ) {
+        if (
+            !importsWifiProfiles ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            confirmImport()
+            return
+        }
+        pendingImportConfirmation = confirmImport
+        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
     fun runAfterClosingSwipe(action: () -> Unit) {
         if (openSwipeItemId != null) {
@@ -355,7 +379,13 @@ fun SettingsScreen(
         ImportSummaryDialog(
             summary = summary,
             mode = uiState.importMode ?: ConfigurationImportMode.MERGE,
-            onImport = viewModel::confirmImportSummary,
+            onImport = {
+                confirmImportWithOptionalScanPermission(
+                    importsWifiProfiles =
+                        summary.wifiProfilesNew + summary.wifiProfilesOverwritten > 0,
+                    confirmImport = viewModel::confirmImportSummary
+                )
+            },
             onCancel = viewModel::cancelPendingImport
         )
     }

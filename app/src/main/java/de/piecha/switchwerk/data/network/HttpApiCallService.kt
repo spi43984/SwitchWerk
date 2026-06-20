@@ -3,6 +3,12 @@ package de.piecha.switchwerk.data.network
 import android.net.Network
 
 interface HttpApiCallService {
+    suspend fun resolveHost(
+        host: String,
+        network: Network,
+        timeoutMillis: Long = DEFAULT_DNS_TIMEOUT_MILLIS
+    ): DnsResolutionResult
+
     suspend fun get(
         url: String,
         network: Network? = null,
@@ -19,6 +25,7 @@ interface HttpApiCallService {
 
     companion object {
         const val DEFAULT_TIMEOUT_MILLIS = 10_000L
+        const val DEFAULT_DNS_TIMEOUT_MILLIS = 5_000L
         const val DEFAULT_CONTENT_TYPE = "application/json; charset=utf-8"
     }
 }

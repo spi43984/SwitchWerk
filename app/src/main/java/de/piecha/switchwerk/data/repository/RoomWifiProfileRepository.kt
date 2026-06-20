@@ -43,8 +43,14 @@ class RoomWifiProfileRepository(
             "Profilname ist bereits vergeben"
         }
 
-        val existingSecurityType = wifiProfileDao.getById(profile.id)?.securityType
-        wifiProfileDao.upsert(profile.toEntity(existingSecurityType))
+        val existingProfile = wifiProfileDao.getById(profile.id)
+        wifiProfileDao.upsert(
+            profile.toEntity(
+                existingSecurityType = existingProfile?.securityType,
+                existingSecurityTypeVerifiedLocally =
+                    existingProfile?.securityTypeVerifiedLocally ?: true
+            )
+        )
 
         if (shouldUpdatePassword) {
             if (password == null) {
@@ -72,7 +78,10 @@ class RoomWifiProfileRepository(
     ) {
         val entity = wifiProfileDao.getById(id) ?: return
         wifiProfileDao.upsert(
-            entity.copy(securityType = securityType.storageValue)
+            entity.copy(
+                securityType = securityType.storageValue,
+                securityTypeVerifiedLocally = true
+            )
         )
     }
 
@@ -90,16 +99,25 @@ class RoomWifiProfileRepository(
             id = id,
             ssid = ssid,
             name = name,
-            lastSuccessfulSecurityType = WifiSecurityType.fromStorageValue(securityType)
+            lastSuccessfulSecurityType = WifiSecurityType.fromStorageValue(securityType),
+            isSecurityTypeVerifiedLocally = securityTypeVerifiedLocally
         )
     }
 
-    private fun WifiProfile.toEntity(existingSecurityType: String?): WifiProfileEntity {
+    private fun WifiProfile.toEntity(
+        existingSecurityType: String?,
+        existingSecurityTypeVerifiedLocally: Boolean
+    ): WifiProfileEntity {
         return WifiProfileEntity(
             id = id,
             name = name,
             ssid = ssid,
-            securityType = lastSuccessfulSecurityType?.storageValue ?: existingSecurityType
+            securityType = lastSuccessfulSecurityType?.storageValue ?: existingSecurityType,
+            securityTypeVerifiedLocally = if (lastSuccessfulSecurityType != null) {
+                isSecurityTypeVerifiedLocally
+            } else {
+                existingSecurityTypeVerifiedLocally
+            }
         )
     }
 }

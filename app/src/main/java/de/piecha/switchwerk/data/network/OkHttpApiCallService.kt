@@ -15,7 +15,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -27,6 +29,31 @@ import okhttp3.Response
 class OkHttpApiCallService(
     private val baseClient: OkHttpClient
 ) : HttpApiCallService {
+
+    override suspend fun resolveHost(
+        host: String,
+        network: Network,
+        timeoutMillis: Long
+    ): DnsResolutionResult {
+        if (host.isBlank() || timeoutMillis <= 0) {
+            return DnsResolutionResult.Error(
+                IllegalArgumentException("Host and timeout must be valid")
+            )
+        }
+
+        return try {
+            withTimeoutOrNull(timeoutMillis) {
+                runInterruptible(Dispatchers.IO) {
+                    network.getAllByName(host)
+                }
+                DnsResolutionResult.Success
+            } ?: DnsResolutionResult.Timeout
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            DnsResolutionResult.Error(exception)
+        }
+    }
 
     override suspend fun get(
         url: String,

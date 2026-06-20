@@ -12,9 +12,13 @@ sealed interface WifiConnectionResult {
 
     data object Timeout : WifiConnectionResult
 
+    data object NetworkRequestTimeout : WifiConnectionResult
+
     data object Unavailable : WifiConnectionResult
 
     data object PermissionDenied : WifiConnectionResult
+
+    data object WifiDisabled : WifiConnectionResult
 
     data object UnsupportedAndroidVersion : WifiConnectionResult
 

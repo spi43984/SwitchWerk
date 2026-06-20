@@ -9,6 +9,8 @@ sealed interface DeviceActionResult {
 
     data object WifiPermissionDenied : DeviceActionResult
 
+    data object WifiDisabled : DeviceActionResult
+
     data object UnsupportedAndroidVersion : DeviceActionResult
 
     data class HttpError(val statusCode: Int) : DeviceActionResult

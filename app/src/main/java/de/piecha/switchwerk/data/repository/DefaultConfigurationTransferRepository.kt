@@ -280,7 +280,8 @@ class DefaultConfigurationTransferRepository(
             id = id,
             name = name,
             ssid = ssid,
-            securityType = securityType
+            securityType = securityType,
+            securityTypeVerifiedLocally = false
         )
     }
 
