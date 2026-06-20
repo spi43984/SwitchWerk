@@ -77,7 +77,7 @@ Für die allgemeine GitHub-Nutzung und manuelle Repository-Arbeit:
 - Tests ausführen
 - erst dann nach `main` mergen
 
-Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`, `ai-context.md` und `AI_SESSION_PROMPT.md`: PRs und Merge nur nach ausdrücklicher Freigabe.
+Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`, `ai-context.md` und `AI_SESSION_PROMPT.md`: PRs und Merge nur nach ausdrücklicher Freigabe. Status, Priorisierung und Reihenfolge der Issues stehen ausschließlich in `docs/issues/overview.txt`.
 
 ## Vollständiger Issue-Workflow
 
@@ -102,11 +102,8 @@ Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`,
 15. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
 16. Lokale Issue-Datei unter `docs/issues` abhaken.
 17. `docs/issues/overview.txt` aktualisieren.
-18. `ai-context.md` aktualisieren:
-    - abgeschlossenes Issue in `Abgeschlossen` verschieben
-    - abgeschlossenes Issue aus `Offen` entfernen
-    - `Nächstes Issue` auf das nächste offene Issue setzen
-19. Prüfen, dass `docs/issues/overview.txt`, die lokale Issue-Datei und `ai-context.md` denselben Status zeigen.
+18. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
+19. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext oder geänderten Projektentscheidungen aktualisieren.
 20. Dokumentationsänderungen committen und pushen.
 21. Zugehöriges GitHub-Issue erst danach schließen.
 22. Branch lokal und remote löschen.
@@ -117,10 +114,10 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 
 * [ ] `docs/issues/<issue>.md` aktualisiert
 * [ ] `docs/issues/overview.txt` aktualisiert
-* [ ] `ai-context.md` aktualisiert
+* [ ] `ai-context.md` bei geändertem dauerhaftem Projektkontext aktualisiert
 * [ ] `AI_HANDOFF.md` aktualisiert
-* [ ] nächstes offenes Issue festgelegt
-* [ ] Status der Dokumentationsdateien ist konsistent
+* [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt
+* [ ] Status von Issue-Datei und `docs/issues/overview.txt` ist konsistent
 * [ ] GitHub-Issue geschlossen
 * [ ] Feature-Branch lokal gelöscht
 * [ ] Feature-Branch remote gelöscht

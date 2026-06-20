@@ -1,5 +1,8 @@
 # Issue-Übersicht
 
+Diese Datei ist die einzige Quelle für die Liste, den Status, die Priorisierung
+und die Reihenfolge der Issues.
+
 ## Priorisierung
 
 Die nächste Umsetzung wird nach folgender Reihenfolge bestimmt:
@@ -50,6 +53,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 034 | P1 | offen | Collapsible Action Details Panel |
 | 035 | P2 | offen | App Identity, Help And Release Packaging |
 | 036 | P2 | offen | Device WiFi Proximity Indicator |
+| 037 | P2 | offen | GitHub Release Update Support |
 
 ## Empfohlene Umsetzungsreihenfolge
 
@@ -67,4 +71,5 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 12. 032 Room Schema And Migration Test Coverage
 13. 035 App Identity, Help And Release Packaging
 14. 036 Device WiFi Proximity Indicator
-15. 024 Authenticated Import Sources Backlog
+15. 037 GitHub Release Update Support
+16. 024 Authenticated Import Sources Backlog
