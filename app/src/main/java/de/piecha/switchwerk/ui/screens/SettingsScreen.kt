@@ -80,6 +80,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
+    val scanQrCodeText = stringResource(R.string.scan_qr_code)
     val uiState by viewModel.uiState.collectAsState()
     var pendingFileImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     var pendingQrImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
@@ -118,7 +119,7 @@ fun SettingsScreen(
     fun launchQrScanner() {
         val options = ScanOptions()
             .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-            .setPrompt(context.getString(R.string.scan_qr_code))
+            .setPrompt(scanQrCodeText)
             .setBeepEnabled(false)
             .setOrientationLocked(false)
         qrScanLauncher.launch(options)

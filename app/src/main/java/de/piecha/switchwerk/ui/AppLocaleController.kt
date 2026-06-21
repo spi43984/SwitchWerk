@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import android.os.LocaleList
+import androidx.annotation.RequiresApi
 import de.piecha.switchwerk.domain.model.AppLanguage
 
 object AppLocaleController {
@@ -16,6 +17,7 @@ object AppLocaleController {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun applyPlatformLocales(context: Context, language: AppLanguage): Boolean {
         val localeManager = context.getSystemService(LocaleManager::class.java)
         val requestedLocales = language.languageTag
