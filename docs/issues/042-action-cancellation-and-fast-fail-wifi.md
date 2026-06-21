@@ -1,12 +1,11 @@
-# 042 Action Cancellation And Fast-Fail WiFi
+# Issue #42: Action Cancellation And Fast-Fail WiFi
 
-## Status
+## Metadaten
 
-offen
-
-## Priorität
-
-P1
+- Status: Offen
+- Priorität: P1
+- Typ: WLAN / UX / Geräteaktion
+- Bereich: Dashboard / WLAN-Verbindung / HTTP-RPC-Aufruf
 
 ## Ziel
 
@@ -16,21 +15,21 @@ Zusätzlich sollen offensichtlich nicht erreichbare WLAN-Profile schneller behan
 
 Die bestehende fachliche Schaltlogik bleibt unverändert:
 
-- WLAN-Reihenfolge bleibt verbindlich
-- alle zugeordneten WLANs bleiben grundsätzlich Kandidaten
-- geschaltet wird weiterhin über das erste erfolgreich erreichbare WLAN
+- WLAN-Reihenfolge bleibt verbindlich.
+- Alle zugeordneten WLANs bleiben grundsätzlich Kandidaten.
+- Geschaltet wird weiterhin über das erste erfolgreich erreichbare WLAN.
 
-## Problem
+## Hintergrund
 
 Ein Schaltvorgang kann lange dauern, wenn einem Gerät mehrere WLAN-Profile zugeordnet sind und keines erreichbar ist.
 
 Beispiele:
 
-- Gerät ist ausgeschaltet
-- Geräte-AP ist außer Reichweite
-- WLAN existiert nicht mehr
-- Passwort wurde geändert
-- Android wartet auf einen Verbindungs-Timeout
+- Gerät ist ausgeschaltet.
+- Geräte-AP ist außer Reichweite.
+- WLAN existiert nicht mehr.
+- Passwort wurde geändert.
+- Android wartet auf einen Verbindungs-Timeout.
 
 Währenddessen kann der Benutzer die laufende Aktion nicht aktiv abbrechen.
 
@@ -38,18 +37,18 @@ Dadurch entsteht der Eindruck, dass die App hängt.
 
 ## Scope
 
-### 1. Manuelles Abbrechen laufender Aktionen
+### Manuelles Abbrechen laufender Aktionen
 
 Während eine Geräteaktion läuft:
 
-- Dashboard-Button zeigt Ladezustand
-- Spinner wird angezeigt
-- sichtbare Abbrechen-Aktion wird eingeblendet
-- bevorzugt als klar erkennbares X oder Material-3-Icon-Button
+- Dashboard-Button zeigt Ladezustand.
+- Spinner oder gleichwertiger Ladeindikator wird angezeigt.
+- Sichtbare Abbrechen-Aktion wird eingeblendet.
+- Bevorzugt als klar erkennbares X oder Material-3-Icon-Button.
 
 Der Benutzer kann die laufende Aktion jederzeit abbrechen.
 
-### 2. Saubere Cancellation
+### Saubere Cancellation
 
 Beim Abbruch:
 
@@ -59,9 +58,11 @@ Beim Abbruch:
 - laufende HTTP/RPC-Aufrufe abbrechen
 - UI-Zustand zurücksetzen
 
-Statusmeldung: Aktion abgebrochen
+Statusmeldung:
 
-### 3. Fast-Fail für offensichtlich nicht erreichbare WLANs
+Aktion abgebrochen
+
+### Fast-Fail für offensichtlich nicht erreichbare WLANs
 
 Die bestehende WLAN-Reihenfolge bleibt erhalten.
 
@@ -71,26 +72,31 @@ Ziel ist ausschließlich eine schnellere Fehlererkennung.
 
 Mögliche Fast-Fail-Situationen:
 
-- WLAN ist deaktiviert
-- Authentifizierungsfehler wurde erkannt
-- Android meldet Netzwerk nicht verfügbar
-- aktueller Scan zeigt WLAN eindeutig nicht sichtbar
-
-Wichtig:
+- WLAN ist deaktiviert.
+- Authentifizierungsfehler wurde erkannt.
+- Android meldet Netzwerk nicht verfügbar.
+- Aktueller Scan zeigt WLAN eindeutig nicht sichtbar.
 
 Eine nicht sichtbare SSID darf nicht pauschal als endgültiger Fehler gewertet werden, wenn der Scan unsicher, veraltet oder nicht verfügbar ist.
 
 In unsicheren Fällen soll das WLAN weiterhin versucht werden, aber mit kürzerem Fast-Fail-Verhalten statt langem Blockieren.
 
-### 4. Keine globale harte Aktionszeitbegrenzung
+## Nicht im Scope
 
-Nicht Bestandteil dieses Issues ist ein fixes globales Aktionszeitbudget.
+- Fixes globales Aktionszeitbudget.
+- Automatische Prioritätsänderungen.
+- Automatische WLAN-Umsortierung.
+- Entfernen von WLAN-Profilen.
+- Änderung der bestehenden WLAN-Reihenfolge.
+- Änderung der fachlichen Geräteaktionslogik.
 
-Grund:
+## Architekturhinweise
 
-Bei vielen bewusst zugeordneten WLAN-Profilen, z. B. 5 WLANs, könnte ein starres globales Limit verhindern, dass spätere WLANs überhaupt versucht werden.
-
-Die Optimierung soll daher pro WLAN-Profil erfolgen und nicht die gesamte Geräteaktion hart begrenzen.
+- Cancellation muss durch ViewModel, Repository, WLAN-Service und HTTP/RPC-Aufruf sauber weitergereicht werden.
+- NetworkCallbacks müssen auch bei Abbruch zuverlässig abgemeldet werden.
+- HTTP/RPC-Aufrufe dürfen nach Abbruch nicht weiterlaufen.
+- Fast-Fail darf die bestehende WLAN-Fallback-Reihenfolge nicht verändern.
+- Keine neuen Frameworks oder Cloud-Abhängigkeiten einführen.
 
 ## UI
 
@@ -126,16 +132,28 @@ Aktion durch Benutzer abgebrochen
 
 ## Akzeptanzkriterien
 
-- Benutzer kann laufende Geräteaktionen abbrechen
-- Dashboard zeigt während laufender Aktion Spinner oder gleichwertigen Ladezustand
-- Dashboard zeigt während laufender Aktion eine klare Abbrechen-Aktion
-- Abbruch beendet nur den aktuellen Schaltvorgang
-- Abbruch ändert keine WLAN-Reihenfolge
-- Abbruch löscht keine Konfiguration
-- keine hängenden NetworkCallbacks nach Abbruch
-- keine hängenden HTTP/RPC-Aufrufe nach Abbruch
-- WLAN-Reihenfolge bleibt unverändert
-- alle zugeordneten WLANs bleiben grundsätzlich nutzbar
-- Fast-Fail reduziert unnötige Wartezeiten
-- nicht sichtbare SSIDs werden nur vorsichtig behandelt und nicht dauerhaft ausgeschlossen
-- bestehende fachliche Schaltlogik bleibt unverändert
+- [ ] Benutzer kann laufende Geräteaktionen abbrechen.
+- [ ] Dashboard zeigt während laufender Aktion Spinner oder gleichwertigen Ladezustand.
+- [ ] Dashboard zeigt während laufender Aktion eine klare Abbrechen-Aktion.
+- [ ] Abbruch beendet nur den aktuellen Schaltvorgang.
+- [ ] Abbruch ändert keine WLAN-Reihenfolge.
+- [ ] Abbruch löscht keine Konfiguration.
+- [ ] Nach Abbruch bleiben keine hängenden NetworkCallbacks zurück.
+- [ ] Nach Abbruch bleiben keine hängenden HTTP/RPC-Aufrufe zurück.
+- [ ] WLAN-Reihenfolge bleibt unverändert.
+- [ ] Alle zugeordneten WLANs bleiben grundsätzlich nutzbar.
+- [ ] Fast-Fail reduziert unnötige Wartezeiten.
+- [ ] Nicht sichtbare SSIDs werden nur vorsichtig behandelt und nicht dauerhaft ausgeschlossen.
+- [ ] Bestehende fachliche Schaltlogik bleibt unverändert.
+- [ ] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+
+## Testhinweise
+
+- Geräteaktion starten und während WLAN-Verbindungsversuch abbrechen.
+- Geräteaktion starten und während HTTP/RPC-Aufruf abbrechen.
+- Mehrere zugeordnete WLANs testen, von denen keines erreichbar ist.
+- Nicht sichtbare SSID testen.
+- Falsch konfiguriertes Passwort testen.
+- Erfolgreiche Aktion nach vorherigem Abbruch erneut starten.
+- Dashboard-Zustand nach Abbruch prüfen.
+- Detailanzeige nach Abbruch und Fast-Fail prüfen.
