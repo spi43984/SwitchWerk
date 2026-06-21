@@ -141,6 +141,11 @@ Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und
 Hilfe-Komponenten liegen unter `ui/components/`. Hamburger-Menü und
 System-Einstellungen öffnen dieselbe Hilfeansicht.
 
+Die App unterstützt eine persistierte Sprachauswahl für System, Deutsch und
+Englisch über dieselbe `AppSettings`-Infrastruktur wie den Theme-Modus. Sichtbare
+App-Texte liegen in Android-String-Ressourcen; Gerätenamen, WLAN-Namen, Hosts,
+URLs, HTTP/RPC-Befehle und sonstige Benutzereingaben werden nicht übersetzt.
+
 Die einem Gerät zugeordneten WLAN-Profile werden über Hoch/Runter-Pfeile in die
 verbindliche Verbindungsreihenfolge gebracht. Diese robuste Bedienung wurde nach
 Gerätetests bewusst gegenüber Drag-and-Drop gewählt.

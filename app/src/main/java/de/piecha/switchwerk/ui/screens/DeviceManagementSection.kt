@@ -38,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import de.piecha.switchwerk.R
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
@@ -102,7 +104,7 @@ fun DeviceManagementSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Name",
+                text = stringResource(R.string.name),
                 style = MaterialTheme.typography.titleSmall
             )
 
@@ -112,7 +114,7 @@ fun DeviceManagementSection(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Gerät hinzufügen"
+                    contentDescription = stringResource(R.string.add_device)
                 )
             }
         }
@@ -148,12 +150,12 @@ private fun DeviceEditDialog(
     onCancelClick: () -> Unit
 ) {
     StandardConfigurationDialog(
-        title = if (form.id == null) "Gerät hinzufügen" else "Gerät bearbeiten",
+        title = stringResource(if (form.id == null) R.string.add_device else R.string.edit_device),
         onDismissRequest = {
             onCloseSwipeItem()
             onCancelClick()
         },
-        actionText = "Speichern",
+        actionText = stringResource(R.string.save),
         onAction = {
             onCloseSwipeItem()
             onSaveClick()
@@ -188,7 +190,7 @@ private fun DeviceList(
     modifier: Modifier = Modifier
 ) {
     if (devices.isEmpty()) {
-        EmptyListArea(text = "Keine Geräte konfiguriert.", modifier = modifier)
+        EmptyListArea(text = stringResource(R.string.no_devices_configured_period), modifier = modifier)
         return
     }
 
@@ -206,7 +208,7 @@ private fun DeviceList(
             if (listState.canScrollBackward) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "Weitere Geräte oberhalb",
+                    contentDescription = stringResource(R.string.more_devices_above),
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -256,7 +258,7 @@ private fun DeviceList(
             if (listState.canScrollForward) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Weitere Geräte unterhalb",
+                    contentDescription = stringResource(R.string.more_devices_below),
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -340,13 +342,13 @@ private fun ConfirmDeviceDeleteDialog(
     onDismiss: () -> Unit
 ) {
     StandardConfigurationDialog(
-        title = "Gerät löschen",
+        title = stringResource(R.string.delete_device),
         onDismissRequest = onDismiss,
-        actionText = "Ja",
+        actionText = stringResource(R.string.yes),
         onAction = onConfirm,
-        cancelText = "Nein"
+        cancelText = stringResource(R.string.no)
     ) {
-        Text("Gerät ${device.name} wirklich löschen?")
+        Text(stringResource(R.string.delete_device_confirmation, device.name))
     }
 }
 
@@ -375,7 +377,7 @@ private fun DeviceForm(
         OutlinedTextField(
             value = form.name,
             onValueChange = onNameChange,
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -383,7 +385,7 @@ private fun DeviceForm(
         OutlinedTextField(
             value = form.actionLabel,
             onValueChange = onActionLabelChange,
-            label = { Text("Button-Beschriftung") },
+            label = { Text(stringResource(R.string.button_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -398,7 +400,11 @@ private fun DeviceForm(
                     }
                 ) {
                     Text(
-                        text = if (form.apiMethod == method.name) "✓ ${method.name}" else method.name
+                        text = if (form.apiMethod == method.name) {
+                            stringResource(R.string.selected_api_method, method.name)
+                        } else {
+                            method.name
+                        }
                     )
                 }
             }
@@ -407,7 +413,7 @@ private fun DeviceForm(
         OutlinedTextField(
             value = form.apiPath,
             onValueChange = onApiPathChange,
-            label = { Text("API-Aufruf") },
+            label = { Text(stringResource(R.string.api_call)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -444,7 +450,7 @@ private fun DeviceConnectionList(
 
     if (isAddingConnection) {
         ConnectionEditDialog(
-            title = "WLAN-Zuordnung hinzufügen",
+            title = stringResource(R.string.add_wifi_assignment),
             wifiProfiles = wifiProfiles,
             usedWifiProfileIds = connections.map { it.wifiProfileId },
             initialConnection = null,
@@ -460,7 +466,7 @@ private fun DeviceConnectionList(
 
     editingConnection?.let { connection ->
         ConnectionEditDialog(
-            title = "WLAN-Zuordnung bearbeiten",
+            title = stringResource(R.string.edit_wifi_assignment),
             wifiProfiles = wifiProfiles,
             usedWifiProfileIds = connections
                 .filterNot { it.wifiProfileId == connection.wifiProfileId }
@@ -478,16 +484,21 @@ private fun DeviceConnectionList(
 
     pendingDeleteConnection?.let { connection ->
         StandardConfigurationDialog(
-            title = "WLAN-Zuordnung löschen",
+            title = stringResource(R.string.delete_wifi_assignment),
             onDismissRequest = { pendingDeleteConnection = null },
-            actionText = "Ja",
+            actionText = stringResource(R.string.yes),
             onAction = {
                 pendingDeleteConnection = null
                 onDeleteConnection(connection.wifiProfileId)
             },
-            cancelText = "Nein"
+            cancelText = stringResource(R.string.no)
         ) {
-            Text("WLAN-Zuordnung ${connection.wifiProfileName} wirklich löschen?")
+            Text(
+                stringResource(
+                    R.string.delete_wifi_assignment_confirmation,
+                    connection.wifiProfileName
+                )
+            )
         }
     }
 
@@ -497,7 +508,7 @@ private fun DeviceConnectionList(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "WLAN-Verbindungsreihenfolge",
+            text = stringResource(R.string.wifi_connection_order),
             style = MaterialTheme.typography.titleSmall
         )
 
@@ -512,21 +523,21 @@ private fun DeviceConnectionList(
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
-                contentDescription = "WLAN-Zuordnung hinzufügen"
+                contentDescription = stringResource(R.string.add_wifi_assignment)
             )
         }
     }
 
     if (connections.isEmpty()) {
         Text(
-            text = "Noch keine WLAN-Zuordnung. Über + kannst du ein WLAN und Hostname/IP hinzufügen.",
+            text = stringResource(R.string.no_wifi_assignment),
             style = MaterialTheme.typography.bodySmall
         )
         return
     }
 
     Text(
-        text = "Mit den Pfeilen sortieren. Beim Schalten gilt die Reihenfolge von oben nach unten.",
+        text = stringResource(R.string.wifi_order_hint),
         style = MaterialTheme.typography.bodySmall
     )
 
@@ -582,7 +593,7 @@ private fun DeviceConnectionList(
         if (listState.canScrollBackward) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowUp,
-                contentDescription = "Weitere WLAN-Zuordnungen oberhalb",
+                contentDescription = stringResource(R.string.more_wifi_assignments_above),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -593,7 +604,7 @@ private fun DeviceConnectionList(
         if (listState.canScrollForward) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Weitere WLAN-Zuordnungen unterhalb",
+                contentDescription = stringResource(R.string.more_wifi_assignments_below),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -672,7 +683,7 @@ private fun DeviceConnectionRow(
                 )
 
                 Text(
-                    text = "SSID: ${connection.ssid} | ${connection.host}",
+                    text = stringResource(R.string.ssid_host_value, connection.ssid, connection.host),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -688,7 +699,7 @@ private fun DeviceConnectionRow(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
-                        contentDescription = "WLAN-Zuordnung nach oben verschieben"
+                        contentDescription = stringResource(R.string.move_wifi_assignment_up)
                     )
                 }
 
@@ -699,7 +710,7 @@ private fun DeviceConnectionRow(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "WLAN-Zuordnung nach unten verschieben"
+                        contentDescription = stringResource(R.string.move_wifi_assignment_down)
                     )
                 }
             }
@@ -733,12 +744,12 @@ private fun ConnectionEditDialog(
     StandardConfigurationDialog(
         title = title,
         onDismissRequest = onCancel,
-        actionText = "Speichern",
+        actionText = stringResource(R.string.save),
         onAction = { onSave(selectedWifiProfileId, host) },
         actionEnabled = selectedWifiProfileId.isNotBlank() && host.isNotBlank()
     ) {
         if (selectableProfiles.isEmpty()) {
-            Text("Es sind keine weiteren WLAN-Profile verfügbar.")
+            Text(stringResource(R.string.no_more_wifi_profiles))
         } else {
             selectableProfiles.forEach { profile ->
                 Row(
@@ -756,7 +767,7 @@ private fun ConnectionEditDialog(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "SSID: ${profile.ssid}",
+                            text = stringResource(R.string.ssid_value, profile.ssid),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -766,7 +777,7 @@ private fun ConnectionEditDialog(
             OutlinedTextField(
                 value = host,
                 onValueChange = { host = it },
-                label = { Text("Hostname/IP") },
+                label = { Text(stringResource(R.string.hostname_ip)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )

@@ -10,6 +10,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +25,10 @@ import de.piecha.switchwerk.ui.screens.SettingsSection
 import de.piecha.switchwerk.ui.screens.StartScreen
 import de.piecha.switchwerk.ui.screens.HelpScreen
 import de.piecha.switchwerk.ui.theme.SwitchWerkTheme
+import de.piecha.switchwerk.ui.AppLocaleController
+import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.viewmodel.MainViewModel
+import org.koin.android.ext.android.inject
 import org.koin.compose.viewmodel.koinViewModel
 
 private enum class AppScreen {
@@ -34,7 +38,11 @@ private enum class AppScreen {
 }
 
 class MainActivity : ComponentActivity() {
+    private val appSettingsRepository: AppSettingsRepository by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val initialLanguage = appSettingsRepository.settings.value.language
+        AppLocaleController.apply(this, initialLanguage)
         super.onCreate(savedInstanceState)
         requestNearbyWifiPermission()
         enableEdgeToEdge(
@@ -51,6 +59,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val mainViewModel: MainViewModel = koinViewModel()
             val uiState by mainViewModel.uiState.collectAsState()
+            LaunchedEffect(uiState.appSettings.language) {
+                val language = uiState.appSettings.language
+                if (language != initialLanguage && AppLocaleController.apply(this@MainActivity, language)) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                        recreate()
+                    }
+                }
+            }
             SwitchWerkTheme(themeMode = uiState.appSettings.themeMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

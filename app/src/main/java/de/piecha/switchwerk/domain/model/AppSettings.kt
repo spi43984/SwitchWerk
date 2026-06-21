@@ -6,6 +6,12 @@ enum class AppThemeMode {
     DARK
 }
 
+enum class AppLanguage(val languageTag: String?) {
+    SYSTEM(null),
+    GERMAN("de"),
+    ENGLISH("en")
+}
+
 enum class DetailPanelHeight(val fraction: Float) {
     TWENTY_PERCENT(0.20f),
     THIRTY_PERCENT(0.30f),
@@ -19,6 +25,7 @@ enum class DashboardLayoutMode {
 
 data class AppSettings(
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
+    val language: AppLanguage = AppLanguage.SYSTEM,
     val showActionDetails: Boolean = false,
     val detailPanelHeight: DetailPanelHeight = DetailPanelHeight.THIRTY_PERCENT,
     val diagnosticsNewestFirst: Boolean = true,

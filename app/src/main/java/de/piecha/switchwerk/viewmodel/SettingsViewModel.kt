@@ -3,6 +3,8 @@ package de.piecha.switchwerk.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.annotation.StringRes
+import de.piecha.switchwerk.R
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
@@ -13,11 +15,15 @@ import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.ui.StringProvider
+import de.piecha.switchwerk.ui.UiText
+import de.piecha.switchwerk.ui.uiText
 import java.net.URI
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,8 +64,8 @@ data class SettingsUiState(
     val deviceForm: DeviceFormState = DeviceFormState(),
     val isEditingWifiProfile: Boolean = false,
     val isEditingDevice: Boolean = false,
-    val errorMessage: String? = null,
-    val statusMessage: String? = null,
+    val errorMessage: UiText? = null,
+    val statusMessage: UiText? = null,
     val isTransferInProgress: Boolean = false,
     val importSummary: ConfigurationImportSummary? = null,
     val importMode: ConfigurationImportMode? = null,
@@ -71,7 +77,8 @@ class SettingsViewModel(
     private val wifiProfileRepository: WifiProfileRepository,
     private val deviceRepository: DeviceRepository,
     private val configurationTransferRepository: ConfigurationTransferRepository,
-    private val appSettingsRepository: AppSettingsRepository
+    private val appSettingsRepository: AppSettingsRepository,
+    private val stringProvider: StringProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -88,6 +95,10 @@ class SettingsViewModel(
 
     fun setThemeMode(themeMode: AppThemeMode) {
         appSettingsRepository.setThemeMode(themeMode)
+    }
+
+    fun setLanguage(language: AppLanguage) {
+        appSettingsRepository.setLanguage(language)
     }
 
     fun setShowActionDetails(showActionDetails: Boolean) {
@@ -228,17 +239,17 @@ class SettingsViewModel(
         val trimmedSsid = form.ssid.trim()
 
         if (trimmedName.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Profilname darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_profile_name_empty))
             return
         }
 
         if (trimmedSsid.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "SSID darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_ssid_empty))
             return
         }
 
         if (isWifiProfileNameUsed(trimmedName, form.id)) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Profilname ist bereits vergeben")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_profile_name_duplicate))
             return
         }
 
@@ -267,7 +278,7 @@ class SettingsViewModel(
                 )
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = error.message ?: "WLAN-Profil konnte nicht gespeichert werden"
+                    errorMessage = error.toUiText(R.string.error_wifi_profile_save)
                 )
             }
         }
@@ -279,7 +290,7 @@ class SettingsViewModel(
                 wifiProfileRepository.deleteWifiProfile(profileId)
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = error.message ?: "WLAN-Profil konnte nicht gelöscht werden"
+                    errorMessage = error.toUiText(R.string.error_wifi_profile_delete)
                 )
             }
         }
@@ -287,7 +298,7 @@ class SettingsViewModel(
 
     fun exportConfiguration(uri: Uri, includePasswords: Boolean) {
         runTransfer(
-            successMessage = "Konfiguration wurde exportiert"
+            successMessage = uiText(R.string.configuration_exported)
         ) {
             configurationTransferRepository.exportToUri(
                 uri = uri,
@@ -318,7 +329,7 @@ class SettingsViewModel(
         val url = content.trim()
         if (!url.isValidImportUrl()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "QR-Code enthält keine gültige HTTPS-URL",
+                errorMessage = uiText(R.string.error_invalid_qr_url),
                 statusMessage = null
             )
             return
@@ -329,7 +340,7 @@ class SettingsViewModel(
 
     fun reportQrCameraPermissionDenied() {
         _uiState.value = _uiState.value.copy(
-            errorMessage = "Kamera-Berechtigung wird zum Scannen des QR-Codes benötigt",
+            errorMessage = uiText(R.string.error_camera_permission),
             statusMessage = null
         )
     }
@@ -372,7 +383,7 @@ class SettingsViewModel(
     fun startNewDevice() {
         _uiState.value = _uiState.value.copy(
             deviceForm = DeviceFormState(
-                actionLabel = "Schalten",
+                actionLabel = stringProvider.get(R.string.default_action_label),
                 apiMethod = ApiMethod.GET.name,
                 apiPath = "/rpc/Switch.Toggle?id=0"
             ),
@@ -396,8 +407,8 @@ class SettingsViewModel(
                     }
                     DeviceConnectionFormState(
                         wifiProfileId = connection.wifiProfileId,
-                        wifiProfileName = profile?.name ?: "Unbekanntes WLAN",
-                        ssid = profile?.ssid ?: "Unbekanntes WLAN",
+                        wifiProfileName = profile?.name ?: stringProvider.get(R.string.unknown_wifi),
+                        ssid = profile?.ssid ?: stringProvider.get(R.string.unknown_wifi),
                         host = connection.host
                     )
                 }
@@ -437,13 +448,13 @@ class SettingsViewModel(
         val trimmedHost = host.trim()
 
         if (trimmedHost.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Hostname/IP darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_host_empty))
             return
         }
 
         val form = _uiState.value.deviceForm
         if (form.connections.any { it.wifiProfileId == wifiProfileId }) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Dieses WLAN ist bereits zugeordnet")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_wifi_already_assigned))
             return
         }
 
@@ -468,13 +479,13 @@ class SettingsViewModel(
         val trimmedHost = host.trim()
 
         if (trimmedHost.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Hostname/IP darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_host_empty))
             return
         }
 
         val form = _uiState.value.deviceForm
         if (oldWifiProfileId != newWifiProfileId && form.connections.any { it.wifiProfileId == newWifiProfileId }) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Dieses WLAN ist bereits zugeordnet")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_wifi_already_assigned))
             return
         }
 
@@ -530,24 +541,24 @@ class SettingsViewModel(
         val trimmedApiPath = form.apiPath.trim()
 
         if (trimmedName.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Gerätename darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_device_name_empty))
             return
         }
 
         if (trimmedActionLabel.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Button-Beschriftung darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_button_label_empty))
             return
         }
 
         if (trimmedApiPath.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = "API-Aufruf darf nicht leer sein")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_api_call_empty))
             return
         }
 
         val apiMethod = runCatching {
             ApiMethod.valueOf(form.apiMethod)
         }.getOrElse {
-            _uiState.value = _uiState.value.copy(errorMessage = "API-Methode ist ungültig")
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_api_method_invalid))
             return
         }
 
@@ -583,7 +594,7 @@ class SettingsViewModel(
                 )
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = error.message ?: "Gerät konnte nicht gespeichert werden"
+                    errorMessage = error.toUiText(R.string.error_device_save)
                 )
             }
         }
@@ -595,7 +606,7 @@ class SettingsViewModel(
                 deviceRepository.deleteDevice(deviceId)
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = error.message ?: "Gerät konnte nicht gelöscht werden"
+                    errorMessage = error.toUiText(R.string.error_device_delete)
                 )
             }
         }
@@ -626,7 +637,7 @@ class SettingsViewModel(
                 deviceRepository.updateDeviceOrder(reorderedDevices.map { it.id })
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = error.message ?: "Gerätereihenfolge konnte nicht geändert werden"
+                    errorMessage = error.toUiText(R.string.error_device_order)
                 )
             }
         }
@@ -681,7 +692,7 @@ class SettingsViewModel(
                     pendingImport = null
                     _uiState.value = _uiState.value.copy(
                         isTransferInProgress = false,
-                        errorMessage = error.message ?: "Import konnte nicht vorbereitet werden"
+                        errorMessage = error.toUiText(R.string.error_import_prepare)
                     )
                 }
         }
@@ -708,20 +719,20 @@ class SettingsViewModel(
                 _uiState.value = _uiState.value.copy(
                     isTransferInProgress = false,
                     importMode = null,
-                    statusMessage = "Konfiguration wurde importiert"
+                    statusMessage = uiText(R.string.configuration_imported)
                 )
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
                     isTransferInProgress = false,
                     importMode = null,
-                    errorMessage = error.message ?: "Konfiguration konnte nicht importiert werden"
+                    errorMessage = error.toUiText(R.string.error_configuration_import)
                 )
             }
         }
     }
 
     private fun runTransfer(
-        successMessage: String,
+        successMessage: UiText,
         transfer: suspend () -> Unit
     ) {
         if (_uiState.value.isTransferInProgress) {
@@ -743,7 +754,7 @@ class SettingsViewModel(
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
                         isTransferInProgress = false,
-                        errorMessage = error.message ?: "Vorgang ist fehlgeschlagen"
+                        errorMessage = error.toUiText(R.string.error_operation_failed)
                     )
                 }
         }
@@ -779,6 +790,10 @@ class SettingsViewModel(
         val uri = runCatching { URI(this) }.getOrNull() ?: return false
         return uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()
     }
+
+    private fun Throwable.toUiText(@StringRes fallbackResourceId: Int): UiText =
+        message?.takeIf(String::isNotBlank)?.let(UiText::Dynamic)
+            ?: uiText(fallbackResourceId)
 
     private fun isWifiProfileNameUsed(name: String, currentProfileId: String?): Boolean {
         return _uiState.value.wifiProfiles.any { profile ->

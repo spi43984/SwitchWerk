@@ -25,6 +25,8 @@ import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
 import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
+import de.piecha.switchwerk.ui.AndroidStringProvider
+import de.piecha.switchwerk.ui.StringProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -71,6 +73,8 @@ val appModule = module {
     single<AppSettingsRepository> {
         SharedPreferencesAppSettingsRepository(androidContext())
     }
+
+    single<StringProvider> { AndroidStringProvider(androidContext()) }
 
     single<HttpApiCallService> {
         OkHttpApiCallService(
@@ -134,7 +138,8 @@ val appModule = module {
             wifiProfileRepository = get(),
             deviceRepository = get(),
             configurationTransferRepository = get(),
-            appSettingsRepository = get()
+            appSettingsRepository = get(),
+            stringProvider = get()
         )
     }
 }

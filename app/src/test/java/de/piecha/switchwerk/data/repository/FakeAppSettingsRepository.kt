@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.data.repository
 
 import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
@@ -16,6 +17,10 @@ class FakeAppSettingsRepository(
 
     override fun setThemeMode(themeMode: AppThemeMode) {
         mutableSettings.value = mutableSettings.value.copy(themeMode = themeMode)
+    }
+
+    override fun setLanguage(language: AppLanguage) {
+        mutableSettings.value = mutableSettings.value.copy(language = language)
     }
 
     override fun setShowActionDetails(showActionDetails: Boolean) {

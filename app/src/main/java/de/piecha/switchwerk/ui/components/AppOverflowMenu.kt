@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import de.piecha.switchwerk.R
 
 @Composable
 fun AppMenuLayout(
@@ -66,18 +68,18 @@ fun AppMenuLayout(
                         IconButton(onClick = { isExpanded = false }) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = "Menü schließen"
+                                contentDescription = stringResource(R.string.menu_close)
                             )
                         }
                         MenuItem(
-                            text = "Einstellungen",
+                            text = stringResource(R.string.settings),
                             onClick = {
                                 isExpanded = false
                                 onOpenSettings()
                             }
                         )
                         MenuItem(
-                            text = "Hilfe",
+                            text = stringResource(R.string.help),
                             onClick = {
                                 isExpanded = false
                                 onOpenHelp()
@@ -95,7 +97,7 @@ fun AppOverflowMenu(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Filled.Menu,
-            contentDescription = "Menü öffnen"
+            contentDescription = stringResource(R.string.menu_open)
         )
     }
 }

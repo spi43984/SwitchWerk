@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.viewmodel
 
 import android.net.Uri
+import de.piecha.switchwerk.R
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
@@ -15,9 +16,12 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiSecurityType
+import de.piecha.switchwerk.ui.StringProvider
+import de.piecha.switchwerk.ui.UiText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -80,7 +84,10 @@ class SettingsViewModelTest {
 
         assertEquals(null, transferRepository.lastUrl)
         assertFalse(viewModel.uiState.value.isTransferInProgress)
-        assertEquals("QR-Code enthält keine gültige HTTPS-URL", viewModel.uiState.value.errorMessage)
+        assertEquals(
+            R.string.error_invalid_qr_url,
+            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+        )
     }
 
     @Test
@@ -98,7 +105,10 @@ class SettingsViewModelTest {
         viewModel.saveWifiProfile()
         runCurrent()
 
-        assertEquals("Profilname darf nicht leer sein", viewModel.uiState.value.errorMessage)
+        assertEquals(
+            R.string.error_profile_name_empty,
+            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+        )
         assertTrue(wifiRepository.savedProfiles.isEmpty())
     }
 
@@ -147,7 +157,10 @@ class SettingsViewModelTest {
         viewModel.saveWifiProfile()
         runCurrent()
 
-        assertEquals("Profilname ist bereits vergeben", viewModel.uiState.value.errorMessage)
+        assertEquals(
+            R.string.error_profile_name_duplicate,
+            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+        )
         assertTrue(wifiRepository.savedProfiles.isEmpty())
     }
 
@@ -203,12 +216,14 @@ class SettingsViewModelTest {
         runCurrent()
 
         viewModel.setThemeMode(AppThemeMode.DARK)
+        viewModel.setLanguage(AppLanguage.ENGLISH)
         viewModel.setShowActionDetails(true)
         viewModel.setDetailPanelHeight(DetailPanelHeight.FORTY_PERCENT)
         viewModel.setDiagnosticsNewestFirst(false)
         runCurrent()
 
         assertEquals(AppThemeMode.DARK, viewModel.uiState.value.appSettings.themeMode)
+        assertEquals(AppLanguage.ENGLISH, viewModel.uiState.value.appSettings.language)
         assertTrue(viewModel.uiState.value.appSettings.showActionDetails)
         assertEquals(
             DetailPanelHeight.FORTY_PERCENT,
@@ -227,8 +242,17 @@ class SettingsViewModelTest {
             wifiProfileRepository = wifiProfileRepository,
             deviceRepository = deviceRepository,
             configurationTransferRepository = transferRepository,
-            appSettingsRepository = appSettingsRepository
+            appSettingsRepository = appSettingsRepository,
+            stringProvider = FakeStringProvider
         )
+    }
+
+    private object FakeStringProvider : StringProvider {
+        override fun get(resourceId: Int, vararg arguments: Any): String = when (resourceId) {
+            R.string.default_action_label -> "Schalten"
+            R.string.unknown_wifi -> "Unbekanntes WLAN"
+            else -> resourceId.toString()
+        }
     }
 
     private class FakeWifiProfileRepository(
