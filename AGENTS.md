@@ -96,6 +96,46 @@ Beispiel:
 
 Damit ist „Nein“ bei Lösch- oder Sicherheitsabfragen immer auf der rechten Seite.
 
+## Dokumentationsregeln für lokale Planungs-Issues
+
+Dateien unter `docs/issues/*.md` sind lokale Planungs-Issues und nicht automatisch GitHub-Issues.
+
+Vor dem Anlegen eines neuen Planungs-Issues ist immer zu prüfen:
+
+1. ob bereits ein ähnliches Issue existiert
+2. ob das Thema bereits durch ein anderes Issue abgedeckt ist
+3. ob sich das Thema mit bestehenden offenen Issues überschneidet
+4. welche nächste freie lokale Issue-Nummer nach `docs/issues/overview.txt` zu verwenden ist
+
+Für neue lokale Planungs-Issues gilt:
+
+1. GitHub lesend prüfen
+2. `docs/issues/overview.txt` lesen
+3. nächste freie lokale Issue-Nummer bestimmen
+4. neue Datei unter `docs/issues` anlegen
+5. `docs/issues/overview.txt` aktualisieren
+
+Dabei gilt:
+
+- kein `gh issue create`
+- kein GitHub-Issue erforderlich
+- kein Implementierungs-Branch erforderlich
+- kein Pull Request erforderlich
+
+Ein Dokumentations-Branch darf verwendet werden, wenn der Benutzer die Änderung in GitHub veröffentlichen möchte.
+
+Ausnahme: Der Benutzer fordert ausdrücklich Veröffentlichung, Branch, Pull Request oder Merge an.
+
+Grundsatz:
+
+```text
+Planungsdatei ≠ GitHub-Issue
+```
+
+`ai-context.md` nur ändern, wenn dauerhafter Projektkontext, Projektentscheidungen oder langfristige Projektregeln betroffen sind.
+
+`AI_HANDOFF.md` nur ändern, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
+
 ## Branch- und Issue-Workflow
 
 Implementierungen und größere Änderungen werden nie direkt auf `main` begonnen.
@@ -104,7 +144,7 @@ Der vollständige GitHub-Workflow ist in `GITHUB_WORKFLOW.md` dokumentiert.
 
 ### Phase 1: Vorbereitung und Implementierung
 
-Für jedes fachliche Issue gilt zunächst:
+Für jede Implementierung eines bestehenden fachlichen Issues gilt zunächst:
 
 1. Nächstes Issue nach `docs/issues/overview.txt` bestimmen: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
 2. Auf `main` wechseln.
@@ -119,7 +159,7 @@ Für jedes fachliche Issue gilt zunächst:
 8. Änderungen und Diff prüfen.
 9. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
 10. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
-   auf dem Host ausgeben.
+    auf dem Host ausgeben.
 
 Mindestens auf dem Host zu prüfen:
 
@@ -145,11 +185,15 @@ ausgeführt werden:
 8. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben
    Status zeigen. `docs/issues/overview.txt` ist die einzige Quelle für die Liste
    und Reihenfolge offener, abgeschlossener und zurückgestellter Issues.
-9. `ai-context.md` nur aktualisieren, wenn sich dauerhafter Projektkontext oder
-   Projektentscheidungen geändert haben.
-10. Dokumentationsänderungen committen und pushen.
-11. Zugehöriges GitHub-Issue erst danach schließen.
-12. Feature-Branch lokal und remote löschen.
+9. `ai-context.md` nur aktualisieren, wenn sich dauerhafter Projektkontext,
+   Projektentscheidungen oder langfristige Projektregeln geändert haben.
+10. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder
+    abgeschlossene Arbeit dokumentiert werden muss.
+11. Dokumentationsänderungen committen und pushen.
+12. Zugehöriges GitHub-Issue erst danach schließen.
+13. Feature-Branch lokal löschen.
+14. Feature-Branch remote löschen.
+15. Remote-Referenzen bereinigen.
 
 ### Verbindliche Issue-Abschluss-Checkliste
 
@@ -158,10 +202,13 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 - [ ] `docs/issues/<issue>.md` aktualisiert
 - [ ] `docs/issues/overview.txt` aktualisiert
 - [ ] `ai-context.md` bei geändertem dauerhaftem Projektkontext aktualisiert
-- [ ] `AI_HANDOFF.md` aktualisiert
+- [ ] `AI_HANDOFF.md` aktualisiert, falls aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss
 - [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt
 - [ ] Status von Issue-Datei und `docs/issues/overview.txt` ist konsistent
 - [ ] GitHub-Issue geschlossen
+- [ ] Feature-Branch lokal gelöscht
+- [ ] Feature-Branch remote gelöscht
+- [ ] Remote-Referenzen bereinigt
 
 Ohne ausdrückliche Nachfrage des Benutzers gilt:
 
@@ -172,12 +219,21 @@ Ohne ausdrückliche Nachfrage des Benutzers gilt:
 - kein GitHub-Issue schließen
 - keinen Branch löschen
 
-Beispiel:
+Beispiel für Implementierungsstart:
 
     git switch main
     git pull
     gh issue create --title "WiFi Connection Service" --body-file docs/issues/009-wifi-connection-service.md
     git switch -c wifi-connection-service
+
+Beispiel nach Merge:
+
+    git switch main
+    git pull
+    git branch -d wifi-connection-service
+    git push origin --delete wifi-connection-service
+    git fetch --prune
+    git status
 
 Der Assistent gibt für alle vom Benutzer lokal auszuführenden Schritte immer die
 vollständigen Copy-&-Paste-Befehle aus.
