@@ -3,7 +3,7 @@
 ## Metadaten
 
 - Status: Offen
-- Priorität: P2
+- Priorität: P0
 - Typ: UX / GUI
 - Bereich: Dialoge / Eingabeformulare
 
