@@ -54,6 +54,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 035 | P2 | offen | App Identity, Help And Release Packaging |
 | 036 | P2 | offen | Device WiFi Proximity Indicator |
 | 037 | P2 | offen | GitHub Release Update Support |
+| 038 | P2 | offen | Dialog Keyboard Handling |
 
 ## Empfohlene Umsetzungsreihenfolge
 
@@ -70,4 +71,5 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 11. 035 App Identity, Help And Release Packaging
 12. 036 Device WiFi Proximity Indicator
 13. 037 GitHub Release Update Support
-14. 024 Authenticated Import Sources Backlog
+14. 038 Dialog Keyboard Handling
+15. 024 Authenticated Import Sources Backlog
