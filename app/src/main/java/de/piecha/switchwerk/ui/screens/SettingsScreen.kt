@@ -263,6 +263,7 @@ fun SettingsScreen(
                     onAddConnection = viewModel::addDeviceConnection,
                     onUpdateConnection = viewModel::updateDeviceConnection,
                     onDeleteConnection = viewModel::deleteDeviceConnection,
+                    onMoveConnection = viewModel::moveDeviceConnection,
                     onSaveClick = viewModel::saveDevice,
                     onCancelClick = viewModel::cancelDeviceEdit,
                     modifier = Modifier.fillMaxSize()

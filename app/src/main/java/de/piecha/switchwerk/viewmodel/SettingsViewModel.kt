@@ -506,6 +506,23 @@ class SettingsViewModel(
         }
     }
 
+    fun moveDeviceConnection(wifiProfileId: String, targetIndex: Int) {
+        val connections = _uiState.value.deviceForm.connections
+        val currentIndex = connections.indexOfFirst { it.wifiProfileId == wifiProfileId }
+
+        if (currentIndex !in connections.indices || targetIndex !in connections.indices) {
+            return
+        }
+
+        updateDeviceForm { form ->
+            form.copy(
+                connections = connections.toMutableList().apply {
+                    add(targetIndex, removeAt(currentIndex))
+                }
+            )
+        }
+    }
+
     fun saveDevice() {
         val form = _uiState.value.deviceForm
         val trimmedName = form.name.trim()
