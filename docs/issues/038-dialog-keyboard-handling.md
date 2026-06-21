@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / GUI
 - Bereich: Dialoge / Eingabeformulare
@@ -93,18 +93,18 @@ Zu prüfen sind insbesondere:
 
 ## Akzeptanzkriterien
 
-- [ ] Die Tastatur verdeckt keine wichtigen Dialogaktionen mehr.
-- [ ] `Speichern` bleibt bei geöffneter Tastatur erreichbar.
-- [ ] `Abbrechen` bleibt bei geöffneter Tastatur erreichbar.
-- [ ] Dialoginhalte sind bei Bedarf scrollbar.
-- [ ] Formular-Dialoge sind auf ca. 80-85 % der verfügbaren Bildschirmhöhe begrenzt.
-- [ ] Die Lösung funktioniert auf kleinen Displays.
-- [ ] Die Lösung funktioniert bei großer Schriftgröße.
-- [ ] Fokuswechsel zwischen Eingabefeldern funktioniert sinnvoll.
-- [ ] Bestehende Dialogfunktionen bleiben unverändert.
-- [ ] Die Lösung wird konsistent für relevante Eingabedialoge verwendet.
-- [ ] Relevante UI- oder Screenshot-Tests sind ergänzt, sofern sinnvoll.
-- [ ] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+- [x] Die Tastatur verdeckt keine wichtigen Dialogaktionen mehr.
+- [x] `Speichern` bleibt bei geöffneter Tastatur erreichbar.
+- [x] `Abbrechen` bleibt bei geöffneter Tastatur erreichbar.
+- [x] Dialoginhalte sind bei Bedarf scrollbar.
+- [x] Formular-Dialoge sind auf ca. 80-85 % der verfügbaren Bildschirmhöhe begrenzt.
+- [x] Die Lösung funktioniert auf kleinen Displays.
+- [x] Die Lösung funktioniert bei großer Schriftgröße.
+- [x] Fokuswechsel zwischen Eingabefeldern funktioniert sinnvoll.
+- [x] Bestehende Dialogfunktionen bleiben unverändert.
+- [x] Die Lösung wird konsistent für relevante Eingabedialoge verwendet.
+- [x] Relevante UI- oder Screenshot-Tests sind ergänzt, sofern sinnvoll.
+- [x] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
 
 ## Testhinweise
 
