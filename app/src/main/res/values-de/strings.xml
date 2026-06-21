@@ -173,7 +173,7 @@
     <string name="diagnostic_dns_succeeded">DNS-Auflösung erfolgreich</string>
     <string name="diagnostic_dns_failed">DNS-Name des Geräts konnte nicht aufgelöst werden</string>
     <string name="diagnostic_device_unreachable">IP-Adresse des Geräts ist nicht erreichbar</string>
-    <string name="diagnostic_request_succeeded">Gerät erfolgreich geschaltet</string>
+    <string name="diagnostic_request_succeeded">Geräteaktion erfolgreich abgeschlossen</string>
     <string name="diagnostic_request_failed">Anfrage fehlgeschlagen</string>
     <string name="diagnostic_timeout_wifi_request">Timeout bei der WLAN-Anforderung; keine Verbindung hergestellt</string>
     <string name="diagnostic_timeout_wifi">Timeout beim WLAN-Verbindungsaufbau</string>
@@ -182,17 +182,17 @@
     <string name="diagnostic_action_completed">Geräteaktion abgeschlossen</string>
     <string name="action_success">Erfolg</string>
     <string name="action_no_wifi">Kein WLAN für Gerät konfiguriert</string>
-    <string name="action_wifi_unreachable">Zugeordnetes WLAN nicht erreichbar</string>
+    <string name="action_wifi_unreachable">Zugeordnetes WLAN nicht verfügbar</string>
     <string name="action_wifi_permission_denied">WLAN-Verbindung nicht erlaubt</string>
     <string name="action_wifi_disabled">WLAN ist deaktiviert</string>
-    <string name="action_android_unsupported">Android unterstützt WLAN-Verbindung nicht</string>
+    <string name="action_android_unsupported">Android unterstützt diese WLAN-Verbindungsmethode nicht</string>
     <string name="action_http_error">Gerät meldet HTTP-Fehler %1$d</string>
-    <string name="action_timeout">Zeitüberschreitung beim Schalten</string>
+    <string name="action_timeout">Zeitüberschreitung bei der Geräteaktion</string>
     <string name="action_invalid_address">Gespeicherte Geräteadresse ungültig</string>
     <string name="action_dns_error">Gerätename nicht auflösbar</string>
     <string name="action_connection_error">Gerät im Netzwerk nicht erreichbar</string>
-    <string name="action_no_route">Keine Netzwerkroute zum Gerät</string>
-    <string name="action_vpn_blocked">VPN oder Firewall blockiert Zugriff</string>
+    <string name="action_no_route">Keine Route zum Gerät</string>
+    <string name="action_vpn_blocked">Zugriff durch VPN oder Firewall blockiert</string>
     <string name="action_network_error">Netzwerkzugriff zum Gerät fehlgeschlagen</string>
     <string name="action_failed">Geräteaktion fehlgeschlagen</string>
 </resources>

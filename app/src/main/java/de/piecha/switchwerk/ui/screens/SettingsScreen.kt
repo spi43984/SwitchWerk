@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -58,12 +59,16 @@ import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.ui.components.SettingsSectionTabs
 import de.piecha.switchwerk.ui.components.StandardActionButton
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
+import de.piecha.switchwerk.R
+import de.piecha.switchwerk.ui.UiText
+import de.piecha.switchwerk.ui.asString
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -113,7 +118,7 @@ fun SettingsScreen(
     fun launchQrScanner() {
         val options = ScanOptions()
             .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-            .setPrompt("QR-Code scannen")
+            .setPrompt(context.getString(R.string.scan_qr_code))
             .setBeepEnabled(false)
             .setOrientationLocked(false)
         qrScanLauncher.launch(options)
@@ -195,18 +200,18 @@ fun SettingsScreen(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Zurück zum Dashboard"
+                    contentDescription = stringResource(R.string.back_to_dashboard)
                 )
             }
             Text(
-                text = "Einstellungen",
+                text = stringResource(R.string.settings),
                 style = MaterialTheme.typography.headlineLarge
             )
         }
 
         uiState.errorMessage?.let { message ->
             Text(
-                text = message,
+                text = message.asString(),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -214,14 +219,14 @@ fun SettingsScreen(
 
         uiState.statusMessage?.let { message ->
             Text(
-                text = message,
+                text = message.asString(),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
 
         SettingsSectionTabs(
-            sections = SettingsSection.entries.map(SettingsSection::title),
+            sections = SettingsSection.entries.map { stringResource(it.titleResourceId) },
             selectedIndex = selectedSection.ordinal,
             onSectionSelected = { index ->
                 openSwipeItemId = null
@@ -278,6 +283,8 @@ fun SettingsScreen(
                 ) {
                     DisplaySettingsSection(
                         themeMode = uiState.appSettings.themeMode,
+                        language = uiState.appSettings.language,
+                        onLanguageChange = viewModel::setLanguage,
                         onThemeModeChange = viewModel::setThemeMode
                     )
                     HorizontalDivider()
@@ -356,7 +363,7 @@ fun SettingsScreen(
 
     if (showFileImportModeDialog) {
         ImportModeDialog(
-            continueText = "Datei auswählen",
+            continueText = stringResource(R.string.select_file),
             onContinue = { mode ->
                 pendingFileImportMode = mode
                 showFileImportModeDialog = false
@@ -370,7 +377,7 @@ fun SettingsScreen(
 
     if (showQrImportModeDialog) {
         ImportModeDialog(
-            continueText = "QR-Code scannen",
+            continueText = stringResource(R.string.scan_qr_code),
             onContinue = { mode ->
                 pendingQrImportMode = mode
                 showQrImportModeDialog = false
@@ -424,11 +431,11 @@ fun SettingsScreen(
     }
 }
 
-enum class SettingsSection(val title: String) {
-    WIFI_PROFILES("WLAN-Profile"),
-    DEVICES("Geräte"),
-    SYSTEM("System"),
-    BACKUP("Backup")
+enum class SettingsSection(val titleResourceId: Int) {
+    WIFI_PROFILES(R.string.settings_tab_wifi_profiles),
+    DEVICES(R.string.settings_tab_devices),
+    SYSTEM(R.string.settings_tab_system),
+    BACKUP(R.string.settings_tab_backup)
 }
 
 @Composable
@@ -437,10 +444,10 @@ private fun SystemHelpSection(onOpenHelp: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Hilfe", style = MaterialTheme.typography.titleMedium)
-        Text("App-Informationen, Version und Link zum GitHub-Projekt anzeigen.")
+        Text(stringResource(R.string.help), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.system_help_description))
         StandardActionButton(
-            text = "Hilfe anzeigen",
+            text = stringResource(R.string.show_help),
             onClick = onOpenHelp,
             modifier = Modifier.fillMaxWidth()
         )
@@ -450,6 +457,8 @@ private fun SystemHelpSection(onOpenHelp: () -> Unit) {
 @Composable
 private fun DisplaySettingsSection(
     themeMode: AppThemeMode,
+    language: AppLanguage,
+    onLanguageChange: (AppLanguage) -> Unit,
     onThemeModeChange: (AppThemeMode) -> Unit
 ) {
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
@@ -457,16 +466,28 @@ private fun DisplaySettingsSection(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            Text("Darstellung", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.display), style = MaterialTheme.typography.titleMedium)
             AppThemeMode.entries.forEach { option ->
                 RadioOptionRow(
                     label = when (option) {
-                        AppThemeMode.SYSTEM -> "Systemvorgabe"
-                        AppThemeMode.LIGHT -> "Hell"
-                        AppThemeMode.DARK -> "Dunkel"
+                        AppThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                        AppThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                        AppThemeMode.DARK -> stringResource(R.string.theme_dark)
                     },
                     selected = themeMode == option,
                     onClick = { onThemeModeChange(option) }
+                )
+            }
+            Text(stringResource(R.string.language), style = MaterialTheme.typography.titleSmall)
+            AppLanguage.entries.forEach { option ->
+                RadioOptionRow(
+                    label = when (option) {
+                        AppLanguage.SYSTEM -> stringResource(R.string.language_system)
+                        AppLanguage.GERMAN -> stringResource(R.string.language_german)
+                        AppLanguage.ENGLISH -> stringResource(R.string.language_english)
+                    },
+                    selected = language == option,
+                    onClick = { onLanguageChange(option) }
                 )
             }
         }
@@ -487,7 +508,7 @@ private fun ActionDetailsSettingsSection(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            Text("Aktionsdetails", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.action_details), style = MaterialTheme.typography.titleMedium)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -496,20 +517,20 @@ private fun ActionDetailsSettingsSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Aktionsdetails anzeigen")
+                Text(stringResource(R.string.show_action_details))
                 Switch(
                     checked = showActionDetails,
                     onCheckedChange = onShowActionDetailsChange
                 )
             }
 
-            Text("Höhe des Detailbereichs", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.detail_panel_height), style = MaterialTheme.typography.titleSmall)
             DetailPanelHeight.entries.forEach { option ->
                 RadioOptionRow(
                     label = when (option) {
-                        DetailPanelHeight.TWENTY_PERCENT -> "20 %"
-                        DetailPanelHeight.THIRTY_PERCENT -> "30 %"
-                        DetailPanelHeight.FORTY_PERCENT -> "40 %"
+                        DetailPanelHeight.TWENTY_PERCENT -> stringResource(R.string.detail_panel_height_20)
+                        DetailPanelHeight.THIRTY_PERCENT -> stringResource(R.string.detail_panel_height_30)
+                        DetailPanelHeight.FORTY_PERCENT -> stringResource(R.string.detail_panel_height_40)
                     },
                     selected = detailPanelHeight == option,
                     onClick = { onDetailPanelHeightChange(option) },
@@ -518,7 +539,7 @@ private fun ActionDetailsSettingsSection(
             }
 
             Text(
-                text = "Sortierung Aktionsdetails",
+                text = stringResource(R.string.action_details_sort_order),
                 color = if (showActionDetails) {
                     MaterialTheme.colorScheme.onSurface
                 } else {
@@ -527,13 +548,13 @@ private fun ActionDetailsSettingsSection(
                 style = MaterialTheme.typography.titleSmall
             )
             RadioOptionRow(
-                label = "Neueste oben",
+                label = stringResource(R.string.newest_first),
                 selected = diagnosticsNewestFirst,
                 onClick = { onDiagnosticsNewestFirstChange(true) },
                 enabled = showActionDetails
             )
             RadioOptionRow(
-                label = "Neueste unten",
+                label = stringResource(R.string.newest_last),
                 selected = !diagnosticsNewestFirst,
                 onClick = { onDiagnosticsNewestFirstChange(false) },
                 enabled = showActionDetails
@@ -596,7 +617,7 @@ private fun WifiProfileManagementSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Name\nSSID",
+                text = stringResource(R.string.name_and_ssid),
                 style = MaterialTheme.typography.titleSmall
             )
 
@@ -606,7 +627,7 @@ private fun WifiProfileManagementSection(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "WLAN-Profil hinzufügen"
+                    contentDescription = stringResource(R.string.add_wifi_profile)
                 )
             }
         }
@@ -652,7 +673,7 @@ private fun WifiProfileList(
             if (listState.canScrollBackward) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "Weitere WLAN-Profile oberhalb",
+                    contentDescription = stringResource(R.string.more_wifi_profiles_above),
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -702,7 +723,7 @@ private fun WifiProfileList(
             if (listState.canScrollForward) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Weitere WLAN-Profile unterhalb",
+                    contentDescription = stringResource(R.string.more_wifi_profiles_below),
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -718,7 +739,7 @@ private fun EmptyWifiProfileListArea(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
-            text = "Keine WLAN-Profile konfiguriert.",
+            text = stringResource(R.string.no_wifi_profiles_configured),
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -738,16 +759,16 @@ private fun WifiProfileRow(
 
     pendingDeleteProfile?.let { profileToDelete ->
         StandardConfigurationDialog(
-            title = "WLAN-Profil löschen",
+            title = stringResource(R.string.delete_wifi_profile),
             onDismissRequest = { pendingDeleteProfile = null },
-            actionText = "Ja",
+            actionText = stringResource(R.string.yes),
             onAction = {
                 pendingDeleteProfile = null
                 onDeleteClick()
             },
-            cancelText = "Nein"
+            cancelText = stringResource(R.string.no)
         ) {
-            Text("WLAN-Profil ${profileToDelete.name} wirklich löschen?")
+            Text(stringResource(R.string.delete_wifi_profile_confirmation, profileToDelete.name))
         }
     }
 
@@ -776,7 +797,7 @@ private fun WifiProfileRow(
                 )
 
                 Text(
-                    text = "SSID: ${profile.ssid}",
+                    text = stringResource(R.string.ssid_value, profile.ssid),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -791,7 +812,7 @@ private fun WifiProfileDialog(
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
-    errorMessage: String?,
+    errorMessage: UiText?,
     onNameChange: (String) -> Unit,
     onSsidChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
@@ -801,9 +822,11 @@ private fun WifiProfileDialog(
     onCancelClick: () -> Unit
 ) {
     StandardConfigurationDialog(
-        title = if (isNewProfile) "WLAN-Profil anlegen" else "WLAN-Profil bearbeiten",
+        title = stringResource(
+            if (isNewProfile) R.string.create_wifi_profile else R.string.edit_wifi_profile
+        ),
         onDismissRequest = onCancelClick,
-        actionText = "Speichern",
+        actionText = stringResource(R.string.save),
         onAction = onSaveClick
     ) {
         WifiProfileForm(
@@ -827,7 +850,7 @@ private fun WifiProfileForm(
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
-    errorMessage: String?,
+    errorMessage: UiText?,
     onNameChange: (String) -> Unit,
     onSsidChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
@@ -842,7 +865,7 @@ private fun WifiProfileForm(
         OutlinedTextField(
             value = ssid,
             onValueChange = onSsidChange,
-            label = { Text("SSID") },
+            label = { Text(stringResource(R.string.ssid)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -850,7 +873,7 @@ private fun WifiProfileForm(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Passwort") },
+            label = { Text(stringResource(R.string.password)) },
             singleLine = true,
             visualTransformation = if (isPasswordVisible) {
                 VisualTransformation.None
@@ -867,7 +890,7 @@ private fun WifiProfileForm(
                         } else {
                             Icons.Filled.Visibility
                         },
-                        contentDescription = "Passwort anzeigen oder verbergen"
+                        contentDescription = stringResource(R.string.toggle_password_visibility)
                     )
                 }
             },
@@ -875,12 +898,12 @@ private fun WifiProfileForm(
         )
 
         Text(
-            text = "Leeres Passwort ist erlaubt. Vorhandenes Passwort bleibt nur erhalten, wenn die Sternchen unverändert bleiben.",
+            text = stringResource(R.string.password_hint),
             style = MaterialTheme.typography.bodySmall
         )
 
         StandardActionButton(
-            text = "Passwort leeren",
+            text = stringResource(R.string.clear_password),
             onClick = onClearPasswordClick,
             modifier = Modifier.fillMaxWidth()
         )
@@ -888,14 +911,14 @@ private fun WifiProfileForm(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
         errorMessage?.let { message ->
             Text(
-                text = message,
+                text = message.asString(),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall
             )
@@ -919,7 +942,7 @@ private fun ImportExportSection(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Konfigurationen als JSON-Datei sichern oder aus einer vertrauenswürdigen Quelle importieren.",
+            text = stringResource(R.string.backup_description),
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -929,37 +952,37 @@ private fun ImportExportSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                Text("Konfiguration wird verarbeitet …")
+                Text(stringResource(R.string.configuration_processing))
             }
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Export", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.export), style = MaterialTheme.typography.titleSmall)
                 StandardActionButton(
-                    text = "Exportieren",
+                    text = stringResource(R.string.export_configuration),
                     onClick = onExportClick,
                     modifier = Modifier.fillMaxWidth()
                 )
                 StandardActionButton(
-                    text = "Exportieren mit Passwörtern",
+                    text = stringResource(R.string.export_with_passwords),
                     onClick = onExportWithPasswordsClick,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                Text("Import", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.import_title), style = MaterialTheme.typography.titleSmall)
                 StandardActionButton(
-                    text = "Datei importieren",
+                    text = stringResource(R.string.import_file),
                     onClick = onImportFileClick,
                     modifier = Modifier.fillMaxWidth()
                 )
                 StandardActionButton(
-                    text = "URL importieren",
+                    text = stringResource(R.string.import_url),
                     onClick = onImportUrlClick,
                     modifier = Modifier.fillMaxWidth()
                 )
                 StandardActionButton(
-                    text = "QR-Code importieren",
+                    text = stringResource(R.string.import_qr_code),
                     onClick = onScanQrCodeClick,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -974,15 +997,12 @@ private fun PasswordExportWarningDialog(
     onCancel: () -> Unit
 ) {
     StandardConfigurationDialog(
-        title = "Passwörter unverschlüsselt exportieren?",
+        title = stringResource(R.string.export_passwords_title),
         onDismissRequest = onCancel,
-        actionText = "Passwörter exportieren",
+        actionText = stringResource(R.string.export_passwords_action),
         onAction = onExport
     ) {
-        Text(
-            "Die Exportdatei enthält WLAN-Passwörter im Klartext. " +
-                "Teile sie nur mit Personen, die diese Passwörter kennen dürfen."
-        )
+        Text(stringResource(R.string.export_passwords_warning))
     }
 }
 
@@ -994,7 +1014,7 @@ private fun ImportModeDialog(
 ) {
     var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     StandardConfigurationDialog(
-        title = "Importmodus wählen",
+        title = stringResource(R.string.choose_import_mode),
         onDismissRequest = onCancel,
         actionText = continueText,
         onAction = { onContinue(mode) }
@@ -1014,16 +1034,16 @@ private fun UrlImportDialog(
     var url by remember { mutableStateOf("") }
     var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     StandardConfigurationDialog(
-        title = "Aus HTTPS-URL importieren",
+        title = stringResource(R.string.import_from_https),
         onDismissRequest = onCancel,
-        actionText = "Import prüfen",
+        actionText = stringResource(R.string.check_import),
         onAction = { onImport(url, mode) },
         actionEnabled = url.isNotBlank()
     ) {
         OutlinedTextField(
             value = url,
             onValueChange = { url = it },
-            label = { Text("HTTPS-URL") },
+            label = { Text(stringResource(R.string.https_url)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -1042,14 +1062,14 @@ private fun ImportModeSelection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ImportModeOption(
             selected = mode == ConfigurationImportMode.MERGE,
-            title = "Ergänzen / überschreiben",
-            description = "Bestehende Einträge bleiben erhalten. Gleiche IDs werden überschrieben.",
+            title = stringResource(R.string.import_mode_merge),
+            description = stringResource(R.string.import_mode_merge_description),
             onClick = { onModeChange(ConfigurationImportMode.MERGE) }
         )
         ImportModeOption(
             selected = mode == ConfigurationImportMode.REPLACE,
-            title = "Alles ersetzen",
-            description = "Alle lokalen Geräte, WLAN-Profile und Passwörter werden zuerst gelöscht.",
+            title = stringResource(R.string.import_mode_replace),
+            description = stringResource(R.string.import_mode_replace_description),
             onClick = { onModeChange(ConfigurationImportMode.REPLACE) }
         )
     }
@@ -1083,20 +1103,43 @@ private fun ImportSummaryDialog(
     onImport: () -> Unit,
     onCancel: () -> Unit
 ) {
+    val wifiProfilesText = stringResource(
+        R.string.import_summary_wifi_profiles,
+        summary.wifiProfilesNew,
+        summary.wifiProfilesOverwritten
+    )
+    val devicesText = stringResource(
+        R.string.import_summary_devices,
+        summary.devicesNew,
+        summary.devicesOverwritten
+    )
+    val passwordsText = stringResource(
+        R.string.import_summary_passwords,
+        summary.passwordsIncluded,
+        summary.passwordsDeleted
+    )
+    val deletedWifiProfilesText = stringResource(
+        R.string.import_summary_local_wifi_profiles_deleted,
+        summary.localWifiProfilesDeleted
+    )
+    val deletedDevicesText = stringResource(
+        R.string.import_summary_local_devices_deleted,
+        summary.localDevicesDeleted
+    )
     val text = buildString {
-        appendLine("WLAN-Profile: ${summary.wifiProfilesNew} neu, ${summary.wifiProfilesOverwritten} überschrieben")
-        appendLine("Geräte: ${summary.devicesNew} neu, ${summary.devicesOverwritten} überschrieben")
-        appendLine("Passwörter: ${summary.passwordsIncluded} enthalten, ${summary.passwordsDeleted} werden gelöscht")
+        appendLine(wifiProfilesText)
+        appendLine(devicesText)
+        appendLine(passwordsText)
         if (mode == ConfigurationImportMode.REPLACE) {
             appendLine()
-            appendLine("${summary.localWifiProfilesDeleted} lokale WLAN-Profile werden gelöscht.")
-            append("${summary.localDevicesDeleted} lokale Geräte werden gelöscht.")
+            appendLine(deletedWifiProfilesText)
+            append(deletedDevicesText)
         }
     }
     StandardConfigurationDialog(
-        title = "Import-Zusammenfassung",
+        title = stringResource(R.string.import_summary_title),
         onDismissRequest = onCancel,
-        actionText = "Importieren",
+        actionText = stringResource(R.string.import_action),
         onAction = onImport
     ) {
         Text(text)
@@ -1109,15 +1152,12 @@ private fun PasswordImportWarningDialog(
     onCancel: () -> Unit
 ) {
     StandardConfigurationDialog(
-        title = "Import enthält Passwörter",
+        title = stringResource(R.string.import_passwords_title),
         onDismissRequest = onCancel,
-        actionText = "Importieren",
+        actionText = stringResource(R.string.import_action),
         onAction = onImport
     ) {
-        Text(
-            "Die Importdatei enthält WLAN-Passwörter im Klartext oder löscht gespeicherte Passwörter. " +
-                "Importiere sie nur aus einer vertrauenswürdigen Quelle."
-        )
+        Text(stringResource(R.string.import_passwords_warning))
     }
 }
 

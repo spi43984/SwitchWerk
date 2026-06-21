@@ -4,7 +4,28 @@ Stand: 21. Juni 2026
 
 ## Aktuelle Arbeit
 
-Keine aktive Implementierung.
+Issue 029 "Language Setting" / GitHub Issue #75 ist implementiert und auf dem
+Ubuntu-Host erfolgreich gebaut, installiert und manuell geprüft. Veröffentlichung,
+Merge und Abschlussdokumentation stehen noch aus.
+
+- persistierte Auswahl System / Deutsch / Englisch in der bestehenden
+  App-Settings-Infrastruktur
+- Anwendung über Android `LocaleManager` ab API 33 und lokale
+  Ressourcen-Konfiguration auf API 26 bis 32
+- sichtbare Compose-, Status-, Validierungs- und Diagnosetexte in Android
+  String-Ressourcen überführt
+- vollständige deutsche und englische Ressourcensätze mit identischen Schlüsseln
+- keine Änderung an Netzwerk-, Geräte-, WLAN-, Import-/Export- oder Passwortlogik
+
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+manuelle Prüfung von System-, deutscher und englischer Sprache sowie Neustartpersistenz
+```
 
 Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
 in `docs/issues/overview.txt`.

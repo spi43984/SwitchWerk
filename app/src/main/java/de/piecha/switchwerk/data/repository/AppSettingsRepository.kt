@@ -2,6 +2,7 @@ package de.piecha.switchwerk.data.repository
 
 import android.content.Context
 import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
@@ -11,6 +12,8 @@ interface AppSettingsRepository {
     val settings: StateFlow<AppSettings>
 
     fun setThemeMode(themeMode: AppThemeMode)
+
+    fun setLanguage(language: AppLanguage)
 
     fun setShowActionDetails(showActionDetails: Boolean)
 
@@ -30,6 +33,11 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
     override fun setThemeMode(themeMode: AppThemeMode) {
         preferences.edit().putString(KEY_THEME_MODE, themeMode.name).apply()
         mutableSettings.value = mutableSettings.value.copy(themeMode = themeMode)
+    }
+
+    override fun setLanguage(language: AppLanguage) {
+        preferences.edit().putString(KEY_LANGUAGE, language.name).apply()
+        mutableSettings.value = mutableSettings.value.copy(language = language)
     }
 
     override fun setShowActionDetails(showActionDetails: Boolean) {
@@ -61,6 +69,7 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
     private fun loadSettings(): AppSettings {
         return AppSettings(
             themeMode = preferences.getEnum(KEY_THEME_MODE, AppThemeMode.SYSTEM),
+            language = preferences.getEnum(KEY_LANGUAGE, AppLanguage.SYSTEM),
             showActionDetails = preferences.getBoolean(KEY_SHOW_ACTION_DETAILS, false),
             detailPanelHeight = preferences.getEnum(
                 KEY_DETAIL_PANEL_HEIGHT,
@@ -88,6 +97,7 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
     private companion object {
         const val PREFERENCES_NAME = "app_settings"
         const val KEY_THEME_MODE = "theme_mode"
+        const val KEY_LANGUAGE = "language"
         const val KEY_SHOW_ACTION_DETAILS = "show_action_details"
         const val KEY_DETAIL_PANEL_HEIGHT = "detail_panel_height"
         const val KEY_DIAGNOSTICS_NEWEST_FIRST = "diagnostics_newest_first"

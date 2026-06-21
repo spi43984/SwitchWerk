@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.components.HelpContent
 
 @Composable
@@ -38,10 +40,10 @@ fun HelpScreen(onNavigateBack: () -> Unit) {
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Zurück"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
-            Text("Hilfe", style = MaterialTheme.typography.headlineLarge)
+            Text(stringResource(R.string.help), style = MaterialTheme.typography.headlineLarge)
         }
         HelpContent()
     }

@@ -53,9 +53,32 @@ Benutzerdaten wie Gerätenamen, WLAN-Namen und technische Eingaben werden nicht 
 
 ## Akzeptanzkriterien
 
-- [ ] Einstellung "Sprache" ist sichtbar
-- [ ] System/Deutsch/Englisch auswählbar
-- [ ] Auswahl bleibt nach App-Neustart erhalten
-- [ ] UI-Texte werden über String-Ressourcen geladen
-- [ ] Gerätenamen und Nutzereingaben bleiben unverändert
-- [ ] Architektur passt zur Theme-Mode-Einstellung aus Issue 028
+- [x] Einstellung "Sprache" ist sichtbar
+- [x] System/Deutsch/Englisch auswählbar
+- [x] Auswahl bleibt nach App-Neustart erhalten
+- [x] UI-Texte werden über String-Ressourcen geladen
+- [x] Gerätenamen und Nutzereingaben bleiben unverändert
+- [x] Architektur passt zur Theme-Mode-Einstellung aus Issue 028
+
+## Implementierungsstand
+
+- Sprache ist Teil des bestehenden `AppSettings`-State und wird zusammen mit
+  den übrigen Einstellungen im vorhandenen SharedPreferences-Repository gespeichert.
+- Android 13 und neuer verwendet `LocaleManager`; Android 8 bis 12 verwendet
+  eine lokale Ressourcen-Konfiguration ohne zusätzliche AppCompat-Abhängigkeit.
+- Default-, deutsche und englische Ressourcen enthalten denselben vollständigen
+  Schlüsselsatz für sichtbare UI-, Status-, Validierungs- und Diagnosetexte.
+- Benutzerdaten und technische Eingaben werden ausschließlich als unveränderte
+  Formatargumente eingesetzt.
+
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+manuelle Prüfung der Sprachvarianten und Neustartpersistenz
+```
+
+Der Issue-Status bleibt bis zum Merge und zur anschließenden Abschlussdokumentation offen.

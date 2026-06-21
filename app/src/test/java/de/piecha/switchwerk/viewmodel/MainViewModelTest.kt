@@ -1,5 +1,6 @@
 package de.piecha.switchwerk.viewmodel
 
+import de.piecha.switchwerk.R
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
@@ -9,6 +10,7 @@ import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.ui.UiText
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,22 +64,15 @@ class MainViewModelTest {
         runCurrent()
 
         assertTrue(viewModel.uiState.value.deviceActionStates[device.id] is DeviceActionUiState.Success)
-        assertTrue(
-            viewModel.uiState.value.diagnosticItems
-                .filterIsInstance<DiagnosticListItem.Message>()
-                .all {
-                    it.text.matches(
-                        Regex("\\d{2}:\\d{2}:\\d{2}\\.\\d{3} \\(\\+\\d+ ms\\) .+")
-                    )
-                }
-        )
-        assertTrue(
-            viewModel.uiState.value.diagnosticItems
-                .filterIsInstance<DiagnosticListItem.Message>()
-                .first()
-                .text
-                .endsWith("Geräteaktion „Device“ gestartet")
-        )
+        val firstDiagnostic = viewModel.uiState.value.diagnosticItems
+            .filterIsInstance<DiagnosticListItem.Message>()
+            .first()
+            .text as UiText.Resource
+        assertEquals(R.string.diagnostic_entry, firstDiagnostic.resourceId)
+        assertTrue((firstDiagnostic.arguments[0] as String).matches(Regex("\\d{2}:\\d{2}:\\d{2}\\.\\d{3}")))
+        val diagnosticMessage = firstDiagnostic.arguments[2] as UiText.Resource
+        assertEquals(R.string.diagnostic_action_started, diagnosticMessage.resourceId)
+        assertEquals("Device", diagnosticMessage.arguments.single())
 
         viewModel.executeDeviceAction(device)
         runCurrent()

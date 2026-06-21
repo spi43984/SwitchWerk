@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.res.stringResource
+import de.piecha.switchwerk.R
 
 @Composable
 fun StandardConfigurationDialog(
@@ -32,7 +34,7 @@ fun StandardConfigurationDialog(
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
-    cancelText: String = "Abbrechen",
+    cancelText: String? = null,
     content: @Composable () -> Unit
 ) {
     Dialog(
@@ -63,7 +65,7 @@ fun StandardConfigurationDialog(
                 StandardDialogButtons(
                     actionText = actionText,
                     onAction = onAction,
-                    cancelText = cancelText,
+                    cancelText = cancelText ?: stringResource(R.string.cancel),
                     onCancel = onDismissRequest,
                     actionEnabled = actionEnabled
                 )

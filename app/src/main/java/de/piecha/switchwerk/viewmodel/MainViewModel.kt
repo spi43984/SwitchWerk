@@ -2,6 +2,7 @@ package de.piecha.switchwerk.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.piecha.switchwerk.R
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
@@ -13,6 +14,8 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.ui.UiText
+import de.piecha.switchwerk.ui.uiText
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -26,13 +29,13 @@ import kotlinx.coroutines.launch
 sealed interface DeviceActionUiState {
     data object Loading : DeviceActionUiState
 
-    data class Success(val message: String) : DeviceActionUiState
+    data class Success(val message: UiText) : DeviceActionUiState
 
-    data class Error(val message: String) : DeviceActionUiState
+    data class Error(val message: UiText) : DeviceActionUiState
 }
 
 sealed interface DiagnosticListItem {
-    data class Message(val text: String) : DiagnosticListItem
+    data class Message(val text: UiText) : DiagnosticListItem
 
     data object Separator : DiagnosticListItem
 }
@@ -40,7 +43,7 @@ sealed interface DiagnosticListItem {
 data class MainUiState(
     val devices: List<Device> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+    val errorMessage: UiText? = null,
     val deviceActionStates: Map<String, DeviceActionUiState> = emptyMap(),
     val appSettings: AppSettings = AppSettings(),
     val diagnosticItems: List<DiagnosticListItem> = emptyList()
@@ -80,7 +83,7 @@ class MainViewModel(
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = error.message ?: "Geräte konnten nicht geladen werden"
+                    errorMessage = error.toUiText(R.string.error_devices_load)
                 )
             }
         }
@@ -171,7 +174,7 @@ class MainViewModel(
                 repository.updateDeviceOrder(reorderedDevices.map { it.id })
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = error.message ?: "Gerätereihenfolge konnte nicht geändert werden"
+                    errorMessage = error.toUiText(R.string.error_device_order)
                 )
             }
         }
@@ -210,13 +213,13 @@ class MainViewModel(
         }
     }
 
-    private fun appendDiagnosticMessage(message: String, elapsedMillis: Long) {
-        val timestamp = SimpleDateFormat(DIAGNOSTIC_TIMESTAMP_PATTERN, Locale.GERMANY)
+    private fun appendDiagnosticMessage(message: UiText, elapsedMillis: Long) {
+        val timestamp = SimpleDateFormat(DIAGNOSTIC_TIMESTAMP_PATTERN, Locale.getDefault())
             .format(Date())
         _uiState.value = _uiState.value.copy(
             diagnosticItems = (
                 _uiState.value.diagnosticItems + DiagnosticListItem.Message(
-                    "$timestamp (+${elapsedMillis} ms) $message"
+                    uiText(R.string.diagnostic_entry, timestamp, elapsedMillis, message)
                 )
             )
                 .takeLast(MAX_DIAGNOSTIC_MESSAGES)
@@ -233,124 +236,132 @@ class MainViewModel(
         )
     }
 
-    private fun DeviceActionDiagnosticEvent.toUserMessage(deviceName: String): String {
+    private fun DeviceActionDiagnosticEvent.toUserMessage(deviceName: String): UiText {
         return when (this) {
-            DeviceActionDiagnosticEvent.ActionStarted -> "Geräteaktion „$deviceName“ gestartet"
+            DeviceActionDiagnosticEvent.ActionStarted ->
+                uiText(R.string.diagnostic_action_started, deviceName)
             is DeviceActionDiagnosticEvent.WifiRequestStarted -> {
-                "WLAN-Anforderung für Profil „$profileName“ gestartet"
+                uiText(R.string.diagnostic_wifi_request_started, profileName)
             }
             DeviceActionDiagnosticEvent.WifiSecurityDetectionStarted -> {
-                "WLAN-Sicherheitstyp wird ermittelt"
+                uiText(R.string.diagnostic_wifi_security_started)
             }
             DeviceActionDiagnosticEvent.WifiSecurityDetectionSucceeded -> {
-                "WLAN-Sicherheitstyp erkannt"
+                uiText(R.string.diagnostic_wifi_security_succeeded)
             }
             DeviceActionDiagnosticEvent.WifiSecurityDetectionUnavailable -> {
-                "WLAN-Sicherheitstyp nicht ermittelbar; Fallback wird verwendet"
+                uiText(R.string.diagnostic_wifi_security_unavailable)
             }
-            DeviceActionDiagnosticEvent.WifiFound -> "WLAN gefunden"
-            DeviceActionDiagnosticEvent.WifiConnected -> "WLAN verbunden"
-            DeviceActionDiagnosticEvent.IpAddressReceived -> "IP-Adresse erhalten"
+            DeviceActionDiagnosticEvent.WifiFound -> uiText(R.string.diagnostic_wifi_found)
+            DeviceActionDiagnosticEvent.WifiConnected -> uiText(R.string.diagnostic_wifi_connected)
+            DeviceActionDiagnosticEvent.IpAddressReceived -> uiText(R.string.diagnostic_ip_received)
             DeviceActionDiagnosticEvent.WifiConnectionFailed -> {
-                "WLAN-Verbindung fehlgeschlagen"
+                uiText(R.string.diagnostic_wifi_failed)
             }
-            DeviceActionDiagnosticEvent.WifiDisabled -> "WLAN ist deaktiviert"
+            DeviceActionDiagnosticEvent.WifiDisabled -> uiText(R.string.diagnostic_wifi_disabled)
             is DeviceActionDiagnosticEvent.DeviceAddress -> {
-                "Geräteadresse: $address"
+                uiText(R.string.diagnostic_device_address, address)
             }
             is DeviceActionDiagnosticEvent.HttpRequestStarted -> when (method) {
-                ApiMethod.GET -> "HTTP/RPC GET an $address gestartet"
-                ApiMethod.POST -> "HTTP/RPC POST an $address gestartet"
+                ApiMethod.GET -> uiText(R.string.diagnostic_http_get_started, address)
+                ApiMethod.POST -> uiText(R.string.diagnostic_http_post_started, address)
             }
             is DeviceActionDiagnosticEvent.HttpResponseReceived -> {
-                "HTTP/RPC-Antwort erhalten: Status $statusCode"
+                uiText(R.string.diagnostic_http_response, statusCode)
             }
             is DeviceActionDiagnosticEvent.HttpRequestSucceeded -> {
-                "HTTP/RPC-Aufruf erfolgreich: Status $statusCode"
+                uiText(R.string.diagnostic_http_success, statusCode)
             }
             is DeviceActionDiagnosticEvent.DnsResolutionStarted -> {
-                "DNS-Auflösung für $address gestartet"
+                uiText(R.string.diagnostic_dns_started, address)
             }
-            DeviceActionDiagnosticEvent.DnsResolutionSucceeded -> "DNS-Auflösung erfolgreich"
+            DeviceActionDiagnosticEvent.DnsResolutionSucceeded ->
+                uiText(R.string.diagnostic_dns_succeeded)
             DeviceActionDiagnosticEvent.DnsResolutionFailed -> {
-                "DNS-Name des Geräts konnte nicht aufgelöst werden"
+                uiText(R.string.diagnostic_dns_failed)
             }
             DeviceActionDiagnosticEvent.DeviceNotReachable -> {
-                "IP-Adresse des Geräts ist nicht erreichbar"
+                uiText(R.string.diagnostic_device_unreachable)
             }
-            DeviceActionDiagnosticEvent.RequestSucceeded -> "Gerät erfolgreich geschaltet"
-            DeviceActionDiagnosticEvent.RequestFailed -> "Anfrage fehlgeschlagen"
+            DeviceActionDiagnosticEvent.RequestSucceeded ->
+                uiText(R.string.diagnostic_request_succeeded)
+            DeviceActionDiagnosticEvent.RequestFailed -> uiText(R.string.diagnostic_request_failed)
             is DeviceActionDiagnosticEvent.Timeout -> when (stage) {
                 DiagnosticStage.WIFI_REQUEST -> {
-                    "Timeout bei der WLAN-Anforderung; keine Verbindung hergestellt"
+                    uiText(R.string.diagnostic_timeout_wifi_request)
                 }
                 DiagnosticStage.WIFI -> {
-                    "Timeout beim WLAN-Verbindungsaufbau"
+                    uiText(R.string.diagnostic_timeout_wifi)
                 }
                 DiagnosticStage.DNS -> {
-                    "Timeout bei der DNS-Auflösung"
+                    uiText(R.string.diagnostic_timeout_dns)
                 }
                 DiagnosticStage.HTTP -> {
-                    "Timeout beim HTTP/RPC-Aufruf"
+                    uiText(R.string.diagnostic_timeout_http)
                 }
             }
-            DeviceActionDiagnosticEvent.ActionCompleted -> "Geräteaktion abgeschlossen"
+            DeviceActionDiagnosticEvent.ActionCompleted ->
+                uiText(R.string.diagnostic_action_completed)
         }
     }
 
     private fun DeviceActionResult.toUiState(): DeviceActionUiState {
         return when (this) {
-            DeviceActionResult.Success -> DeviceActionUiState.Success("Erfolg")
+            DeviceActionResult.Success -> DeviceActionUiState.Success(uiText(R.string.action_success))
             DeviceActionResult.NoConnections -> {
-                DeviceActionUiState.Error("Kein WLAN für Gerät konfiguriert")
+                DeviceActionUiState.Error(uiText(R.string.action_no_wifi))
             }
 
             DeviceActionResult.WifiConnectionFailed -> {
-                DeviceActionUiState.Error("Zugeordnetes WLAN nicht erreichbar")
+                DeviceActionUiState.Error(uiText(R.string.action_wifi_unreachable))
             }
 
             DeviceActionResult.WifiPermissionDenied -> {
-                DeviceActionUiState.Error("WLAN-Verbindung nicht erlaubt")
+                DeviceActionUiState.Error(uiText(R.string.action_wifi_permission_denied))
             }
 
             DeviceActionResult.WifiDisabled -> {
-                DeviceActionUiState.Error("WLAN ist deaktiviert")
+                DeviceActionUiState.Error(uiText(R.string.action_wifi_disabled))
             }
 
             DeviceActionResult.UnsupportedAndroidVersion -> {
-                DeviceActionUiState.Error("Android unterstützt WLAN-Verbindung nicht")
+                DeviceActionUiState.Error(uiText(R.string.action_android_unsupported))
             }
 
             is DeviceActionResult.HttpError -> {
-                DeviceActionUiState.Error("Gerät meldet HTTP-Fehler $statusCode")
+                DeviceActionUiState.Error(uiText(R.string.action_http_error, statusCode))
             }
 
             DeviceActionResult.Timeout -> {
-                DeviceActionUiState.Error("Zeitüberschreitung beim Schalten")
+                DeviceActionUiState.Error(uiText(R.string.action_timeout))
             }
 
             DeviceActionResult.InvalidRequest -> {
-                DeviceActionUiState.Error("Gespeicherte Geräteadresse ungültig")
+                DeviceActionUiState.Error(uiText(R.string.action_invalid_address))
             }
 
             is DeviceActionResult.NetworkError -> {
                 val detail = when (reason) {
-                    NetworkFailureReason.DNS -> "Gerätename nicht auflösbar"
-                    NetworkFailureReason.CONNECTION -> "Gerät im Netzwerk nicht erreichbar"
-                    NetworkFailureReason.NO_ROUTE -> "Keine Netzwerkroute zum Gerät"
+                    NetworkFailureReason.DNS -> uiText(R.string.action_dns_error)
+                    NetworkFailureReason.CONNECTION -> uiText(R.string.action_connection_error)
+                    NetworkFailureReason.NO_ROUTE -> uiText(R.string.action_no_route)
                     NetworkFailureReason.VPN_BLOCKED -> {
-                        "VPN oder Firewall blockiert Zugriff"
+                        uiText(R.string.action_vpn_blocked)
                     }
-                    NetworkFailureReason.OTHER -> "Netzwerkzugriff zum Gerät fehlgeschlagen"
+                    NetworkFailureReason.OTHER -> uiText(R.string.action_network_error)
                 }
                 DeviceActionUiState.Error(detail)
             }
 
             DeviceActionResult.UnexpectedError -> {
-                DeviceActionUiState.Error("Geräteaktion fehlgeschlagen")
+                DeviceActionUiState.Error(uiText(R.string.action_failed))
             }
         }
     }
+
+    private fun Throwable.toUiText(fallbackResourceId: Int): UiText =
+        message?.takeIf(String::isNotBlank)?.let(UiText::Dynamic)
+            ?: uiText(fallbackResourceId)
 
     private companion object {
         const val DIAGNOSTIC_TIMESTAMP_PATTERN = "HH:mm:ss.SSS"

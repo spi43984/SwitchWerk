@@ -38,6 +38,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
@@ -47,6 +49,8 @@ import de.piecha.switchwerk.ui.components.AppOverflowMenu
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.DiagnosticListItem
 import de.piecha.switchwerk.viewmodel.MainViewModel
+import de.piecha.switchwerk.R
+import de.piecha.switchwerk.ui.asString
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -82,7 +86,7 @@ fun StartScreen(
 
             uiState.errorMessage?.let { message ->
                 Text(
-                    text = message,
+                    text = message.asString(),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 16.dp)
                 )
@@ -153,14 +157,14 @@ private fun DashboardHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "SwitchWerk",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "$deviceCount Geräte gefunden",
+                text = pluralStringResource(R.plurals.devices_found, deviceCount, deviceCount),
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1
             )
@@ -177,7 +181,7 @@ private fun DashboardHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "SwitchWerk",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge
             )
             AppOverflowMenu(onClick = onOpenMenu)
@@ -191,7 +195,7 @@ private fun DashboardHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "$deviceCount Geräte gefunden",
+                text = pluralStringResource(R.plurals.devices_found, deviceCount, deviceCount),
                 style = MaterialTheme.typography.bodyLarge
             )
             DashboardLayoutSelector(
@@ -215,12 +219,12 @@ private fun DashboardLayoutSelector(
         FilterChip(
             selected = selectedMode == DashboardLayoutMode.LIST,
             onClick = { onModeSelected(DashboardLayoutMode.LIST) },
-            label = { Text("Liste") }
+            label = { Text(stringResource(R.string.layout_list)) }
         )
         FilterChip(
             selected = selectedMode == DashboardLayoutMode.WIDGETS,
             onClick = { onModeSelected(DashboardLayoutMode.WIDGETS) },
-            label = { Text("Widgets") }
+            label = { Text(stringResource(R.string.layout_widgets)) }
         )
     }
 }
@@ -233,7 +237,7 @@ private fun EmptyDeviceList(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Keine Geräte konfiguriert",
+            text = stringResource(R.string.no_devices_configured),
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -379,7 +383,7 @@ private fun DeviceActionFooter(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
-                        contentDescription = "Gerät eine Position nach vorne verschieben"
+                        contentDescription = stringResource(R.string.move_device_forward)
                     )
                 }
                 IconButton(
@@ -389,7 +393,7 @@ private fun DeviceActionFooter(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "Gerät eine Position nach hinten verschieben"
+                        contentDescription = stringResource(R.string.move_device_backward)
                     )
                 }
             }
@@ -427,7 +431,7 @@ private fun DeviceActionArea(
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
-                        text = actionState.message,
+                        text = actionState.message.asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis
@@ -461,8 +465,8 @@ private fun DeviceActionButton(
     onActionClick: () -> Unit
 ) {
     val label = when (actionState) {
-        DeviceActionUiState.Loading -> "Schaltet…"
-        is DeviceActionUiState.Error -> actionState.message
+        DeviceActionUiState.Loading -> stringResource(R.string.switching)
+        is DeviceActionUiState.Error -> actionState.message.asString()
         is DeviceActionUiState.Success,
         null -> device.actionLabel
     }
@@ -487,9 +491,9 @@ private fun DeviceActionStatus(
     modifier: Modifier = Modifier
 ) {
     val text = when (actionState) {
-        DeviceActionUiState.Loading -> "Wird ausgeführt..."
-        is DeviceActionUiState.Success -> actionState.message
-        is DeviceActionUiState.Error -> actionState.message
+        DeviceActionUiState.Loading -> stringResource(R.string.executing)
+        is DeviceActionUiState.Success -> actionState.message.asString()
+        is DeviceActionUiState.Error -> actionState.message.asString()
     }
     val color = when (actionState) {
         is DeviceActionUiState.Success -> MaterialTheme.colorScheme.primary
@@ -533,7 +537,7 @@ private fun DiagnosticPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Aktionsdetails",
+                    text = stringResource(R.string.action_details),
                     style = MaterialTheme.typography.titleSmall
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -543,11 +547,15 @@ private fun DiagnosticPanel(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
-                            contentDescription = "Aktionsprotokoll löschen"
+                            contentDescription = stringResource(R.string.clear_action_log)
                         )
                     }
                     OutlinedButton(onClick = onToggleSortOrder) {
-                        Text(if (newestFirst) "Neueste oben" else "Neueste unten")
+                        Text(
+                            stringResource(
+                                if (newestFirst) R.string.newest_first else R.string.newest_last
+                            )
+                        )
                     }
                 }
             }
@@ -560,7 +568,7 @@ private fun DiagnosticPanel(
                 if (displayedItems.isEmpty()) {
                     item {
                         Text(
-                            text = "Noch keine Geräteaktion ausgeführt",
+                            text = stringResource(R.string.no_device_action_yet),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -568,7 +576,7 @@ private fun DiagnosticPanel(
                     items(displayedItems) { item ->
                         when (item) {
                             is DiagnosticListItem.Message -> Text(
-                                text = item.text,
+                                text = item.text.asString(),
                                 style = MaterialTheme.typography.bodySmall
                             )
                             DiagnosticListItem.Separator -> HorizontalDivider(

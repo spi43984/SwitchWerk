@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import de.piecha.switchwerk.R
 
 @Composable
 fun HelpContent(modifier: Modifier = Modifier) {
@@ -27,14 +29,11 @@ fun HelpContent(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Über SwitchWerk", style = MaterialTheme.typography.titleMedium)
-            Text(
-                "SwitchWerk steuert Shelly und andere Geräte direkt im lokalen Netzwerk. " +
-                    "Die Konfiguration bleibt auf diesem Gerät."
-            )
-            Text("Version $versionName")
+            Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.about_description))
+            Text(stringResource(R.string.version_value, versionName))
             StandardActionButton(
-                text = "GitHub-Projekt öffnen",
+                text = stringResource(R.string.open_github_project),
                 onClick = { uriHandler.openUri(PROJECT_URL) },
                 modifier = Modifier.fillMaxWidth()
             )
