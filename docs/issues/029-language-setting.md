@@ -24,7 +24,7 @@ Android-Standardressourcen verwenden:
 - `res/values-de/strings.xml` für Deutsch
 - `res/values-en/strings.xml` für Englisch
 
-UI-Texte sollen schrittweise aus fest codierten Strings in String-Ressourcen verschoben werden.
+UI-Texte sollen aus fest codierten Strings in String-Ressourcen verschoben werden.
 
 Für die App-Sprachauswahl wird eine gespeicherte Einstellung verwendet. Bei "System" wird die Android-Systemsprache genutzt.
 
