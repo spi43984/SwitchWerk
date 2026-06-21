@@ -4,18 +4,25 @@ Stand: 21. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 029 "Language Setting" / GitHub Issue #75 ist implementiert und auf dem
-Ubuntu-Host erfolgreich gebaut, installiert und manuell geprüft. Veröffentlichung,
-Merge und Abschlussdokumentation stehen noch aus.
+Keine aktive Implementierung.
 
-- persistierte Auswahl System / Deutsch / Englisch in der bestehenden
-  App-Settings-Infrastruktur
-- Anwendung über Android `LocaleManager` ab API 33 und lokale
-  Ressourcen-Konfiguration auf API 26 bis 32
-- sichtbare Compose-, Status-, Validierungs- und Diagnosetexte in Android
-  String-Ressourcen überführt
-- vollständige deutsche und englische Ressourcensätze mit identischen Schlüsseln
-- keine Änderung an Netzwerk-, Geräte-, WLAN-, Import-/Export- oder Passwortlogik
+Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
+in `docs/issues/overview.txt`.
+
+Nächstes offenes Issue: 030 "WiFi Profile Deletion Safety".
+
+## Zuletzt abgeschlossene Arbeit
+
+Issue 029 "Language Setting" ist implementiert, auf dem Ubuntu-Host geprüft und
+nach `main` gemergt.
+
+- GitHub-Issue: #75
+- Pull Request: #76
+- Merge-Commit: `25484b8f9d12031785700cca9fa749eb12acbf86`
+- persistierte Auswahl System / Deutsch / Englisch
+- vollständige deutsche und englische Android-String-Ressourcen
+- keine Übersetzung von Benutzerdaten oder technischen Eingaben
+- keine neuen Cloud-, Tracking-, Analytics- oder Übersetzungsabhängigkeiten
 
 Bestätigte Prüfungen:
 
@@ -24,15 +31,9 @@ git diff --check
 ./gradlew testDebugUnitTest
 ./gradlew clean assembleDebug
 ./gradlew installDebug
-manuelle Prüfung von System-, deutscher und englischer Sprache sowie Neustartpersistenz
-```
+manuelle Prüfung der Sprachvarianten und Neustartpersistenz
 
-Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
-in `docs/issues/overview.txt`.
-
-Nächstes offenes Issue: 029 "Language Setting".
-
-## Zuletzt abgeschlossene Arbeit
+## Zuvor abgeschlossene Arbeit
 
 Issue 025 "Dashboard Widget Layout" ist implementiert und auf dem Ubuntu-Host
 geprüft.

@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: GUI / Einstellungen
 
@@ -81,4 +81,4 @@ git diff --check
 manuelle Prüfung der Sprachvarianten und Neustartpersistenz
 ```
 
-Der Issue-Status bleibt bis zum Merge und zur anschließenden Abschlussdokumentation offen.
+Issue 029 wurde nach dem Merge abgeschlossen.
