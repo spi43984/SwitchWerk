@@ -4,13 +4,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -59,6 +62,7 @@ fun DeviceManagementSection(
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
+    onMoveConnection: (String, Int) -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -74,6 +78,7 @@ fun DeviceManagementSection(
             onAddConnection = onAddConnection,
             onUpdateConnection = onUpdateConnection,
             onDeleteConnection = onDeleteConnection,
+            onMoveConnection = onMoveConnection,
             onSaveClick = onSaveClick,
             onCancelClick = onCancelClick
         )
@@ -129,6 +134,7 @@ private fun DeviceEditDialog(
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
+    onMoveConnection: (String, Int) -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
@@ -147,7 +153,8 @@ private fun DeviceEditDialog(
             onApiPathChange = onApiPathChange,
             onAddConnection = onAddConnection,
             onUpdateConnection = onUpdateConnection,
-            onDeleteConnection = onDeleteConnection
+            onDeleteConnection = onDeleteConnection,
+            onMoveConnection = onMoveConnection
         )
     }
 }
@@ -338,7 +345,8 @@ private fun DeviceForm(
     onApiPathChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
-    onDeleteConnection: (String) -> Unit
+    onDeleteConnection: (String) -> Unit,
+    onMoveConnection: (String, Int) -> Unit
 ) {
     OutlinedTextField(
         value = form.name,
@@ -385,7 +393,8 @@ private fun DeviceForm(
         connections = form.connections,
         onAddConnection = onAddConnection,
         onUpdateConnection = onUpdateConnection,
-        onDeleteConnection = onDeleteConnection
+        onDeleteConnection = onDeleteConnection,
+        onMoveConnection = onMoveConnection
     )
 }
 
@@ -395,7 +404,8 @@ private fun DeviceConnectionList(
     connections: List<DeviceConnectionFormState>,
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
-    onDeleteConnection: (String) -> Unit
+    onDeleteConnection: (String) -> Unit,
+    onMoveConnection: (String, Int) -> Unit
 ) {
     var isAddingConnection by remember { mutableStateOf(false) }
     var editingConnection by remember { mutableStateOf<DeviceConnectionFormState?>(null) }
@@ -440,7 +450,7 @@ private fun DeviceConnectionList(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "WLAN-Zuordnungen",
+            text = "WLAN-Verbindungsreihenfolge",
             style = MaterialTheme.typography.titleSmall
         )
 
@@ -468,38 +478,38 @@ private fun DeviceConnectionList(
         return
     }
 
+    Text(
+        text = "Mit den Pfeilen sortieren. Beim Schalten gilt die Reihenfolge von oben nach unten.",
+        style = MaterialTheme.typography.bodySmall
+    )
+
     val listState = rememberLazyListState()
 
-    Column(
-        modifier = Modifier.height(172.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollBackward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "Weitere Zuordnungen oberhalb",
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-
         LazyColumn(
             state = listState,
+            contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier.height(140.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(
+            itemsIndexed(
                 items = connections,
-                key = { connection -> connection.wifiProfileId }
-            ) { connection ->
+                key = { _, connection -> connection.wifiProfileId }
+            ) { index, connection ->
                 DeviceConnectionRow(
                     connection = connection,
+                    canMoveUp = index > 0,
+                    canMoveDown = index < connections.lastIndex,
+                    onMoveUpClick = {
+                        onMoveConnection(connection.wifiProfileId, index - 1)
+                    },
+                    onMoveDownClick = {
+                        onMoveConnection(connection.wifiProfileId, index + 1)
+                    },
                     onEditClick = {
                         editingConnection = connection
                     },
@@ -510,19 +520,26 @@ private fun DeviceConnectionList(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollForward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Weitere Zuordnungen unterhalb",
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+        if (listState.canScrollBackward) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowUp,
+                contentDescription = "Weitere WLAN-Zuordnungen oberhalb",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .size(16.dp)
+            )
+        }
+
+        if (listState.canScrollForward) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Weitere WLAN-Zuordnungen unterhalb",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .size(16.dp)
+            )
         }
     }
 }
@@ -530,6 +547,10 @@ private fun DeviceConnectionList(
 @Composable
 private fun DeviceConnectionRow(
     connection: DeviceConnectionFormState,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onMoveUpClick: () -> Unit,
+    onMoveDownClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -559,6 +580,28 @@ private fun DeviceConnectionRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(
+                onClick = onMoveUpClick,
+                enabled = canMoveUp,
+                modifier = Modifier.size(26.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "WLAN-Zuordnung nach oben verschieben"
+                )
+            }
+
+            IconButton(
+                onClick = onMoveDownClick,
+                enabled = canMoveDown,
+                modifier = Modifier.size(26.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "WLAN-Zuordnung nach unten verschieben"
+                )
+            }
+
             IconButton(
                 onClick = onEditClick,
                 modifier = Modifier.size(26.dp)

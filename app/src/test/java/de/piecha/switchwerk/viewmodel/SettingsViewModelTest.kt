@@ -10,7 +10,10 @@ import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
+import de.piecha.switchwerk.domain.model.ApiCall
+import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
@@ -149,6 +152,48 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun reorderedDeviceConnectionsAreSavedInDisplayedOrder() = runTest(dispatcher) {
+        val profiles = listOf(
+            WifiProfile(id = "wifi-1", name = "First", ssid = "First SSID"),
+            WifiProfile(id = "wifi-2", name = "Second", ssid = "Second SSID")
+        )
+        val device = Device(
+            id = "device-1",
+            name = "Device",
+            actionLabel = "Switch",
+            apiCall = ApiCall(ApiMethod.GET, "/rpc/Switch.Toggle?id=0"),
+            connections = listOf(
+                DeviceConnection(wifiProfileId = "wifi-1", host = "first.local"),
+                DeviceConnection(wifiProfileId = "wifi-2", host = "second.local")
+            ),
+            sortOrder = 0
+        )
+        val deviceRepository = FakeDeviceRepository(devices = listOf(device))
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(profiles),
+            deviceRepository = deviceRepository
+        )
+        runCurrent()
+
+        viewModel.startEditDevice(device)
+        viewModel.moveDeviceConnection(wifiProfileId = "wifi-1", targetIndex = 1)
+
+        assertEquals(
+            listOf("wifi-2", "wifi-1"),
+            viewModel.uiState.value.deviceForm.connections.map { it.wifiProfileId }
+        )
+
+        viewModel.saveDevice()
+        runCurrent()
+
+        assertEquals(
+            listOf("wifi-2", "wifi-1"),
+            deviceRepository.savedDevice?.connections?.map { it.wifiProfileId }
+        )
+    }
+
+    @Test
     fun displaySettingsAreUpdatedThroughRepository() = runTest(dispatcher) {
         val appSettingsRepository = FakeAppSettingsRepository()
         val viewModel = settingsViewModel(
@@ -175,11 +220,12 @@ class SettingsViewModelTest {
     private fun settingsViewModel(
         transferRepository: ConfigurationTransferRepository,
         wifiProfileRepository: WifiProfileRepository = FakeWifiProfileRepository(),
-        appSettingsRepository: FakeAppSettingsRepository = FakeAppSettingsRepository()
+        appSettingsRepository: FakeAppSettingsRepository = FakeAppSettingsRepository(),
+        deviceRepository: DeviceRepository = FakeDeviceRepository()
     ): SettingsViewModel {
         return SettingsViewModel(
             wifiProfileRepository = wifiProfileRepository,
-            deviceRepository = FakeDeviceRepository(),
+            deviceRepository = deviceRepository,
             configurationTransferRepository = transferRepository,
             appSettingsRepository = appSettingsRepository
         )
@@ -216,12 +262,18 @@ class SettingsViewModelTest {
         override suspend fun deleteWifiProfile(id: String) = Unit
     }
 
-    private class FakeDeviceRepository : DeviceRepository {
-        override fun observeDevices(): Flow<List<Device>> = flowOf(emptyList())
+    private class FakeDeviceRepository(
+        private val devices: List<Device> = emptyList()
+    ) : DeviceRepository {
+        var savedDevice: Device? = null
 
-        override suspend fun getDevices(): List<Device> = emptyList()
+        override fun observeDevices(): Flow<List<Device>> = flowOf(devices)
 
-        override suspend fun saveDevice(device: Device) = Unit
+        override suspend fun getDevices(): List<Device> = devices
+
+        override suspend fun saveDevice(device: Device) {
+            savedDevice = device
+        }
 
         override suspend fun updateDeviceOrder(deviceIds: List<String>) = Unit
 
