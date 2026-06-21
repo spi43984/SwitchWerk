@@ -11,11 +11,13 @@ import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,6 +60,7 @@ class MainViewModel(
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
     private val actionJobs = mutableMapOf<String, Job>()
+    private val actionStateResetJobs = mutableMapOf<String, Job>()
 
     init {
         observeDevices()
@@ -88,6 +91,7 @@ class MainViewModel(
             return
         }
 
+        actionStateResetJobs.remove(device.id)?.cancel()
         updateDeviceActionState(device.id, DeviceActionUiState.Loading)
         actionJobs[device.id] = viewModelScope.launch {
             var previousDiagnosticAtNanos: Long? = null
@@ -105,7 +109,21 @@ class MainViewModel(
                     elapsedMillis = elapsedMillis
                 )
             }
-            updateDeviceActionState(device.id, result.toUiState())
+            val resultState = result.toUiState()
+            updateDeviceActionState(device.id, resultState)
+            when (resultState) {
+                is DeviceActionUiState.Success -> scheduleActionStateReset(
+                    deviceId = device.id,
+                    state = resultState,
+                    delayMillis = ACTION_SUCCESS_DISPLAY_MILLIS
+                )
+                is DeviceActionUiState.Error -> scheduleActionStateReset(
+                    deviceId = device.id,
+                    state = resultState,
+                    delayMillis = ACTION_ERROR_DISPLAY_MILLIS
+                )
+                DeviceActionUiState.Loading -> Unit
+            }
         }.also { job ->
             job.invokeOnCompletion {
                 actionJobs.remove(device.id, job)
@@ -125,6 +143,10 @@ class MainViewModel(
         appSettingsRepository.setDiagnosticsNewestFirst(
             !_uiState.value.appSettings.diagnosticsNewestFirst
         )
+    }
+
+    fun setDashboardLayoutMode(dashboardLayoutMode: DashboardLayoutMode) {
+        appSettingsRepository.setDashboardLayoutMode(dashboardLayoutMode)
     }
 
     fun clearDiagnosticMessages() {
@@ -159,6 +181,25 @@ class MainViewModel(
         _uiState.value = _uiState.value.copy(
             deviceActionStates = _uiState.value.deviceActionStates + (deviceId to state)
         )
+    }
+
+    private fun scheduleActionStateReset(
+        deviceId: String,
+        state: DeviceActionUiState,
+        delayMillis: Long
+    ) {
+        actionStateResetJobs[deviceId] = viewModelScope.launch {
+            delay(delayMillis)
+            if (_uiState.value.deviceActionStates[deviceId] == state) {
+                _uiState.value = _uiState.value.copy(
+                    deviceActionStates = _uiState.value.deviceActionStates - deviceId
+                )
+            }
+        }.also { job ->
+            job.invokeOnCompletion {
+                actionStateResetJobs.remove(deviceId, job)
+            }
+        }
     }
 
     private fun observeAppSettings() {
@@ -259,17 +300,17 @@ class MainViewModel(
 
     private fun DeviceActionResult.toUiState(): DeviceActionUiState {
         return when (this) {
-            DeviceActionResult.Success -> DeviceActionUiState.Success("Aktion erfolgreich ausgeführt")
+            DeviceActionResult.Success -> DeviceActionUiState.Success("Erfolg")
             DeviceActionResult.NoConnections -> {
-                DeviceActionUiState.Error("Für dieses Gerät ist kein WLAN konfiguriert")
+                DeviceActionUiState.Error("Kein WLAN für Gerät konfiguriert")
             }
 
             DeviceActionResult.WifiConnectionFailed -> {
-                DeviceActionUiState.Error("Keines der zugeordneten WLANs ist erreichbar")
+                DeviceActionUiState.Error("Zugeordnetes WLAN nicht erreichbar")
             }
 
             DeviceActionResult.WifiPermissionDenied -> {
-                DeviceActionUiState.Error("WLAN-Verbindung wurde nicht erlaubt")
+                DeviceActionUiState.Error("WLAN-Verbindung nicht erlaubt")
             }
 
             DeviceActionResult.WifiDisabled -> {
@@ -277,36 +318,36 @@ class MainViewModel(
             }
 
             DeviceActionResult.UnsupportedAndroidVersion -> {
-                DeviceActionUiState.Error("Diese Android-Version unterstützt die WLAN-Verbindung nicht")
+                DeviceActionUiState.Error("Android unterstützt WLAN-Verbindung nicht")
             }
 
             is DeviceActionResult.HttpError -> {
-                DeviceActionUiState.Error("Gerät antwortet mit HTTP-Status $statusCode")
+                DeviceActionUiState.Error("Gerät meldet HTTP-Fehler $statusCode")
             }
 
             DeviceActionResult.Timeout -> {
-                DeviceActionUiState.Error("Zeitüberschreitung; die Aktion wird nicht wiederholt")
+                DeviceActionUiState.Error("Zeitüberschreitung beim Schalten")
             }
 
             DeviceActionResult.InvalidRequest -> {
-                DeviceActionUiState.Error("Die gespeicherte Geräteadresse ist ungültig")
+                DeviceActionUiState.Error("Gespeicherte Geräteadresse ungültig")
             }
 
             is DeviceActionResult.NetworkError -> {
                 val detail = when (reason) {
-                    NetworkFailureReason.DNS -> "Der Gerätename konnte nicht aufgelöst werden"
-                    NetworkFailureReason.CONNECTION -> "Port 80 des Geräts ist nicht erreichbar"
-                    NetworkFailureReason.NO_ROUTE -> "Es besteht keine Netzwerkroute zum Gerät"
+                    NetworkFailureReason.DNS -> "Gerätename nicht auflösbar"
+                    NetworkFailureReason.CONNECTION -> "Gerät im Netzwerk nicht erreichbar"
+                    NetworkFailureReason.NO_ROUTE -> "Keine Netzwerkroute zum Gerät"
                     NetworkFailureReason.VPN_BLOCKED -> {
-                        "VPN oder Firewall blockiert den lokalen Netzwerkzugriff"
+                        "VPN oder Firewall blockiert Zugriff"
                     }
-                    NetworkFailureReason.OTHER -> "Der gebundene Netzwerkzugriff ist fehlgeschlagen"
+                    NetworkFailureReason.OTHER -> "Netzwerkzugriff zum Gerät fehlgeschlagen"
                 }
                 DeviceActionUiState.Error(detail)
             }
 
             DeviceActionResult.UnexpectedError -> {
-                DeviceActionUiState.Error("Die Geräteaktion ist fehlgeschlagen")
+                DeviceActionUiState.Error("Geräteaktion fehlgeschlagen")
             }
         }
     }
@@ -315,5 +356,7 @@ class MainViewModel(
         const val DIAGNOSTIC_TIMESTAMP_PATTERN = "HH:mm:ss.SSS"
         const val MAX_DIAGNOSTIC_MESSAGES = 200
         const val NANOS_PER_MILLISECOND = 1_000_000L
+        const val ACTION_SUCCESS_DISPLAY_MILLIS = 2_000L
+        const val ACTION_ERROR_DISPLAY_MILLIS = 4_000L
     }
 }

@@ -1,6 +1,8 @@
 package de.piecha.switchwerk.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -21,8 +26,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +37,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.ui.components.AppMenuLayout
 import de.piecha.switchwerk.ui.components.AppOverflowMenu
@@ -47,6 +57,8 @@ fun StartScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val devices = uiState.devices.sortedBy { it.sortOrder }
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val screenPadding = if (isLandscape) 12.dp else 24.dp
 
     AppMenuLayout(
         onOpenSettings = onNavigateToSettings,
@@ -54,30 +66,18 @@ fun StartScreen(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .padding(24.dp),
-        rightEdgeExtension = 24.dp
+            .padding(screenPadding),
+        rightEdgeExtension = screenPadding
     ) { openMenu ->
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "SwitchWerk",
-                    style = MaterialTheme.typography.headlineLarge
-                )
-
-                AppOverflowMenu(onClick = openMenu)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "${devices.size} Geräte gefunden",
-                style = MaterialTheme.typography.bodyLarge
+            DashboardHeader(
+                deviceCount = devices.size,
+                selectedMode = uiState.appSettings.dashboardLayoutMode,
+                isLandscape = isLandscape,
+                onModeSelected = viewModel::setDashboardLayoutMode,
+                onOpenMenu = openMenu
             )
 
             uiState.errorMessage?.let { message ->
@@ -88,11 +88,12 @@ fun StartScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (isLandscape) 6.dp else 12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 val detailHeight = uiState.appSettings.detailPanelHeight.fraction
-                val deviceAreaWeight = if (uiState.appSettings.showActionDetails) {
+                val showActionDetails = uiState.appSettings.showActionDetails && !isLandscape
+                val deviceAreaWeight = if (showActionDetails) {
                     1f - detailHeight
                 } else {
                     1f
@@ -101,17 +102,28 @@ fun StartScreen(
                 if (devices.isEmpty()) {
                     EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
                 } else {
-                    DeviceList(
-                        devices = devices,
-                        actionStates = uiState.deviceActionStates,
-                        onDeviceActionClick = viewModel::executeDeviceAction,
-                        onMoveUpClick = viewModel::moveDeviceUp,
-                        onMoveDownClick = viewModel::moveDeviceDown,
-                        modifier = Modifier.weight(deviceAreaWeight)
-                    )
+                    when (uiState.appSettings.dashboardLayoutMode) {
+                        DashboardLayoutMode.LIST -> DeviceList(
+                            devices = devices,
+                            actionStates = uiState.deviceActionStates,
+                            onDeviceActionClick = viewModel::executeDeviceAction,
+                            onMoveUpClick = viewModel::moveDeviceUp,
+                            onMoveDownClick = viewModel::moveDeviceDown,
+                            modifier = Modifier.weight(deviceAreaWeight)
+                        )
+
+                        DashboardLayoutMode.WIDGETS -> DeviceWidgetGrid(
+                            devices = devices,
+                            actionStates = uiState.deviceActionStates,
+                            onDeviceActionClick = viewModel::executeDeviceAction,
+                            onMoveUpClick = viewModel::moveDeviceUp,
+                            onMoveDownClick = viewModel::moveDeviceDown,
+                            modifier = Modifier.weight(deviceAreaWeight)
+                        )
+                    }
                 }
 
-                if (uiState.appSettings.showActionDetails) {
+                if (showActionDetails) {
                     Spacer(modifier = Modifier.height(12.dp))
                     DiagnosticPanel(
                         items = uiState.diagnosticItems,
@@ -123,6 +135,93 @@ fun StartScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DashboardHeader(
+    deviceCount: Int,
+    selectedMode: DashboardLayoutMode,
+    isLandscape: Boolean,
+    onModeSelected: (DashboardLayoutMode) -> Unit,
+    onOpenMenu: () -> Unit
+) {
+    if (isLandscape) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "SwitchWerk",
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "$deviceCount Geräte gefunden",
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1
+            )
+            DashboardLayoutSelector(
+                selectedMode = selectedMode,
+                onModeSelected = onModeSelected
+            )
+            AppOverflowMenu(onClick = onOpenMenu)
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "SwitchWerk",
+                style = MaterialTheme.typography.headlineLarge
+            )
+            AppOverflowMenu(onClick = onOpenMenu)
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "$deviceCount Geräte gefunden",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            DashboardLayoutSelector(
+                selectedMode = selectedMode,
+                onModeSelected = onModeSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun DashboardLayoutSelector(
+    selectedMode: DashboardLayoutMode,
+    onModeSelected: (DashboardLayoutMode) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            selected = selectedMode == DashboardLayoutMode.LIST,
+            onClick = { onModeSelected(DashboardLayoutMode.LIST) },
+            label = { Text("Liste") }
+        )
+        FilterChip(
+            selected = selectedMode == DashboardLayoutMode.WIDGETS,
+            onClick = { onModeSelected(DashboardLayoutMode.WIDGETS) },
+            label = { Text("Widgets") }
+        )
     }
 }
 
@@ -168,6 +267,245 @@ private fun DeviceList(
             )
         }
     }
+}
+
+@Composable
+private fun DeviceWidgetGrid(
+    devices: List<Device>,
+    actionStates: Map<String, DeviceActionUiState>,
+    onDeviceActionClick: (Device) -> Unit,
+    onMoveUpClick: (String) -> Unit,
+    onMoveDownClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 140.dp),
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(
+            items = devices,
+            key = { device -> device.id }
+        ) { device ->
+            DeviceWidget(
+                device = device,
+                actionState = actionStates[device.id],
+                canMoveUp = devices.indexOf(device) > 0,
+                canMoveDown = devices.indexOf(device) < devices.lastIndex,
+                onActionClick = { onDeviceActionClick(device) },
+                onMoveUpClick = { onMoveUpClick(device.id) },
+                onMoveDownClick = { onMoveDownClick(device.id) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeviceWidget(
+    device: Device,
+    actionState: DeviceActionUiState?,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onActionClick: () -> Unit,
+    onMoveUpClick: () -> Unit,
+    onMoveDownClick: () -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(
+                start = 12.dp,
+                top = 10.dp,
+                end = 12.dp,
+                bottom = 0.dp
+            )
+        ) {
+            Text(
+                text = device.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.height(48.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DeviceActionArea(
+                device = device,
+                actionState = actionState,
+                canMoveUp = canMoveUp,
+                canMoveDown = canMoveDown,
+                onActionClick = onActionClick,
+                onMoveUpClick = onMoveUpClick,
+                onMoveDownClick = onMoveDownClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeviceActionFooter(
+    actionState: DeviceActionUiState?,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onMoveUpClick: () -> Unit,
+    onMoveDownClick: () -> Unit
+) {
+    val showSortButtons = actionState == null || actionState is DeviceActionUiState.Success
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (actionState == null) {
+            Spacer(modifier = Modifier.weight(1f))
+        } else if (actionState is DeviceActionUiState.Success) {
+            DeviceActionStatus(
+                actionState = actionState,
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+        if (showSortButtons) {
+            Row {
+                IconButton(
+                    onClick = onMoveUpClick,
+                    enabled = canMoveUp,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Gerät eine Position nach vorne verschieben"
+                    )
+                }
+                IconButton(
+                    onClick = onMoveDownClick,
+                    enabled = canMoveDown,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Gerät eine Position nach hinten verschieben"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeviceActionArea(
+    device: Device,
+    actionState: DeviceActionUiState?,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onActionClick: () -> Unit,
+    onMoveUpClick: () -> Unit,
+    onMoveDownClick: () -> Unit
+) {
+    if (actionState is DeviceActionUiState.Error) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(84.dp)
+                .padding(bottom = 4.dp)
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = actionState.message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    } else {
+        Column(modifier = Modifier.height(84.dp)) {
+            DeviceActionButton(
+                device = device,
+                actionState = actionState,
+                onActionClick = onActionClick
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            DeviceActionFooter(
+                actionState = actionState,
+                canMoveUp = canMoveUp,
+                canMoveDown = canMoveDown,
+                onMoveUpClick = onMoveUpClick,
+                onMoveDownClick = onMoveDownClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeviceActionButton(
+    device: Device,
+    actionState: DeviceActionUiState?,
+    onActionClick: () -> Unit
+) {
+    val label = when (actionState) {
+        DeviceActionUiState.Loading -> "Schaltet…"
+        is DeviceActionUiState.Error -> actionState.message
+        is DeviceActionUiState.Success,
+        null -> device.actionLabel
+    }
+    Button(
+        onClick = onActionClick,
+        enabled = actionState !is DeviceActionUiState.Loading,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+    ) {
+        Text(
+            text = label,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun DeviceActionStatus(
+    actionState: DeviceActionUiState,
+    modifier: Modifier = Modifier
+) {
+    val text = when (actionState) {
+        DeviceActionUiState.Loading -> "Wird ausgeführt..."
+        is DeviceActionUiState.Success -> actionState.message
+        is DeviceActionUiState.Error -> actionState.message
+    }
+    val color = when (actionState) {
+        is DeviceActionUiState.Success -> MaterialTheme.colorScheme.primary
+        is DeviceActionUiState.Error -> MaterialTheme.colorScheme.error
+        DeviceActionUiState.Loading -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Text(
+        text = text,
+        color = color,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = modifier,
+        minLines = 1,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
@@ -258,7 +596,12 @@ private fun DeviceCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(
+                start = 16.dp,
+                top = 12.dp,
+                end = 16.dp,
+                bottom = 0.dp
+            )
         ) {
             Text(
                 text = device.name,
@@ -267,70 +610,15 @@ private fun DeviceCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
-                onClick = onActionClick,
-                enabled = actionState !is DeviceActionUiState.Loading,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    if (actionState is DeviceActionUiState.Loading) {
-                        "Wird ausgeführt..."
-                    } else {
-                        device.actionLabel
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onMoveUpClick,
-                    enabled = canMoveUp,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.KeyboardArrowUp,
-                        contentDescription = "Gerät nach oben verschieben"
-                    )
-                }
-
-                IconButton(
-                    onClick = onMoveDownClick,
-                    enabled = canMoveDown,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "Gerät nach unten verschieben"
-                    )
-                }
-            }
-
-            when (actionState) {
-                is DeviceActionUiState.Success -> {
-                    Text(
-                        text = actionState.message,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-
-                is DeviceActionUiState.Error -> {
-                    Text(
-                        text = actionState.message,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-
-                DeviceActionUiState.Loading,
-                null -> Unit
-            }
+            DeviceActionArea(
+                device = device,
+                actionState = actionState,
+                canMoveUp = canMoveUp,
+                canMoveDown = canMoveDown,
+                onActionClick = onActionClick,
+                onMoveUpClick = onMoveUpClick,
+                onMoveDownClick = onMoveDownClick
+            )
         }
     }
 }

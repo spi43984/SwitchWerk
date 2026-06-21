@@ -21,6 +21,7 @@ import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
 import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
 import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -130,7 +131,8 @@ class DefaultConfigurationTransferRepository(
                     themeMode = settings.themeMode.name,
                     showActionDetails = settings.showActionDetails,
                     detailPanelHeight = settings.detailPanelHeight.name,
-                    diagnosticsNewestFirst = settings.diagnosticsNewestFirst
+                    diagnosticsNewestFirst = settings.diagnosticsNewestFirst,
+                    dashboardLayoutMode = settings.dashboardLayoutMode.name
                 )
             },
             wifiProfiles = profiles.map { profile ->
@@ -273,6 +275,11 @@ class DefaultConfigurationTransferRepository(
             DetailPanelHeight.valueOf(settings.detailPanelHeight)
         )
         appSettingsRepository.setDiagnosticsNewestFirst(settings.diagnosticsNewestFirst)
+        settings.dashboardLayoutMode?.let { dashboardLayoutMode ->
+            appSettingsRepository.setDashboardLayoutMode(
+                DashboardLayoutMode.valueOf(dashboardLayoutMode)
+            )
+        }
     }
 
     private fun ConfigurationWifiProfile.toEntity(): WifiProfileEntity {

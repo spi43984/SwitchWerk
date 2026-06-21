@@ -7,6 +7,7 @@ import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -114,6 +115,24 @@ class MainViewModelTest {
         runCurrent()
 
         assertEquals(listOf("device-2", "device-1", "device-3"), repository.lastDeviceOrder)
+    }
+
+    @Test
+    fun dashboardLayoutModeIsAppliedImmediately() = runTest(dispatcher) {
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(emptyList()),
+            deviceActionService = WaitingDeviceActionService(),
+            appSettingsRepository = FakeAppSettingsRepository()
+        )
+        runCurrent()
+
+        viewModel.setDashboardLayoutMode(DashboardLayoutMode.WIDGETS)
+        runCurrent()
+
+        assertEquals(
+            DashboardLayoutMode.WIDGETS,
+            viewModel.uiState.value.appSettings.dashboardLayoutMode
+        )
     }
 
     private fun device(id: String, sortOrder: Int): Device {

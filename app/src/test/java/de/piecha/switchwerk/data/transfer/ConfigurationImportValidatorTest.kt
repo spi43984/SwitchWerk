@@ -49,10 +49,42 @@ class ConfigurationImportValidatorTest {
                     themeMode = "DARK",
                     showActionDetails = true,
                     detailPanelHeight = "FORTY_PERCENT",
-                    diagnosticsNewestFirst = false
+                    diagnosticsNewestFirst = false,
+                    dashboardLayoutMode = "WIDGETS"
                 )
             )
         )
+    }
+
+    @Test
+    fun appSettingsWithoutDashboardLayoutRemainSupported() {
+        validator.validate(
+            validDocument().copy(
+                appSettings = ConfigurationAppSettings(
+                    themeMode = "SYSTEM",
+                    showActionDetails = false,
+                    detailPanelHeight = "THIRTY_PERCENT",
+                    diagnosticsNewestFirst = true
+                )
+            )
+        )
+    }
+
+    @Test
+    fun unsupportedDashboardLayoutIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument().copy(
+                    appSettings = ConfigurationAppSettings(
+                        themeMode = "SYSTEM",
+                        showActionDetails = false,
+                        detailPanelHeight = "THIRTY_PERCENT",
+                        diagnosticsNewestFirst = true,
+                        dashboardLayoutMode = "FREEFORM"
+                    )
+                )
+            )
+        }
     }
 
     @Test
