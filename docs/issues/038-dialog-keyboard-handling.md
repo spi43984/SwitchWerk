@@ -45,6 +45,13 @@ Das betrifft insbesondere:
   - Formularbereich scrollt
   - Aktionsbereich bleibt sichtbar oder wird zuverlässig über die Tastatur geschoben
 
+### Begrenzte Dialoghöhe
+
+- Formular-Dialoge verwenden eine maximale Höhe von ca. 80-85 % der verfügbaren Bildschirmhöhe.
+- Die genaue technische Umsetzung bleibt der zentralen Dialog-Basis überlassen.
+- Dialoge sollen auf kleinen Displays nicht den gesamten Bildschirm ausfüllen.
+- Die Höhenbegrenzung soll zentral umgesetzt werden und nicht in jedem Dialog separat.
+
 ### Fokus- und Tastaturbedienung
 
 - Die Tastaturaktion `Weiter` springt zum nächsten Eingabefeld.
@@ -80,6 +87,7 @@ Zu prüfen sind insbesondere:
 
 - Bestehende Compose- und Material-3-Struktur beibehalten.
 - Falls sinnvoll, eine wiederverwendbare Komponente wie `KeyboardAwareDialog` oder eine gemeinsame Formular-Dialog-Basis einführen.
+- Die gemeinsame Dialog-Basis soll neben Keyboard-Awareness optional auch die maximale Dialoghöhe zentral verwalten.
 - UI-Zustand bleibt weiterhin im ViewModel beziehungsweise in bestehenden State-Haltern.
 - Keine Logik in reine UI-Hilfskomponenten verschieben, die fachlich in ViewModels gehört.
 
@@ -89,6 +97,7 @@ Zu prüfen sind insbesondere:
 - [ ] `Speichern` bleibt bei geöffneter Tastatur erreichbar.
 - [ ] `Abbrechen` bleibt bei geöffneter Tastatur erreichbar.
 - [ ] Dialoginhalte sind bei Bedarf scrollbar.
+- [ ] Formular-Dialoge sind auf ca. 80-85 % der verfügbaren Bildschirmhöhe begrenzt.
 - [ ] Die Lösung funktioniert auf kleinen Displays.
 - [ ] Die Lösung funktioniert bei großer Schriftgröße.
 - [ ] Fokuswechsel zwischen Eingabefeldern funktioniert sinnvoll.

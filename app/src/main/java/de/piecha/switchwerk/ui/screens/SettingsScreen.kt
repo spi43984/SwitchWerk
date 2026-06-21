@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -47,8 +49,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -859,6 +865,10 @@ private fun WifiProfileForm(
     onTogglePasswordVisibility: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+    val passwordFocusRequester = remember { FocusRequester() }
+    val nameFocusRequester = remember { FocusRequester() }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -868,6 +878,10 @@ private fun WifiProfileForm(
             onValueChange = onSsidChange,
             label = { Text(stringResource(R.string.ssid)) },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { passwordFocusRequester.requestFocus() }
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -881,6 +895,8 @@ private fun WifiProfileForm(
             } else {
                 PasswordVisualTransformation()
             },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { nameFocusRequester.requestFocus() }),
             trailingIcon = {
                 IconButton(
                     onClick = onTogglePasswordVisibility
@@ -895,7 +911,9 @@ private fun WifiProfileForm(
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(passwordFocusRequester)
         )
 
         Text(
@@ -914,7 +932,11 @@ private fun WifiProfileForm(
             onValueChange = onNameChange,
             label = { Text(stringResource(R.string.name)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(nameFocusRequester)
         )
 
         errorMessage?.let { message ->
@@ -1032,6 +1054,7 @@ private fun UrlImportDialog(
     onImport: (String, ConfigurationImportMode) -> Unit,
     onCancel: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
     var url by remember { mutableStateOf("") }
     var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     StandardConfigurationDialog(
@@ -1046,6 +1069,8 @@ private fun UrlImportDialog(
             onValueChange = { url = it },
             label = { Text(stringResource(R.string.https_url)) },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             modifier = Modifier.fillMaxWidth()
         )
         ImportModeSelection(
