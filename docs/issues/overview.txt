@@ -57,6 +57,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 038 | P2 | offen | Dialog Keyboard Handling |
 | 039 | P0 | abgeschlossen | Unified List Interactions |
 | 040 | P1 | offen | Import/Export Password Handling |
+| 041 | P2 | offen | Dashboard Drag And Drop |
 
 ## Empfohlene Umsetzungsreihenfolge
 
