@@ -75,4 +75,5 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 12. 036 Device WiFi Proximity Indicator
 13. 037 GitHub Release Update Support
 14. 038 Dialog Keyboard Handling
-15. 024 Authenticated Import Sources Backlog
+15. 041 Dashboard Drag And Drop
+16. 024 Authenticated Import Sources Backlog
