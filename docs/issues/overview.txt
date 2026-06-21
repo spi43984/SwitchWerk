@@ -55,21 +55,23 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 036 | P2 | offen | Device WiFi Proximity Indicator |
 | 037 | P2 | offen | GitHub Release Update Support |
 | 038 | P2 | offen | Dialog Keyboard Handling |
+| 039 | P0 | offen | Unified List Interactions |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 025 Dashboard Widget Layout
-2. 029 Language Setting
-3. 030 WiFi Profile Deletion Safety
-4. 033 Android-managed WiFi networks
-5. 034 Collapsible Action Details Panel
-6. 019 Configurable WiFi List Sorting
-7. 021 HTTP/HTTPS Device Actions
-8. 022 Request Body And Content-Type Support
-9. 031 Import Enforces Unique WiFi Profile Names
-10. 032 Room Schema And Migration Test Coverage
-11. 035 App Identity, Help And Release Packaging
-12. 036 Device WiFi Proximity Indicator
-13. 037 GitHub Release Update Support
-14. 038 Dialog Keyboard Handling
-15. 024 Authenticated Import Sources Backlog
+1. 039 Unified List Interactions
+2. 025 Dashboard Widget Layout
+3. 029 Language Setting
+4. 030 WiFi Profile Deletion Safety
+5. 033 Android-managed WiFi networks
+6. 034 Collapsible Action Details Panel
+7. 019 Configurable WiFi List Sorting
+8. 021 HTTP/HTTPS Device Actions
+9. 022 Request Body And Content-Type Support
+10. 031 Import Enforces Unique WiFi Profile Names
+11. 032 Room Schema And Migration Test Coverage
+12. 035 App Identity, Help And Release Packaging
+13. 036 Device WiFi Proximity Indicator
+14. 037 GitHub Release Update Support
+15. 038 Dialog Keyboard Handling
+16. 024 Authenticated Import Sources Backlog
