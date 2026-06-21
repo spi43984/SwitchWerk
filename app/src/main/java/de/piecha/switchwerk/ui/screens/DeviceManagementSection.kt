@@ -1,6 +1,8 @@
 package de.piecha.switchwerk.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +19,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
@@ -35,11 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
+import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
 import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
 import de.piecha.switchwerk.viewmodel.DeviceFormState
 
@@ -71,6 +74,9 @@ fun DeviceManagementSection(
         DeviceEditDialog(
             form = form,
             wifiProfiles = wifiProfiles,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = onOpenSwipeItem,
+            onCloseSwipeItem = onCloseSwipeItem,
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
             onApiMethodChange = onApiMethodChange,
@@ -127,6 +133,9 @@ fun DeviceManagementSection(
 private fun DeviceEditDialog(
     form: DeviceFormState,
     wifiProfiles: List<WifiProfile>,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
@@ -140,13 +149,22 @@ private fun DeviceEditDialog(
 ) {
     StandardConfigurationDialog(
         title = if (form.id == null) "Gerät hinzufügen" else "Gerät bearbeiten",
-        onDismissRequest = onCancelClick,
+        onDismissRequest = {
+            onCloseSwipeItem()
+            onCancelClick()
+        },
         actionText = "Speichern",
-        onAction = onSaveClick
+        onAction = {
+            onCloseSwipeItem()
+            onSaveClick()
+        }
     ) {
         DeviceForm(
             form = form,
             wifiProfiles = wifiProfiles,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = onOpenSwipeItem,
+            onCloseSwipeItem = onCloseSwipeItem,
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
             onApiMethodChange = onApiMethodChange,
@@ -224,7 +242,6 @@ private fun DeviceList(
                             onCloseSwipeItem()
                         }
                     },
-                    onEditClick = { onEditClick(device) },
                     onDeleteClick = { onDeleteClick(device.id) }
                 )
             }
@@ -269,7 +286,6 @@ private fun DeviceRow(
     onOpen: () -> Unit,
     onClose: () -> Unit,
     onContentClick: () -> Unit,
-    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     var pendingDeleteDevice by remember { mutableStateOf<Device?>(null) }
@@ -287,13 +303,12 @@ private fun DeviceRow(
         )
     }
 
-    SwipeRevealItem(
+    SwipeToDeleteListItem(
         isOpen = isOpen,
         isAnyItemOpen = isAnyItemOpen,
         onOpen = onOpen,
         onClose = onClose,
         onContentClick = onContentClick,
-        onEditClick = onEditClick,
         onDeleteClick = {
             pendingDeleteDevice = device
         }
@@ -339,6 +354,9 @@ private fun ConfirmDeviceDeleteDialog(
 private fun DeviceForm(
     form: DeviceFormState,
     wifiProfiles: List<WifiProfile>,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
@@ -348,60 +366,73 @@ private fun DeviceForm(
     onDeleteConnection: (String) -> Unit,
     onMoveConnection: (String, Int) -> Unit
 ) {
-    OutlinedTextField(
-        value = form.name,
-        onValueChange = onNameChange,
-        label = { Text("Name") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
-    )
-
-    OutlinedTextField(
-        value = form.actionLabel,
-        onValueChange = onActionLabelChange,
-        label = { Text("Button-Beschriftung") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
-    )
-
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .closeSwipeOnTap(openSwipeItemId != null, onCloseSwipeItem),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        ApiMethod.entries.forEach { method ->
-            OutlinedButton(
-                onClick = {
-                    onApiMethodChange(method.name)
+        OutlinedTextField(
+            value = form.name,
+            onValueChange = onNameChange,
+            label = { Text("Name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = form.actionLabel,
+            onValueChange = onActionLabelChange,
+            label = { Text("Button-Beschriftung") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ApiMethod.entries.forEach { method ->
+                OutlinedButton(
+                    onClick = {
+                        onApiMethodChange(method.name)
+                    }
+                ) {
+                    Text(
+                        text = if (form.apiMethod == method.name) "✓ ${method.name}" else method.name
+                    )
                 }
-            ) {
-                Text(
-                    text = if (form.apiMethod == method.name) "✓ ${method.name}" else method.name
-                )
             }
         }
+
+        OutlinedTextField(
+            value = form.apiPath,
+            onValueChange = onApiPathChange,
+            label = { Text("API-Aufruf") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        DeviceConnectionList(
+            wifiProfiles = wifiProfiles,
+            connections = form.connections,
+            openSwipeItemId = openSwipeItemId,
+            onOpenSwipeItem = onOpenSwipeItem,
+            onCloseSwipeItem = onCloseSwipeItem,
+            onAddConnection = onAddConnection,
+            onUpdateConnection = onUpdateConnection,
+            onDeleteConnection = onDeleteConnection,
+            onMoveConnection = onMoveConnection
+        )
     }
-
-    OutlinedTextField(
-        value = form.apiPath,
-        onValueChange = onApiPathChange,
-        label = { Text("API-Aufruf") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
-    )
-
-    DeviceConnectionList(
-        wifiProfiles = wifiProfiles,
-        connections = form.connections,
-        onAddConnection = onAddConnection,
-        onUpdateConnection = onUpdateConnection,
-        onDeleteConnection = onDeleteConnection,
-        onMoveConnection = onMoveConnection
-    )
 }
 
 @Composable
 private fun DeviceConnectionList(
     wifiProfiles: List<WifiProfile>,
     connections: List<DeviceConnectionFormState>,
+    openSwipeItemId: String?,
+    onOpenSwipeItem: (String) -> Unit,
+    onCloseSwipeItem: () -> Unit,
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
@@ -409,6 +440,7 @@ private fun DeviceConnectionList(
 ) {
     var isAddingConnection by remember { mutableStateOf(false) }
     var editingConnection by remember { mutableStateOf<DeviceConnectionFormState?>(null) }
+    var pendingDeleteConnection by remember { mutableStateOf<DeviceConnectionFormState?>(null) }
 
     if (isAddingConnection) {
         ConnectionEditDialog(
@@ -442,6 +474,21 @@ private fun DeviceConnectionList(
                 editingConnection = null
             }
         )
+    }
+
+    pendingDeleteConnection?.let { connection ->
+        StandardConfigurationDialog(
+            title = "WLAN-Zuordnung löschen",
+            onDismissRequest = { pendingDeleteConnection = null },
+            actionText = "Ja",
+            onAction = {
+                pendingDeleteConnection = null
+                onDeleteConnection(connection.wifiProfileId)
+            },
+            cancelText = "Nein"
+        ) {
+            Text("WLAN-Zuordnung ${connection.wifiProfileName} wirklich löschen?")
+        }
     }
 
     Row(
@@ -494,14 +541,26 @@ private fun DeviceConnectionList(
             state = listState,
             contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    enabled = openSwipeItemId != null,
+                    onClick = onCloseSwipeItem
+                )
         ) {
             itemsIndexed(
                 items = connections,
                 key = { _, connection -> connection.wifiProfileId }
             ) { index, connection ->
+                val swipeItemId = "connection:${connection.wifiProfileId}"
                 DeviceConnectionRow(
                     connection = connection,
+                    isOpen = openSwipeItemId == swipeItemId,
+                    isAnyItemOpen = openSwipeItemId != null,
+                    onOpen = {
+                        onOpenSwipeItem(swipeItemId)
+                    },
+                    onClose = onCloseSwipeItem,
                     canMoveUp = index > 0,
                     canMoveDown = index < connections.lastIndex,
                     onMoveUpClick = {
@@ -514,7 +573,7 @@ private fun DeviceConnectionList(
                         editingConnection = connection
                     },
                     onDeleteClick = {
-                        onDeleteConnection(connection.wifiProfileId)
+                        pendingDeleteConnection = connection
                     }
                 )
             }
@@ -544,9 +603,45 @@ private fun DeviceConnectionList(
     }
 }
 
+private fun Modifier.closeSwipeOnTap(
+    enabled: Boolean,
+    onCloseSwipeItem: () -> Unit
+): Modifier = pointerInput(enabled, onCloseSwipeItem) {
+    if (!enabled) return@pointerInput
+
+    awaitEachGesture {
+        val down = awaitFirstDown(
+            requireUnconsumed = false,
+            pass = PointerEventPass.Final
+        )
+        var movedBeyondTap = false
+        var isPressed = true
+
+        while (isPressed) {
+            val event = awaitPointerEvent(PointerEventPass.Final)
+            val change = event.changes.firstOrNull { it.id == down.id }
+            if (change != null) {
+                movedBeyondTap = movedBeyondTap ||
+                    (change.position - down.position).getDistance() > viewConfiguration.touchSlop
+                isPressed = change.pressed
+            } else {
+                isPressed = false
+            }
+        }
+
+        if (!movedBeyondTap) {
+            onCloseSwipeItem()
+        }
+    }
+}
+
 @Composable
 private fun DeviceConnectionRow(
     connection: DeviceConnectionFormState,
+    isOpen: Boolean,
+    isAnyItemOpen: Boolean,
+    onOpen: () -> Unit,
+    onClose: () -> Unit,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onMoveUpClick: () -> Unit,
@@ -554,72 +649,59 @@ private fun DeviceConnectionRow(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
-        verticalAlignment = Alignment.CenterVertically
+    SwipeToDeleteListItem(
+        isOpen = isOpen,
+        isAnyItemOpen = isAnyItemOpen,
+        onOpen = onOpen,
+        onClose = onClose,
+        onContentClick = onEditClick,
+        onDeleteClick = onDeleteClick
     ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 4.dp, bottom = 4.dp)
-        ) {
-            Text(
-                text = connection.wifiProfileName,
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Text(
-                text = "SSID: ${connection.ssid} | ${connection.host}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onMoveUpClick,
-                enabled = canMoveUp,
-                modifier = Modifier.size(26.dp)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = 4.dp, bottom = 4.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "WLAN-Zuordnung nach oben verschieben"
+                Text(
+                    text = connection.wifiProfileName,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "SSID: ${connection.ssid} | ${connection.host}",
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
 
-            IconButton(
-                onClick = onMoveDownClick,
-                enabled = canMoveDown,
-                modifier = Modifier.size(26.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "WLAN-Zuordnung nach unten verschieben"
-                )
-            }
+                IconButton(
+                    onClick = onMoveUpClick,
+                    enabled = canMoveUp,
+                    modifier = Modifier.size(26.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "WLAN-Zuordnung nach oben verschieben"
+                    )
+                }
 
-            IconButton(
-                onClick = onEditClick,
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "WLAN-Zuordnung bearbeiten"
-                )
-            }
-
-            IconButton(
-                onClick = onDeleteClick,
-                modifier = Modifier.size(26.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "WLAN-Zuordnung löschen"
-                )
+                IconButton(
+                    onClick = onMoveDownClick,
+                    enabled = canMoveDown,
+                    modifier = Modifier.size(26.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "WLAN-Zuordnung nach unten verschieben"
+                    )
+                }
             }
         }
     }

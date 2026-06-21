@@ -62,6 +62,7 @@ import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.ui.components.SettingsSectionTabs
 import de.piecha.switchwerk.ui.components.StandardActionButton
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
+import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -687,7 +688,6 @@ private fun WifiProfileList(
                             onCloseSwipeItem()
                         }
                     },
-                    onEditClick = { onEditClick(profile) },
                     onDeleteClick = { onDeleteClick(profile.id) }
                 )
             }
@@ -732,7 +732,6 @@ private fun WifiProfileRow(
     onOpen: () -> Unit,
     onClose: () -> Unit,
     onContentClick: () -> Unit,
-    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     var pendingDeleteProfile by remember { mutableStateOf<WifiProfile?>(null) }
@@ -752,13 +751,12 @@ private fun WifiProfileRow(
         }
     }
 
-    SwipeRevealItem(
+    SwipeToDeleteListItem(
         isOpen = isOpen,
         isAnyItemOpen = isAnyItemOpen,
         onOpen = onOpen,
         onClose = onClose,
         onContentClick = onContentClick,
-        onEditClick = onEditClick,
         onDeleteClick = {
             pendingDeleteProfile = profile
         }
