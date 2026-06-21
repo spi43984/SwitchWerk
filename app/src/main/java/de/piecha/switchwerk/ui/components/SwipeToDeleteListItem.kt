@@ -1,4 +1,4 @@
-package de.piecha.switchwerk.ui.screens
+package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -6,7 +6,6 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -38,24 +37,24 @@ private enum class SwipeRevealValue {
 }
 
 @Composable
-fun SwipeRevealItem(
+fun SwipeToDeleteListItem(
     isOpen: Boolean,
     isAnyItemOpen: Boolean,
     onOpen: () -> Unit,
     onClose: () -> Unit,
     onContentClick: () -> Unit,
-    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val revealWidth = 112.dp
-    val revealWidthPx = with(LocalDensity.current) { revealWidth.toPx() }
-    val anchors = remember(revealWidthPx) {
+    val revealWidth = 56.dp
+    val swipeDistance = 128.dp
+    val swipeDistancePx = with(LocalDensity.current) { swipeDistance.toPx() }
+    val anchors = remember(swipeDistancePx) {
         DraggableAnchors {
             SwipeRevealValue.Closed at 0f
-            SwipeRevealValue.OpenStart at revealWidthPx
-            SwipeRevealValue.OpenEnd at -revealWidthPx
+            SwipeRevealValue.OpenStart at swipeDistancePx
+            SwipeRevealValue.OpenEnd at -swipeDistancePx
         }
     }
     val state = remember(anchors) {
@@ -86,10 +85,8 @@ fun SwipeRevealItem(
     }
 
     LaunchedEffect(state.currentValue) {
-        if (state.currentValue == SwipeRevealValue.Closed) {
-            if (isOpen) {
-                onClose()
-            }
+        if (state.currentValue == SwipeRevealValue.Closed && isOpen) {
+            onClose()
         }
     }
 
@@ -115,9 +112,9 @@ fun SwipeRevealItem(
                     }
                 },
             color = if (isRevealed) {
-                MaterialTheme.colorScheme.secondaryContainer
+                MaterialTheme.colorScheme.errorContainer
             } else {
-                MaterialTheme.colorScheme.surface
+                Color.Transparent
             }
         ) {
             Box(
@@ -138,47 +135,27 @@ fun SwipeRevealItem(
             Row(
                 modifier = Modifier
                     .matchParentSize()
-                    .clickable(onClick = onClose)
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .clickable(onClick = onClose),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (openDirection == SwipeRevealValue.OpenStart) {
-                    SwipeRevealActions(
-                        onEditClick = {
-                            coroutineScope.launch {
-                                state.animateTo(SwipeRevealValue.Closed)
-                                onClose()
-                                onEditClick()
-                            }
-                        },
-                        onDeleteClick = {
-                            coroutineScope.launch {
-                                state.animateTo(SwipeRevealValue.Closed)
-                                onClose()
-                                onDeleteClick()
-                            }
+                    DeleteAction(
+                        onClick = {
+                            onClose()
+                            onDeleteClick()
                         }
                     )
                 } else {
                     Box(modifier = Modifier.width(revealWidth))
                 }
 
+                Box(modifier = Modifier.weight(1f))
+
                 if (openDirection == SwipeRevealValue.OpenEnd) {
-                    SwipeRevealActions(
-                        onEditClick = {
-                            coroutineScope.launch {
-                                state.animateTo(SwipeRevealValue.Closed)
-                                onClose()
-                                onEditClick()
-                            }
-                        },
-                        onDeleteClick = {
-                            coroutineScope.launch {
-                                state.animateTo(SwipeRevealValue.Closed)
-                                onClose()
-                                onDeleteClick()
-                            }
+                    DeleteAction(
+                        onClick = {
+                            onClose()
+                            onDeleteClick()
                         }
                     )
                 } else {
@@ -190,49 +167,20 @@ fun SwipeRevealItem(
 }
 
 @Composable
-private fun SwipeRevealActions(
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Row {
-        SwipeRevealAction(
-            onClick = onEditClick
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = "Bearbeiten",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        SwipeRevealAction(
-            onClick = onDeleteClick
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Delete,
-                contentDescription = "Löschen",
-                tint = MaterialTheme.colorScheme.error
-            )
-        }
-    }
-}
-
-@Composable
-private fun SwipeRevealAction(
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit
-) {
+private fun DeleteAction(onClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .width(54.dp)
-            .padding(horizontal = 1.dp),
+        modifier = Modifier.width(56.dp),
         contentAlignment = Alignment.Center
     ) {
         IconButton(
             onClick = onClick,
             modifier = Modifier.size(48.dp)
         ) {
-            icon()
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Löschen",
+                tint = MaterialTheme.colorScheme.onErrorContainer
+            )
         }
     }
 }

@@ -13,6 +13,36 @@ Nächstes offenes Issue: 025 "Dashboard Widget Layout".
 
 ## Zuletzt abgeschlossene Arbeit
 
+Issue 039 "Unified List Interactions" ist implementiert und manuell geprüft.
+
+- GitHub-Issue: #68
+- gemeinsame Swipe-to-delete-Komponente unter `ui/components`
+- WLAN-Profile, Geräte und Geräte-WLAN-Zuordnungen nutzen dieselbe
+  Listeninteraktion
+- Tap auf den Listeneintrag öffnet die Bearbeitung
+- Swipe zeigt ausschließlich die Löschaktion; WLAN-Profile, Geräte und
+  Geräte-WLAN-Zuordnungen verlangen vor dem Löschen eine Bestätigung
+- jeder Tap im Geräteformular beendet einen offenen Swipe der
+  Geräte-WLAN-Zuordnungen; horizontale Swipe-Gesten bleiben davon ausgenommen
+- höhere horizontale Auslösedistanz reduziert versehentliche Swipes beim
+  vertikalen Scrollen
+- geschlossene Listeneinträge übernehmen transparent den Hintergrund ihres
+  Containers; der Lösch-Callback läuft unabhängig von der Schließanimation
+- Bleistift- und direkter Löschbutton der Geräte-WLAN-Zuordnungen entfernt
+- Hoch-/Runter-Pfeile sowie bestehende Sortier-, Persistenz- und
+  ViewModel-Callbacks unverändert
+
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+manuelle Geräteprüfung der Listeninteraktionen, Löschbestätigungen,
+Swipe-Empfindlichkeit und Darstellung
+```
+
+## Zuvor abgeschlossene Arbeit
+
 Issue 020 "Device Assigned WiFi Order" ist implementiert, auf dem Ubuntu-Host
 geprüft und abgeschlossen.
 
@@ -33,7 +63,7 @@ Bestätigte Prüfungen:
 manuelle Sortier-, Neustart-, Schalt-, Import- und Exporttests
 ```
 
-## Zuvor abgeschlossene Arbeit
+## Weitere zuvor abgeschlossene Arbeit
 
 Issue 026 "Settings UI Rework" ist implementiert, geprüft, veröffentlicht und
 nach `main` gemergt.
@@ -57,7 +87,7 @@ git diff --check
 ./gradlew installDebug
 ```
 
-## Weitere zuvor abgeschlossene Arbeit
+## Frühere abgeschlossene Arbeit
 
 Issue 027 "WiFi Timeout Analysis And Stabilization" ist implementiert,
 geprüft, veröffentlicht und nach `main` gemergt.

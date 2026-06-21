@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-* Status: offen
+* Status: abgeschlossen
 * Priorität: P0
 * Typ: GUI / Bedienkonzept
 
@@ -91,17 +91,17 @@ Bestehende Sortierlogik für zugeordnete WLANs bleibt unverändert.
 
 ## Akzeptanzkriterien
 
-* [ ] WLAN-Profile sind per Tap auf den Listeneintrag editierbar
-* [ ] Geräte sind per Tap auf den Listeneintrag editierbar
-* [ ] einem Gerät zugeordnete WLANs sind per Tap auf den Listeneintrag editierbar
-* [ ] Löschaktionen erfolgen einheitlich per Swipe
-* [ ] vorhandene Löschbestätigungen bleiben erhalten
-* [ ] sichere Abbruchaktion steht rechts
-* [ ] unnötige Bleistift-Icons sind entfernt
-* [ ] Hoch-/Runter-Pfeile für Geräte-WLAN-Zuordnungen bleiben erhalten
-* [ ] Reihenfolge zugeordneter WLANs bleibt unverändert persistiert
-* [ ] Verhalten ist im Dark Mode und Light Mode konsistent
-* [ ] Bedienung funktioniert auf kleinen Displays
+* [x] WLAN-Profile sind per Tap auf den Listeneintrag editierbar
+* [x] Geräte sind per Tap auf den Listeneintrag editierbar
+* [x] einem Gerät zugeordnete WLANs sind per Tap auf den Listeneintrag editierbar
+* [x] Löschaktionen erfolgen einheitlich per Swipe
+* [x] vorhandene Löschbestätigungen bleiben erhalten
+* [x] sichere Abbruchaktion steht rechts
+* [x] unnötige Bleistift-Icons sind entfernt
+* [x] Hoch-/Runter-Pfeile für Geräte-WLAN-Zuordnungen bleiben erhalten
+* [x] Reihenfolge zugeordneter WLANs bleibt unverändert persistiert
+* [x] Verhalten ist im Dark Mode und Light Mode konsistent
+* [x] Bedienung funktioniert auf kleinen Displays
 
 ## Testhinweise
 
@@ -118,3 +118,31 @@ Bestehende Sortierlogik für zugeordnete WLANs bleibt unverändert.
 * Light Mode prüfen
 * Dark Mode prüfen
 * kleines Display prüfen
+
+## Umsetzung
+
+* Gemeinsame `SwipeToDeleteListItem`-Komponente unter `ui/components`.
+* WLAN-Profile, Geräte und Geräte-WLAN-Zuordnungen verwenden dieselbe
+  Tap-zum-Bearbeiten- und Swipe-zum-Löschen-Interaktion.
+* Löschbestätigungen werden für alle drei Listen angezeigt; die sichere
+  Abbruchaktion steht rechts.
+* Geräte-WLAN-Zuordnungen behalten Hoch-/Runter-Pfeile, Reihenfolge und
+  bestehende Persistenzlogik unverändert bei.
+* Erhöhte horizontale Auslösedistanz verhindert versehentliche Swipes beim
+  vertikalen Scrollen.
+* Offene Swipes werden durch andere Taps geschlossen; horizontale
+  Swipe-Gesten bleiben davon ausgenommen.
+* Geschlossene Einträge übernehmen den Hintergrund ihres Containers.
+
+## Abschlussprüfung
+
+Im Container erfolgreich:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+```
+
+Die manuelle Geräteprüfung der Listeninteraktionen, Löschbestätigungen,
+Swipe-Empfindlichkeit und Darstellung wurde vom Benutzer als erfolgreich
+bestätigt.
