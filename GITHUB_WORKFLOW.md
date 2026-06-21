@@ -31,7 +31,7 @@ refactor: simplify device repository
 
 ## Issues
 
-Jede größere Änderung bekommt ein GitHub Issue.
+Jede größere Implementierung bekommt ein GitHub Issue.
 
 Die nächste Umsetzung wird über `docs/issues/overview.txt` priorisiert:
 zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
@@ -42,6 +42,46 @@ Issue sollte enthalten:
 - Akzeptanzkriterien
 - Sicherheits-/Datenschutzhinweise
 - Testhinweise
+
+## Lokale Planungs-Issues
+
+Dateien unter `docs/issues/*.md` sind lokale Planungs-Issues und nicht automatisch GitHub-Issues.
+
+Vor dem Anlegen eines neuen Planungs-Issues ist immer zu prüfen:
+
+1. ob bereits ein ähnliches Issue existiert
+2. ob das Thema bereits durch ein anderes Issue abgedeckt ist
+3. ob sich das Thema mit bestehenden offenen Issues überschneidet
+4. welche nächste freie lokale Issue-Nummer nach `docs/issues/overview.txt` zu verwenden ist
+
+Für neue lokale Planungs-Issues gilt:
+
+1. GitHub lesend prüfen
+2. `docs/issues/overview.txt` lesen
+3. nächste freie lokale Issue-Nummer bestimmen
+4. neue Datei unter `docs/issues` anlegen
+5. `docs/issues/overview.txt` aktualisieren
+
+Dabei gilt:
+
+- kein `gh issue create`
+- kein GitHub-Issue erforderlich
+- kein Implementierungs-Branch erforderlich
+- kein Pull Request erforderlich
+
+Ein Dokumentations-Branch darf verwendet werden, wenn der Benutzer die Änderung in GitHub veröffentlichen möchte.
+
+Ausnahme: Der Benutzer fordert ausdrücklich Veröffentlichung, Branch, Pull Request oder Merge an.
+
+Grundsatz:
+
+```text
+Planungsdatei ≠ GitHub-Issue
+```
+
+`ai-context.md` nur ändern, wenn dauerhafter Projektkontext, Projektentscheidungen oder langfristige Projektregeln betroffen sind.
+
+`AI_HANDOFF.md` nur ändern, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
 
 ## Issue-Dateien, GitHub Issues und Branches
 
@@ -103,10 +143,13 @@ Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`,
 16. Lokale Issue-Datei unter `docs/issues` abhaken.
 17. `docs/issues/overview.txt` aktualisieren.
 18. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
-19. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext oder geänderten Projektentscheidungen aktualisieren.
-20. Dokumentationsänderungen committen und pushen.
-21. Zugehöriges GitHub-Issue erst danach schließen.
-22. Branch lokal und remote löschen.
+19. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
+20. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
+21. Dokumentationsänderungen committen und pushen.
+22. Zugehöriges GitHub-Issue erst danach schließen.
+23. Branch lokal löschen.
+24. Branch remote löschen.
+25. Remote-Referenzen bereinigen.
 
 ## Verbindliche Issue-Abschluss-Checkliste
 
@@ -115,16 +158,19 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 * [ ] `docs/issues/<issue>.md` aktualisiert
 * [ ] `docs/issues/overview.txt` aktualisiert
 * [ ] `ai-context.md` bei geändertem dauerhaftem Projektkontext aktualisiert
-* [ ] `AI_HANDOFF.md` aktualisiert
+* [ ] `AI_HANDOFF.md` aktualisiert, falls aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss
 * [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt
 * [ ] Status von Issue-Datei und `docs/issues/overview.txt` ist konsistent
 * [ ] GitHub-Issue geschlossen
 * [ ] Feature-Branch lokal gelöscht
 * [ ] Feature-Branch remote gelöscht
+* [ ] Remote-Referenzen bereinigt
 
 Beispiel nach Merge:
 
     git switch main
     git pull
-    git status
     git branch -d wifi-connection-service
+    git push origin --delete wifi-connection-service
+    git fetch --prune
+    git status
