@@ -4,12 +4,25 @@ Stand: 21. Juni 2026
 
 ## Aktuelle Arbeit
 
-Keine aktive Implementierung.
+Issue 038 "Dialog Keyboard Handling" ist auf dem Branch
+`dialog-keyboard-handling` implementiert. Host-Build und Tests wurden vom
+Benutzer als erfolgreich bestätigt. Veröffentlichung und Abschluss stehen noch
+aus.
 
-Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
-in `docs/issues/overview.txt`.
+- `StandardConfigurationDialog` berücksichtigt die IME zentral, begrenzt seine
+  Höhe auf 85 % des verfügbaren Bereichs und hält die Aktionsleiste außerhalb
+  des scrollbaren Formularbereichs.
+- WLAN-Profil-, Geräte-, Geräte-WLAN-Zuordnungs- und URL-Import-Felder verwenden
+  sinnvolle Weiter-/Fertig-Aktionen.
+- Fachlogik, Datenmodelle und Dependencies sind unverändert.
 
-Nächstes offenes Issue: 030 "WiFi Profile Deletion Safety".
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+```
 
 ## Zuletzt abgeschlossene Arbeit
 

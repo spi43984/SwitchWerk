@@ -1,13 +1,16 @@
 package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -41,38 +44,47 @@ fun StandardConfigurationDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Card(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .widthIn(max = 560.dp)
-                .fillMaxWidth()
-                .fillMaxHeight(0.9f)
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Card(
+                modifier = modifier
+                    .padding(horizontal = 16.dp)
+                    .widthIn(max = 560.dp)
+                    .fillMaxWidth()
+                    .heightIn(max = maxHeight * MAX_DIALOG_HEIGHT_FRACTION)
             ) {
-                Text(text = title, style = MaterialTheme.typography.titleLarge)
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    content()
+                    Text(text = title, style = MaterialTheme.typography.titleLarge)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f, fill = false)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        content()
+                    }
+                    StandardDialogButtons(
+                        actionText = actionText,
+                        onAction = onAction,
+                        cancelText = cancelText ?: stringResource(R.string.cancel),
+                        onCancel = onDismissRequest,
+                        actionEnabled = actionEnabled
+                    )
                 }
-                StandardDialogButtons(
-                    actionText = actionText,
-                    onAction = onAction,
-                    cancelText = cancelText ?: stringResource(R.string.cancel),
-                    onCancel = onDismissRequest,
-                    actionEnabled = actionEnabled
-                )
             }
         }
     }
 }
+
+private const val MAX_DIALOG_HEIGHT_FRACTION = 0.85f
 
 @Composable
 fun StandardDialogButtons(

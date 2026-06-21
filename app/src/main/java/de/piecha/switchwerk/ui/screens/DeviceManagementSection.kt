@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -35,8 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
@@ -368,6 +374,10 @@ private fun DeviceForm(
     onDeleteConnection: (String) -> Unit,
     onMoveConnection: (String, Int) -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val actionLabelFocusRequester = remember { FocusRequester() }
+    val apiPathFocusRequester = remember { FocusRequester() }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -379,6 +389,10 @@ private fun DeviceForm(
             onValueChange = onNameChange,
             label = { Text(stringResource(R.string.name)) },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { actionLabelFocusRequester.requestFocus() }
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -387,7 +401,13 @@ private fun DeviceForm(
             onValueChange = onActionLabelChange,
             label = { Text(stringResource(R.string.button_label)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { apiPathFocusRequester.requestFocus() }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(actionLabelFocusRequester)
         )
 
         Row(
@@ -415,7 +435,11 @@ private fun DeviceForm(
             onValueChange = onApiPathChange,
             label = { Text(stringResource(R.string.api_call)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(apiPathFocusRequester)
         )
 
         DeviceConnectionList(
@@ -727,6 +751,7 @@ private fun ConnectionEditDialog(
     onSave: (String, String) -> Unit,
     onCancel: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
     val selectableProfiles = wifiProfiles.filterNot { profile ->
         usedWifiProfileIds.contains(profile.id)
     }
@@ -779,6 +804,8 @@ private fun ConnectionEditDialog(
                 onValueChange = { host = it },
                 label = { Text(stringResource(R.string.hostname_ip)) },
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 modifier = Modifier.fillMaxWidth()
             )
         }
