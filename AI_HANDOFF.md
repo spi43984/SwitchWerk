@@ -9,9 +9,33 @@ Keine aktive Implementierung.
 Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
 in `docs/issues/overview.txt`.
 
-Nächstes offenes Issue: 025 "Dashboard Widget Layout".
+Nächstes offenes Issue: 029 "Language Setting".
 
 ## Zuletzt abgeschlossene Arbeit
+
+Issue 025 "Dashboard Widget Layout" ist implementiert und auf dem Ubuntu-Host
+geprüft.
+
+- GitHub-Issue: #70
+- persistierte Listen- und Widget-Darstellung mit direktem Dashboard-Umschalter
+- adaptives Compose-Grid mit gemeinsamer `sortOrder`
+- kompakte Sortierpfeile in Listen- und Widget-Ansicht
+- stabile Kartenhöhen und verständliche, zeitlich begrenzte Aktionsmeldungen
+- kompakte Landscape-Kopfzeile und nur visuell ausgeblendete Aktionsdetails
+- Dashboard-Darstellung in Export und rückwärtskompatiblem Import
+- keine neuen Netzwerk-, Cloud-, Tracking- oder Analytics-Abhängigkeiten
+
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+manuelle Prüfung von Portrait-/Landscape-Layout, Sortierung und Statusdarstellung
+```
+
+## Zuvor abgeschlossene Arbeit
 
 Issue 039 "Unified List Interactions" ist implementiert und manuell geprüft.
 
@@ -41,7 +65,7 @@ manuelle Geräteprüfung der Listeninteraktionen, Löschbestätigungen,
 Swipe-Empfindlichkeit und Darstellung
 ```
 
-## Zuvor abgeschlossene Arbeit
+## Weitere abgeschlossene Arbeit
 
 Issue 020 "Device Assigned WiFi Order" ist implementiert, auf dem Ubuntu-Host
 geprüft und abgeschlossen.

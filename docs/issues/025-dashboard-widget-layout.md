@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: GUI / Dashboard
 
@@ -56,13 +56,11 @@ Jedes Geraete-Widget zeigt:
 
 Der Statusbereich zeigt kurze verstaendliche Meldungen:
 
-- Bereit
-- Verbinde WLAN...
-- WLAN verbunden
-- HTTP GET...
-- HTTP POST...
-- Erfolgreich
-- Fehler
+- kurze Ladeanzeige waehrend der Aktion
+- kurze Erfolgsmeldung
+- verstaendliche Fehlermeldung im Aktionsbereich
+- anschliessende automatische Wiederherstellung von Aktionsbutton und
+  Sortierbedienung
 
 ### Import / Export
 
@@ -79,7 +77,7 @@ Import:
 
 ### Bedienung
 
-- Aktionsbutton bleibt jederzeit sichtbar
+- Aktionsbereich bleibt jederzeit sichtbar und hoehenstabil
 - Widgets bleiben auch bei langen Geraetenamen nutzbar
 - Bestehende Geraeteaktionen bleiben unveraendert
 
@@ -154,20 +152,44 @@ Zwei Widgets nebeneinander:
 
 ## Akzeptanzkriterien
 
-- [ ] Listenansicht weiterhin verfuegbar
-- [ ] Widget-Ansicht verfuegbar
-- [ ] Umschaltung zwischen Liste und Widgets direkt im Dashboard moeglich
-- [ ] Umschaltung erfolgt sofort ohne App-Neustart
-- [ ] Auswahl wird gespeichert
-- [ ] Auswahl bleibt nach App-Neustart erhalten
-- [ ] Dashboard-Darstellung wird exportiert
-- [ ] Vorhandene Einstellung wird beim Import uebernommen
-- [ ] Fehlende Einstellung ueberschreibt bestehende Benutzereinstellung nicht
-- [ ] Mehrere Geraete koennen nebeneinander dargestellt werden
-- [ ] Aktionsbutton ist jederzeit sichtbar
-- [ ] Statusbereich zeigt aktuelle Aktionen an
-- [ ] Bedienung auf kleinen Displays bleibt nutzbar
-- [ ] Build erfolgreich
+- [x] Listenansicht weiterhin verfuegbar
+- [x] Widget-Ansicht verfuegbar
+- [x] Umschaltung zwischen Liste und Widgets direkt im Dashboard moeglich
+- [x] Umschaltung erfolgt sofort ohne App-Neustart
+- [x] Auswahl wird gespeichert
+- [x] Auswahl bleibt nach App-Neustart erhalten
+- [x] Dashboard-Darstellung wird exportiert
+- [x] Vorhandene Einstellung wird beim Import uebernommen
+- [x] Fehlende Einstellung ueberschreibt bestehende Benutzereinstellung nicht
+- [x] Mehrere Geraete koennen nebeneinander dargestellt werden
+- [x] Aktionsbereich bleibt jederzeit sichtbar und hoehenstabil
+- [x] Statusbereich zeigt aktuelle Aktionen an
+- [x] Bedienung auf kleinen Displays bleibt nutzbar
+- [x] Build erfolgreich
+
+## Umsetzungsergebnis
+
+- persistierbarer Dashboard-Modus `LIST` oder `WIDGETS`
+- direkter Material-3-Umschalter im Dashboard-Kopf
+- adaptives Compose-Grid mit gemeinsamer persistierter `sortOrder`
+- kompakte Hoch-/Runter-Sortierung in Listen- und Widget-Ansicht
+- stabile Kartenhoehen mit zeitlich begrenzten Erfolgs- und Fehlermeldungen
+- kompakte Landscape-Kopfzeile; Aktionsdetails werden dort nur visuell
+  ausgeblendet, ohne die gespeicherte Einstellung zu veraendern
+- Export der Dashboard-Darstellung und rueckwaertskompatibler Import, der bei
+  fehlender Einstellung den aktuellen Benutzerwert beibehaelt
+- keine neue Netzwerk-, Cloud-, Tracking- oder Analytics-Abhaengigkeit
+
+Bestätigte Prüfungen:
+
+```text
+git diff --check
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+manuelle Prüfung von Listen-/Widget-Umschaltung, Sortierung, Statusdarstellung,
+Portrait- und Landscape-Layout
+```
 
 ## Testhinweise
 

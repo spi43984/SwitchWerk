@@ -126,6 +126,16 @@ Beispiele:
 
 Die Hauptnavigation wird über das rechte Hamburger-Menü im Dashboard geöffnet.
 
+Das Dashboard unterstützt eine persistierte Listen- und Widget-Darstellung.
+Die Widget-Darstellung verwendet ein adaptives Compose-Grid und dieselbe über
+`sortOrder` gespeicherte Gerätereihenfolge wie die Liste. Beide Darstellungen
+verwenden kompakte Hoch-/Runter-Aktionen; Drag-and-Drop und freie
+Widget-Positionen sind nicht Bestandteil des Layouts. Im Landscape-Modus wird
+der Dashboard-Kopf in einer Zeile dargestellt und ein aktivierter
+Aktionsdetailbereich nur visuell ausgeblendet, ohne die Benutzereinstellung zu
+verändern. Die Dashboard-Darstellung ist Teil des Konfigurationsexports; fehlt
+sie in älteren Importen, bleibt die aktuelle Benutzereinstellung erhalten.
+
 Die Einstellungen sind in die exklusiv sichtbaren Bereiche WLAN-Profile,
 Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und
 Hilfe-Komponenten liegen unter `ui/components/`. Hamburger-Menü und
