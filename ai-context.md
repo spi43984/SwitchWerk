@@ -131,6 +131,10 @@ Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und
 Hilfe-Komponenten liegen unter `ui/components/`. Hamburger-Menü und
 System-Einstellungen öffnen dieselbe Hilfeansicht.
 
+Die einem Gerät zugeordneten WLAN-Profile werden über Hoch/Runter-Pfeile in die
+verbindliche Verbindungsreihenfolge gebracht. Diese robuste Bedienung wurde nach
+Gerätetests bewusst gegenüber Drag-and-Drop gewählt.
+
 ---
 
 ## Zielgeräte

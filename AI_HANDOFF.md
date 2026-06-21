@@ -1,6 +1,6 @@
 # AI Handoff
 
-Stand: 20. Juni 2026
+Stand: 21. Juni 2026
 
 ## Aktuelle Arbeit
 
@@ -9,9 +9,31 @@ Keine aktive Implementierung.
 Issue-Status, Priorisierung und nächste geplante Umsetzung stehen ausschließlich
 in `docs/issues/overview.txt`.
 
-Nächstes offenes Issue: 020 "Device Assigned WiFi Order".
+Nächstes offenes Issue: 025 "Dashboard Widget Layout".
 
 ## Zuletzt abgeschlossene Arbeit
+
+Issue 020 "Device Assigned WiFi Order" ist implementiert, auf dem Ubuntu-Host
+geprüft und abgeschlossen.
+
+- GitHub-Issue: #63
+- robuste Hoch/Runter-Sortierung in der Gerätebearbeitung
+- 300 dp hohe Zuordnungsliste mit Scroll-Hinweisen oben und unten
+- persistierte Reihenfolge über die bestehende `priority`-Spalte
+- gespeicherte Reihenfolge als verbindliche Reihenfolge des Schaltvorgangs
+- keine Room-Migration, neuen Berechtigungen oder Änderungen an Zugangsdaten
+- Drag-and-Drop nach Gerätetest bewusst zugunsten der Pfeilbedienung verworfen
+
+Bestätigte Prüfungen:
+
+```text
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+manuelle Sortier-, Neustart-, Schalt-, Import- und Exporttests
+```
+
+## Zuvor abgeschlossene Arbeit
 
 Issue 026 "Settings UI Rework" ist implementiert, geprüft, veröffentlicht und
 nach `main` gemergt.
@@ -35,7 +57,7 @@ git diff --check
 ./gradlew installDebug
 ```
 
-## Zuvor abgeschlossene Arbeit
+## Weitere zuvor abgeschlossene Arbeit
 
 Issue 027 "WiFi Timeout Analysis And Stabilization" ist implementiert,
 geprüft, veröffentlicht und nach `main` gemergt.
