@@ -21,6 +21,9 @@ class ConfigurationJsonCodec {
                     writer.name("showActionDetails").value(settings.showActionDetails)
                     writer.name("detailPanelHeight").value(settings.detailPanelHeight)
                     writer.name("diagnosticsNewestFirst").value(settings.diagnosticsNewestFirst)
+                    settings.dashboardLayoutMode?.let { dashboardLayoutMode ->
+                        writer.name("dashboardLayoutMode").value(dashboardLayoutMode)
+                    }
                     writer.endObject()
                 }
                 writer.name("wifiProfiles")
@@ -102,6 +105,7 @@ class ConfigurationJsonCodec {
         var showActionDetails: Boolean? = null
         var detailPanelHeight: String? = null
         var diagnosticsNewestFirst: Boolean? = null
+        var dashboardLayoutMode: String? = null
 
         beginObject()
         while (hasNext()) {
@@ -110,6 +114,7 @@ class ConfigurationJsonCodec {
                 "showActionDetails" -> showActionDetails = nextBoolean()
                 "detailPanelHeight" -> detailPanelHeight = nextString()
                 "diagnosticsNewestFirst" -> diagnosticsNewestFirst = nextBoolean()
+                "dashboardLayoutMode" -> dashboardLayoutMode = nextString()
                 else -> skipValue()
             }
         }
@@ -128,7 +133,8 @@ class ConfigurationJsonCodec {
             diagnosticsNewestFirst = requireField(
                 diagnosticsNewestFirst,
                 "appSettings.diagnosticsNewestFirst"
-            )
+            ),
+            dashboardLayoutMode = dashboardLayoutMode
         )
     }
 

@@ -3,6 +3,7 @@ package de.piecha.switchwerk.data.repository
 import android.content.Context
 import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,6 +17,8 @@ interface AppSettingsRepository {
     fun setDetailPanelHeight(detailPanelHeight: DetailPanelHeight)
 
     fun setDiagnosticsNewestFirst(diagnosticsNewestFirst: Boolean)
+
+    fun setDashboardLayoutMode(dashboardLayoutMode: DashboardLayoutMode)
 }
 
 class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepository {
@@ -48,6 +51,13 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         )
     }
 
+    override fun setDashboardLayoutMode(dashboardLayoutMode: DashboardLayoutMode) {
+        preferences.edit().putString(KEY_DASHBOARD_LAYOUT_MODE, dashboardLayoutMode.name).apply()
+        mutableSettings.value = mutableSettings.value.copy(
+            dashboardLayoutMode = dashboardLayoutMode
+        )
+    }
+
     private fun loadSettings(): AppSettings {
         return AppSettings(
             themeMode = preferences.getEnum(KEY_THEME_MODE, AppThemeMode.SYSTEM),
@@ -59,6 +69,10 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
             diagnosticsNewestFirst = preferences.getBoolean(
                 KEY_DIAGNOSTICS_NEWEST_FIRST,
                 true
+            ),
+            dashboardLayoutMode = preferences.getEnum(
+                KEY_DASHBOARD_LAYOUT_MODE,
+                DashboardLayoutMode.LIST
             )
         )
     }
@@ -77,5 +91,6 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         const val KEY_SHOW_ACTION_DETAILS = "show_action_details"
         const val KEY_DETAIL_PANEL_HEIGHT = "detail_panel_height"
         const val KEY_DIAGNOSTICS_NEWEST_FIRST = "diagnostics_newest_first"
+        const val KEY_DASHBOARD_LAYOUT_MODE = "dashboard_layout_mode"
     }
 }

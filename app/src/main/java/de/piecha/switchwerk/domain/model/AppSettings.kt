@@ -12,9 +12,15 @@ enum class DetailPanelHeight(val fraction: Float) {
     FORTY_PERCENT(0.40f)
 }
 
+enum class DashboardLayoutMode {
+    LIST,
+    WIDGETS
+}
+
 data class AppSettings(
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val showActionDetails: Boolean = false,
     val detailPanelHeight: DetailPanelHeight = DetailPanelHeight.THIRTY_PERCENT,
-    val diagnosticsNewestFirst: Boolean = true
+    val diagnosticsNewestFirst: Boolean = true,
+    val dashboardLayoutMode: DashboardLayoutMode = DashboardLayoutMode.LIST
 )

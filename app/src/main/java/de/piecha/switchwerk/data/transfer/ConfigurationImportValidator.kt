@@ -2,6 +2,7 @@ package de.piecha.switchwerk.data.transfer
 
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 
 class ConfigurationImportValidator {
@@ -17,6 +18,11 @@ class ConfigurationImportValidator {
             }
             require(DetailPanelHeight.entries.any { it.name == settings.detailPanelHeight }) {
                 "Nicht unterstützte Detailbereich-Höhe: ${settings.detailPanelHeight}"
+            }
+            settings.dashboardLayoutMode?.let { dashboardLayoutMode ->
+                require(DashboardLayoutMode.entries.any { it.name == dashboardLayoutMode }) {
+                    "Nicht unterstützte Dashboard-Darstellung: $dashboardLayoutMode"
+                }
             }
         }
 

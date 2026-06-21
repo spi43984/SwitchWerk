@@ -11,7 +11,8 @@ data class ConfigurationAppSettings(
     val themeMode: String,
     val showActionDetails: Boolean,
     val detailPanelHeight: String,
-    val diagnosticsNewestFirst: Boolean
+    val diagnosticsNewestFirst: Boolean,
+    val dashboardLayoutMode: String? = null
 )
 
 data class ConfigurationWifiProfile(
