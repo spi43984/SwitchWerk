@@ -46,7 +46,7 @@ Benutzerdaten wie Gerätenamen, WLAN-Namen und technische Eingaben werden nicht 
 
 - Sprachauswahl in den Einstellungen
 - Standardwert: System
-- Deutsch und Englisch initial unterstützen
+- Deutsch und Englisch initial unterstützen (für Englisch Übersetzung erstellen und zur Prüfung vorlegen)
 - Keine Übersetzung von Benutzerdaten wie Gerätenamen, WLAN-Namen oder technischen Eingaben
 - Keine externe Übersetzungsbibliothek erforderlich
 - Gemeinsame Einstellungs-Infrastruktur mit dem Theme-Mode-Issue bevorzugen
