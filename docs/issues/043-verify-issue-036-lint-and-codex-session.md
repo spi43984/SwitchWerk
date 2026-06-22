@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Qualitätssicherung / Build / Review
 - Bereich: GitHub Actions / WLAN-Näheindikator / Issue 036
@@ -63,17 +63,17 @@ Beim Build in GitHub Actions ist mindestens ein Lint-Fehler im Bereich WLAN-Scan
 
 ## Akzeptanzkriterien
 
-- [ ] GitHub Actions Run 27939718473 wurde ausgewertet.
-- [ ] Vollständiger Lint-Bericht wurde geprüft.
-- [ ] Alle MissingPermission-Risiken im WLAN-Näheindikator sind behoben oder sauber begründet abgesichert.
-- [ ] ./gradlew lintDebug läuft erfolgreich.
-- [ ] ./gradlew clean assembleDebug läuft erfolgreich.
-- [ ] Der Diff gegen main enthält nur zum Scope passende Änderungen.
-- [ ] Issue-036-Code entspricht Architektur, Security-Regeln und ursprünglichem Scope.
-- [ ] Keine sensiblen WLAN-Daten werden geloggt.
-- [ ] Kein dauerhafter Hintergrundscan und kein unnötiges Polling.
-- [ ] Issue-Dateien und Handoff sind konsistent und nicht voreilig abgeschlossen.
-- [ ] Ergebnis der Review ist in AI_HANDOFF.md dokumentiert.
+- [x] GitHub Actions Run 27939718473 wurde ausgewertet.
+- [x] Vollständiger Lint-Bericht wurde geprüft.
+- [x] Alle MissingPermission-Risiken im WLAN-Näheindikator sind behoben oder sauber begründet abgesichert.
+- [x] ./gradlew lintDebug läuft erfolgreich.
+- [x] ./gradlew clean assembleDebug läuft erfolgreich.
+- [x] Der Diff gegen main enthält nur zum Scope passende Änderungen.
+- [x] Issue-036-Code entspricht Architektur, Security-Regeln und ursprünglichem Scope.
+- [x] Keine sensiblen WLAN-Daten werden geloggt.
+- [x] Kein dauerhafter Hintergrundscan und kein unnötiges Polling.
+- [x] Issue-Dateien und Handoff sind konsistent und nicht voreilig abgeschlossen.
+- [x] Ergebnis der Review ist in AI_HANDOFF.md dokumentiert.
 
 ## Testhinweise
 

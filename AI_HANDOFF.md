@@ -4,9 +4,8 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 043 "Verify Issue 036 Lint And Codex Session" ist auf dem Branch
-`verify-issue-036-lint-and-codex-session` lokal verifiziert und zur
-Veröffentlichung vorbereitet. GitHub-Issue: #84.
+
+  Issue 043 "Verify Issue 036 Lint And Codex Session" ist veröffentlicht und abgeschlossen. GitHub-Issue: #84.
 
 Die Verifikation am 22. Juni 2026 ergibt:
 

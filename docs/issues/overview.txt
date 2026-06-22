@@ -59,7 +59,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 040 | P1 | offen | Import/Export Password Handling |
 | 041 | P2 | offen | Dashboard Drag And Drop |
 | 042 | P1 | offen | Action Cancellation And Fast-Fail WiFi |
-| 043 | P0 | offen | Verify Issue 036 Lint And Codex Session |
+| 043 | P0 | abgeschlossen | Verify Issue 036 Lint And Codex Session |
 
 ## Empfohlene Umsetzungsreihenfolge
 
