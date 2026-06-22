@@ -99,6 +99,8 @@ Nach der Implementierung ausgeben:
 
 Build und Installation auf dem Host mindestens mit:
 
+./gradlew lintDebug
+./gradlew testDebugUnitTest
 ./gradlew clean assembleDebug
 ./gradlew installDebug
 

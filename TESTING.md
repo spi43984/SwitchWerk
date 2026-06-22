@@ -4,6 +4,19 @@
 
 Für diese App reichen zunächst einfache, gezielte Tests.
 
+## Lokale Prüfungen vor Veröffentlichung
+
+GitHub Actions prüft Android-Änderungen nur noch im Pull Request. Vor einer
+Veröffentlichung auf dem Ubuntu-Host ausführen:
+
+    ./gradlew lintDebug
+    ./gradlew testDebugUnitTest
+    ./gradlew clean assembleDebug
+    ./gradlew installDebug
+
+`clean` gehört nur zur lokalen, vollständigen Build-Prüfung; GitHub Actions
+führt es nicht aus, damit der Gradle-Cache wirksam bleibt.
+
 ## Unit Tests
 
 Testen:

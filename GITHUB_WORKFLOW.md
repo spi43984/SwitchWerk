@@ -119,6 +119,29 @@ Für die allgemeine GitHub-Nutzung und manuelle Repository-Arbeit:
 
 Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`, `ai-context.md` und `AI_SESSION_PROMPT.md`: PRs und Merge nur nach ausdrücklicher Freigabe. Status, Priorisierung und Reihenfolge der Issues stehen ausschließlich in `docs/issues/overview.txt`.
 
+## GitHub Actions
+
+GitHub Actions ergänzt die lokalen Prüfungen, ersetzt sie aber nicht. Um
+Runner-Zeit zu sparen, läuft der Workflow **Android Quality Checks** nur für
+Pull Requests nach `main`, die Android- oder Build-relevante Dateien ändern.
+Änderungen ausschließlich unter `docs/` oder ausschließlich an Markdown-Dateien
+starten keinen Android-Workflow. Pushes auf `main` und Feature-Branches starten
+keine Android-Prüfung.
+
+Der Workflow führt ohne `clean` ausschließlich diese nicht überlappenden
+Qualitätsprüfungen aus:
+
+    ./gradlew lintDebug testDebugUnitTest
+
+`gradle/actions/setup-gradle` stellt den Gradle- und Dependency-Cache bereit.
+Ein separater, potenziell inkonsistenter Cache für Build-Ausgaben wird bewusst
+nicht verwendet.
+
+Der Workflow **Release APK** erzeugt weiterhin ein Debug-APK und lädt es als
+Artefakt hoch. Er startet bei Tags mit Präfix `v` oder manuell; der manuelle
+Start ist auf `main` begrenzt. Dadurch bleiben Release-Artefakte verfügbar,
+ohne bei jedem Push erneut erzeugt zu werden.
+
 ## Vollständiger Issue-Workflow
 
 1. Nächstes offenes Issue nach `docs/issues/overview.txt` bestimmen: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
