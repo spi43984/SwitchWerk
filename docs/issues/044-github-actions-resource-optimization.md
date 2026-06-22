@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: CI / GitHub Actions / Build-Kosten
 - Bereich: GitHub Workflows / Lokale Prüfungen / Release-Build
@@ -92,11 +92,11 @@ Prüfen und bei Bedarf verbessern:
 
 ## Akzeptanzkriterien
 
-- [ ] GitHub Actions Verbrauch ist reduziert.
-- [ ] Dokumentationsänderungen starten keine Android-Builds.
-- [ ] Markdown-only Änderungen starten keine Android-Builds.
-- [ ] Release-Prozess bleibt funktionsfähig.
-- [ ] APK-Erzeugung für Releases bleibt möglich.
-- [ ] Lokale Lint-, Test-, Build- und Installationsprüfungen sind dokumentiert.
-- [ ] AGENTS.md, GITHUB_WORKFLOW.md, TESTING.md und AI_SESSION_PROMPT.md sind geprüft und bei Bedarf aktualisiert.
-- [ ] Keine App-Funktionalität wurde verändert.
+- [x] GitHub Actions Verbrauch ist reduziert.
+- [x] Dokumentationsänderungen starten keine Android-Builds.
+- [x] Markdown-only Änderungen starten keine Android-Builds.
+- [x] Release-Prozess bleibt funktionsfähig.
+- [x] APK-Erzeugung für Releases bleibt möglich.
+- [x] Lokale Lint-, Test-, Build- und Installationsprüfungen sind dokumentiert.
+- [x] AGENTS.md, GITHUB_WORKFLOW.md, TESTING.md und AI_SESSION_PROMPT.md sind geprüft und bei Bedarf aktualisiert.
+- [x] Keine App-Funktionalität wurde verändert.
