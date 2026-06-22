@@ -3,14 +3,17 @@ package de.piecha.switchwerk.di
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
+import android.location.LocationManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.action.DefaultDeviceActionService
 import de.piecha.switchwerk.data.action.DeviceActionService
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
+import de.piecha.switchwerk.data.network.AndroidWifiProximityService
 import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.OkHttpApiCallService
 import de.piecha.switchwerk.data.network.WifiConnectionService
+import de.piecha.switchwerk.data.network.WifiProximityService
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.DefaultConfigurationTransferRepository
@@ -58,10 +61,23 @@ val appModule = module {
         androidContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
     }
 
+    single {
+        androidContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    }
+
     single<WifiConnectionService> {
         AndroidWifiConnectionService(
             connectivityManager = get(),
             wifiManager = get()
+        )
+    }
+
+    single<WifiProximityService> {
+        AndroidWifiProximityService(
+            context = androidContext(),
+            connectivityManager = get(),
+            wifiManager = get(),
+            locationManager = get()
         )
     }
 
@@ -129,7 +145,9 @@ val appModule = module {
         MainViewModel(
             repository = get(),
             deviceActionService = get(),
-            appSettingsRepository = get()
+            appSettingsRepository = get(),
+            wifiProfileRepository = get(),
+            wifiProximityService = get()
         )
     }
 

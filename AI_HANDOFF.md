@@ -1,28 +1,90 @@
 # AI Handoff
 
-Stand: 21. Juni 2026
+Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 038 "Dialog Keyboard Handling" ist auf dem Branch
-`dialog-keyboard-handling` implementiert. Host-Build und Tests wurden vom
-Benutzer als erfolgreich bestätigt. Veröffentlichung und Abschluss stehen noch
-aus.
+Issue 036 "Device WiFi Proximity Indicator" ist auf dem Branch
+`device-wifi-proximity-indicator` implementiert und lokal als abgeschlossen
+dokumentiert. Der Benutzer hat Build, Installation und manuelle Gerätetests
+bestätigt; die letzten Änderungen waren die Nachbesserung der rot->grün
+Aktualisierung über einen foreground-only Scan-Takt.
 
-- `StandardConfigurationDialog` berücksichtigt die IME zentral, begrenzt seine
-  Höhe auf 85 % des verfügbaren Bereichs und hält die Aktionsleiste außerhalb
-  des scrollbaren Formularbereichs.
-- WLAN-Profil-, Geräte-, Geräte-WLAN-Zuordnungs- und URL-Import-Felder verwenden
-  sinnvolle Weiter-/Fertig-Aktionen.
-- Fachlogik, Datenmodelle und Dependencies sind unverändert.
+- Ein gekapselter `WifiProximityService` startet beim Öffnen bzw. erneuten
+  Aktivieren des Dashboards einmalig einen Scan. Solange das Dashboard sichtbar
+  ist, verarbeitet er zusätzlich Scan-Abschluss-, WLAN-Status- und aktive
+  Netzwerkereignisse von Android. Zusätzlich läuft im Vordergrund ein
+  begrenzter Scan-Takt, damit neu sichtbare WLANs auch dann nachgezogen werden,
+  wenn Android kein separates Sichtbarkeitsereignis liefert. Beim Verlassen
+  oder Pausieren werden Receiver, NetworkCallback und Scan-Takt abgemeldet. Es
+  gibt keinen Hintergrundscan und kein Logging von WLAN-Daten.
+- Scan-Ergebnisse werden ab Android 11 über den direkten
+  `WifiManager.ScanResultsCallback` verarbeitet. Android 8 bis 10 verwenden
+  einen kontextregistrierten, exportierten BroadcastReceiver. Der vorherige
+  `RECEIVER_NOT_EXPORTED`-Receiver konnte Broadcasts privilegierter
+  WLAN-Systemkomponenten übersehen.
+- `MainViewModel` vergleicht den Snapshot mit WLAN-Profilen und
+  Gerätezuordnungen und veröffentlicht ausschließlich gerätebezogene Statuswerte
+  über `StateFlow`.
+- Der Rückweg von rot zu grün hängt nicht nur an Events, sondern auch an dem
+  foreground-only Scan-Takt. Damit wird die begrenzte Event-Abdeckung von
+  Android für neu sichtbare WLANs pragmatisch abgefedert.
+- Listen- und Widgetansicht verwenden denselben rechtsbündigen Statuspunkt;
+  lange Namen werden gekürzt. Während einer Geräteaktion pulsiert der Punkt in
+  seiner aktuellen Farbe.
+- Deaktiviertes WLAN, fehlende Berechtigung und Scanfehler führen zu roten
+  Statuswerten. Es gibt bewusst keine globale Status- oder Fehlermeldung;
+  Accessibility-Texte unterscheiden Nähe, fehlende Zuordnung, Fehler und
+  laufende Aktion.
+- Global deaktivierte System-Standortdienste werden getrennt von einer
+  verweigerten App-Berechtigung erkannt und grau dargestellt. Ein sicher
+  erkanntes aktuell verbundenes, zugeordnetes WLAN bleibt dabei grün. Änderungen
+  der System-Standortdienste werden über `LocationManager.MODE_CHANGED_ACTION`
+  übernommen.
+- Keine automatische Geräteaktion, kein WLAN-Wechsel, keine neue Berechtigung
+  und keine neue Dependency wurden ergänzt.
+- Lokale Issue-Datei und Übersicht sind auf `abgeschlossen` gesetzt.
 
-Bestätigte Prüfungen:
+Geänderte Dateien:
+
+```text
+app/src/main/java/de/piecha/switchwerk/data/network/WifiProximityService.kt
+app/src/main/java/de/piecha/switchwerk/data/network/AndroidWifiProximityService.kt
+app/src/main/java/de/piecha/switchwerk/di/AppModule.kt
+app/src/main/java/de/piecha/switchwerk/viewmodel/MainViewModel.kt
+app/src/main/java/de/piecha/switchwerk/ui/screens/StartScreen.kt
+app/src/main/res/values*/strings.xml
+app/src/test/java/de/piecha/switchwerk/viewmodel/MainViewModelTest.kt
+app/src/androidTest/java/de/piecha/switchwerk/ui/screens/DeviceWifiProximityIndicatorTest.kt
+AI_HANDOFF.md
+```
+
+Im Container bestätigte Prüfungen:
 
 ```text
 git diff --check
 ./gradlew testDebugUnitTest
-./gradlew clean assembleDebug
+./gradlew compileDebugAndroidTestKotlin
 ```
+
+Offene Prüfungen auf dem Ubuntu-Host:
+
+```text
+./gradlew clean assembleDebug
+./gradlew installDebug
+```
+
+## Weitere unveröffentlichte Arbeit
+
+Issue 038 "Dialog Keyboard Handling" war auf dem Branch
+`dialog-keyboard-handling` implementiert. Host-Build und Tests wurden vom
+Benutzer als erfolgreich bestätigt; Veröffentlichung und Abschluss waren zum
+letzten dokumentierten Stand noch offen.
+
+- `StandardConfigurationDialog` berücksichtigt die IME zentral, begrenzt seine
+  Höhe und hält die Aktionsleiste außerhalb des scrollbaren Formularbereichs.
+- WLAN-Profil-, Geräte-, Geräte-WLAN-Zuordnungs- und URL-Import-Felder verwenden
+  passende Weiter-/Fertig-Aktionen.
 
 ## Zuletzt abgeschlossene Arbeit
 
@@ -45,6 +107,7 @@ git diff --check
 ./gradlew clean assembleDebug
 ./gradlew installDebug
 manuelle Prüfung der Sprachvarianten und Neustartpersistenz
+```
 
 ## Zuvor abgeschlossene Arbeit
 
