@@ -4,11 +4,60 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 036 "Device WiFi Proximity Indicator" ist auf dem Branch
-`device-wifi-proximity-indicator` implementiert und lokal als abgeschlossen
-dokumentiert. Der Benutzer hat Build, Installation und manuelle Gerätetests
-bestätigt; die letzten Änderungen waren die Nachbesserung der rot->grün
-Aktualisierung über einen foreground-only Scan-Takt.
+Issue 043 "Verify Issue 036 Lint And Codex Session" ist auf dem Branch
+`verify-issue-036-lint-and-codex-session` lokal verifiziert und zur
+Veröffentlichung vorbereitet. GitHub-Issue: #84.
+
+Die Verifikation am 22. Juni 2026 ergibt:
+
+- Issue 036 ist in `main` enthalten. Relevante Commits sind `6af855f`
+  (Implementierung), `41ebbe1` (Wiederherstellung der im ursprünglichen Merge
+  fehlenden Service- und Testdateien) und `2e4d40a` (Lint-Korrektur). Der
+  Prüf-Branch enthält gegenüber `main` keinen Code-Diff.
+- Der historische Actions-Run `27939718473` endete für `6af855f` mit
+  `failure`. `gh run view --log-failed` liefert über das aktuelle Token keine
+  Fehlerausgabe; der Abruf der Annotations des zugehörigen Check-Runs ist nicht
+  erlaubt (HTTP 403). Die konkrete frühere MissingPermission-Stelle ist im
+  Commit `2e4d40a` nachvollziehbar und wurde lokal vollständig erneut gelintet.
+- `AndroidWifiProximityService` prüft vor jedem Zugriff auf `startScan()` und
+  `scanResults` die passende Laufzeitberechtigung; die Zugriffe behandeln
+  `SecurityException`. Fehlende Berechtigung oder Scanfehler ergeben keinen
+  grünen Status, sondern einen nicht verfügbaren Status.
+- Es gibt keine `WifiNetworkSpecifier`-, `requestNetwork`- oder
+  `bindProcessToNetwork`-Nutzung. Die Aktualisierung ist auf das sichtbare
+  Dashboard begrenzt: Receiver, Netzwerk-Callback und 30-Sekunden-Scan-Takt
+  werden bei Pause abgemeldet. Es gibt keine Hintergrundüberwachung und kein
+  Logging von SSIDs, Passwörtern oder Scan-Ergebnissen.
+- `MainViewModel` veröffentlicht den Status über `StateFlow`; Compose rendert
+  nur den Statuspunkt. Der Status behandelt verbundenes WLAN, frische
+  Scan-Ergebnisse, fehlende Berechtigung, deaktiviertes WLAN,
+  deaktivierte System-Standortdienste und Scanfehler.
+- `docs/issues/036-device-wifi-proximity-indicator.md` und
+  `docs/issues/overview.txt` führen Issue 036 übereinstimmend als
+  abgeschlossen. Der vorherige Hinweis auf einen aktiven Feature-Branch war
+  veraltet und ist hiermit korrigiert. `ai-context.md` benötigt keine Änderung.
+
+Im Container bestätigte Prüfungen für Issue 043:
+
+```text
+./gradlew lintDebug
+./gradlew clean assembleDebug
+git status
+git log --oneline --decorate --graph --max-count=20
+git diff main...HEAD --stat
+git diff main...HEAD
+```
+
+Die beiden Gradle-Prüfungen waren erfolgreich. Vor dem Merge sind auf dem
+Ubuntu-Host noch Build und Installation zu bestätigen; danach können
+Dokumentation, Pull Request und GitHub-Issue abgeschlossen werden.
+
+## Verifizierter Implementierungsstand Issue 036
+
+Issue 036 "Device WiFi Proximity Indicator" ist in `main` implementiert und
+fachlich geprüft. Der Benutzer hat Build, Installation und manuelle
+Gerätetests bestätigt; die letzten Änderungen waren die Nachbesserung der
+rot->grün-Aktualisierung über einen foreground-only Scan-Takt.
 
 - Ein gekapselter `WifiProximityService` startet beim Öffnen bzw. erneuten
   Aktivieren des Dashboards einmalig einen Scan. Solange das Dashboard sichtbar
