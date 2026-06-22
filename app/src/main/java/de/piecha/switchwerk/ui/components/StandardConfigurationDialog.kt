@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,8 @@ fun StandardConfigurationDialog(
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
     cancelText: String? = null,
+    @StringRes infoTitleResourceId: Int? = null,
+    @StringRes infoMessageResourceId: Int? = null,
     content: @Composable () -> Unit
 ) {
     Dialog(
@@ -61,7 +64,16 @@ fun StandardConfigurationDialog(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = title, style = MaterialTheme.typography.titleLarge)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = title, style = MaterialTheme.typography.titleLarge)
+                        if (infoTitleResourceId != null && infoMessageResourceId != null) {
+                            InfoHint(infoTitleResourceId, infoMessageResourceId)
+                        }
+                    }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()

@@ -36,6 +36,7 @@ import de.piecha.switchwerk.R
 fun AppMenuLayout(
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
+    onOpenAbout: () -> Unit,
     modifier: Modifier = Modifier,
     rightEdgeExtension: Dp = 0.dp,
     content: @Composable (openMenu: () -> Unit) -> Unit
@@ -83,6 +84,13 @@ fun AppMenuLayout(
                             onClick = {
                                 isExpanded = false
                                 onOpenHelp()
+                            }
+                        )
+                        MenuItem(
+                            text = stringResource(R.string.about_switchwerk),
+                            onClick = {
+                                isExpanded = false
+                                onOpenAbout()
                             }
                         )
                     }

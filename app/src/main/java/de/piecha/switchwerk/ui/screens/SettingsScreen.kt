@@ -68,6 +68,7 @@ import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.ui.components.SettingsSectionTabs
+import de.piecha.switchwerk.ui.components.InfoHint
 import de.piecha.switchwerk.ui.components.StandardActionButton
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
@@ -82,7 +83,6 @@ fun SettingsScreen(
     selectedSection: SettingsSection,
     onSectionSelected: (SettingsSection) -> Unit,
     onNavigateBack: () -> Unit,
-    onNavigateToHelp: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -202,6 +202,7 @@ fun SettingsScreen(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onNavigateBack) {
@@ -214,6 +215,7 @@ fun SettingsScreen(
                 text = stringResource(R.string.settings),
                 style = MaterialTheme.typography.headlineLarge
             )
+            InfoHint(R.string.settings, R.string.settings_info)
         }
 
         uiState.errorMessage?.let { message ->
@@ -288,6 +290,7 @@ fun SettingsScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    TabInfoHint(R.string.system_info_title, R.string.system_info)
                     DisplaySettingsSection(
                         themeMode = uiState.appSettings.themeMode,
                         language = uiState.appSettings.language,
@@ -303,8 +306,6 @@ fun SettingsScreen(
                         onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
                         onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
                     )
-                    HorizontalDivider()
-                    SystemHelpSection(onOpenHelp = onNavigateToHelp)
                 }
 
                 SettingsSection.BACKUP -> Column(
@@ -312,6 +313,7 @@ fun SettingsScreen(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
+                    TabInfoHint(R.string.settings_tab_backup, R.string.backup_info)
                     ImportExportSection(
                         isTransferInProgress = uiState.isTransferInProgress,
                         onExportClick = {
@@ -443,22 +445,6 @@ enum class SettingsSection(val titleResourceId: Int) {
     DEVICES(R.string.settings_tab_devices),
     SYSTEM(R.string.settings_tab_system),
     BACKUP(R.string.settings_tab_backup)
-}
-
-@Composable
-private fun SystemHelpSection(onOpenHelp: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(stringResource(R.string.help), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(R.string.system_help_description))
-        StandardActionButton(
-            text = stringResource(R.string.show_help),
-            onClick = onOpenHelp,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
 }
 
 @Composable
@@ -628,14 +614,14 @@ private fun WifiProfileManagementSection(
                 style = MaterialTheme.typography.titleSmall
             )
 
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.add_wifi_profile)
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                InfoHint(R.string.wifi_profiles_info_title, R.string.list_interaction_info)
+                IconButton(onClick = onAddClick, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.add_wifi_profile)
+                    )
+                }
             }
         }
 
@@ -834,7 +820,9 @@ private fun WifiProfileDialog(
         ),
         onDismissRequest = onCancelClick,
         actionText = stringResource(R.string.save),
-        onAction = onSaveClick
+        onAction = onSaveClick,
+        infoTitleResourceId = R.string.wifi_profile_dialog_info_title,
+        infoMessageResourceId = R.string.wifi_profile_dialog_info
     ) {
         WifiProfileForm(
             name = name,
@@ -1011,6 +999,16 @@ private fun ImportExportSection(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TabInfoHint(titleResourceId: Int, messageResourceId: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        InfoHint(titleResourceId, messageResourceId)
     }
 }
 

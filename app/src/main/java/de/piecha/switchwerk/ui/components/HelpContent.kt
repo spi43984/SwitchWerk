@@ -4,34 +4,68 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
 
 @Composable
 fun HelpContent(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+    Card(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            HelpSection(R.string.help_getting_started_title, R.string.help_getting_started_text)
+            HelpSection(R.string.help_connection_title, R.string.help_connection_text)
+            HelpSection(R.string.help_privacy_title, R.string.help_privacy_text)
+        }
+    }
+}
+
+@Composable
+private fun HelpSection(titleResourceId: Int, textResourceId: Int) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(titleResourceId), style = MaterialTheme.typography.titleSmall)
+        BulletListText(stringResource(textResourceId))
+    }
+}
+
+@Composable
+fun AboutContent(versionName: String, modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
-    val versionName = context.packageManager
-        .getPackageInfo(context.packageName, 0)
-        .versionName
-        .orEmpty()
 
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Surface(
+                modifier = Modifier.size(80.dp),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    contentDescription = stringResource(R.string.app_name),
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
             Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.about_description))
             Text(stringResource(R.string.version_value, versionName))
+            Text(stringResource(R.string.about_author))
+            Text(stringResource(R.string.about_license))
             StandardActionButton(
                 text = stringResource(R.string.open_github_project),
                 onClick = { uriHandler.openUri(PROJECT_URL) },

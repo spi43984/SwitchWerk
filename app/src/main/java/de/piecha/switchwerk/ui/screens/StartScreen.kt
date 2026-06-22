@@ -61,6 +61,7 @@ import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.ui.components.AppMenuLayout
 import de.piecha.switchwerk.ui.components.AppOverflowMenu
+import de.piecha.switchwerk.ui.components.InfoHint
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.DeviceWifiProximityStatus
 import de.piecha.switchwerk.viewmodel.DiagnosticListItem
@@ -73,6 +74,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun StartScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
+    onNavigateToAbout: () -> Unit,
     viewModel: MainViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -102,6 +104,7 @@ fun StartScreen(
     AppMenuLayout(
         onOpenSettings = onNavigateToSettings,
         onOpenHelp = onNavigateToHelp,
+        onOpenAbout = onNavigateToAbout,
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
@@ -209,7 +212,10 @@ private fun DashboardHeader(
                 selectedMode = selectedMode,
                 onModeSelected = onModeSelected
             )
-            AppOverflowMenu(onClick = onOpenMenu)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                InfoHint(R.string.dashboard_info_title, R.string.dashboard_info)
+                AppOverflowMenu(onClick = onOpenMenu)
+            }
         }
     } else {
         Row(
@@ -221,7 +227,10 @@ private fun DashboardHeader(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge
             )
-            AppOverflowMenu(onClick = onOpenMenu)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                InfoHint(R.string.dashboard_info_title, R.string.dashboard_info)
+                AppOverflowMenu(onClick = onOpenMenu)
+            }
         }
 
         Spacer(modifier = Modifier.height(4.dp))
