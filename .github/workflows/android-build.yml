@@ -1,13 +1,19 @@
-name: Android Build
+name: Android Quality Checks
 
 on:
-  push:
-    branches:
-      - main
-      - 'feature/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-quality-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -26,5 +32,5 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
-        run: ./gradlew build
+      - name: Lint and unit tests
+        run: ./gradlew lintDebug testDebugUnitTest

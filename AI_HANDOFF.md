@@ -4,6 +4,31 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 044 "GitHub Actions Resource Optimization" ist implementiert, aber noch
+nicht veröffentlicht oder abgeschlossen. Für neue Sessions ist
+`AI_SESSION_PROMPT.md` als wiederverwendbare Startvorlage zu verwenden.
+
+- `.github/workflows/android-build.yml` führt Android-Qualitätsprüfungen nur
+  noch bei Pull Requests nach `main` aus. Änderungen ausschließlich unter
+  `docs/` oder ausschließlich an Markdown-Dateien sind über `paths-ignore`
+  ausgeschlossen; Pushes auf `main` und Feature-Branches lösen keinen
+  Android-Workflow mehr aus.
+- Die PR-Prüfung verwendet ohne `clean` nur `lintDebug` und
+  `testDebugUnitTest`; laufende veraltete PR-Läufe werden per Concurrency
+  abgebrochen. `gradle/actions/setup-gradle` bleibt für Gradle- und
+  Dependency-Caching erhalten. Ein separater Cache für Build-Ausgaben wird
+  nicht verwendet.
+- `.github/workflows/apk-build.yml` erzeugt und lädt das Debug-APK weiterhin
+  hoch, aber nur für Tags mit Präfix `v` sowie manuell von `main`. Damit
+  entfällt die doppelte APK-Erzeugung bei jedem Push auf `main`.
+- `GITHUB_WORKFLOW.md`, `TESTING.md` und `AI_SESSION_PROMPT.md` dokumentieren
+  die Trigger sowie die lokalen Pflichtprüfungen `lintDebug`,
+  `testDebugUnitTest`, `clean assembleDebug` und `installDebug`.
+- Im Container waren `git diff --check` erfolgreich. `actionlint`, Ruby und
+  PyYAML sind nicht installiert; eine vollständige Workflow-Lint-Prüfung steht
+  daher auf dem Host oder in GitHub Actions aus. Für die reine Workflow- und
+  Dokumentationsänderung wurden keine Gradle-Aufgaben im Container ausgeführt.
+
 
   Issue 043 "Verify Issue 036 Lint And Codex Session" ist veröffentlicht und abgeschlossen. GitHub-Issue: #84.
 
