@@ -1,5 +1,6 @@
 package de.piecha.switchwerk.data.network
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,8 +13,10 @@ import android.net.wifi.WifiManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.SystemClock
+import android.content.pm.PackageManager
 import androidx.core.location.LocationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.annotation.RequiresApi
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -67,18 +70,18 @@ class AndroidWifiProximityService(
                 registerReceiver(legacyScanReceiver, scanIntentFilter())
             }.isSuccess
 
-        val scanResultsCallback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            object : WifiManager.ScanResultsCallback() {
+        var scanResultsCallback: WifiManager.ScanResultsCallback? = null
+        var scanResultsCallbackRegistered = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            scanResultsCallback = object : WifiManager.ScanResultsCallback() {
                 override fun onScanResultsAvailable() {
                     publishSnapshot()
                 }
             }
-        } else {
-            null
+            scanResultsCallbackRegistered = runCatching {
+                registerScanResultsCallback(scanResultsCallback)
+            }.isSuccess
         }
-        val scanResultsCallbackRegistered = scanResultsCallback != null && runCatching {
-            wifiManager.registerScanResultsCallback(context.mainExecutor, scanResultsCallback)
-        }.isSuccess
 
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -118,11 +121,13 @@ class AndroidWifiProximityService(
             if (legacyScanReceiverRegistered) {
                 unregisterReceiver(legacyScanReceiver)
             }
-            scanResultsCallback
-                ?.takeIf { scanResultsCallbackRegistered }
-                ?.let { callback ->
-                    runCatching { wifiManager.unregisterScanResultsCallback(callback) }
-                }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                scanResultsCallback
+                    ?.takeIf { scanResultsCallbackRegistered }
+                    ?.let { callback ->
+                        runCatching { unregisterScanResultsCallback(callback) }
+                    }
+            }
             if (networkCallbackRegistered) {
                 runCatching { connectivityManager.unregisterNetworkCallback(networkCallback) }
             }
@@ -214,13 +219,19 @@ class AndroidWifiProximityService(
     }
 
     private fun readConnectedSsid(): String? {
-        val network = connectivityManager.activeNetwork ?: return null
-        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return null
-        if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return null
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val network = connectivityManager.activeNetwork ?: return null
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return null
+            if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                return null
+            }
+            val wifiInfo = capabilities.transportInfo as? WifiInfo ?: return null
+            wifiInfo.ssid.normalizedSsid()
+        } else {
+            @Suppress("DEPRECATION")
+            val wifiInfo = wifiManager.connectionInfo ?: return null
+            wifiInfo.ssid.normalizedSsid()
         }
-        val wifiInfo = capabilities.transportInfo as? WifiInfo ?: return null
-        return wifiInfo.ssid.normalizedSsid()
     }
 
     @Suppress("DEPRECATION")
@@ -244,6 +255,16 @@ class AndroidWifiProximityService(
                     registerReceiver(receiver, scanIntentFilter())
                     continuation.invokeOnCancellation {
                         unregisterReceiver(receiver)
+                    }
+
+                    if (!hasWifiScanPermission()) {
+                        unregisterReceiver(receiver)
+                        continuation.resumeWith(
+                            Result.failure(
+                                SecurityException("Missing Wi-Fi scan permission")
+                            )
+                        )
+                        return@suspendCancellableCoroutine
                     }
 
                     val started = try {
@@ -281,15 +302,22 @@ class AndroidWifiProximityService(
 
     @Suppress("DEPRECATION")
     private fun readFreshScanSsids(): Set<String> {
+        if (!hasWifiScanPermission()) {
+            throw SecurityException("Missing Wi-Fi scan permission")
+        }
         val nowMicros = SystemClock.elapsedRealtimeNanos() / NANOS_PER_MICROSECOND
-        return wifiManager.scanResults
-            .asSequence()
-            .filter { result ->
-                result.timestamp > 0L &&
-                    nowMicros - result.timestamp in 0..MAX_SCAN_RESULT_AGE_MICROS
-            }
-            .mapNotNull { result -> result.SSID.normalizedSsid() }
-            .toSet()
+        return try {
+            wifiManager.scanResults
+                .asSequence()
+                .filter { result ->
+                    result.timestamp > 0L &&
+                        nowMicros - result.timestamp in 0..MAX_SCAN_RESULT_AGE_MICROS
+                }
+                .mapNotNull { result -> result.SSID.normalizedSsid() }
+                .toSet()
+        } catch (exception: SecurityException) {
+            throw exception
+        }
     }
 
     private fun scanIntentFilter(): IntentFilter {
@@ -312,6 +340,23 @@ class AndroidWifiProximityService(
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun registerScanResultsCallback(
+        scanResultsCallback: WifiManager.ScanResultsCallback
+    ) {
+        wifiManager.registerScanResultsCallback(
+            ContextCompat.getMainExecutor(context),
+            scanResultsCallback
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun unregisterScanResultsCallback(
+        scanResultsCallback: WifiManager.ScanResultsCallback
+    ) {
+        wifiManager.unregisterScanResultsCallback(scanResultsCallback)
+    }
+
     private fun unregisterReceiver(receiver: BroadcastReceiver) {
         runCatching { context.unregisterReceiver(receiver) }
     }
@@ -321,6 +366,24 @@ class AndroidWifiProximityService(
             ?.removeSurrounding("\"")
             ?.trim()
             ?.takeIf { it.isNotEmpty() && it != WifiManager.UNKNOWN_SSID }
+    }
+
+    private fun hasWifiScanPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.NEARBY_WIFI_DEVICES
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private data class ScanReadResult(
