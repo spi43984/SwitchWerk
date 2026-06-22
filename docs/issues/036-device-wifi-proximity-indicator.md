@@ -3,7 +3,7 @@
 ## Metadaten
 
 - Status: Offen
-- Priorität: P2
+- Priorität: P0
 - Typ: Feature / GUI
 - Bereich: Dashboard / WLAN
 
@@ -43,12 +43,17 @@ früh erkennen, ohne zunächst eine Aktion auszuführen.
 
 ### Dashboard-Anzeige
 
-- Der Statuspunkt wird direkt neben dem Gerätenamen angezeigt.
+- Der Statuspunkt wird rechtsbündig auf derselben Zeile wie der Gerätename
+  angezeigt.
+- Die Position bleibt in Listen- und Widgetansicht konsistent.
+- Lange Gerätenamen werden so gekürzt, dass der Statuspunkt sichtbar bleibt.
 - Grün bedeutet: mindestens ein zugeordnetes WLAN ist in der Nähe.
 - Rot bedeutet: kein zugeordnetes WLAN ist in der Nähe.
-- Farbe darf nicht das einzige Unterscheidungsmerkmal sein. Der Punkt erhält
-  eine verständliche Accessibility-Beschreibung, zum Beispiel
-  `WLAN in der Nähe` oder `Kein WLAN in der Nähe`.
+- Während eine Geräteaktion läuft, pulsiert der Statuspunkt und behält dabei
+  seine aktuelle Farbe.
+- Farbe und Animation dürfen nicht die einzigen Unterscheidungsmerkmale sein.
+  Der Punkt erhält eine verständliche Accessibility-Beschreibung, zum Beispiel
+  `WLAN in der Nähe`, `Kein WLAN in der Nähe` oder `Aktion läuft`.
 - Die Anzeige muss in allen vorhandenen Dashboard-Darstellungen konsistent
   funktionieren.
 - Lange Gerätenamen und kleine Displays bleiben nutzbar.
@@ -103,9 +108,11 @@ früh erkennen, ohne zunächst eine Aktion auszuführen.
 
 ## Akzeptanzkriterien
 
-- [ ] Neben jedem Gerätenamen wird ein WLAN-Statuspunkt angezeigt.
+- [ ] Neben jedem Gerätenamen wird rechtsbündig auf der Namenszeile ein WLAN-Statuspunkt angezeigt.
+- [ ] Der Punkt bleibt auch bei langen Gerätenamen sichtbar.
 - [ ] Der Punkt ist grün, wenn mindestens ein dem Gerät zugeordnetes WLAN erkannt wird.
 - [ ] Der Punkt ist rot, wenn kein zugeordnetes WLAN erkannt wird.
+- [ ] Der Punkt pulsiert während einer Geräteaktion und behält dabei seine aktuelle Farbe.
 - [ ] Ein aktuell verbundenes, zugeordnetes WLAN führt zu einem grünen Status.
 - [ ] Geräte ohne WLAN-Zuordnung erhalten keinen fälschlich grünen Status.
 - [ ] Der Status wird beim Öffnen oder erneuten Aktivieren des Dashboards aktualisiert.
