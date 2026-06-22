@@ -290,12 +290,12 @@ fun SettingsScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    TabInfoHint(R.string.system_info_title, R.string.system_info)
                     DisplaySettingsSection(
                         themeMode = uiState.appSettings.themeMode,
                         language = uiState.appSettings.language,
                         onLanguageChange = viewModel::setLanguage,
-                        onThemeModeChange = viewModel::setThemeMode
+                        onThemeModeChange = viewModel::setThemeMode,
+                        showInfoHint = true
                     )
                     HorizontalDivider()
                     ActionDetailsSettingsSection(
@@ -313,7 +313,6 @@ fun SettingsScreen(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    TabInfoHint(R.string.settings_tab_backup, R.string.backup_info)
                     ImportExportSection(
                         isTransferInProgress = uiState.isTransferInProgress,
                         onExportClick = {
@@ -452,14 +451,24 @@ private fun DisplaySettingsSection(
     themeMode: AppThemeMode,
     language: AppLanguage,
     onLanguageChange: (AppLanguage) -> Unit,
-    onThemeModeChange: (AppThemeMode) -> Unit
+    onThemeModeChange: (AppThemeMode) -> Unit,
+    showInfoHint: Boolean = false
 ) {
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            Text(stringResource(R.string.display), style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.display), style = MaterialTheme.typography.titleMedium)
+                if (showInfoHint) {
+                    InfoHint(R.string.system_info_title, R.string.system_info)
+                }
+            }
             AppThemeMode.entries.forEach { option ->
                 RadioOptionRow(
                     label = when (option) {
@@ -949,13 +958,20 @@ private fun ImportExportSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp),
+            .padding(start = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = stringResource(R.string.backup_description),
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = stringResource(R.string.backup_description),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+            InfoHint(R.string.settings_tab_backup, R.string.backup_info)
+        }
 
         if (isTransferInProgress) {
             Row(
@@ -999,16 +1015,6 @@ private fun ImportExportSection(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun TabInfoHint(titleResourceId: Int, messageResourceId: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
-        InfoHint(titleResourceId, messageResourceId)
     }
 }
 

@@ -45,11 +45,11 @@
     <string name="about_license">License: GNU AGPL-3.0-or-later</string>
     <string name="open_github_project">Open GitHub project</string>
     <string name="help_getting_started_title">Setup</string>
-    <string name="help_getting_started_text">First create a Wi-Fi profile, then add a device with its address and an HTTP/RPC call. When needed, a device action connects SwitchWerk to the assigned Wi-Fi network.</string>
+    <string name="help_getting_started_text">• Create a Wi-Fi profile\n• Add a device with address and API call\n• Run the action</string>
     <string name="help_connection_title">Connection and troubleshooting</string>
-    <string name="help_connection_text">While connected to a device access point, internet access may be unavailable. For timeouts, check the Wi-Fi network, local device address, and API path. HTTP errors are returned by the device.</string>
+    <string name="help_connection_text">• A device access point may interrupt internet access\n• For timeouts, check Wi-Fi, address, and API path\n• HTTP errors come from the device</string>
     <string name="help_privacy_title">Permissions and privacy</string>
-    <string name="help_privacy_text">Wi-Fi and location permissions are only used for Wi-Fi connection and visible Wi-Fi detection. The app operates locally, with no accounts, tracking, or cloud. Action details never contain passwords.</string>
+    <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
 
     <string name="settings_tab_wifi_profiles">Wi-Fi profiles</string>
     <string name="settings_tab_devices">Devices</string>
