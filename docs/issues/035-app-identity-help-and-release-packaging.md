@@ -41,7 +41,8 @@ Prüfen und bei Bedarf definieren:
 
 Ein Hilfe-Menü in die App integrieren.
 
-Erste Hilfetexte erstellen auf Grundlage der bisherigen Issues und umgesetzter Funktionen. Hilfetexte mehrsprachig erstellen.
+Hilfetexte erstellen auf Grundlage der bisherigen Issues und umgesetzter Funktionen. Hilfetexte mehrsprachig erstellen.
+Hilfetexte zur Prüfung vorlegen.
 
 Mögliche Inhalte:
 
