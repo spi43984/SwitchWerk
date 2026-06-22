@@ -1,17 +1,20 @@
 package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.Image
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -49,16 +52,18 @@ fun AboutContent(versionName: String, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Surface(
-                modifier = Modifier.size(80.dp),
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.primary
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                Image(
+                    painter = painterResource(R.drawable.about_logo),
                     contentDescription = stringResource(R.string.app_name),
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier
+                        .widthIn(max = 512.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(988f / 1050f),
+                    contentScale = ContentScale.Fit
                 )
             }
             Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.titleMedium)
