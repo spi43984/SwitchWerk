@@ -195,4 +195,12 @@
     <string name="action_vpn_blocked">Access blocked by VPN or firewall</string>
     <string name="action_network_error">Failed to access device over the network</string>
     <string name="action_failed">Device action failed</string>
+    <string name="wifi_proximity_nearby">Wi-Fi nearby</string>
+    <string name="wifi_proximity_not_nearby">No Wi-Fi nearby</string>
+    <string name="wifi_proximity_no_assignment">No Wi-Fi assigned</string>
+    <string name="wifi_proximity_wifi_disabled">Wi-Fi detection unavailable: Wi-Fi is disabled</string>
+    <string name="wifi_proximity_location_services_disabled">Wi-Fi detection unavailable: system location services are disabled</string>
+    <string name="wifi_proximity_permission_denied">Wi-Fi detection unavailable: permission is missing</string>
+    <string name="wifi_proximity_scan_failed">Wi-Fi detection unavailable: scan failed</string>
+    <string name="wifi_proximity_action_running">%1$s. Action running</string>
 </resources>

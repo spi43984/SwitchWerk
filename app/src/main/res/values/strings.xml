@@ -195,4 +195,12 @@
     <string name="action_vpn_blocked">VPN oder Firewall blockiert Zugriff</string>
     <string name="action_network_error">Netzwerkzugriff zum Gerät fehlgeschlagen</string>
     <string name="action_failed">Geräteaktion fehlgeschlagen</string>
+    <string name="wifi_proximity_nearby">WLAN in der Nähe</string>
+    <string name="wifi_proximity_not_nearby">Kein WLAN in der Nähe</string>
+    <string name="wifi_proximity_no_assignment">Kein WLAN zugeordnet</string>
+    <string name="wifi_proximity_wifi_disabled">WLAN-Erkennung nicht verfügbar: WLAN ist deaktiviert</string>
+    <string name="wifi_proximity_location_services_disabled">WLAN-Erkennung nicht verfügbar: System-Standortdienste sind deaktiviert</string>
+    <string name="wifi_proximity_permission_denied">WLAN-Erkennung nicht verfügbar: Berechtigung fehlt</string>
+    <string name="wifi_proximity_scan_failed">WLAN-Erkennung nicht verfügbar: Scan fehlgeschlagen</string>
+    <string name="wifi_proximity_action_running">%1$s. Aktion läuft</string>
 </resources>

@@ -6,16 +6,23 @@ import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
+import de.piecha.switchwerk.data.repository.FakeWifiProfileRepository
+import de.piecha.switchwerk.data.network.WifiProximityIssue
+import de.piecha.switchwerk.data.network.WifiProximityService
+import de.piecha.switchwerk.data.network.WifiProximitySnapshot
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.UiText
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -49,7 +56,9 @@ class MainViewModelTest {
         val viewModel = MainViewModel(
             repository = FakeDeviceRepository(listOf(device)),
             deviceActionService = actionService,
-            appSettingsRepository = FakeAppSettingsRepository()
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService()
         )
         runCurrent()
 
@@ -102,7 +111,9 @@ class MainViewModelTest {
         val viewModel = MainViewModel(
             repository = repository,
             deviceActionService = WaitingDeviceActionService(),
-            appSettingsRepository = FakeAppSettingsRepository()
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService()
         )
         runCurrent()
 
@@ -117,7 +128,9 @@ class MainViewModelTest {
         val viewModel = MainViewModel(
             repository = FakeDeviceRepository(emptyList()),
             deviceActionService = WaitingDeviceActionService(),
-            appSettingsRepository = FakeAppSettingsRepository()
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService()
         )
         runCurrent()
 
@@ -127,6 +140,194 @@ class MainViewModelTest {
         assertEquals(
             DashboardLayoutMode.WIDGETS,
             viewModel.uiState.value.appSettings.dashboardLayoutMode
+        )
+    }
+
+    @Test
+    fun assignedVisibleWifiIsNearby() {
+        val device = device(id = "device-1", sortOrder = 0).copy(
+            connections = listOf(DeviceConnection(wifiProfileId = "wifi-1", host = "device.local"))
+        )
+
+        val statuses = resolveWifiProximityStatuses(
+            devices = listOf(device),
+            wifiProfiles = listOf(WifiProfile(id = "wifi-1", ssid = "Home")),
+            snapshot = WifiProximitySnapshot(visibleSsids = setOf("Home"))
+        )
+
+        assertEquals(DeviceWifiProximityStatus.NEARBY, statuses[device.id])
+    }
+
+    @Test
+    fun deviceWithoutAssignmentIsNeverNearby() {
+        val device = device(id = "device-1", sortOrder = 0)
+
+        val statuses = resolveWifiProximityStatuses(
+            devices = listOf(device),
+            wifiProfiles = listOf(WifiProfile(id = "wifi-1", ssid = "Home")),
+            snapshot = WifiProximitySnapshot(visibleSsids = setOf("Home"))
+        )
+
+        assertEquals(DeviceWifiProximityStatus.NO_ASSIGNMENT, statuses[device.id])
+    }
+
+    @Test
+    fun scanFailureKeepsMatchingConnectedWifiNearbyAndMarksOtherDeviceFailed() {
+        val matchingDevice = device(id = "matching", sortOrder = 0).copy(
+            connections = listOf(DeviceConnection(wifiProfileId = "wifi-1", host = "device.local"))
+        )
+        val otherDevice = device(id = "other", sortOrder = 1).copy(
+            connections = listOf(DeviceConnection(wifiProfileId = "wifi-2", host = "other.local"))
+        )
+
+        val statuses = resolveWifiProximityStatuses(
+            devices = listOf(matchingDevice, otherDevice),
+            wifiProfiles = listOf(
+                WifiProfile(id = "wifi-1", ssid = "Connected"),
+                WifiProfile(id = "wifi-2", ssid = "Other")
+            ),
+            snapshot = WifiProximitySnapshot(
+                visibleSsids = setOf("Connected"),
+                issue = WifiProximityIssue.SCAN_FAILED
+            )
+        )
+
+        assertEquals(DeviceWifiProximityStatus.NEARBY, statuses[matchingDevice.id])
+        assertEquals(DeviceWifiProximityStatus.SCAN_FAILED, statuses[otherDevice.id])
+    }
+
+    @Test
+    fun disabledLocationServicesAreGrayUnlessAssignedWifiIsConnected() {
+        val connectedDevice = device(id = "connected", sortOrder = 0).copy(
+            connections = listOf(DeviceConnection(wifiProfileId = "wifi-1", host = "one.local"))
+        )
+        val scanDependentDevice = device(id = "scan", sortOrder = 1).copy(
+            connections = listOf(DeviceConnection(wifiProfileId = "wifi-2", host = "two.local"))
+        )
+
+        val statuses = resolveWifiProximityStatuses(
+            devices = listOf(connectedDevice, scanDependentDevice),
+            wifiProfiles = listOf(
+                WifiProfile(id = "wifi-1", ssid = "Connected"),
+                WifiProfile(id = "wifi-2", ssid = "Nearby")
+            ),
+            snapshot = WifiProximitySnapshot(
+                visibleSsids = setOf("Connected"),
+                issue = WifiProximityIssue.LOCATION_SERVICES_DISABLED
+            )
+        )
+
+        assertEquals(DeviceWifiProximityStatus.NEARBY, statuses[connectedDevice.id])
+        assertEquals(
+            DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED,
+            statuses[scanDependentDevice.id]
+        )
+    }
+
+    @Test
+    fun refreshPublishesProximityThroughUiState() = runTest(dispatcher) {
+        val device = device(id = "device-1", sortOrder = 0).copy(
+            connections = listOf(
+                DeviceConnection(wifiProfileId = "garage-ap", host = "device.local")
+            )
+        )
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(listOf(device)),
+            deviceActionService = WaitingDeviceActionService(),
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(
+                WifiProximitySnapshot(visibleSsids = setOf("Shelly-Garage"))
+            )
+        )
+        runCurrent()
+
+        viewModel.refreshWifiProximity()
+        runCurrent()
+
+        assertEquals(
+            DeviceWifiProximityStatus.NEARBY,
+            viewModel.uiState.value.wifiProximityStatuses[device.id]
+        )
+    }
+
+    @Test
+    fun changedWifiAssignmentReusesLatestSnapshot() = runTest(dispatcher) {
+        val repository = FakeDeviceRepository(
+            listOf(
+                device(id = "device-1", sortOrder = 0).copy(
+                    connections = listOf(
+                        DeviceConnection(wifiProfileId = "garage-ap", host = "device.local")
+                    )
+                )
+            )
+        )
+        val viewModel = MainViewModel(
+            repository = repository,
+            deviceActionService = WaitingDeviceActionService(),
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(
+                WifiProximitySnapshot(visibleSsids = setOf("Home-WLAN"))
+            )
+        )
+        runCurrent()
+        viewModel.refreshWifiProximity()
+        runCurrent()
+
+        repository.setDevices(
+            listOf(
+                device(id = "device-1", sortOrder = 0).copy(
+                    connections = listOf(
+                        DeviceConnection(wifiProfileId = "home-wifi", host = "device.local")
+                    )
+                )
+            )
+        )
+        runCurrent()
+
+        assertEquals(
+            DeviceWifiProximityStatus.NEARBY,
+            viewModel.uiState.value.wifiProximityStatuses["device-1"]
+        )
+    }
+
+    @Test
+    fun monitoringPublishesEventsOnlyWhileStarted() = runTest(dispatcher) {
+        val device = device(id = "device-1", sortOrder = 0).copy(
+            connections = listOf(
+                DeviceConnection(wifiProfileId = "home-wifi", host = "device.local")
+            )
+        )
+        val proximityService = MonitoringWifiProximityService()
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(listOf(device)),
+            deviceActionService = WaitingDeviceActionService(),
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = proximityService
+        )
+        runCurrent()
+
+        viewModel.startWifiProximityMonitoring()
+        runCurrent()
+        proximityService.snapshots.value = WifiProximitySnapshot(
+            visibleSsids = setOf("Home-WLAN")
+        )
+        runCurrent()
+
+        assertEquals(
+            DeviceWifiProximityStatus.NEARBY,
+            viewModel.uiState.value.wifiProximityStatuses[device.id]
+        )
+
+        viewModel.stopWifiProximityMonitoring()
+        proximityService.snapshots.value = WifiProximitySnapshot()
+        runCurrent()
+
+        assertEquals(
+            DeviceWifiProximityStatus.NEARBY,
+            viewModel.uiState.value.wifiProximityStatuses[device.id]
         )
     }
 
@@ -165,6 +366,22 @@ class MainViewModelTest {
         }
     }
 
+    private class FixedWifiProximityService(
+        private val snapshot: WifiProximitySnapshot = WifiProximitySnapshot()
+    ) : WifiProximityService {
+        override fun observe(): Flow<WifiProximitySnapshot> = flowOf(snapshot)
+
+        override suspend fun refresh(): WifiProximitySnapshot = snapshot
+    }
+
+    private class MonitoringWifiProximityService : WifiProximityService {
+        val snapshots = MutableStateFlow(WifiProximitySnapshot())
+
+        override fun observe(): Flow<WifiProximitySnapshot> = snapshots
+
+        override suspend fun refresh(): WifiProximitySnapshot = snapshots.value
+    }
+
     private class FakeDeviceRepository(
         devices: List<Device>
     ) : DeviceRepository {
@@ -186,5 +403,9 @@ class MainViewModelTest {
         }
 
         override suspend fun deleteDevice(deviceId: String) = Unit
+
+        fun setDevices(devices: List<Device>) {
+            devicesFlow.value = devices
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Feature / GUI
 - Bereich: Dashboard / WLAN
@@ -63,8 +63,9 @@ früh erkennen, ohne zunächst eine Aktion auszuführen.
 - Der Status wird beim Öffnen beziehungsweise erneuten Aktivieren des
   Dashboards aktualisiert.
 - Änderungen an Geräten oder WLAN-Zuordnungen aktualisieren die Anzeige.
-- Die Aktualisierung berücksichtigt Androids Scan-Beschränkungen und startet
-  keine unnötigen oder eng getakteten Scans.
+- Die Aktualisierung berücksichtigt Androids Scan-Beschränkungen und kombiniert
+  Ereignisse mit einem begrenzten Scan-Takt im Vordergrund, damit neu sichtbare
+  WLANs zeitnah nachgezogen werden.
 - Es wird kein dauerhafter Hintergrundscan eingeführt.
 
 ### Fehler- und Berechtigungsbehandlung
@@ -108,22 +109,22 @@ früh erkennen, ohne zunächst eine Aktion auszuführen.
 
 ## Akzeptanzkriterien
 
-- [ ] Neben jedem Gerätenamen wird rechtsbündig auf der Namenszeile ein WLAN-Statuspunkt angezeigt.
-- [ ] Der Punkt bleibt auch bei langen Gerätenamen sichtbar.
-- [ ] Der Punkt ist grün, wenn mindestens ein dem Gerät zugeordnetes WLAN erkannt wird.
-- [ ] Der Punkt ist rot, wenn kein zugeordnetes WLAN erkannt wird.
-- [ ] Der Punkt pulsiert während einer Geräteaktion und behält dabei seine aktuelle Farbe.
-- [ ] Ein aktuell verbundenes, zugeordnetes WLAN führt zu einem grünen Status.
-- [ ] Geräte ohne WLAN-Zuordnung erhalten keinen fälschlich grünen Status.
-- [ ] Der Status wird beim Öffnen oder erneuten Aktivieren des Dashboards aktualisiert.
-- [ ] Änderungen an WLAN-Zuordnungen werden in der Anzeige berücksichtigt.
-- [ ] Fehlende Berechtigungen, deaktiviertes WLAN und Scanfehler werden verständlich behandelt.
-- [ ] Die Anzeige ist per Accessibility-Beschreibung verständlich.
-- [ ] Es findet kein dauerhafter Hintergrundscan statt.
-- [ ] Es werden keine sensiblen WLAN-Daten geloggt oder extern übertragen.
-- [ ] Bestehende Geräteaktionen und WLAN-Verbindungen funktionieren unverändert.
-- [ ] Relevante Unit- und UI-Tests sind ergänzt.
-- [ ] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+- [x] Neben jedem Gerätenamen wird rechtsbündig auf der Namenszeile ein WLAN-Statuspunkt angezeigt.
+- [x] Der Punkt bleibt auch bei langen Gerätenamen sichtbar.
+- [x] Der Punkt ist grün, wenn mindestens ein dem Gerät zugeordnetes WLAN erkannt wird.
+- [x] Der Punkt ist rot, wenn kein zugeordnetes WLAN erkannt wird.
+- [x] Der Punkt pulsiert während einer Geräteaktion und behält dabei seine aktuelle Farbe.
+- [x] Ein aktuell verbundenes, zugeordnetes WLAN führt zu einem grünen Status.
+- [x] Geräte ohne WLAN-Zuordnung erhalten keinen fälschlich grünen Status.
+- [x] Der Status wird beim Öffnen oder erneuten Aktivieren des Dashboards aktualisiert.
+- [x] Änderungen an WLAN-Zuordnungen werden in der Anzeige berücksichtigt.
+- [x] Fehlende Berechtigungen, deaktiviertes WLAN und Scanfehler werden verständlich behandelt.
+- [x] Die Anzeige ist per Accessibility-Beschreibung verständlich.
+- [x] Es findet kein dauerhafter Hintergrundscan statt.
+- [x] Es werden keine sensiblen WLAN-Daten geloggt oder extern übertragen.
+- [x] Bestehende Geräteaktionen und WLAN-Verbindungen funktionieren unverändert.
+- [x] Relevante Unit- und UI-Tests sind ergänzt.
+- [x] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
 
 ## Testhinweise
 
