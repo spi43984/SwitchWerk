@@ -10,10 +10,15 @@ import de.piecha.switchwerk.data.action.DiagnosticStage
 import de.piecha.switchwerk.data.action.NetworkFailureReason
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
+import de.piecha.switchwerk.data.repository.WifiProfileRepository
+import de.piecha.switchwerk.data.network.WifiProximityIssue
+import de.piecha.switchwerk.data.network.WifiProximityService
+import de.piecha.switchwerk.data.network.WifiProximitySnapshot
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
 import java.text.SimpleDateFormat
@@ -40,11 +45,22 @@ sealed interface DiagnosticListItem {
     data object Separator : DiagnosticListItem
 }
 
+enum class DeviceWifiProximityStatus {
+    NEARBY,
+    NOT_NEARBY,
+    NO_ASSIGNMENT,
+    WIFI_DISABLED,
+    LOCATION_SERVICES_DISABLED,
+    PERMISSION_DENIED,
+    SCAN_FAILED
+}
+
 data class MainUiState(
     val devices: List<Device> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: UiText? = null,
     val deviceActionStates: Map<String, DeviceActionUiState> = emptyMap(),
+    val wifiProximityStatuses: Map<String, DeviceWifiProximityStatus> = emptyMap(),
     val appSettings: AppSettings = AppSettings(),
     val diagnosticItems: List<DiagnosticListItem> = emptyList()
 )
@@ -52,7 +68,9 @@ data class MainUiState(
 class MainViewModel(
     private val repository: DeviceRepository,
     private val deviceActionService: DeviceActionService,
-    private val appSettingsRepository: AppSettingsRepository
+    private val appSettingsRepository: AppSettingsRepository,
+    private val wifiProfileRepository: WifiProfileRepository,
+    private val wifiProximityService: WifiProximityService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -64,18 +82,29 @@ class MainViewModel(
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
     private val actionJobs = mutableMapOf<String, Job>()
     private val actionStateResetJobs = mutableMapOf<String, Job>()
+    private var wifiProfiles: List<WifiProfile> = emptyList()
+    private var wifiProximitySnapshot = WifiProximitySnapshot()
+    private var wifiRefreshJob: Job? = null
+    private var wifiMonitorJob: Job? = null
 
     init {
         observeDevices()
         observeAppSettings()
+        observeWifiProfiles()
     }
 
     private fun observeDevices() {
         viewModelScope.launch {
             runCatching {
                 repository.observeDevices().collect { devices ->
+                    val sortedDevices = devices.sortedBy { it.sortOrder }
                     _uiState.value = _uiState.value.copy(
-                        devices = devices.sortedBy { it.sortOrder },
+                        devices = sortedDevices,
+                        wifiProximityStatuses = resolveWifiProximityStatuses(
+                            devices = sortedDevices,
+                            wifiProfiles = wifiProfiles,
+                            snapshot = wifiProximitySnapshot
+                        ),
                         isLoading = false,
                         errorMessage = null
                     )
@@ -132,6 +161,34 @@ class MainViewModel(
                 actionJobs.remove(device.id, job)
             }
         }
+    }
+
+    fun refreshWifiProximity() {
+        wifiRefreshJob?.cancel()
+        wifiRefreshJob = viewModelScope.launch {
+            wifiProximitySnapshot = wifiProximityService.refresh()
+            updateWifiProximityState()
+        }
+    }
+
+    fun startWifiProximityMonitoring() {
+        if (wifiMonitorJob?.isActive == true) {
+            return
+        }
+        wifiMonitorJob = viewModelScope.launch {
+            wifiProximityService.observe().collect { snapshot ->
+                wifiProximitySnapshot = snapshot
+                updateWifiProximityState()
+            }
+        }
+        refreshWifiProximity()
+    }
+
+    fun stopWifiProximityMonitoring() {
+        wifiRefreshJob?.cancel()
+        wifiRefreshJob = null
+        wifiMonitorJob?.cancel()
+        wifiMonitorJob = null
     }
 
     fun moveDeviceUp(deviceId: String) {
@@ -211,6 +268,25 @@ class MainViewModel(
                 _uiState.value = _uiState.value.copy(appSettings = settings)
             }
         }
+    }
+
+    private fun observeWifiProfiles() {
+        viewModelScope.launch {
+            wifiProfileRepository.observeWifiProfiles().collect { profiles ->
+                wifiProfiles = profiles
+                updateWifiProximityState()
+            }
+        }
+    }
+
+    private fun updateWifiProximityState() {
+        _uiState.value = _uiState.value.copy(
+            wifiProximityStatuses = resolveWifiProximityStatuses(
+                devices = _uiState.value.devices,
+                wifiProfiles = wifiProfiles,
+                snapshot = wifiProximitySnapshot
+            )
+        )
     }
 
     private fun appendDiagnosticMessage(message: UiText, elapsedMillis: Long) {
@@ -369,5 +445,41 @@ class MainViewModel(
         const val NANOS_PER_MILLISECOND = 1_000_000L
         const val ACTION_SUCCESS_DISPLAY_MILLIS = 2_000L
         const val ACTION_ERROR_DISPLAY_MILLIS = 4_000L
+    }
+}
+
+internal fun resolveWifiProximityStatuses(
+    devices: List<Device>,
+    wifiProfiles: List<WifiProfile>,
+    snapshot: WifiProximitySnapshot
+): Map<String, DeviceWifiProximityStatus> {
+    val ssidByProfileId = wifiProfiles
+        .filter { profile -> profile.ssid.isNotBlank() }
+        .associate { profile -> profile.id to profile.ssid }
+
+    return devices.associate { device ->
+        val assignedSsids = device.connections.mapNotNull { connection ->
+            ssidByProfileId[connection.wifiProfileId]
+        }
+        val status = when {
+            assignedSsids.isEmpty() -> DeviceWifiProximityStatus.NO_ASSIGNMENT
+            assignedSsids.any(snapshot.visibleSsids::contains) -> {
+                DeviceWifiProximityStatus.NEARBY
+            }
+            snapshot.issue == WifiProximityIssue.WIFI_DISABLED -> {
+                DeviceWifiProximityStatus.WIFI_DISABLED
+            }
+            snapshot.issue == WifiProximityIssue.LOCATION_SERVICES_DISABLED -> {
+                DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED
+            }
+            snapshot.issue == WifiProximityIssue.PERMISSION_DENIED -> {
+                DeviceWifiProximityStatus.PERMISSION_DENIED
+            }
+            snapshot.issue == WifiProximityIssue.SCAN_FAILED -> {
+                DeviceWifiProximityStatus.SCAN_FAILED
+            }
+            else -> DeviceWifiProximityStatus.NOT_NEARBY
+        }
+        device.id to status
     }
 }

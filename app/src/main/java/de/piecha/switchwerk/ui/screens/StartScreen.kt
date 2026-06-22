@@ -1,6 +1,13 @@
 package de.piecha.switchwerk.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,21 +39,30 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.ui.components.AppMenuLayout
 import de.piecha.switchwerk.ui.components.AppOverflowMenu
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
+import de.piecha.switchwerk.viewmodel.DeviceWifiProximityStatus
 import de.piecha.switchwerk.viewmodel.DiagnosticListItem
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.R
@@ -63,6 +79,25 @@ fun StartScreen(
     val devices = uiState.devices.sortedBy { it.sortOrder }
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val screenPadding = if (isLandscape) 12.dp else 24.dp
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> viewModel.startWifiProximityMonitoring()
+                Lifecycle.Event.ON_PAUSE -> viewModel.stopWifiProximityMonitoring()
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            viewModel.startWifiProximityMonitoring()
+        }
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            viewModel.stopWifiProximityMonitoring()
+        }
+    }
 
     AppMenuLayout(
         onOpenSettings = onNavigateToSettings,
@@ -110,6 +145,7 @@ fun StartScreen(
                         DashboardLayoutMode.LIST -> DeviceList(
                             devices = devices,
                             actionStates = uiState.deviceActionStates,
+                            wifiProximityStatuses = uiState.wifiProximityStatuses,
                             onDeviceActionClick = viewModel::executeDeviceAction,
                             onMoveUpClick = viewModel::moveDeviceUp,
                             onMoveDownClick = viewModel::moveDeviceDown,
@@ -119,6 +155,7 @@ fun StartScreen(
                         DashboardLayoutMode.WIDGETS -> DeviceWidgetGrid(
                             devices = devices,
                             actionStates = uiState.deviceActionStates,
+                            wifiProximityStatuses = uiState.wifiProximityStatuses,
                             onDeviceActionClick = viewModel::executeDeviceAction,
                             onMoveUpClick = viewModel::moveDeviceUp,
                             onMoveDownClick = viewModel::moveDeviceDown,
@@ -247,6 +284,7 @@ private fun EmptyDeviceList(modifier: Modifier = Modifier) {
 private fun DeviceList(
     devices: List<Device>,
     actionStates: Map<String, DeviceActionUiState>,
+    wifiProximityStatuses: Map<String, DeviceWifiProximityStatus>,
     onDeviceActionClick: (Device) -> Unit,
     onMoveUpClick: (String) -> Unit,
     onMoveDownClick: (String) -> Unit,
@@ -263,6 +301,8 @@ private fun DeviceList(
             DeviceCard(
                 device = device,
                 actionState = actionStates[device.id],
+                wifiProximityStatus = wifiProximityStatuses[device.id]
+                    ?: DeviceWifiProximityStatus.NOT_NEARBY,
                 canMoveUp = devices.indexOf(device) > 0,
                 canMoveDown = devices.indexOf(device) < devices.lastIndex,
                 onActionClick = { onDeviceActionClick(device) },
@@ -277,6 +317,7 @@ private fun DeviceList(
 private fun DeviceWidgetGrid(
     devices: List<Device>,
     actionStates: Map<String, DeviceActionUiState>,
+    wifiProximityStatuses: Map<String, DeviceWifiProximityStatus>,
     onDeviceActionClick: (Device) -> Unit,
     onMoveUpClick: (String) -> Unit,
     onMoveDownClick: (String) -> Unit,
@@ -295,6 +336,8 @@ private fun DeviceWidgetGrid(
             DeviceWidget(
                 device = device,
                 actionState = actionStates[device.id],
+                wifiProximityStatus = wifiProximityStatuses[device.id]
+                    ?: DeviceWifiProximityStatus.NOT_NEARBY,
                 canMoveUp = devices.indexOf(device) > 0,
                 canMoveDown = devices.indexOf(device) < devices.lastIndex,
                 onActionClick = { onDeviceActionClick(device) },
@@ -309,6 +352,7 @@ private fun DeviceWidgetGrid(
 private fun DeviceWidget(
     device: Device,
     actionState: DeviceActionUiState?,
+    wifiProximityStatus: DeviceWifiProximityStatus,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onActionClick: () -> Unit,
@@ -324,11 +368,11 @@ private fun DeviceWidget(
                 bottom = 0.dp
             )
         ) {
-            Text(
-                text = device.name,
-                style = MaterialTheme.typography.titleMedium,
+            DeviceTitle(
+                name = device.name,
+                wifiProximityStatus = wifiProximityStatus,
+                isActionRunning = actionState == DeviceActionUiState.Loading,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.height(48.dp)
             )
 
@@ -594,6 +638,7 @@ private fun DiagnosticPanel(
 private fun DeviceCard(
     device: Device,
     actionState: DeviceActionUiState?,
+    wifiProximityStatus: DeviceWifiProximityStatus,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onActionClick: () -> Unit,
@@ -611,9 +656,11 @@ private fun DeviceCard(
                 bottom = 0.dp
             )
         ) {
-            Text(
-                text = device.name,
-                style = MaterialTheme.typography.titleMedium
+            DeviceTitle(
+                name = device.name,
+                wifiProximityStatus = wifiProximityStatus,
+                isActionRunning = actionState == DeviceActionUiState.Loading,
+                maxLines = 1
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -630,3 +677,92 @@ private fun DeviceCard(
         }
     }
 }
+
+@Composable
+internal fun DeviceTitle(
+    name: String,
+    wifiProximityStatus: DeviceWifiProximityStatus,
+    isActionRunning: Boolean,
+    maxLines: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        WifiProximityIndicator(
+            status = wifiProximityStatus,
+            isActionRunning = isActionRunning,
+            modifier = Modifier.padding(top = 5.dp)
+        )
+    }
+}
+
+@Composable
+private fun WifiProximityIndicator(
+    status: DeviceWifiProximityStatus,
+    isActionRunning: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val statusDescription = deviceWifiProximityText(status)
+    val description = if (isActionRunning) {
+        stringResource(R.string.wifi_proximity_action_running, statusDescription)
+    } else {
+        statusDescription
+    }
+    val alpha = if (isActionRunning) {
+        val transition = rememberInfiniteTransition(label = "wifi proximity pulse")
+        transition.animateFloat(
+            initialValue = 0.35f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 650),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "wifi proximity alpha"
+        ).value
+    } else {
+        1f
+    }
+    val color = when (status) {
+        DeviceWifiProximityStatus.NEARBY -> WifiNearbyColor
+        DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> WifiUnavailableColor
+        else -> WifiNotNearbyColor
+    }
+
+    Box(
+        modifier = modifier
+            .size(14.dp)
+            .alpha(alpha)
+            .background(color = color, shape = CircleShape)
+            .clearAndSetSemantics { contentDescription = description }
+    )
+}
+
+@Composable
+private fun deviceWifiProximityText(status: DeviceWifiProximityStatus): String {
+    val resourceId = when (status) {
+        DeviceWifiProximityStatus.NEARBY -> R.string.wifi_proximity_nearby
+        DeviceWifiProximityStatus.NOT_NEARBY -> R.string.wifi_proximity_not_nearby
+        DeviceWifiProximityStatus.NO_ASSIGNMENT -> R.string.wifi_proximity_no_assignment
+        DeviceWifiProximityStatus.WIFI_DISABLED -> R.string.wifi_proximity_wifi_disabled
+        DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> {
+            R.string.wifi_proximity_location_services_disabled
+        }
+        DeviceWifiProximityStatus.PERMISSION_DENIED -> R.string.wifi_proximity_permission_denied
+        DeviceWifiProximityStatus.SCAN_FAILED -> R.string.wifi_proximity_scan_failed
+    }
+    return stringResource(resourceId)
+}
+
+private val WifiNearbyColor = Color(0xFF2E7D32)
+private val WifiNotNearbyColor = Color(0xFFC62828)
+private val WifiUnavailableColor = Color(0xFF757575)
