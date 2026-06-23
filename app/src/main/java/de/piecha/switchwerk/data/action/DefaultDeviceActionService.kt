@@ -259,7 +259,10 @@ class DefaultDeviceActionService(
                     failures += SecurityAttemptFailure(securityType, connectionResult)
                     if (
                         index == securityTypes.lastIndex ||
-                        !connectionResult.allowsSecurityFallback()
+                        !connectionResult.allowsSecurityFallback(
+                            nextSecurityType = securityTypes[index + 1],
+                            detectedSecurityTypes = detectedSecurityTypes
+                        )
                     ) {
                         return securityFailureResult(failures, connectionResult)
                     }
@@ -289,11 +292,10 @@ class DefaultDeviceActionService(
         val first = preferredSecurityType ?: WifiSecurityType.WPA2
         val configuredOrder = listOf(first, first.fallback())
         if (detectedSecurityTypes.isNullOrEmpty()) {
-            return configuredOrder
+            return listOf(first)
         }
-        return configuredOrder.sortedBy { securityType ->
-            securityType !in detectedSecurityTypes
-        }
+        return configuredOrder.filter(detectedSecurityTypes::contains)
+            .ifEmpty { listOf(first) }
     }
 
     private fun remainingTimeoutMillis(startedAtNanos: Long): Long {
@@ -514,21 +516,14 @@ class DefaultDeviceActionService(
         }
     }
 
-    private fun WifiConnectionResult.allowsSecurityFallback(): Boolean {
-        return when (this) {
-            WifiConnectionResult.Unavailable -> true
-
-            WifiConnectionResult.Timeout,
-            WifiConnectionResult.NetworkRequestTimeout -> true
-
-            is WifiConnectionResult.Error -> cause !is IllegalArgumentException
-
-            is WifiConnectionResult.Success,
-            is WifiConnectionResult.SecurityTypesFailed,
-            WifiConnectionResult.PermissionDenied,
-            WifiConnectionResult.WifiDisabled,
-            WifiConnectionResult.UnsupportedAndroidVersion -> false
+    private fun WifiConnectionResult.allowsSecurityFallback(
+        nextSecurityType: WifiSecurityType,
+        detectedSecurityTypes: Set<WifiSecurityType>?
+    ): Boolean {
+        if (nextSecurityType in detectedSecurityTypes.orEmpty()) {
+            return true
         }
+        return false
     }
 
     private fun logInfo(message: String) {
@@ -562,6 +557,6 @@ class DefaultDeviceActionService(
     private companion object {
         const val LOG_TAG = "SwitchWerkNetwork"
         const val NANOS_PER_MILLISECOND = 1_000_000L
-        const val FIRST_SECURITY_ATTEMPT_TIMEOUT_MILLIS = 15_000L
+        const val FIRST_SECURITY_ATTEMPT_TIMEOUT_MILLIS = 25_000L
     }
 }

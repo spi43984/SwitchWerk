@@ -60,13 +60,6 @@ class AndroidWifiProximityService(
             }
         }
 
-        fun launchActiveScanLoop() = launch {
-            while (true) {
-                delay(FOREGROUND_REFRESH_INTERVAL_MILLIS)
-                trySend(withConfirmations(refreshSnapshot()))
-            }
-        }
-
         val statusReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 publishSnapshot()
@@ -133,7 +126,6 @@ class AndroidWifiProximityService(
             connectivityManager.registerDefaultNetworkCallback(networkCallback)
         }.isSuccess
         val foregroundRefreshJob = launchForegroundRefreshLoop()
-        val activeScanJob = launchActiveScanLoop()
         val confirmationJob = launch {
             proximityConfirmationStore.confirmations.collect { publishSnapshot() }
         }
@@ -142,7 +134,6 @@ class AndroidWifiProximityService(
 
         awaitClose {
             foregroundRefreshJob.cancel()
-            activeScanJob.cancel()
             confirmationJob.cancel()
             if (statusReceiverRegistered) {
                 unregisterReceiver(statusReceiver)
@@ -492,6 +483,5 @@ class AndroidWifiProximityService(
         const val PROXIMITY_RETENTION_MILLIS = 2 * 60 * 1_000L
         const val NETWORK_CALLBACK_SETTLE_MILLIS = 100L
         const val PASSIVE_REFRESH_INTERVAL_MILLIS = 5_000L
-        const val FOREGROUND_REFRESH_INTERVAL_MILLIS = 45_000L
     }
 }

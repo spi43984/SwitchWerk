@@ -53,8 +53,10 @@ zeigt stattdessen einen nachvollziehbaren, bestätigten Verbindungszustand.
 
 - Keine periodischen aktiven WLAN-Scans als Voraussetzung für einen roten
   Status verwenden; Scan-Drosselung nicht durch Entwickleroptionen umgehen.
-- Passive, frische positive Scan-Treffer dürfen Grün liefern, fehlende Treffer
-  jedoch nur als unbestätigt behandeln.
+- Passive, frische positive Scan-Treffer dürfen ohne vorherigen
+  Verbindungsfehler Grün liefern; fehlende Treffer bleiben unbestätigt. Ein
+  sichtbarer Scan-Treffer überschreibt keinen konkret fehlgeschlagenen
+  Verbindungsversuch.
 - Verbindungsservice und Nähe-Service über einen kleinen, in-memory
   Bestätigungszustand verbinden: Erfolg bestätigt Grün, nicht verfügbare
   Netzwerk-Anfrage bzw. kombinierter Sicherheitsfehler bestätigt Rot.
@@ -83,6 +85,10 @@ zeigt stattdessen einen nachvollziehbaren, bestätigten Verbindungszustand.
   Logging.
 - Der bestehende `WifiNetworkSpecifier`-Callback ist Quelle für verbindliche
   Erfolg-/Fehlerbestätigungen.
+- Der primäre Sicherheitsversuch nutzt den Android-Plattform-Timeout; ein
+  WPA3-Fallback erfolgt nur bei bestätigter WPA3-Fähigkeit. Eine in-memory
+  Request-ID dokumentiert den Callback-Ablauf ohne WLAN- oder Gerätedaten zu
+  loggen.
 
 ## Akzeptanzkriterien
 
@@ -92,7 +98,8 @@ zeigt stattdessen einen nachvollziehbaren, bestätigten Verbindungszustand.
 - [ ] Erfolgreiche WLAN-Verbindung setzt zugeordnete Geräte auf Grün.
 - [ ] `NetworkRequestTimeout`, `Unavailable` und `SecurityTypesFailed` setzen
   das betroffene WLAN auf Rot mit „WLAN-Verbindung nicht möglich“.
-- [ ] Ein Scan oder eine erfolgreiche Verbindung hebt Rot wieder auf Grün.
+- [ ] Eine erfolgreiche Verbindung hebt Rot wieder auf Grün; ein bloß
+  sichtbarer Scan-Treffer nicht.
 - [ ] Nicht zugeordnete Geräte werden nie fälschlich Grün.
 - [ ] Der Statuspunkt blockiert keine Geräteaktion.
 - [ ] Der erwartete Android-Systemdialog wird nicht als Scan- oder
@@ -102,7 +109,7 @@ zeigt stattdessen einen nachvollziehbaren, bestätigten Verbindungszustand.
 - [ ] Keine dauerhaften Hintergrundscans und keine sensitiven Logs.
 - [ ] Relevante Unit-/UI-Tests decken unbekannten, bestätigten und
   fehlgeschlagenen Status ab.
-- [ ] Host-Prüfungen sind erfolgreich bestätigt.
+- [x] Host-Prüfungen sind erfolgreich bestätigt.
 
 ## Testhinweise
 

@@ -464,11 +464,11 @@ internal fun resolveWifiProximityStatuses(
         }
         val status = when {
             assignedSsids.isEmpty() -> DeviceWifiProximityStatus.NO_ASSIGNMENT
-            assignedSsids.any(snapshot.visibleSsids::contains) -> {
-                DeviceWifiProximityStatus.NEARBY
-            }
             assignedSsids.any(snapshot.unavailableSsids::contains) -> {
                 DeviceWifiProximityStatus.NOT_NEARBY
+            }
+            assignedSsids.any(snapshot.visibleSsids::contains) -> {
+                DeviceWifiProximityStatus.NEARBY
             }
             snapshot.issue == WifiProximityIssue.WIFI_DISABLED -> {
                 DeviceWifiProximityStatus.WIFI_DISABLED

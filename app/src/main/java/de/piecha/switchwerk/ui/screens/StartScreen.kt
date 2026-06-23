@@ -744,6 +744,7 @@ private fun WifiProximityIndicator(
     val color = when (status) {
         DeviceWifiProximityStatus.NEARBY -> WifiNearbyColor
         DeviceWifiProximityStatus.UNKNOWN,
+        DeviceWifiProximityStatus.NO_ASSIGNMENT,
         DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> WifiUnavailableColor
         else -> WifiNotNearbyColor
     }
