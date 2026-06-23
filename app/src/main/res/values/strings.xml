@@ -119,6 +119,11 @@
     <string name="no_wifi_profiles_configured">Keine WLAN-Profile konfiguriert.</string>
     <string name="delete_wifi_profile">WLAN-Profil löschen</string>
     <string name="delete_wifi_profile_confirmation">WLAN-Profil %1$s wirklich löschen?</string>
+    <plurals name="delete_wifi_profile_used_warning">
+        <item quantity="one">%1$d Gerät verliert seine WLAN-Zuordnung.</item>
+        <item quantity="other">%1$d Geräte verlieren ihre WLAN-Zuordnung.</item>
+    </plurals>
+    <string name="affected_devices">Betroffene Geräte:</string>
     <string name="create_wifi_profile">WLAN-Profil anlegen</string>
     <string name="edit_wifi_profile">WLAN-Profil bearbeiten</string>
     <string name="toggle_password_visibility">Passwort anzeigen oder verbergen</string>

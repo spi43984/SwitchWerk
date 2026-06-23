@@ -57,6 +57,11 @@ data class DeviceFormState(
     val connections: List<DeviceConnectionFormState> = emptyList()
 )
 
+data class WifiProfileDeletionConfirmation(
+    val profile: WifiProfile,
+    val affectedDeviceNames: List<String>
+)
+
 data class SettingsUiState(
     val wifiProfiles: List<WifiProfile> = emptyList(),
     val devices: List<Device> = emptyList(),
@@ -64,6 +69,7 @@ data class SettingsUiState(
     val deviceForm: DeviceFormState = DeviceFormState(),
     val isEditingWifiProfile: Boolean = false,
     val isEditingDevice: Boolean = false,
+    val wifiProfileDeletionConfirmation: WifiProfileDeletionConfirmation? = null,
     val errorMessage: UiText? = null,
     val statusMessage: UiText? = null,
     val isTransferInProgress: Boolean = false,
@@ -284,10 +290,32 @@ class SettingsViewModel(
         }
     }
 
-    fun deleteWifiProfile(profileId: String) {
+    fun requestWifiProfileDeletion(profileId: String) {
+        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == profileId } ?: return
+        val affectedDeviceNames = _uiState.value.devices
+            .filter { device -> device.connections.any { it.wifiProfileId == profileId } }
+            .map { it.name }
+
+        _uiState.value = _uiState.value.copy(
+            wifiProfileDeletionConfirmation = WifiProfileDeletionConfirmation(
+                profile = profile,
+                affectedDeviceNames = affectedDeviceNames
+            ),
+            errorMessage = null
+        )
+    }
+
+    fun cancelWifiProfileDeletion() {
+        _uiState.value = _uiState.value.copy(wifiProfileDeletionConfirmation = null)
+    }
+
+    fun confirmWifiProfileDeletion() {
+        val confirmation = _uiState.value.wifiProfileDeletionConfirmation ?: return
+        _uiState.value = _uiState.value.copy(wifiProfileDeletionConfirmation = null)
+
         viewModelScope.launch {
             runCatching {
-                wifiProfileRepository.deleteWifiProfile(profileId)
+                wifiProfileRepository.deleteWifiProfile(confirmation.profile.id)
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
                     errorMessage = error.toUiText(R.string.error_wifi_profile_delete)

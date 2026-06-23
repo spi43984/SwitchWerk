@@ -1,5 +1,6 @@
 package de.piecha.switchwerk.data.repository
 
+import de.piecha.switchwerk.data.local.dao.DeviceConnectionDao
 import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.map
 
 class RoomWifiProfileRepository(
     private val wifiProfileDao: WifiProfileDao,
+    private val deviceConnectionDao: DeviceConnectionDao,
     private val credentialStore: WifiCredentialStore
 ) : WifiProfileRepository {
 
@@ -90,6 +92,7 @@ class RoomWifiProfileRepository(
     }
 
     override suspend fun deleteWifiProfile(id: String) {
+        deviceConnectionDao.deleteForWifiProfile(id)
         credentialStore.deletePassword(id)
         wifiProfileDao.deleteById(id)
     }

@@ -119,6 +119,11 @@
     <string name="no_wifi_profiles_configured">No Wi-Fi profiles configured.</string>
     <string name="delete_wifi_profile">Delete Wi-Fi profile</string>
     <string name="delete_wifi_profile_confirmation">Really delete Wi-Fi profile %1$s?</string>
+    <plurals name="delete_wifi_profile_used_warning">
+        <item quantity="one">%1$d device will lose its Wi-Fi assignment.</item>
+        <item quantity="other">%1$d devices will lose their Wi-Fi assignment.</item>
+    </plurals>
+    <string name="affected_devices">Affected devices:</string>
     <string name="create_wifi_profile">Create Wi-Fi profile</string>
     <string name="edit_wifi_profile">Edit Wi-Fi profile</string>
     <string name="toggle_password_visibility">Show or hide password</string>
