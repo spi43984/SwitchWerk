@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / Stabilisierung / GUI
 - Bereich: Dashboard / WLAN / Hilfe
@@ -92,24 +92,30 @@ zeigt stattdessen einen nachvollziehbaren, bestätigten Verbindungszustand.
 
 ## Akzeptanzkriterien
 
-- [ ] Ein einzelner fehlender Scan setzt keinen Punkt auf Rot.
-- [ ] Nach App-Start ohne bestätigtes Ergebnis ist der Punkt grau und erklärt
+- [x] Ein einzelner fehlender Scan setzt keinen Punkt auf Rot.
+- [x] Nach App-Start ohne bestätigtes Ergebnis ist der Punkt grau und erklärt
   „WLAN noch nicht bestätigt“.
-- [ ] Erfolgreiche WLAN-Verbindung setzt zugeordnete Geräte auf Grün.
-- [ ] `NetworkRequestTimeout`, `Unavailable` und `SecurityTypesFailed` setzen
+- [x] Erfolgreiche WLAN-Verbindung setzt zugeordnete Geräte auf Grün.
+- [x] `NetworkRequestTimeout`, `Unavailable` und `SecurityTypesFailed` setzen
   das betroffene WLAN auf Rot mit „WLAN-Verbindung nicht möglich“.
-- [ ] Eine erfolgreiche Verbindung hebt Rot wieder auf Grün; ein bloß
+- [x] Eine erfolgreiche Verbindung hebt Rot wieder auf Grün; ein bloß
   sichtbarer Scan-Treffer nicht.
-- [ ] Nicht zugeordnete Geräte werden nie fälschlich Grün.
-- [ ] Der Statuspunkt blockiert keine Geräteaktion.
-- [ ] Der erwartete Android-Systemdialog wird nicht als Scan- oder
+- [x] Nicht zugeordnete Geräte werden nie fälschlich Grün.
+- [x] Der Statuspunkt blockiert keine Geräteaktion.
+- [x] Der erwartete Android-Systemdialog wird nicht als Scan- oder
   Sichtbarkeitsfehler interpretiert.
-- [ ] Listen- und Widgetansicht sowie Accessibility verwenden denselben Status.
-- [ ] Aktionspulsieren bleibt erhalten.
-- [ ] Keine dauerhaften Hintergrundscans und keine sensitiven Logs.
-- [ ] Relevante Unit-/UI-Tests decken unbekannten, bestätigten und
+- [x] Listen- und Widgetansicht sowie Accessibility verwenden denselben Status.
+- [x] Aktionspulsieren bleibt erhalten.
+- [x] Keine dauerhaften Hintergrundscans und keine sensitiven Logs.
+- [x] Relevante Unit-/UI-Tests decken unbekannten, bestätigten und
   fehlgeschlagenen Status ab.
 - [x] Host-Prüfungen sind erfolgreich bestätigt.
+
+## Abschluss
+
+- GitHub-Issue: #93
+- Pull Request: #94
+- Merge-Commit: `e012223`
 
 ## Testhinweise
 

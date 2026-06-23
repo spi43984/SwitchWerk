@@ -61,21 +61,20 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 042 | P1 | offen | Action Cancellation And Fast-Fail WiFi |
 | 043 | P0 | abgeschlossen | Verify Issue 036 Lint And Codex Session |
 | 044 | P0 | abgeschlossen | GitHub Actions Resource Optimization |
-| 045 | P0 | offen | WiFi Proximity Indicator Stabilization |
+| 045 | P0 | abgeschlossen | WiFi Proximity Indicator Stabilization |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 045 WiFi Proximity Indicator Stabilization
-2. 030 WiFi Profile Deletion Safety
-3. 033 Android-managed WiFi networks
-4. 034 Collapsible Action Details Panel
-5. 040 Import/Export Password Handling
-6. 042 Action Cancellation And Fast-Fail WiFi
-7. 019 Configurable WiFi List Sorting
-8. 021 HTTP/HTTPS Device Actions
-9. 022 Request Body And Content-Type Support
-10. 031 Import Enforces Unique WiFi Profile Names
-11. 032 Room Schema And Migration Test Coverage
-12. 037 GitHub Release Update Support
-13. 041 Dashboard Drag And Drop
-14. 024 Authenticated Import Sources Backlog
+1. 030 WiFi Profile Deletion Safety
+2. 033 Android-managed WiFi networks
+3. 034 Collapsible Action Details Panel
+4. 040 Import/Export Password Handling
+5. 042 Action Cancellation And Fast-Fail WiFi
+6. 019 Configurable WiFi List Sorting
+7. 021 HTTP/HTTPS Device Actions
+8. 022 Request Body And Content-Type Support
+9. 031 Import Enforces Unique WiFi Profile Names
+10. 032 Room Schema And Migration Test Coverage
+11. 037 GitHub Release Update Support
+12. 041 Dashboard Drag And Drop
+13. 024 Authenticated Import Sources Backlog

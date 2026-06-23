@@ -4,10 +4,14 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 045 „WiFi Proximity Indicator Stabilization“ ist auf dem Branch
-`wifi-proximity-indicator-stabilization` als Zwischenstand implementiert und
-wird gesichert, aber noch nicht veröffentlicht, manuell abgenommen oder
+Issue 045 „WiFi Proximity Indicator Stabilization“ ist veröffentlicht und
 abgeschlossen.
+
+- GitHub-Issue: #93
+- Pull Request: #94
+- Merge-Commit: `e012223`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 030
+  „WiFi Profile Deletion Safety“.
 
 - Der Statuspunkt verwendet künftig Grün für positive Bestätigung, Grau für
   „WLAN noch nicht bestätigt“ und Rot für eine konkrete fehlgeschlagene
@@ -46,7 +50,7 @@ abgeschlossen.
   Timeout-Fälle vor der IP-Zuweisung sowie getrennte HTTP-Gerätefehler.
   Insbesondere darf keine Toraktion ohne sichere Testsituation ausgelöst
   werden.
-- Kein PR, kein Merge und kein Issue-Abschluss vor der späteren Abnahme.
+- Der Feature-Branch wurde nach erfolgreicher Host- und Pixel-Prüfung gemergt.
 
 Issue 044 "GitHub Actions Resource Optimization" ist implementiert, aber noch
 nicht veröffentlicht oder abgeschlossen. Für neue Sessions ist
