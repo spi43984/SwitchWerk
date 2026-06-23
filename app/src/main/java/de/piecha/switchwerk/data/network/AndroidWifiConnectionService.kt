@@ -21,7 +21,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class AndroidWifiConnectionService(
     private val connectivityManager: ConnectivityManager,
-    private val wifiManager: WifiManager
+    private val wifiManager: WifiManager,
+    private val proximityConfirmationStore: WifiProximityConfirmationStore
 ) : WifiConnectionService {
 
     private val callbackLock = Any()
@@ -116,7 +117,7 @@ class AndroidWifiConnectionService(
             emitProgress(onProgress, progress)
         }
 
-        return try {
+        val result = try {
             withTimeoutOrNull(timeoutMillis) {
                 requestNetwork(
                     ssid = ssid,
@@ -138,6 +139,16 @@ class AndroidWifiConnectionService(
         } catch (exception: RuntimeException) {
             WifiConnectionResult.Error(exception)
         }
+        when (result) {
+            is WifiConnectionResult.Success -> proximityConfirmationStore.markAvailable(ssid)
+            WifiConnectionResult.NetworkRequestTimeout,
+            WifiConnectionResult.Unavailable,
+            is WifiConnectionResult.SecurityTypesFailed -> {
+                proximityConfirmationStore.markUnavailable(ssid)
+            }
+            else -> Unit
+        }
+        return result
     }
 
     override fun disconnect() {

@@ -4,6 +4,26 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 045 „WiFi Proximity Indicator Stabilization“ ist auf dem Branch
+`wifi-proximity-indicator-stabilization` als Zwischenstand implementiert und
+wird gesichert, aber noch nicht veröffentlicht, manuell abgenommen oder
+abgeschlossen.
+
+- Der Statuspunkt verwendet künftig Grün für positive Bestätigung, Grau für
+  „WLAN noch nicht bestätigt“ und Rot für eine konkrete fehlgeschlagene
+  WLAN-Verbindungsanfrage. Ein einzelner fehlender Scan setzt nicht Rot.
+- Android-Systemscan und `WifiManager.getScanResults()` lieferten auf dem
+  Test-Pixel nachweislich unterschiedliche Ergebnisse; die Scan-Drosselung
+  wird nicht als Nutzeranforderung umgangen.
+- Verbindungsbestätigungen aus `WifiNetworkSpecifier` werden über einen
+  in-memory Store an die Näheanzeige weitergegeben. `SecurityTypesFailed` wird
+  als Verbindungsfehler behandelt.
+- Unit-Tests im Container waren erfolgreich. Die vom Benutzer gestarteten
+  Host-Aufgaben und die sichere manuelle Geräteprüfung sind noch nicht als
+  vollständig bestätigt; insbesondere darf keine Toraktion ohne sichere
+  Testsituation ausgelöst werden.
+- Kein PR, kein Merge und kein Issue-Abschluss vor der späteren Abnahme.
+
 Issue 044 "GitHub Actions Resource Optimization" ist implementiert, aber noch
 nicht veröffentlicht oder abgeschlossen. Für neue Sessions ist
 `AI_SESSION_PROMPT.md` als wiederverwendbare Startvorlage zu verwenden.

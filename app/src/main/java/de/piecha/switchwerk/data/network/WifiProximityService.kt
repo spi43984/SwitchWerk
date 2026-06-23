@@ -11,6 +11,7 @@ enum class WifiProximityIssue {
 
 data class WifiProximitySnapshot(
     val visibleSsids: Set<String> = emptySet(),
+    val unavailableSsids: Set<String> = emptySet(),
     val issue: WifiProximityIssue? = null
 )
 
