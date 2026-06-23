@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: WLAN / Sicherheit
 
@@ -35,11 +35,20 @@ Nach dem Löschen erscheint bei diesen Geräten lediglich „unbekanntes WLAN“
 
 ## Akzeptanzkriterien
 
-- [ ] Beim Löschen eines unbenutzten WLAN-Profils erfolgt keine zusätzliche Warnung.
-- [ ] Beim Löschen eines verwendeten WLAN-Profils wird die Anzahl betroffener Geräte angezeigt.
-- [ ] Die betroffenen Gerätenamen werden angezeigt.
-- [ ] Der Benutzer muss das Löschen ausdrücklich bestätigen.
-- [ ] Die sichere Abbruchaktion befindet sich rechts.
-- [ ] Nach dem Löschen existieren keine verwaisten WLAN-Referenzen mehr.
-- [ ] Geräte zeigen nach dem Löschen nicht mehr „unbekanntes WLAN“ aufgrund einer verwaisten Referenz.
-- [ ] Bestehende Datenbankmigrationen bleiben unverändert.
+- [x] Beim Löschen eines unbenutzten WLAN-Profils erfolgt keine zusätzliche Warnung.
+- [x] Beim Löschen eines verwendeten WLAN-Profils wird die Anzahl betroffener Geräte angezeigt.
+- [x] Die betroffenen Gerätenamen werden angezeigt.
+- [x] Der Benutzer muss das Löschen ausdrücklich bestätigen.
+- [x] Die sichere Abbruchaktion befindet sich rechts.
+- [x] Nach dem Löschen existieren keine verwaisten WLAN-Referenzen mehr.
+- [x] Geräte zeigen nach dem Löschen nicht mehr „unbekanntes WLAN“ aufgrund einer verwaisten Referenz.
+- [x] Bestehende Datenbankmigrationen bleiben unverändert.
+
+## Abschluss
+
+- GitHub-Issue: #98
+- Pull Request: #99
+- Merge-Commit: `74dd238`
+- Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`,
+  `git diff --check`
+- Host-Prüfungen und manuelle Löschszenarien wurden erfolgreich bestätigt.

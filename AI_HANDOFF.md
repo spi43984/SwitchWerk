@@ -4,6 +4,23 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 030 „WiFi Profile Deletion Safety“ ist veröffentlicht und abgeschlossen.
+
+- GitHub-Issue: #98
+- Pull Request: #99
+- Merge-Commit: `74dd238`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 033
+  „Android-managed WiFi networks“.
+- Der Löschdialog ermittelt im `SettingsViewModel` die betroffenen Geräte und
+  zeigt Anzahl sowie Namen an. Singular und Plural werden über Android-
+  Pluralressourcen getrennt ausgegeben; die Abbruchaktion bleibt rechts.
+- `RoomWifiProfileRepository` löscht beim Entfernen eines WLAN-Profils dessen
+  Gerätezuordnungen. Damit verbleiben keine verwaisten WLAN-Referenzen und
+  Geräte zeigen nicht mehr aufgrund dieser Referenzen „Unbekanntes WLAN“.
+- Datenbankmigrationen blieben unverändert. `lintDebug`, `testDebugUnitTest`,
+  Host-Build, Installation und manuelle Löschszenarien wurden erfolgreich
+  bestätigt.
+
 Issue 046 „UI State And Orientation Polish“ ist veröffentlicht und
 abgeschlossen.
 
