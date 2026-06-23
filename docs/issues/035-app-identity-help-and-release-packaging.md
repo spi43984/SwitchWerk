@@ -19,7 +19,9 @@ Die App soll für Anwender besser erkennbar, erklärbarer und verteilbar werden.
 Auf Branch `app-identity-help-release-packaging` umgesetzt:
 
 - Launcher- und Adaptive-Icons für SwitchWerk in den erforderlichen Dichten;
-  das launcher-optimierte Schalter-/Blitz-Icon ist vom About-Logo getrennt.
+  sie verwenden `docs/assets/icons/App_Icon_transparent_weiss.png` als Haus-/
+  WLAN-Motiv mit vollständig weißem, kontrastreichem Vordergrund. Das About-
+  Logo bleibt davon getrennt.
 - App-Name `SwitchWerk`, Versionsname `0.1`; Paketname unverändert.
 - Hamburger-Menü mit getrennter Hilfe- und About-Ansicht. About zeigt Lizenz-
   und Autorenhinweis sowie das zentrale About-Logo.
