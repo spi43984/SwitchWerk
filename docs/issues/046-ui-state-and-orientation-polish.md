@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: GUI / Navigation / Orientierung / Text
 
@@ -70,20 +70,20 @@ Aktuell gibt es mehrere Situationen, in denen die App unerwartet zum Dashboard z
 
 ## Akzeptanzkriterien
 
-- [ ] Mülleimer in `Aktionsdetails` steht rechts
-- [ ] Sortierung `Neueste oben/unten` steht links vom Mülleimer
-- [ ] Sprachwechsel in `Einstellungen -> System` bleibt in `Einstellungen -> System`
-- [ ] Sprachwechsel aus anderen Einstellungsbereichen verlässt die Einstellungen nicht
-- [ ] QR-Code-Scanner startet im Portrait-Modus, wenn das Gerät hochkant gehalten wird
-- [ ] QR-Code-Scanner startet im Landscape-Modus, wenn das Gerät quer gehalten wird
-- [ ] Rotation in den Einstellungen führt nicht zurück zum Dashboard
-- [ ] Aktiver Einstellungsbereich bleibt nach Rotation erhalten
-- [ ] Geöffnete Dialoge bleiben nach Rotation erhalten
-- [ ] About-Text erklärt lokalen Netzwerk-/Access-Point-Anwendungsfall verständlich
-- [ ] About-Text ist auf Deutsch und Englisch konsistent gepflegt
-- [ ] Dashboard bleibt weiterhin normal erreichbar
-- [ ] Dark Mode und Light Mode funktionieren weiterhin
-- [ ] Build erfolgreich
+- [x] Mülleimer in `Aktionsdetails` steht rechts
+- [x] Sortierung `Neueste oben/unten` steht links vom Mülleimer
+- [x] Sprachwechsel in `Einstellungen -> System` bleibt in `Einstellungen -> System`
+- [x] Sprachwechsel aus anderen Einstellungsbereichen verlässt die Einstellungen nicht
+- [x] QR-Code-Scanner startet im Portrait-Modus, wenn das Gerät hochkant gehalten wird
+- [x] QR-Code-Scanner startet im Landscape-Modus, wenn das Gerät quer gehalten wird
+- [x] Rotation in den Einstellungen führt nicht zurück zum Dashboard
+- [x] Aktiver Einstellungsbereich bleibt nach Rotation erhalten
+- [x] Geöffnete Dialoge bleiben nach Rotation erhalten
+- [x] About-Text erklärt lokalen Netzwerk-/Access-Point-Anwendungsfall verständlich
+- [x] About-Text ist auf Deutsch und Englisch konsistent gepflegt
+- [x] Dashboard bleibt weiterhin normal erreichbar
+- [x] Dark Mode und Light Mode funktionieren weiterhin
+- [x] Build erfolgreich
 
 ## Testhinweise
 

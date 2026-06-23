@@ -4,6 +4,23 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 046 „UI State And Orientation Polish“ ist veröffentlicht und
+abgeschlossen.
+
+- GitHub-Issue: #95
+- Pull Request: #96
+- Merge-Commit: `a8d2078`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 030
+  „WiFi Profile Deletion Safety“.
+- Navigation, der aktive Einstellungsbereich sowie relevante lokale
+  Import-/Export-/Dialogzustände werden über den Activity-Speicher bei einer
+  Recreation wiederhergestellt. Bearbeitungsdialoge bleiben über ihr
+  ViewModel erhalten.
+- Die JourneyApps-Scanner-Activity überschreibt ihre Landscape-Vorgabe mit
+  `screenOrientation="unspecified"`; der Scanner sperrt danach die beim Start
+  bestehende Geräteorientierung.
+- Der Benutzer hat die Host- und Gerätetests als erfolgreich bestätigt.
+
 Issue 045 „WiFi Proximity Indicator Stabilization“ ist veröffentlicht und
 abgeschlossen.
 
