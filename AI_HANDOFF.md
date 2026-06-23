@@ -4,6 +4,27 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 035 "App Identity, Help And Release Packaging" wird auf dem Branch
+`app-identity-help-release-packaging` weitergeführt und ist noch nicht
+veröffentlicht oder abgeschlossen.
+
+- `.gitignore` schließt neben `keystore.properties` nun auch die üblichen
+  Java-Keystore-Dateien (`*.jks`, `*.keystore`) aus. Damit können weder der
+  in `docs/release-build.md` dokumentierte Release-Keystore noch seine
+  Zugangsdaten versehentlich versioniert werden.
+- Die Launcher- und Adaptive-Icon-Ressourcen leiten sich nun aus
+  `docs/assets/icons/App_Icon_transparent_weiss.png` ab. Für ältere Launcher
+  wird das transparente Motiv auf dem vorhandenen dunklen Icon-Hintergrund
+  gerendert; das Adaptive Icon verwendet das Original als Vordergrund. Alle
+  sichtbaren Vordergrundselemente sind weiß und kontrastverstärkt.
+- Im Container waren `git diff --check`, `./gradlew lintDebug` und
+  `./gradlew testDebugUnitTest` erfolgreich. Die im Gradle-Output gemeldete
+  Room-Schema-Warnung besteht unabhängig von dieser Änderung fort.
+- Vor einer Veröffentlichung bleiben die Host-Prüfungen der finalen
+  Icon-/About-Darstellung, `./gradlew clean assembleDebug`,
+  `./gradlew installDebug` sowie vor dem ersten Release die Erzeugung und
+  Prüfung einer signierten Release-APK erforderlich.
+
 Issue 044 "GitHub Actions Resource Optimization" ist implementiert, aber noch
 nicht veröffentlicht oder abgeschlossen. Für neue Sessions ist
 `AI_SESSION_PROMPT.md` als wiederverwendbare Startvorlage zu verwenden.

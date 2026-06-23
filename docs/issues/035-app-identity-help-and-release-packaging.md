@@ -8,11 +8,50 @@
 
 ## Priorität
 
-P2
+P0
 
 ## Ziel
 
 Die App soll für Anwender besser erkennbar, erklärbarer und verteilbar werden. Dazu werden App-Icon, optionale Metadaten, Hilfe-Menü, kontextbezogene Hinweise sowie ein Release-Build-Prozess vorbereitet.
+
+## Implementierungsstand
+
+Auf Branch `app-identity-help-release-packaging` umgesetzt:
+
+- Launcher- und Adaptive-Icons für SwitchWerk in den erforderlichen Dichten;
+  sie verwenden `docs/assets/icons/App_Icon_transparent_weiss.png` als Haus-/
+  WLAN-Motiv mit vollständig weißem, kontrastreichem Vordergrund. Das About-
+  Logo bleibt davon getrennt.
+- App-Name `SwitchWerk`, Versionsname `0.1`; Paketname unverändert.
+- Hamburger-Menü mit getrennter Hilfe- und About-Ansicht. About zeigt Lizenz-
+  und Autorenhinweis sowie das zentrale About-Logo.
+- Deutsche und englische Hilfe- und Accessibility-Texte als Android-String-
+  Ressourcen. Hilfe verwendet übersichtliche Aufzählungen.
+- Kontextbezogene `i`-Hinweise an Dashboard, WLAN-Profilen, Geräten,
+  Aktionsdetails, Einstellungen sowie Backup. Sie erklären jeweils das ganze
+  sichtbare Dialogfeld; bei System und Backup sind die Hinweise tabübergreifend
+  ausgerichtet.
+- Release-Signing über die lokale, ignorierte `keystore.properties`
+  vorbereitet. Keystore und Passwörter werden nicht versioniert.
+- Lokale Befehle, Keystore-Erzeugung und die Verteilungsentscheidung sind in
+  `docs/release-build.md` dokumentiert.
+
+## Verteilungsentscheidung
+
+Für die erste Anwenderverteilung wird ein GitHub Release mit signierter APK
+empfohlen. Ein Play-Store-Upload ist bewusst späterer, separater Aufwand.
+
+## Verifizierung und offene Schritte
+
+- Die Debug-Prüfungen `lintDebug`, `testDebugUnitTest` und
+  `clean assembleDebug` wurden im Host-Verlauf erfolgreich ausgeführt.
+- Eine vollständige erneute manuelle Host-Prüfung der finalen Icon-/About-
+  Assets sowie `installDebug` ist vor Veröffentlichung nochmals durchzuführen.
+- Ein realer Release-Keystore wurde bewusst noch nicht erzeugt. Vor einem
+  Release sind `keystore.properties`, `./gradlew assembleRelease` und die
+  signierte APK lokal zu prüfen.
+- Kein Play-Store-Upload, kein Paketnamenwechsel und keine sensiblen Dateien im
+  Repository.
 
 ## Umfang
 
