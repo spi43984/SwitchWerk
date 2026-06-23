@@ -24,6 +24,7 @@ import de.piecha.switchwerk.ui.screens.SettingsScreen
 import de.piecha.switchwerk.ui.screens.SettingsSection
 import de.piecha.switchwerk.ui.screens.StartScreen
 import de.piecha.switchwerk.ui.screens.HelpScreen
+import de.piecha.switchwerk.ui.screens.AboutScreen
 import de.piecha.switchwerk.ui.theme.SwitchWerkTheme
 import de.piecha.switchwerk.ui.AppLocaleController
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
@@ -34,7 +35,8 @@ import org.koin.compose.viewmodel.koinViewModel
 private enum class AppScreen {
     Dashboard,
     Settings,
-    Help
+    Help,
+    About
 }
 
 class MainActivity : ComponentActivity() {
@@ -113,6 +115,9 @@ private fun SwitchWerkAppContent(mainViewModel: MainViewModel) {
             onNavigateToHelp = {
                 helpReturnScreen = AppScreen.Dashboard
                 currentScreen = AppScreen.Help
+            },
+            onNavigateToAbout = {
+                currentScreen = AppScreen.About
             }
         )
 
@@ -121,10 +126,6 @@ private fun SwitchWerkAppContent(mainViewModel: MainViewModel) {
             onSectionSelected = { selectedSettingsSection = it },
             onNavigateBack = {
                 currentScreen = AppScreen.Dashboard
-            },
-            onNavigateToHelp = {
-                helpReturnScreen = AppScreen.Settings
-                currentScreen = AppScreen.Help
             }
         )
 
@@ -132,6 +133,10 @@ private fun SwitchWerkAppContent(mainViewModel: MainViewModel) {
             onNavigateBack = {
                 currentScreen = helpReturnScreen
             }
+        )
+
+        AppScreen.About -> AboutScreen(
+            onNavigateBack = { currentScreen = AppScreen.Dashboard }
         )
     }
 }

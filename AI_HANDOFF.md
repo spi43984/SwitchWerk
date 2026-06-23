@@ -50,7 +50,24 @@ nicht veröffentlicht oder abgeschlossen. Für neue Sessions ist
   Dokumentationsänderung wurden keine Gradle-Aufgaben im Container ausgeführt.
 
 
-  Issue 043 "Verify Issue 036 Lint And Codex Session" ist veröffentlicht und abgeschlossen. GitHub-Issue: #84.
+## Zuletzt abgeschlossene Arbeit
+
+Issue 035 "App Identity, Help And Release Packaging" ist veröffentlicht und
+abgeschlossen. GitHub-Issue: #90, Pull Request: #92, Release:
+[`v0.1.0`](https://github.com/spi43984/SwitchWerk/releases/tag/v0.1.0).
+
+- SwitchWerk verwendet Launcher- und Adaptive-Icons aus
+  `docs/assets/icons/App_Icon_transparent_weiss.png`; der Vordergrund ist weiß
+  und kontraststark. Hilfe, About und kontextbezogene Hinweise sind integriert.
+- `.gitignore` schließt `keystore.properties`, `.jks`- und `.keystore`-Dateien
+  aus. Der Release-Keystore und seine Zugangsdaten bleiben lokal.
+- Die Host-Prüfungen `lintDebug`, `testDebugUnitTest`, `clean assembleDebug`,
+  `installDebug`, `clean assembleRelease`, `apksigner verify` sowie die
+  Installation der signierten APK waren erfolgreich.
+- Die signierte APK ist im GitHub Release `v0.1.0` veröffentlicht. GitHub
+  Releases bleiben der vorgesehene erste Verteilungsweg.
+
+Issue 043 "Verify Issue 036 Lint And Codex Session" ist veröffentlicht und abgeschlossen. GitHub-Issue: #84.
 
 Die Verifikation am 22. Juni 2026 ergibt:
 

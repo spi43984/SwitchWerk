@@ -49,6 +49,7 @@ import de.piecha.switchwerk.R
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.ui.components.InfoHint
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
 import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
@@ -114,14 +115,14 @@ fun DeviceManagementSection(
                 style = MaterialTheme.typography.titleSmall
             )
 
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.add_device)
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                InfoHint(R.string.devices_info_title, R.string.list_interaction_info)
+                IconButton(onClick = onAddClick, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.add_device)
+                    )
+                }
             }
         }
 
@@ -165,7 +166,9 @@ private fun DeviceEditDialog(
         onAction = {
             onCloseSwipeItem()
             onSaveClick()
-        }
+        },
+        infoTitleResourceId = R.string.device_dialog_info_title,
+        infoMessageResourceId = R.string.device_dialog_info
     ) {
         DeviceForm(
             form = form,
@@ -771,7 +774,9 @@ private fun ConnectionEditDialog(
         onDismissRequest = onCancel,
         actionText = stringResource(R.string.save),
         onAction = { onSave(selectedWifiProfileId, host) },
-        actionEnabled = selectedWifiProfileId.isNotBlank() && host.isNotBlank()
+        actionEnabled = selectedWifiProfileId.isNotBlank() && host.isNotBlank(),
+        infoTitleResourceId = R.string.wifi_assignment_dialog_info_title,
+        infoMessageResourceId = R.string.wifi_assignment_dialog_info
     ) {
         if (selectableProfiles.isEmpty()) {
             Text(stringResource(R.string.no_more_wifi_profiles))

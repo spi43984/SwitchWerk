@@ -2,17 +2,59 @@
 
 ## Status
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: GUI / Dashboard
 
 ## Priorität
 
-P2
+P0
 
 ## Ziel
 
 Die App soll für Anwender besser erkennbar, erklärbarer und verteilbar werden. Dazu werden App-Icon, optionale Metadaten, Hilfe-Menü, kontextbezogene Hinweise sowie ein Release-Build-Prozess vorbereitet.
+
+## Implementierungsstand
+
+Auf Branch `app-identity-help-release-packaging` umgesetzt:
+
+- Launcher- und Adaptive-Icons für SwitchWerk in den erforderlichen Dichten;
+  sie verwenden `docs/assets/icons/App_Icon_transparent_weiss.png` als Haus-/
+  WLAN-Motiv mit vollständig weißem, kontrastreichem Vordergrund. Das About-
+  Logo bleibt davon getrennt.
+- App-Name `SwitchWerk`, Versionsname `0.1`; Paketname unverändert.
+- Hamburger-Menü mit getrennter Hilfe- und About-Ansicht. About zeigt Lizenz-
+  und Autorenhinweis sowie das zentrale About-Logo.
+- Deutsche und englische Hilfe- und Accessibility-Texte als Android-String-
+  Ressourcen. Hilfe verwendet übersichtliche Aufzählungen.
+- Kontextbezogene `i`-Hinweise an Dashboard, WLAN-Profilen, Geräten,
+  Aktionsdetails, Einstellungen sowie Backup. Sie erklären jeweils das ganze
+  sichtbare Dialogfeld; bei System und Backup sind die Hinweise tabübergreifend
+  ausgerichtet.
+- Release-Signing über die lokale, ignorierte `keystore.properties`
+  vorbereitet. Keystore und Passwörter werden nicht versioniert.
+- Lokale Befehle, Keystore-Erzeugung und die Verteilungsentscheidung sind in
+  `docs/release-build.md` dokumentiert.
+
+## Verteilungsentscheidung
+
+Für die erste Anwenderverteilung wird ein GitHub Release mit signierter APK
+empfohlen. Ein Play-Store-Upload ist bewusst späterer, separater Aufwand.
+
+## Verifizierung und Abschluss
+
+- Die Host-Prüfungen `lintDebug`, `testDebugUnitTest`, `clean assembleDebug`
+  und `installDebug` waren erfolgreich; die finale Icon-/About-Darstellung
+  wurde manuell geprüft.
+- Ein lokaler Release-Keystore und die ignorierte `keystore.properties` sind
+  eingerichtet. `clean assembleRelease`, die Signaturprüfung mit `apksigner`
+  sowie die Installation der signierten APK auf einem Gerät waren erfolgreich.
+- Pull Request [#92](https://github.com/spi43984/SwitchWerk/pull/92) wurde nach
+  `main` gemergt. Der GitHub Release
+  [SwitchWerk 0.1 (v0.1.0)](https://github.com/spi43984/SwitchWerk/releases/tag/v0.1.0)
+  enthält die signierte APK.
+- Kein Play-Store-Upload, kein Paketnamenwechsel und keine sensiblen Dateien im
+  Repository.
 
 ## Umfang
 
