@@ -13,6 +13,7 @@ import de.piecha.switchwerk.data.network.AndroidWifiProximityService
 import de.piecha.switchwerk.data.network.HttpApiCallService
 import de.piecha.switchwerk.data.network.OkHttpApiCallService
 import de.piecha.switchwerk.data.network.WifiConnectionService
+import de.piecha.switchwerk.data.network.WifiProximityConfirmationStore
 import de.piecha.switchwerk.data.network.WifiProximityService
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
@@ -65,10 +66,13 @@ val appModule = module {
         androidContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
+    single { WifiProximityConfirmationStore() }
+
     single<WifiConnectionService> {
         AndroidWifiConnectionService(
             connectivityManager = get(),
-            wifiManager = get()
+            wifiManager = get(),
+            proximityConfirmationStore = get()
         )
     }
 
@@ -77,7 +81,8 @@ val appModule = module {
             context = androidContext(),
             connectivityManager = get(),
             wifiManager = get(),
-            locationManager = get()
+            locationManager = get(),
+            proximityConfirmationStore = get()
         )
     }
 

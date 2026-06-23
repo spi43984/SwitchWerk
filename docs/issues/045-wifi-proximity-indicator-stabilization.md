@@ -9,137 +9,117 @@
 
 ## Ziel
 
-Die WLAN-Näheanzeige im Dashboard soll auch in Umgebungen mit vielen WLANs stabil und nachvollziehbar bleiben.
+Der Statuspunkt darf keine unzuverlässige physische WLAN-Nähe behaupten. Er
+zeigt stattdessen einen nachvollziehbaren, bestätigten Verbindungszustand.
 
-Aktuell kann der Geräte-Statuspunkt zwischen grün und rot wechseln oder dauerhaft rot bleiben, obwohl das zugeordnete Geräte-WLAN tatsächlich vorhanden ist. Ursache können unvollständige, verzögerte oder gecachte Android-WLAN-Scanergebnisse sein.
+## Erkenntnisse aus der Untersuchung am Pixel
 
-## Hintergrund
+- WLAN, Standortdienste sowie `ACCESS_FINE_LOCATION`, `NEARBY_WIFI_DEVICES`
+  und die WLAN-Berechtigungen waren aktiv.
+- Der Systemscan führte das Geräte-WLAN wiederholt als sichtbar, während
+  `WifiManager.getScanResults()` für SwitchWerk keine passende SSID lieferte.
+  Der rote Punkt war somit kein verlässlicher Reichweitennachweis.
+- Dieser Unterschied trat in mehreren direkten Vergleichsmessungen auf. Ein
+  fehlender App-Scan-Eintrag rechtfertigt daher keinen Offline-Status.
+- Der Scan-Cache schwankte; ein frischer Systemscan konnte das WLAN finden,
+  obwohl vorherige Cache-Abfragen es nicht enthielten.
+- Android drosselt App-Scans. Der frühere Startscan plus 30-Sekunden-Takt
+  überschreitet die dokumentierte Grenze von vier Vordergrundscans in zwei
+  Minuten.
+- Eine `WifiNetworkSpecifier`-Anfrage öffnet erwartungsgemäß einen
+  Android-Systemdialog. Sie ist die verlässliche Prüfung, ob Android das
+  konfigurierte WLAN tatsächlich verbinden kann; der Dialog selbst ist weder
+  ein Fehler noch ein Sichtbarkeitsbeweis.
+- Ein Test lieferte `SecurityTypesFailed`: Beide Sicherheitsvarianten konnten
+  nicht verbunden werden. Das ist ein Verbindungsfehler, kein Beleg dafür,
+  dass die SSID physisch nicht sichtbar ist.
+- Keine SSIDs, Passwörter, BSSIDs, IP-Adressen oder vollständigen Scanlisten
+  wurden geloggt.
 
-Issue 036 hat den Geräte-WLAN-Näheindikator eingeführt. In einfachen WLAN-Umgebungen funktioniert die Anzeige zuverlässig. In Werkstatt- oder Industrieumgebungen mit vielen Access Points kann Android jedoch wechselnde oder unvollständige Scanlisten liefern. Ein einzelner fehlender Scan-Eintrag darf daher nicht sofort als zuverlässiger Offline-Zustand interpretiert werden.
+## Verbindliche Statusentscheidung
 
-## Problemstellung
-
-Beobachtetes Verhalten:
-
-- Zuhause mit wenigen WLANs wird ein Shelly regelmäßig erkannt.
-- In einer Werkstatt mit mehreren WLANs wechselt die Anzeige häufig zwischen grün und rot.
-- Teilweise bleibt die Anzeige dauerhaft rot, obwohl das Geräte-WLAN vorhanden ist.
-- Dadurch wirkt die App unzuverlässig, obwohl wahrscheinlich die Android-Scanergebnisse schwanken.
-
-Mögliche Ursachen:
-
-- Android liefert WLAN-Scanergebnisse verzögert.
-- Android liefert nicht bei jedem Scan alle sichtbaren WLANs.
-- Scan-Ergebnisse können gecacht oder veraltet sein.
-- Die Scanfrequenz wird durch Android aus Akku- und Datenschutzgründen begrenzt.
-- In WLAN-reichen Umgebungen können einzelne SSIDs temporär aus der Scanliste fehlen.
-- Ein einzelner fehlender Scan kann aktuell zu schnell zu einem roten Status führen.
+- **Grau – WLAN noch nicht bestätigt:** Standard nach App-Start oder wenn
+  Android nur unzuverlässige Scaninformationen liefert.
+- **Grün – WLAN bestätigt:** Ein zugeordnetes WLAN wurde positiv erkannt oder
+  durch eine erfolgreiche Android-Verbindung bestätigt.
+- **Rot – WLAN-Verbindung nicht möglich:** Nur nach einer konkreten
+  fehlgeschlagenen `WifiNetworkSpecifier`-Anfrage, nicht wegen eines einzelnen
+  fehlenden Scan-Eintrags.
+- Der Statuspunkt löst niemals selbst eine WLAN-Verbindung oder Geräteaktion
+  aus. Die Geräteaktion bleibt unabhängig vom Punkt bedienbar und wird durch
+  Grau oder Rot nicht blockiert.
 
 ## Scope
 
-- Last-Seen-Zeitstempel für erkannte Geräte-WLANs ergänzen.
-- Hysterese gegen Statusflattern einführen.
-- Kurzzeitig fehlende Scanergebnisse dürfen den Status nicht sofort auf rot setzen.
-- Aktuell verbundenes WLAN, frische Scanergebnisse und zuletzt gesehene passende WLANs berücksichtigen.
-- Fehlende Berechtigungen, deaktiviertes WLAN, deaktivierte System-Standortdienste und Scanfehler weiterhin sauber behandeln.
-- Listen- und Widgetansicht müssen dieselbe stabilisierte Logik verwenden.
-- Das bestehende Pulsieren während laufender Geräteaktionen bleibt erhalten.
-
-## Hilfetexte und Benutzerverständnis
-
-Die Hilfetexte müssen angepasst werden.
-
-Zu erklären ist:
-
-- was der Statuspunkt bedeutet
-- dass die Anzeige auf Android-WLAN-Erkennung basiert
-- dass Android WLAN-Listen verzögert oder unvollständig liefern kann
-- dass grün eine wahrscheinliche WLAN-Nähe bedeutet
-- dass rot nicht zwingend beweist, dass das Gerät physisch ausgeschaltet ist
-- was ein optionaler Zwischenstatus bedeutet, falls eingeführt
-- dass die Anzeige keine aktive HTTP-Erreichbarkeitsprüfung ersetzt
-- dass keine WLAN-Daten extern übertragen werden
-
-Betroffene Texte voraussichtlich:
-
-- deutsche String-Ressourcen
-- englische String-Ressourcen
-- Hilfeansicht / Hilfedialoge
-- Accessibility-Beschreibungen des Statuspunkts
-
-## Datenschutz und Sicherheit
-
-- Keine SSIDs, Passwörter oder vollständigen Scanlisten loggen.
-- Keine Cloud-, Tracking- oder Analytics-Abhängigkeiten ergänzen.
-- Keine Hintergrund-Standortüberwachung einführen.
-- Keine neuen Berechtigungen ohne ausdrückliche Prüfung und Begründung.
-- Kein dauerhafter Hintergrundscan.
+- Keine periodischen aktiven WLAN-Scans als Voraussetzung für einen roten
+  Status verwenden; Scan-Drosselung nicht durch Entwickleroptionen umgehen.
+- Passive, frische positive Scan-Treffer dürfen ohne vorherigen
+  Verbindungsfehler Grün liefern; fehlende Treffer bleiben unbestätigt. Ein
+  sichtbarer Scan-Treffer überschreibt keinen konkret fehlgeschlagenen
+  Verbindungsversuch.
+- Verbindungsservice und Nähe-Service über einen kleinen, in-memory
+  Bestätigungszustand verbinden: Erfolg bestätigt Grün, nicht verfügbare
+  Netzwerk-Anfrage bzw. kombinierter Sicherheitsfehler bestätigt Rot.
+- Bestehende Fehler für deaktiviertes WLAN, fehlende Berechtigung und
+  deaktivierte Standortdienste verständlich anzeigen.
+- Listen- und Widgetansicht verwenden denselben `MainViewModel`-Status.
+- Hilfe-, Accessibility- und deutsch/englische String-Texte an das neue
+  Statusmodell anpassen.
 
 ## Nicht im Scope
 
-- automatische Geräteaktion bei erkanntem WLAN
-- automatischer WLAN-Wechsel aufgrund des Statuspunktes
-- aktive HTTP-Erreichbarkeitsprüfung des Gerätes
-- Ping-, DNS- oder Shelly-RPC-Diagnose
-- dauerhafte Hintergrundüberwachung
-- Anzeige vollständiger WLAN-Scanlisten
-- Änderung der Geräte-WLAN-Reihenfolge
+- Deaktivieren der Android-WLAN-Scan-Drosselung beim Anwender.
+- Automatische Geräteaktion, automatischer WLAN-Wechsel oder aktiver Ping,
+  DNS-, HTTP- oder Shelly-RPC-Check.
+- Hintergrundüberwachung, zusätzliche Berechtigungen, Cloud, Tracking oder
+  Analytics.
+- Anzeige vollständiger Scanlisten oder Protokollierung sensitiver WLAN-Daten.
 
-## Architekturhinweise
+## Architektur
 
-- Die Stabilisierung gehört in die gekapselte WLAN-Erkennungslogik, nicht direkt in Compose.
-- Das ViewModel soll weiterhin nur fertigen UI-State veröffentlichen.
-- Compose rendert ausschließlich den bereitgestellten Status.
-- Bestehende Services und StateFlow-Strukturen aus Issue 036 sollen weiterverwendet werden.
-- Die Lösung soll klein und nachvollziehbar bleiben.
-
-Voraussichtlich betroffene Komponenten:
-
-- `WifiProximityService`
-- `AndroidWifiProximityService`
-- `MainViewModel`
-- Dashboard-Statusanzeige
-- String-Ressourcen
-- Hilfe-Komponenten
-- Tests für ViewModel und Statusanzeige
+- Statusableitung bleibt in Netzwerk-/Service-Schicht; Compose rendert nur den
+  fertigen `StateFlow` aus dem ViewModel.
+- Bestehende Koin-, MVVM- und Flow-Struktur weiterverwenden.
+- Ein kleiner `WifiProximityConfirmationStore` hält nur SSID und
+  Bestätigungsart im Speicher der laufenden App; keine Persistenz und kein
+  Logging.
+- Der bestehende `WifiNetworkSpecifier`-Callback ist Quelle für verbindliche
+  Erfolg-/Fehlerbestätigungen.
+- Der primäre Sicherheitsversuch nutzt den Android-Plattform-Timeout; ein
+  WPA3-Fallback erfolgt nur bei bestätigter WPA3-Fähigkeit. Eine in-memory
+  Request-ID dokumentiert den Callback-Ablauf ohne WLAN- oder Gerätedaten zu
+  loggen.
 
 ## Akzeptanzkriterien
 
-- [ ] Ein einzelnes fehlendes Android-Scanergebnis setzt den Gerätepunkt nicht sofort auf rot.
-- [ ] Die Anzeige flackert in WLAN-reichen Umgebungen deutlich weniger.
-- [ ] Ein aktuell verbundenes, zugeordnetes WLAN führt weiterhin zuverlässig zu einem grünen Status.
-- [ ] Geräte ohne WLAN-Zuordnung erhalten keinen fälschlich grünen Status.
-- [ ] Fehlende Berechtigungen, deaktiviertes WLAN, deaktivierte System-Standortdienste und Scanfehler werden weiterhin verständlich behandelt.
-- [ ] Die Listen- und Widgetansicht verwenden dieselbe stabilisierte Logik.
-- [ ] Während einer Geräteaktion pulsiert der Statuspunkt weiterhin.
-- [ ] Accessibility-Beschreibungen erklären den tatsächlichen Status korrekt.
-- [ ] Hilfetexte erklären die Bedeutung und Grenzen der WLAN-Näheanzeige.
-- [ ] Es werden keine SSIDs, Passwörter oder Scanergebnisse geloggt.
-- [ ] Es wird kein dauerhafter Hintergrundscan eingeführt.
-- [ ] Es werden keine Cloud-, Tracking- oder Analytics-Abhängigkeiten ergänzt.
-- [ ] Relevante Unit- und UI-Tests sind ergänzt oder angepasst.
-- [ ] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+- [ ] Ein einzelner fehlender Scan setzt keinen Punkt auf Rot.
+- [ ] Nach App-Start ohne bestätigtes Ergebnis ist der Punkt grau und erklärt
+  „WLAN noch nicht bestätigt“.
+- [ ] Erfolgreiche WLAN-Verbindung setzt zugeordnete Geräte auf Grün.
+- [ ] `NetworkRequestTimeout`, `Unavailable` und `SecurityTypesFailed` setzen
+  das betroffene WLAN auf Rot mit „WLAN-Verbindung nicht möglich“.
+- [ ] Eine erfolgreiche Verbindung hebt Rot wieder auf Grün; ein bloß
+  sichtbarer Scan-Treffer nicht.
+- [ ] Nicht zugeordnete Geräte werden nie fälschlich Grün.
+- [ ] Der Statuspunkt blockiert keine Geräteaktion.
+- [ ] Der erwartete Android-Systemdialog wird nicht als Scan- oder
+  Sichtbarkeitsfehler interpretiert.
+- [ ] Listen- und Widgetansicht sowie Accessibility verwenden denselben Status.
+- [ ] Aktionspulsieren bleibt erhalten.
+- [ ] Keine dauerhaften Hintergrundscans und keine sensitiven Logs.
+- [ ] Relevante Unit-/UI-Tests decken unbekannten, bestätigten und
+  fehlgeschlagenen Status ab.
+- [x] Host-Prüfungen sind erfolgreich bestätigt.
 
 ## Testhinweise
 
-Manuell testen:
-
-- Zuhause mit wenigen WLANs
-- Werkstatt oder Umgebung mit vielen sichtbaren WLANs
-- Gerät mit einem zugeordneten sichtbaren WLAN
-- Gerät mit mehreren zugeordneten WLANs
-- Gerät mit ausschließlich nicht sichtbaren WLANs
-- Gerät ohne WLAN-Zuordnung
-- Smartphone ist bereits mit einem zugeordneten WLAN verbunden
-- WLAN am Smartphone deaktiviert
-- notwendige Berechtigung verweigert
-- System-Standortdienste deaktiviert
-- App-Wechsel und Rückkehr zum Dashboard
-- längere Beobachtung des Statuspunktes ohne Geräteaktion
-- Listenansicht und Widgetansicht
-- TalkBack beziehungsweise Semantik der Statusanzeige
-
-Host-Prüfungen nach Implementierung:
+- App-Start ohne vorherige Aktion: grau statt rot.
+- Erfolg mit einem ungefährlichen Testgerät oder bei gefahrlos möglicher
+  Geräteaktion: danach grün.
+- Fehlgeschlagene Verbindung: rot mit Verbindungsfehlermeldung.
+- Rückkehr zu erfolgreicher Verbindung: wieder grün.
+- WLAN aus, Berechtigung verweigert, Standortdienste aus, Listen-/Widgetansicht
+  und TalkBack prüfen.
 
 ```bash
 ./gradlew lintDebug

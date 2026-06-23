@@ -311,7 +311,7 @@ private fun DeviceList(
                 device = device,
                 actionState = actionStates[device.id],
                 wifiProximityStatus = wifiProximityStatuses[device.id]
-                    ?: DeviceWifiProximityStatus.NOT_NEARBY,
+                    ?: DeviceWifiProximityStatus.UNKNOWN,
                 canMoveUp = devices.indexOf(device) > 0,
                 canMoveDown = devices.indexOf(device) < devices.lastIndex,
                 onActionClick = { onDeviceActionClick(device) },
@@ -346,7 +346,7 @@ private fun DeviceWidgetGrid(
                 device = device,
                 actionState = actionStates[device.id],
                 wifiProximityStatus = wifiProximityStatuses[device.id]
-                    ?: DeviceWifiProximityStatus.NOT_NEARBY,
+                    ?: DeviceWifiProximityStatus.UNKNOWN,
                 canMoveUp = devices.indexOf(device) > 0,
                 canMoveDown = devices.indexOf(device) < devices.lastIndex,
                 onActionClick = { onDeviceActionClick(device) },
@@ -743,6 +743,8 @@ private fun WifiProximityIndicator(
     }
     val color = when (status) {
         DeviceWifiProximityStatus.NEARBY -> WifiNearbyColor
+        DeviceWifiProximityStatus.UNKNOWN,
+        DeviceWifiProximityStatus.NO_ASSIGNMENT,
         DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> WifiUnavailableColor
         else -> WifiNotNearbyColor
     }
@@ -761,6 +763,7 @@ private fun deviceWifiProximityText(status: DeviceWifiProximityStatus): String {
     val resourceId = when (status) {
         DeviceWifiProximityStatus.NEARBY -> R.string.wifi_proximity_nearby
         DeviceWifiProximityStatus.NOT_NEARBY -> R.string.wifi_proximity_not_nearby
+        DeviceWifiProximityStatus.UNKNOWN -> R.string.wifi_proximity_unknown
         DeviceWifiProximityStatus.NO_ASSIGNMENT -> R.string.wifi_proximity_no_assignment
         DeviceWifiProximityStatus.WIFI_DISABLED -> R.string.wifi_proximity_wifi_disabled
         DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> {

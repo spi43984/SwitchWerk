@@ -8,10 +8,12 @@ import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
+import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.RequiresApi
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CancellationException
@@ -21,11 +23,13 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class AndroidWifiConnectionService(
     private val connectivityManager: ConnectivityManager,
-    private val wifiManager: WifiManager
+    private val wifiManager: WifiManager,
+    private val proximityConfirmationStore: WifiProximityConfirmationStore
 ) : WifiConnectionService {
 
     private val callbackLock = Any()
-    private var activeCallback: ConnectivityManager.NetworkCallback? = null
+    private var activeRequest: ActiveWifiRequest? = null
+    private val requestIdCounter = AtomicLong(0L)
 
     @Suppress("DEPRECATION")
     override suspend fun detectedSecurityTypes(ssid: String): Set<WifiSecurityType>? {
@@ -105,30 +109,20 @@ class AndroidWifiConnectionService(
             )
         }
 
+        val requestId = requestIdCounter.incrementAndGet()
         disconnect()
-        logInfo("Requesting explicit WiFi network")
+        logInfo("WiFi request id=$requestId event=requested")
         emitProgress(onProgress, WifiConnectionProgress.RequestStarted)
-        val networkFound = AtomicBoolean(false)
-        val trackedProgress: (WifiConnectionProgress) -> Unit = { progress ->
-            if (progress == WifiConnectionProgress.NetworkFound) {
-                networkFound.set(true)
-            }
-            emitProgress(onProgress, progress)
-        }
 
-        return try {
-            withTimeoutOrNull(timeoutMillis) {
-                requestNetwork(
-                    ssid = ssid,
-                    password = password,
-                    securityType = securityType,
-                    onProgress = trackedProgress
-                )
-            } ?: if (networkFound.get()) {
-                WifiConnectionResult.Timeout
-            } else {
-                WifiConnectionResult.NetworkRequestTimeout
-            }
+        val result = try {
+            requestNetwork(
+                requestId = requestId,
+                ssid = ssid,
+                password = password,
+                securityType = securityType,
+                timeoutMillis = timeoutMillis,
+                onProgress = onProgress
+            )
         } catch (_: SecurityException) {
             WifiConnectionResult.PermissionDenied
         } catch (exception: CancellationException) {
@@ -138,22 +132,37 @@ class AndroidWifiConnectionService(
         } catch (exception: RuntimeException) {
             WifiConnectionResult.Error(exception)
         }
+        when (result) {
+            is WifiConnectionResult.Success -> proximityConfirmationStore.markAvailable(ssid)
+            WifiConnectionResult.NetworkRequestTimeout,
+            WifiConnectionResult.Unavailable,
+            is WifiConnectionResult.SecurityTypesFailed -> {
+                proximityConfirmationStore.markUnavailable(ssid)
+            }
+            else -> Unit
+        }
+        return result
     }
 
     override fun disconnect() {
-        val callback = synchronized(callbackLock) {
-            activeCallback.also {
-                activeCallback = null
+        val request = synchronized(callbackLock) {
+            activeRequest.also {
+                activeRequest = null
             }
         }
-        callback?.let(::unregisterCallback)
+        request?.let {
+            logInfo("WiFi request id=${it.id} event=released")
+            unregisterCallback(it.callback)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun requestNetwork(
+        requestId: Long,
         ssid: String,
         password: String?,
         securityType: WifiSecurityType,
+        timeoutMillis: Long,
         onProgress: (WifiConnectionProgress) -> Unit
     ): WifiConnectionResult {
         val specifierBuilder = WifiNetworkSpecifier.Builder()
@@ -174,9 +183,12 @@ class AndroidWifiConnectionService(
 
         return suspendCancellableCoroutine { continuation ->
             val readiness = NetworkReadiness()
+            val requestedAtMillis = SystemClock.elapsedRealtime()
+            val networkAvailable = AtomicBoolean(false)
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
-                    logInfo("Explicit WiFi network callback: available")
+                    networkAvailable.set(true)
+                    logInfo("WiFi request id=$requestId event=available")
                     readiness.markFound(network, onProgress, continuation.isActive)
                     val capabilitiesReady = readiness.updateCapabilities(
                         network = network,
@@ -191,6 +203,7 @@ class AndroidWifiConnectionService(
                         isActive = continuation.isActive
                     )
                     (capabilitiesReady ?: linkPropertiesReady)?.let { readyNetwork ->
+                        logInfo("WiFi request id=$requestId event=ip_ready")
                         if (continuation.isActive) {
                             continuation.resume(WifiConnectionResult.Success(readyNetwork))
                         }
@@ -207,6 +220,7 @@ class AndroidWifiConnectionService(
                         onProgress = onProgress,
                         isActive = continuation.isActive
                     )?.let { readyNetwork ->
+                        logInfo("WiFi request id=$requestId event=ip_ready")
                         if (continuation.isActive) {
                             continuation.resume(WifiConnectionResult.Success(readyNetwork))
                         }
@@ -223,6 +237,7 @@ class AndroidWifiConnectionService(
                         onProgress = onProgress,
                         isActive = continuation.isActive
                     )?.let { readyNetwork ->
+                        logInfo("WiFi request id=$requestId event=ip_ready")
                         if (continuation.isActive) {
                             continuation.resume(WifiConnectionResult.Success(readyNetwork))
                         }
@@ -230,15 +245,28 @@ class AndroidWifiConnectionService(
                 }
 
                 override fun onUnavailable() {
-                    logWarning("Explicit WiFi network callback: unavailable")
+                    val elapsedMillis = SystemClock.elapsedRealtime() - requestedAtMillis
+                    val timedOut = elapsedMillis >= timeoutMillis - PLATFORM_TIMEOUT_TOLERANCE_MILLIS
+                    val event = when {
+                        !timedOut -> "unavailable"
+                        networkAvailable.get() -> "timeout_after_available"
+                        else -> "timeout_before_available"
+                    }
+                    logWarning("WiFi request id=$requestId event=$event")
                     clearActiveCallback(this)
                     if (continuation.isActive) {
-                        continuation.resume(WifiConnectionResult.Unavailable)
+                        continuation.resume(
+                            if (timedOut) {
+                                WifiConnectionResult.NetworkRequestTimeout
+                            } else {
+                                WifiConnectionResult.Unavailable
+                            }
+                        )
                     }
                 }
 
                 override fun onLost(network: Network) {
-                    logWarning("Explicit WiFi network callback: lost")
+                    logWarning("WiFi request id=$requestId event=lost")
                     clearActiveCallback(this)
                     unregisterCallback(this)
                     if (continuation.isActive) {
@@ -247,15 +275,20 @@ class AndroidWifiConnectionService(
                 }
             }
 
-            setActiveCallback(callback)
+            setActiveCallback(requestId, callback)
 
             continuation.invokeOnCancellation {
+                logInfo("WiFi request id=$requestId event=cancelled")
                 clearActiveCallback(callback)
                 unregisterCallback(callback)
             }
 
             try {
-                connectivityManager.requestNetwork(request, callback)
+                connectivityManager.requestNetwork(
+                    request,
+                    callback,
+                    timeoutMillis.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+                )
             } catch (exception: RuntimeException) {
                 clearActiveCallback(callback)
                 unregisterCallback(callback)
@@ -266,19 +299,27 @@ class AndroidWifiConnectionService(
         }
     }
 
-    private fun setActiveCallback(callback: ConnectivityManager.NetworkCallback) {
+    private fun setActiveCallback(
+        requestId: Long,
+        callback: ConnectivityManager.NetworkCallback
+    ) {
         synchronized(callbackLock) {
-            activeCallback = callback
+            activeRequest = ActiveWifiRequest(requestId, callback)
         }
     }
 
     private fun clearActiveCallback(callback: ConnectivityManager.NetworkCallback) {
         synchronized(callbackLock) {
-            if (activeCallback === callback) {
-                activeCallback = null
+            if (activeRequest?.callback === callback) {
+                activeRequest = null
             }
         }
     }
+
+    private data class ActiveWifiRequest(
+        val id: Long,
+        val callback: ConnectivityManager.NetworkCallback
+    )
 
     private fun unregisterCallback(callback: ConnectivityManager.NetworkCallback) {
         try {
@@ -384,5 +425,6 @@ class AndroidWifiConnectionService(
         const val LOG_TAG = "SwitchWerkNetwork"
         const val SCAN_RESULT_TIMEOUT_MILLIS = 8_000L
         const val SCAN_RESULT_POLL_INTERVAL_MILLIS = 500L
+        const val PLATFORM_TIMEOUT_TOLERANCE_MILLIS = 250L
     }
 }

@@ -61,4 +61,42 @@ class DeviceWifiProximityIndicatorTest {
 
         composeRule.onNodeWithContentDescription(description).assertIsDisplayed()
     }
+
+    @Test
+    fun unconfirmedWifiIsAccessibleAsGrayStatus() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val description = context.getString(R.string.wifi_proximity_unknown)
+
+        composeRule.setContent {
+            SwitchWerkTheme {
+                DeviceTitle(
+                    name = "Device",
+                    wifiProximityStatus = DeviceWifiProximityStatus.UNKNOWN,
+                    isActionRunning = false,
+                    maxLines = 1
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription(description).assertIsDisplayed()
+    }
+
+    @Test
+    fun deviceWithoutWifiAssignmentIsAccessibleAsGrayStatus() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val description = context.getString(R.string.wifi_proximity_no_assignment)
+
+        composeRule.setContent {
+            SwitchWerkTheme {
+                DeviceTitle(
+                    name = "Device",
+                    wifiProximityStatus = DeviceWifiProximityStatus.NO_ASSIGNMENT,
+                    isActionRunning = false,
+                    maxLines = 1
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription(description).assertIsDisplayed()
+    }
 }

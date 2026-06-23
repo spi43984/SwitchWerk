@@ -4,6 +4,50 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 045 „WiFi Proximity Indicator Stabilization“ ist auf dem Branch
+`wifi-proximity-indicator-stabilization` als Zwischenstand implementiert und
+wird gesichert, aber noch nicht veröffentlicht, manuell abgenommen oder
+abgeschlossen.
+
+- Der Statuspunkt verwendet künftig Grün für positive Bestätigung, Grau für
+  „WLAN noch nicht bestätigt“ und Rot für eine konkrete fehlgeschlagene
+  WLAN-Verbindungsanfrage. Ein einzelner fehlender Scan setzt nicht Rot.
+- Die Geräteprüfung am Pixel zeigte, dass eine SSID gleichzeitig sichtbar sein
+  und beide `WifiNetworkSpecifier`-Sicherheitsversuche ablehnen kann. Deshalb
+  hat der konkrete Verbindungsfehler Vorrang vor einem sichtbaren Scan-Treffer;
+  nur eine erfolgreiche Verbindung hebt Rot wieder auf Grün.
+- Android-Systemscan und `WifiManager.getScanResults()` lieferten auf dem
+  Test-Pixel nachweislich unterschiedliche Ergebnisse; die Scan-Drosselung
+  wird nicht als Nutzeranforderung umgangen. Der frühere periodische aktive
+  45-Sekunden-Scan wurde entfernt; der einmalige Refresh beim Aktivieren des
+  Dashboards und die passive Beobachtung bleiben bestehen.
+- Verbindungsbestätigungen aus `WifiNetworkSpecifier` werden über einen
+  in-memory Store an die Näheanzeige weitergegeben. `SecurityTypesFailed` wird
+  als Verbindungsfehler behandelt.
+- Die direkte Pixel-Prüfung zeigte sowohl temporäre
+  `WifiNetworkSpecifier`-Timeouts als auch erfolgreiche Verbindungen mit
+  derselben sichtbaren SSID. Der Android-Dialog erschien zeitnah; die Ursache
+  der Aussetzer ist damit noch nicht abschließend bestätigt. Ein einzelner
+  erkannter Sicherheitstyp erhält das volle 30-Sekunden-Budget; nur zwei von
+  Android erkannte Sicherheitstypen teilen sich das Budget. Ein WPA3-Fallback
+  folgt nur, wenn Android WPA3 für die SSID erkennt; `Unavailable` und
+  Timeouts starten keinen zweiten Sicherheitsversuch. Die Android-Plattform
+  übernimmt den Request-Timeout über `requestNetwork`.
+- Jeder Verbindungsversuch erhält eine nur im Speicher lebende, monotone
+  Request-ID. Logcat protokolliert ausschließlich ID und Ablaufereignisse
+  `requested`, `available`, `ip_ready`, `unavailable`, `lost`,
+  `timeout_before_available`, `timeout_after_available`, `cancelled` und
+  `released`; SSID, Zugangsdaten, BSSID, IP-Adresse, Geräte- und URL-Daten
+  werden dabei nicht geloggt.
+- Unit-Tests und Android-Test-Kompilierung im Container waren erfolgreich.
+  Der Benutzer hat `lintDebug`, `clean assembleDebug` und `installDebug` auf
+  dem Host erfolgreich bestätigt. Die Verbindungsprüfung am Pixel zeigte
+  erfolgreiche Aufbauten bis knapp 28 Sekunden, Android-`Unavailable`- und
+  Timeout-Fälle vor der IP-Zuweisung sowie getrennte HTTP-Gerätefehler.
+  Insbesondere darf keine Toraktion ohne sichere Testsituation ausgelöst
+  werden.
+- Kein PR, kein Merge und kein Issue-Abschluss vor der späteren Abnahme.
+
 Issue 044 "GitHub Actions Resource Optimization" ist implementiert, aber noch
 nicht veröffentlicht oder abgeschlossen. Für neue Sessions ist
 `AI_SESSION_PROMPT.md` als wiederverwendbare Startvorlage zu verwenden.

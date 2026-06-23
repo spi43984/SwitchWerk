@@ -159,6 +159,24 @@ class MainViewModelTest {
     }
 
     @Test
+    fun explicitConnectionFailureOverridesVisibleWifi() {
+        val device = device(id = "device-1", sortOrder = 0).copy(
+            connections = listOf(DeviceConnection(wifiProfileId = "wifi-1", host = "device.local"))
+        )
+
+        val statuses = resolveWifiProximityStatuses(
+            devices = listOf(device),
+            wifiProfiles = listOf(WifiProfile(id = "wifi-1", ssid = "Home")),
+            snapshot = WifiProximitySnapshot(
+                visibleSsids = setOf("Home"),
+                unavailableSsids = setOf("Home")
+            )
+        )
+
+        assertEquals(DeviceWifiProximityStatus.NOT_NEARBY, statuses[device.id])
+    }
+
+    @Test
     fun deviceWithoutAssignmentIsNeverNearby() {
         val device = device(id = "device-1", sortOrder = 0)
 

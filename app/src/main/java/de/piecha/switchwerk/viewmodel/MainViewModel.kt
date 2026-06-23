@@ -48,6 +48,7 @@ sealed interface DiagnosticListItem {
 enum class DeviceWifiProximityStatus {
     NEARBY,
     NOT_NEARBY,
+    UNKNOWN,
     NO_ASSIGNMENT,
     WIFI_DISABLED,
     LOCATION_SERVICES_DISABLED,
@@ -463,6 +464,9 @@ internal fun resolveWifiProximityStatuses(
         }
         val status = when {
             assignedSsids.isEmpty() -> DeviceWifiProximityStatus.NO_ASSIGNMENT
+            assignedSsids.any(snapshot.unavailableSsids::contains) -> {
+                DeviceWifiProximityStatus.NOT_NEARBY
+            }
             assignedSsids.any(snapshot.visibleSsids::contains) -> {
                 DeviceWifiProximityStatus.NEARBY
             }
@@ -478,7 +482,7 @@ internal fun resolveWifiProximityStatuses(
             snapshot.issue == WifiProximityIssue.SCAN_FAILED -> {
                 DeviceWifiProximityStatus.SCAN_FAILED
             }
-            else -> DeviceWifiProximityStatus.NOT_NEARBY
+            else -> DeviceWifiProximityStatus.UNKNOWN
         }
         device.id to status
     }

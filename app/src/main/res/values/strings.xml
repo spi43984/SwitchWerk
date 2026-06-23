@@ -20,7 +20,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• Grün: zugeordnetes WLAN in Reichweite\n• Rot: WLAN nicht erreichbar oder Fehler\n• Grau: keine Zuordnung oder Erkennung nicht verfügbar\n• Menü öffnet Einstellungen und Hilfe</string>
+    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen und Hilfe</string>
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung und Aktionsdetails\n• Backup: Konfiguration sichern oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Aktionsdetails ein- oder ausblenden</string>
@@ -47,7 +47,7 @@
     <string name="help_getting_started_title">Schnellstart</string>
     <string name="help_getting_started_text">• WLAN-Profil anlegen\n• Gerät mit Adresse und API-Aufruf hinzufügen\n• Aktion starten</string>
     <string name="help_connection_title">Verbindung</string>
-    <string name="help_connection_text">• Geräte-AP kann Internetzugang unterbrechen\n• bei Timeout: WLAN, Adresse und API-Pfad prüfen\n• HTTP-Fehler kommen vom Gerät</string>
+    <string name="help_connection_text">• Der Statuspunkt bestätigt eine WLAN-Verbindung, nicht die physische WLAN-Nähe\n• Grün: WLAN-Verbindung bestätigt\n• Rot: Android konnte die konkrete WLAN-Anfrage nicht verbinden\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID allein bestätigt keine Verbindung\n• Geräte-AP kann Internetzugang unterbrechen\n• HTTP-Fehler kommen vom Gerät</string>
     <string name="help_privacy_title">Datenschutz</string>
     <string name="help_privacy_text">• ausschließlich lokal\n• keine Konten, Cloud oder Tracking\n• WLAN- und Standortrechte nur für WLAN-Funktionen</string>
 
@@ -225,7 +225,8 @@
     <string name="action_network_error">Netzwerkzugriff zum Gerät fehlgeschlagen</string>
     <string name="action_failed">Geräteaktion fehlgeschlagen</string>
     <string name="wifi_proximity_nearby">WLAN in der Nähe</string>
-    <string name="wifi_proximity_not_nearby">Kein WLAN in der Nähe</string>
+    <string name="wifi_proximity_not_nearby">WLAN-Verbindung nicht möglich</string>
+    <string name="wifi_proximity_unknown">WLAN noch nicht bestätigt</string>
     <string name="wifi_proximity_no_assignment">Kein WLAN zugeordnet</string>
     <string name="wifi_proximity_wifi_disabled">WLAN-Erkennung nicht verfügbar: WLAN ist deaktiviert</string>
     <string name="wifi_proximity_location_services_disabled">WLAN-Erkennung nicht verfügbar: System-Standortdienste sind deaktiviert</string>

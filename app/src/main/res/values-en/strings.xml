@@ -20,7 +20,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Show information</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view\n• Arrows change the order\n• Green: assigned Wi-Fi is nearby\n• Red: Wi-Fi is unavailable or an error occurred\n• Gray: no assignment or detection is unavailable\n• The menu opens settings and help</string>
+    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view\n• Arrows change the order\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings and help</string>
     <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance and action details\n• Backup: save or import configuration</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Choose appearance and language\n• Show or hide action details</string>
@@ -47,7 +47,7 @@
     <string name="help_getting_started_title">Setup</string>
     <string name="help_getting_started_text">• Create a Wi-Fi profile\n• Add a device with address and API call\n• Run the action</string>
     <string name="help_connection_title">Connection and troubleshooting</string>
-    <string name="help_connection_text">• A device access point may interrupt internet access\n• For timeouts, check Wi-Fi, address, and API path\n• HTTP errors come from the device</string>
+    <string name="help_connection_text">• The status point confirms a Wi-Fi connection, not physical Wi-Fi proximity\n• Green: Wi-Fi connection confirmed\n• Red: Android could not establish the specific Wi-Fi request\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID alone does not confirm a connection\n• A device access point may interrupt internet access\n• HTTP errors come from the device</string>
     <string name="help_privacy_title">Permissions and privacy</string>
     <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
 
@@ -225,7 +225,8 @@
     <string name="action_network_error">Failed to access device over the network</string>
     <string name="action_failed">Device action failed</string>
     <string name="wifi_proximity_nearby">Wi-Fi nearby</string>
-    <string name="wifi_proximity_not_nearby">No Wi-Fi nearby</string>
+    <string name="wifi_proximity_not_nearby">Wi-Fi connection unavailable</string>
+    <string name="wifi_proximity_unknown">Wi-Fi not yet confirmed</string>
     <string name="wifi_proximity_no_assignment">No Wi-Fi assigned</string>
     <string name="wifi_proximity_wifi_disabled">Wi-Fi detection unavailable: Wi-Fi is disabled</string>
     <string name="wifi_proximity_location_services_disabled">Wi-Fi detection unavailable: system location services are disabled</string>

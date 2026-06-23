@@ -196,7 +196,6 @@ class DefaultDeviceActionServiceTest {
             results = ArrayDeque(
                 listOf(
                     WifiConnectionResult.Unavailable,
-                    WifiConnectionResult.Unavailable,
                     WifiConnectionResult.Success(secondNetwork)
                 )
             )
@@ -225,11 +224,8 @@ class DefaultDeviceActionServiceTest {
         )
 
         assertEquals(DeviceActionResult.Success, result)
-        assertEquals(listOf("First WiFi", "First WiFi", "Second WiFi"), wifiService.requestedSsids)
-        assertEquals(
-            listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3, WifiSecurityType.WPA2),
-            wifiService.requestedSecurityTypes
-        )
+        assertEquals(listOf("First WiFi", "Second WiFi"), wifiService.requestedSsids)
+        assertEquals(listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA2), wifiService.requestedSecurityTypes)
         assertEquals(2, wifiService.disconnectCount)
         assertEquals("POST", httpService.calls.single().method)
         assertEquals("""{"on":true}""", httpService.calls.single().body)
@@ -237,10 +233,16 @@ class DefaultDeviceActionServiceTest {
     }
 
     @Test
-    fun missingStoredSecurityTypeTriesWpa2FirstAndStoresSuccessfulFallback() = runBlocking {
+    fun detectedWpa3AllowsFallbackAfterUnavailable() = runBlocking {
         val network = mock(Network::class.java)
         val wifiRepository = FakeWifiProfileRepository(
-            profiles = listOf(WifiProfile("wifi-1", "Device WiFi"))
+            profiles = listOf(
+                WifiProfile(
+                    id = "wifi-1",
+                    ssid = "Device WiFi",
+                    isSecurityTypeVerifiedLocally = false
+                )
+            )
         )
         val wifiService = FakeWifiConnectionService(
             results = ArrayDeque(
@@ -248,7 +250,8 @@ class DefaultDeviceActionServiceTest {
                     WifiConnectionResult.Unavailable,
                     WifiConnectionResult.Success(network)
                 )
-            )
+            ),
+            detectedSecurityTypes = setOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3)
         )
         val service = createService(
             wifiProfileRepository = wifiRepository,
@@ -266,14 +269,13 @@ class DefaultDeviceActionServiceTest {
         assertEquals(listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3), wifiService.requestedSecurityTypes)
         assertEquals(WifiSecurityType.WPA3, wifiRepository.savedSecurityTypes["wifi-1"])
         assertEquals(2, wifiService.requestedTimeouts.size)
-        assertEquals(15_000L, wifiService.requestedTimeouts.first())
+        assertEquals(25_000L, wifiService.requestedTimeouts.first())
         assertTrue(wifiService.requestedTimeouts.last() >= 14_000L)
         assertTrue(wifiService.requestedTimeouts.last() <= WifiConnectionService.DEFAULT_TIMEOUT_MILLIS)
     }
 
     @Test
-    fun storedWpa3IsTriedFirstAndFallsBackToWpa2() = runBlocking {
-        val network = mock(Network::class.java)
+    fun storedWpa3DoesNotFallbackAfterUnavailable() = runBlocking {
         val wifiRepository = FakeWifiProfileRepository(
             profiles = listOf(
                 WifiProfile(
@@ -286,15 +288,14 @@ class DefaultDeviceActionServiceTest {
         val wifiService = FakeWifiConnectionService(
             results = ArrayDeque(
                 listOf(
-                    WifiConnectionResult.Unavailable,
-                    WifiConnectionResult.Success(network)
+                    WifiConnectionResult.Unavailable
                 )
             )
         )
         val service = createService(
             wifiProfileRepository = wifiRepository,
             wifiService = wifiService,
-            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+            httpService = FakeHttpApiCallService(ArrayDeque())
         )
 
         val result = service.execute(
@@ -303,9 +304,8 @@ class DefaultDeviceActionServiceTest {
             )
         )
 
-        assertEquals(DeviceActionResult.Success, result)
-        assertEquals(listOf(WifiSecurityType.WPA3, WifiSecurityType.WPA2), wifiService.requestedSecurityTypes)
-        assertEquals(WifiSecurityType.WPA2, wifiRepository.savedSecurityTypes["wifi-1"])
+        assertEquals(DeviceActionResult.WifiConnectionFailed, result)
+        assertEquals(listOf(WifiSecurityType.WPA3), wifiService.requestedSecurityTypes)
     }
 
     @Test
@@ -343,13 +343,11 @@ class DefaultDeviceActionServiceTest {
     }
 
     @Test
-    fun knownSecurityTypeFallsBackWithinSharedTimeoutAfterRequestTimeout() = runBlocking {
-        val network = mock(Network::class.java)
+    fun knownSecurityTypeDoesNotFallbackAfterRequestTimeout() = runBlocking {
         val wifiService = FakeWifiConnectionService(
             results = ArrayDeque(
                 listOf(
-                    WifiConnectionResult.NetworkRequestTimeout,
-                    WifiConnectionResult.Success(network)
+                    WifiConnectionResult.NetworkRequestTimeout
                 )
             )
         )
@@ -362,7 +360,7 @@ class DefaultDeviceActionServiceTest {
                 )
             ),
             wifiService = wifiService,
-            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+            httpService = FakeHttpApiCallService(ArrayDeque())
         )
         val events = mutableListOf<DeviceActionDiagnosticEvent>()
 
@@ -373,12 +371,9 @@ class DefaultDeviceActionServiceTest {
             events::add
         )
 
-        assertEquals(DeviceActionResult.Success, result)
-        assertEquals(
-            listOf(WifiSecurityType.WPA3, WifiSecurityType.WPA2),
-            wifiService.requestedSecurityTypes
-        )
-        assertEquals(15_000L, wifiService.requestedTimeouts.first())
+        assertEquals(DeviceActionResult.WifiConnectionFailed, result)
+        assertEquals(listOf(WifiSecurityType.WPA3), wifiService.requestedSecurityTypes)
+        assertEquals(WifiConnectionService.DEFAULT_TIMEOUT_MILLIS, wifiService.requestedTimeouts.first())
         assertTrue(
             events.contains(
                 DeviceActionDiagnosticEvent.Timeout(DiagnosticStage.WIFI_REQUEST)
@@ -417,20 +412,18 @@ class DefaultDeviceActionServiceTest {
     }
 
     @Test
-    fun unknownSecurityTypeStillFallsBackAfterRequestTimeout() = runBlocking {
-        val network = mock(Network::class.java)
+    fun unknownSecurityTypeDoesNotFallbackAfterRequestTimeout() = runBlocking {
         val wifiService = FakeWifiConnectionService(
             results = ArrayDeque(
                 listOf(
-                    WifiConnectionResult.NetworkRequestTimeout,
-                    WifiConnectionResult.Success(network)
+                    WifiConnectionResult.NetworkRequestTimeout
                 )
             )
         )
         val service = createService(
             profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
             wifiService = wifiService,
-            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+            httpService = FakeHttpApiCallService(ArrayDeque())
         )
 
         val result = service.execute(
@@ -439,11 +432,8 @@ class DefaultDeviceActionServiceTest {
             )
         )
 
-        assertEquals(DeviceActionResult.Success, result)
-        assertEquals(
-            listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3),
-            wifiService.requestedSecurityTypes
-        )
+        assertEquals(DeviceActionResult.WifiConnectionFailed, result)
+        assertEquals(listOf(WifiSecurityType.WPA2), wifiService.requestedSecurityTypes)
     }
 
     @Test
@@ -471,13 +461,12 @@ class DefaultDeviceActionServiceTest {
     }
 
     @Test
-    fun bothSecurityTypesFailedContinuesWithNextWifiProfile() = runBlocking {
+    fun unavailableWifiContinuesWithNextWifiProfile() = runBlocking {
         val network = mock(Network::class.java)
         val wifiService = FakeWifiConnectionService(
             results = ArrayDeque(
                 listOf(
                     WifiConnectionResult.Unavailable,
-                    WifiConnectionResult.Timeout,
                     WifiConnectionResult.Success(network)
                 )
             )
@@ -501,11 +490,8 @@ class DefaultDeviceActionServiceTest {
         )
 
         assertEquals(DeviceActionResult.Success, result)
-        assertEquals(listOf("First WiFi", "First WiFi", "Second WiFi"), wifiService.requestedSsids)
-        assertEquals(
-            listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA3, WifiSecurityType.WPA2),
-            wifiService.requestedSecurityTypes
-        )
+        assertEquals(listOf("First WiFi", "Second WiFi"), wifiService.requestedSsids)
+        assertEquals(listOf(WifiSecurityType.WPA2, WifiSecurityType.WPA2), wifiService.requestedSecurityTypes)
     }
 
     @Test
