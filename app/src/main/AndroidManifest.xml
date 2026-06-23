@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-	android:name=".SwitchWerkApp"
+        android:name=".SwitchWerkApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -29,6 +29,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SwitchWerk"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="unspecified"
+            tools:replace="android:screenOrientation" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

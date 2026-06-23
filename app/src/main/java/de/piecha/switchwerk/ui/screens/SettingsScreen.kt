@@ -42,6 +42,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -83,19 +84,45 @@ fun SettingsScreen(
     selectedSection: SettingsSection,
     onSectionSelected: (SettingsSection) -> Unit,
     onNavigateBack: () -> Unit,
+    initialUiState: SettingsScreenUiState,
+    onUiStateChanged: (SettingsScreenUiState) -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val scanQrCodeText = stringResource(R.string.scan_qr_code)
     val uiState by viewModel.uiState.collectAsState()
-    var pendingFileImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
-    var pendingQrImportMode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
-    var showFileImportModeDialog by remember { mutableStateOf(false) }
-    var showQrImportModeDialog by remember { mutableStateOf(false) }
-    var showUrlImportDialog by remember { mutableStateOf(false) }
-    var showPasswordExportWarning by remember { mutableStateOf(false) }
-    var openSwipeItemId by remember { mutableStateOf<String?>(null) }
+    var pendingFileImportMode by remember { mutableStateOf(initialUiState.pendingFileImportMode) }
+    var pendingQrImportMode by remember { mutableStateOf(initialUiState.pendingQrImportMode) }
+    var fileImportMode by remember { mutableStateOf(initialUiState.fileImportMode) }
+    var qrImportMode by remember { mutableStateOf(initialUiState.qrImportMode) }
+    var urlImportMode by remember { mutableStateOf(initialUiState.urlImportMode) }
+    var urlImportValue by remember { mutableStateOf(initialUiState.urlImportValue) }
+    var showFileImportModeDialog by remember { mutableStateOf(initialUiState.showFileImportModeDialog) }
+    var showQrImportModeDialog by remember { mutableStateOf(initialUiState.showQrImportModeDialog) }
+    var showUrlImportDialog by remember { mutableStateOf(initialUiState.showUrlImportDialog) }
+    var showPasswordExportWarning by remember { mutableStateOf(initialUiState.showPasswordExportWarning) }
+    var openSwipeItemId by remember { mutableStateOf(initialUiState.openSwipeItemId) }
+    var pendingDeleteProfileId by remember { mutableStateOf(initialUiState.pendingDeleteProfileId) }
     var pendingImportConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    SideEffect {
+        onUiStateChanged(
+            SettingsScreenUiState(
+                pendingFileImportMode = pendingFileImportMode,
+                pendingQrImportMode = pendingQrImportMode,
+                fileImportMode = fileImportMode,
+                qrImportMode = qrImportMode,
+                urlImportMode = urlImportMode,
+                urlImportValue = urlImportValue,
+                showFileImportModeDialog = showFileImportModeDialog,
+                showQrImportModeDialog = showQrImportModeDialog,
+                showUrlImportDialog = showUrlImportDialog,
+                showPasswordExportWarning = showPasswordExportWarning,
+                openSwipeItemId = openSwipeItemId,
+                pendingDeleteProfileId = pendingDeleteProfileId
+            )
+        )
+    }
 
     val exportWithoutPasswordsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -127,7 +154,7 @@ fun SettingsScreen(
             .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
             .setPrompt(scanQrCodeText)
             .setBeepEnabled(false)
-            .setOrientationLocked(false)
+            .setOrientationLocked(true)
         qrScanLauncher.launch(options)
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -256,7 +283,7 @@ fun SettingsScreen(
                     onCloseSwipeItem = { openSwipeItemId = null },
                     onAddClick = { runAfterClosingSwipe(viewModel::startNewWifiProfile) },
                     onEditClick = viewModel::startEditWifiProfile,
-                    onDeleteClick = viewModel::deleteWifiProfile,
+                    onDeleteClick = { profileId -> pendingDeleteProfileId = profileId },
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -351,6 +378,21 @@ fun SettingsScreen(
         )
     }
 
+    uiState.wifiProfiles.firstOrNull { it.id == pendingDeleteProfileId }?.let { profile ->
+        StandardConfigurationDialog(
+            title = stringResource(R.string.delete_wifi_profile),
+            onDismissRequest = { pendingDeleteProfileId = null },
+            actionText = stringResource(R.string.yes),
+            onAction = {
+                pendingDeleteProfileId = null
+                viewModel.deleteWifiProfile(profile.id)
+            },
+            cancelText = stringResource(R.string.no)
+        ) {
+            Text(stringResource(R.string.delete_wifi_profile_confirmation, profile.name))
+        }
+    }
+
     if (uiState.isEditingWifiProfile) {
         WifiProfileDialog(
             isNewProfile = uiState.form.id == null,
@@ -372,6 +414,8 @@ fun SettingsScreen(
     if (showFileImportModeDialog) {
         ImportModeDialog(
             continueText = stringResource(R.string.select_file),
+            mode = fileImportMode,
+            onModeChange = { fileImportMode = it },
             onContinue = { mode ->
                 pendingFileImportMode = mode
                 showFileImportModeDialog = false
@@ -386,6 +430,8 @@ fun SettingsScreen(
     if (showQrImportModeDialog) {
         ImportModeDialog(
             continueText = stringResource(R.string.scan_qr_code),
+            mode = qrImportMode,
+            onModeChange = { qrImportMode = it },
             onContinue = { mode ->
                 pendingQrImportMode = mode
                 showQrImportModeDialog = false
@@ -406,6 +452,10 @@ fun SettingsScreen(
 
     if (showUrlImportDialog) {
         UrlImportDialog(
+            url = urlImportValue,
+            mode = urlImportMode,
+            onUrlChange = { urlImportValue = it },
+            onModeChange = { urlImportMode = it },
             onImport = { url, mode ->
                 showUrlImportDialog = false
                 viewModel.prepareImportFromUrl(url, mode)
@@ -438,6 +488,21 @@ fun SettingsScreen(
         )
     }
 }
+
+data class SettingsScreenUiState(
+    val pendingFileImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
+    val pendingQrImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
+    val fileImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
+    val qrImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
+    val urlImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
+    val urlImportValue: String = "",
+    val showFileImportModeDialog: Boolean = false,
+    val showQrImportModeDialog: Boolean = false,
+    val showUrlImportDialog: Boolean = false,
+    val showPasswordExportWarning: Boolean = false,
+    val openSwipeItemId: String? = null,
+    val pendingDeleteProfileId: String? = null
+)
 
 enum class SettingsSection(val titleResourceId: Int) {
     WIFI_PROFILES(R.string.settings_tab_wifi_profiles),
@@ -757,32 +822,13 @@ private fun WifiProfileRow(
     onContentClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    var pendingDeleteProfile by remember { mutableStateOf<WifiProfile?>(null) }
-
-    pendingDeleteProfile?.let { profileToDelete ->
-        StandardConfigurationDialog(
-            title = stringResource(R.string.delete_wifi_profile),
-            onDismissRequest = { pendingDeleteProfile = null },
-            actionText = stringResource(R.string.yes),
-            onAction = {
-                pendingDeleteProfile = null
-                onDeleteClick()
-            },
-            cancelText = stringResource(R.string.no)
-        ) {
-            Text(stringResource(R.string.delete_wifi_profile_confirmation, profileToDelete.name))
-        }
-    }
-
     SwipeToDeleteListItem(
         isOpen = isOpen,
         isAnyItemOpen = isAnyItemOpen,
         onOpen = onOpen,
         onClose = onClose,
         onContentClick = onContentClick,
-        onDeleteClick = {
-            pendingDeleteProfile = profile
-        }
+        onDeleteClick = onDeleteClick
     ) {
         Row(
             modifier = Modifier
@@ -1036,10 +1082,11 @@ private fun PasswordExportWarningDialog(
 @Composable
 private fun ImportModeDialog(
     continueText: String,
+    mode: ConfigurationImportMode,
+    onModeChange: (ConfigurationImportMode) -> Unit,
     onContinue: (ConfigurationImportMode) -> Unit,
     onCancel: () -> Unit
 ) {
-    var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     StandardConfigurationDialog(
         title = stringResource(R.string.choose_import_mode),
         onDismissRequest = onCancel,
@@ -1048,19 +1095,21 @@ private fun ImportModeDialog(
     ) {
         ImportModeSelection(
             mode = mode,
-            onModeChange = { mode = it }
+            onModeChange = onModeChange
         )
     }
 }
 
 @Composable
 private fun UrlImportDialog(
+    url: String,
+    mode: ConfigurationImportMode,
+    onUrlChange: (String) -> Unit,
+    onModeChange: (ConfigurationImportMode) -> Unit,
     onImport: (String, ConfigurationImportMode) -> Unit,
     onCancel: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    var url by remember { mutableStateOf("") }
-    var mode by remember { mutableStateOf(ConfigurationImportMode.MERGE) }
     StandardConfigurationDialog(
         title = stringResource(R.string.import_from_https),
         onDismissRequest = onCancel,
@@ -1070,7 +1119,7 @@ private fun UrlImportDialog(
     ) {
         OutlinedTextField(
             value = url,
-            onValueChange = { url = it },
+            onValueChange = onUrlChange,
             label = { Text(stringResource(R.string.https_url)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -1079,7 +1128,7 @@ private fun UrlImportDialog(
         )
         ImportModeSelection(
             mode = mode,
-            onModeChange = { mode = it }
+            onModeChange = onModeChange
         )
     }
 }
