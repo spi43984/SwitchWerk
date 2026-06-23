@@ -2,7 +2,7 @@
 
 ## Status
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: GUI / Dashboard
 
@@ -41,15 +41,18 @@ Auf Branch `app-identity-help-release-packaging` umgesetzt:
 Für die erste Anwenderverteilung wird ein GitHub Release mit signierter APK
 empfohlen. Ein Play-Store-Upload ist bewusst späterer, separater Aufwand.
 
-## Verifizierung und offene Schritte
+## Verifizierung und Abschluss
 
-- Die Debug-Prüfungen `lintDebug`, `testDebugUnitTest` und
-  `clean assembleDebug` wurden im Host-Verlauf erfolgreich ausgeführt.
-- Eine vollständige erneute manuelle Host-Prüfung der finalen Icon-/About-
-  Assets sowie `installDebug` ist vor Veröffentlichung nochmals durchzuführen.
-- Ein realer Release-Keystore wurde bewusst noch nicht erzeugt. Vor einem
-  Release sind `keystore.properties`, `./gradlew assembleRelease` und die
-  signierte APK lokal zu prüfen.
+- Die Host-Prüfungen `lintDebug`, `testDebugUnitTest`, `clean assembleDebug`
+  und `installDebug` waren erfolgreich; die finale Icon-/About-Darstellung
+  wurde manuell geprüft.
+- Ein lokaler Release-Keystore und die ignorierte `keystore.properties` sind
+  eingerichtet. `clean assembleRelease`, die Signaturprüfung mit `apksigner`
+  sowie die Installation der signierten APK auf einem Gerät waren erfolgreich.
+- Pull Request [#92](https://github.com/spi43984/SwitchWerk/pull/92) wurde nach
+  `main` gemergt. Der GitHub Release
+  [SwitchWerk 0.1 (v0.1.0)](https://github.com/spi43984/SwitchWerk/releases/tag/v0.1.0)
+  enthält die signierte APK.
 - Kein Play-Store-Upload, kein Paketnamenwechsel und keine sensiblen Dateien im
   Repository.
 

@@ -51,7 +51,7 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 032 | P2 | offen | Room Schema And Migration Test Coverage |
 | 033 | P1 | offen | Android-managed WiFi networks |
 | 034 | P1 | offen | Collapsible Action Details Panel |
-| 035 | P0 | offen | App Identity, Help And Release Packaging |
+| 035 | P0 | abgeschlossen | App Identity, Help And Release Packaging |
 | 036 | P0 | abgeschlossen | Device WiFi Proximity Indicator |
 | 037 | P2 | offen | GitHub Release Update Support |
 | 038 | P0 | abgeschlossen | Dialog Keyboard Handling |
@@ -65,18 +65,17 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 035 App Identity, Help And Release Packaging
-2. 045 WiFi Proximity Indicator Stabilization
-3. 030 WiFi Profile Deletion Safety
-4. 033 Android-managed WiFi networks
-5. 034 Collapsible Action Details Panel
-6. 040 Import/Export Password Handling
-7. 042 Action Cancellation And Fast-Fail WiFi
-8. 019 Configurable WiFi List Sorting
-9. 021 HTTP/HTTPS Device Actions
-10. 022 Request Body And Content-Type Support
-11. 031 Import Enforces Unique WiFi Profile Names
-12. 032 Room Schema And Migration Test Coverage
-13. 037 GitHub Release Update Support
-14. 041 Dashboard Drag And Drop
-15. 024 Authenticated Import Sources Backlog
+1. 045 WiFi Proximity Indicator Stabilization
+2. 030 WiFi Profile Deletion Safety
+3. 033 Android-managed WiFi networks
+4. 034 Collapsible Action Details Panel
+5. 040 Import/Export Password Handling
+6. 042 Action Cancellation And Fast-Fail WiFi
+7. 019 Configurable WiFi List Sorting
+8. 021 HTTP/HTTPS Device Actions
+9. 022 Request Body And Content-Type Support
+10. 031 Import Enforces Unique WiFi Profile Names
+11. 032 Room Schema And Migration Test Coverage
+12. 037 GitHub Release Update Support
+13. 041 Dashboard Drag And Drop
+14. 024 Authenticated Import Sources Backlog
