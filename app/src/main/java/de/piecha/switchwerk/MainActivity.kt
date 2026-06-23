@@ -55,7 +55,6 @@ private const val STATE_SHOW_QR_IMPORT_MODE_DIALOG = "show_qr_import_mode_dialog
 private const val STATE_SHOW_URL_IMPORT_DIALOG = "show_url_import_dialog"
 private const val STATE_SHOW_PASSWORD_EXPORT_WARNING = "show_password_export_warning"
 private const val STATE_OPEN_SWIPE_ITEM_ID = "open_swipe_item_id"
-private const val STATE_PENDING_DELETE_PROFILE_ID = "pending_delete_profile_id"
 
 class MainActivity : ComponentActivity() {
     private val appSettingsRepository: AppSettingsRepository by inject()
@@ -144,7 +143,6 @@ class MainActivity : ComponentActivity() {
         outState.putBoolean(STATE_SHOW_URL_IMPORT_DIALOG, settingsScreenUiStateForRestoration.showUrlImportDialog)
         outState.putBoolean(STATE_SHOW_PASSWORD_EXPORT_WARNING, settingsScreenUiStateForRestoration.showPasswordExportWarning)
         outState.putString(STATE_OPEN_SWIPE_ITEM_ID, settingsScreenUiStateForRestoration.openSwipeItemId)
-        outState.putString(STATE_PENDING_DELETE_PROFILE_ID, settingsScreenUiStateForRestoration.pendingDeleteProfileId)
         super.onSaveInstanceState(outState)
     }
 
@@ -188,8 +186,7 @@ private fun Bundle?.restoreSettingsScreenUiState(): SettingsScreenUiState {
         showQrImportModeDialog = this?.getBoolean(STATE_SHOW_QR_IMPORT_MODE_DIALOG) ?: false,
         showUrlImportDialog = this?.getBoolean(STATE_SHOW_URL_IMPORT_DIALOG) ?: false,
         showPasswordExportWarning = this?.getBoolean(STATE_SHOW_PASSWORD_EXPORT_WARNING) ?: false,
-        openSwipeItemId = this?.getString(STATE_OPEN_SWIPE_ITEM_ID),
-        pendingDeleteProfileId = this?.getString(STATE_PENDING_DELETE_PROFILE_ID)
+        openSwipeItemId = this?.getString(STATE_OPEN_SWIPE_ITEM_ID)
     )
 }
 

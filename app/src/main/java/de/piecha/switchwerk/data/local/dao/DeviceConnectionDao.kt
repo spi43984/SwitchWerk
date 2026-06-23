@@ -33,6 +33,9 @@ interface DeviceConnectionDao {
     @Query("DELETE FROM connections WHERE deviceId = :deviceId")
     suspend fun deleteForDevice(deviceId: String)
 
+    @Query("DELETE FROM connections WHERE wifiProfileId = :wifiProfileId")
+    suspend fun deleteForWifiProfile(wifiProfileId: String)
+
     @Query("DELETE FROM connections")
     suspend fun deleteAll()
 }

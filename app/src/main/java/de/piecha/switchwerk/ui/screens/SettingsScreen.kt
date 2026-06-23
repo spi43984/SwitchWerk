@@ -54,6 +54,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -102,7 +103,6 @@ fun SettingsScreen(
     var showUrlImportDialog by remember { mutableStateOf(initialUiState.showUrlImportDialog) }
     var showPasswordExportWarning by remember { mutableStateOf(initialUiState.showPasswordExportWarning) }
     var openSwipeItemId by remember { mutableStateOf(initialUiState.openSwipeItemId) }
-    var pendingDeleteProfileId by remember { mutableStateOf(initialUiState.pendingDeleteProfileId) }
     var pendingImportConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     SideEffect {
@@ -118,8 +118,7 @@ fun SettingsScreen(
                 showQrImportModeDialog = showQrImportModeDialog,
                 showUrlImportDialog = showUrlImportDialog,
                 showPasswordExportWarning = showPasswordExportWarning,
-                openSwipeItemId = openSwipeItemId,
-                pendingDeleteProfileId = pendingDeleteProfileId
+                openSwipeItemId = openSwipeItemId
             )
         )
     }
@@ -283,7 +282,7 @@ fun SettingsScreen(
                     onCloseSwipeItem = { openSwipeItemId = null },
                     onAddClick = { runAfterClosingSwipe(viewModel::startNewWifiProfile) },
                     onEditClick = viewModel::startEditWifiProfile,
-                    onDeleteClick = { profileId -> pendingDeleteProfileId = profileId },
+                    onDeleteClick = viewModel::requestWifiProfileDeletion,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -378,18 +377,28 @@ fun SettingsScreen(
         )
     }
 
-    uiState.wifiProfiles.firstOrNull { it.id == pendingDeleteProfileId }?.let { profile ->
+    uiState.wifiProfileDeletionConfirmation?.let { confirmation ->
         StandardConfigurationDialog(
             title = stringResource(R.string.delete_wifi_profile),
-            onDismissRequest = { pendingDeleteProfileId = null },
+            onDismissRequest = viewModel::cancelWifiProfileDeletion,
             actionText = stringResource(R.string.yes),
-            onAction = {
-                pendingDeleteProfileId = null
-                viewModel.deleteWifiProfile(profile.id)
-            },
-            cancelText = stringResource(R.string.no)
+            onAction = viewModel::confirmWifiProfileDeletion,
+            cancelText = stringResource(R.string.no),
         ) {
-            Text(stringResource(R.string.delete_wifi_profile_confirmation, profile.name))
+            Text(stringResource(R.string.delete_wifi_profile_confirmation, confirmation.profile.name))
+            if (confirmation.affectedDeviceNames.isNotEmpty()) {
+                Text(
+                    pluralStringResource(
+                        R.plurals.delete_wifi_profile_used_warning,
+                        confirmation.affectedDeviceNames.size,
+                        confirmation.affectedDeviceNames.size
+                    )
+                )
+                Text(stringResource(R.string.affected_devices))
+                confirmation.affectedDeviceNames.forEach { deviceName ->
+                    Text(deviceName)
+                }
+            }
         }
     }
 
@@ -500,8 +509,7 @@ data class SettingsScreenUiState(
     val showQrImportModeDialog: Boolean = false,
     val showUrlImportDialog: Boolean = false,
     val showPasswordExportWarning: Boolean = false,
-    val openSwipeItemId: String? = null,
-    val pendingDeleteProfileId: String? = null
+    val openSwipeItemId: String? = null
 )
 
 enum class SettingsSection(val titleResourceId: Int) {

@@ -165,6 +165,59 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun deletingUsedWifiProfileListsAffectedDevicesAndRequiresConfirmation() = runTest(dispatcher) {
+        val wifiRepository = FakeWifiProfileRepository(
+            profiles = listOf(WifiProfile(id = "wifi-1", name = "Home", ssid = "Home"))
+        )
+        val deviceRepository = FakeDeviceRepository(
+            devices = listOf(
+                device(id = "device-1", name = "Garage", wifiProfileId = "wifi-1"),
+                device(id = "device-2", name = "Garden", wifiProfileId = "wifi-2")
+            )
+        )
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = wifiRepository,
+            deviceRepository = deviceRepository
+        )
+        runCurrent()
+
+        viewModel.requestWifiProfileDeletion("wifi-1")
+
+        assertEquals(
+            listOf("Garage"),
+            viewModel.uiState.value.wifiProfileDeletionConfirmation?.affectedDeviceNames
+        )
+        assertTrue(wifiRepository.deletedProfileIds.isEmpty())
+
+        viewModel.confirmWifiProfileDeletion()
+        runCurrent()
+
+        assertEquals(listOf("wifi-1"), wifiRepository.deletedProfileIds)
+        assertEquals(null, viewModel.uiState.value.wifiProfileDeletionConfirmation)
+    }
+
+    @Test
+    fun deletingUnusedWifiProfileDoesNotAddAffectedDeviceWarning() = runTest(dispatcher) {
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(
+                profiles = listOf(WifiProfile(id = "wifi-1", name = "Home", ssid = "Home"))
+            ),
+            deviceRepository = FakeDeviceRepository(
+                devices = listOf(device(id = "device-1", name = "Garage", wifiProfileId = "wifi-2"))
+            )
+        )
+        runCurrent()
+
+        viewModel.requestWifiProfileDeletion("wifi-1")
+
+        assertTrue(
+            viewModel.uiState.value.wifiProfileDeletionConfirmation?.affectedDeviceNames.orEmpty().isEmpty()
+        )
+    }
+
+    @Test
     fun reorderedDeviceConnectionsAreSavedInDisplayedOrder() = runTest(dispatcher) {
         val profiles = listOf(
             WifiProfile(id = "wifi-1", name = "First", ssid = "First SSID"),
@@ -255,10 +308,22 @@ class SettingsViewModelTest {
         }
     }
 
+    private fun device(id: String, name: String, wifiProfileId: String): Device {
+        return Device(
+            id = id,
+            name = name,
+            actionLabel = "Switch",
+            apiCall = ApiCall(ApiMethod.GET, "/rpc/Switch.Toggle?id=0"),
+            connections = listOf(DeviceConnection(wifiProfileId = wifiProfileId, host = "$id.local")),
+            sortOrder = 0
+        )
+    }
+
     private class FakeWifiProfileRepository(
         private val profiles: List<WifiProfile> = emptyList()
     ) : WifiProfileRepository {
         val savedProfiles = mutableListOf<WifiProfile>()
+        val deletedProfileIds = mutableListOf<String>()
 
         override fun observeWifiProfiles(): Flow<List<WifiProfile>> = flowOf(profiles)
 
@@ -283,7 +348,9 @@ class SettingsViewModelTest {
 
         override suspend fun deletePassword(id: String) = Unit
 
-        override suspend fun deleteWifiProfile(id: String) = Unit
+        override suspend fun deleteWifiProfile(id: String) {
+            deletedProfileIds += id
+        }
     }
 
     private class FakeDeviceRepository(

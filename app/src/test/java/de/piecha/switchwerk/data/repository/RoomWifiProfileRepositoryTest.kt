@@ -1,5 +1,6 @@
 package de.piecha.switchwerk.data.repository
 
+import de.piecha.switchwerk.data.local.dao.DeviceConnectionDao
 import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
@@ -25,6 +26,7 @@ class RoomWifiProfileRepositoryTest {
         `when`(dao.getById("wifi-1")).thenReturn(entity)
         val repository = RoomWifiProfileRepository(
             wifiProfileDao = dao,
+            deviceConnectionDao = mock(DeviceConnectionDao::class.java),
             credentialStore = mock(WifiCredentialStore::class.java)
         )
 
@@ -39,5 +41,23 @@ class RoomWifiProfileRepositoryTest {
                 securityTypeVerifiedLocally = true
             )
         )
+    }
+
+    @Test
+    fun deletingWifiProfileRemovesDeviceConnections() = runBlocking {
+        val wifiProfileDao = mock(WifiProfileDao::class.java)
+        val deviceConnectionDao = mock(DeviceConnectionDao::class.java)
+        val credentialStore = mock(WifiCredentialStore::class.java)
+        val repository = RoomWifiProfileRepository(
+            wifiProfileDao = wifiProfileDao,
+            deviceConnectionDao = deviceConnectionDao,
+            credentialStore = credentialStore
+        )
+
+        repository.deleteWifiProfile("wifi-1")
+
+        verify(deviceConnectionDao).deleteForWifiProfile("wifi-1")
+        verify(wifiProfileDao).deleteById("wifi-1")
+        verify(credentialStore).deletePassword("wifi-1")
     }
 }

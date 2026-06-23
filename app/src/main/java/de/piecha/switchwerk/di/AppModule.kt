@@ -119,6 +119,7 @@ val appModule = module {
     single<WifiProfileRepository> {
         RoomWifiProfileRepository(
             wifiProfileDao = get(),
+            deviceConnectionDao = get(),
             credentialStore = get()
         )
     }
