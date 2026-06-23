@@ -39,7 +39,7 @@
     <string name="wifi_assignment_dialog_info_title">WLAN-Zuordnung</string>
     <string name="wifi_assignment_dialog_info">• WLAN-Profil für das Gerät auswählen\n• lokale Geräteadresse eintragen\n• kein Internetzugang erforderlich</string>
     <string name="about_switchwerk">Über SwitchWerk</string>
-    <string name="about_description">Lokale Steuerung für Shelly und andere Geräte.</string>
+    <string name="about_description">SwitchWerk controls compatible devices on the local network, including devices that are not otherwise reachable through a Wi-Fi network or the internet. It connects directly to the access point of the device being controlled. Your configuration stays on this device.</string>
     <string name="version_value">Version %1$s</string>
     <string name="about_author">Entwickelt von spi</string>
     <string name="about_license">Lizenz: GNU AGPL-3.0-or-later</string>

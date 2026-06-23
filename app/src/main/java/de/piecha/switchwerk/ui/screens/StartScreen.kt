@@ -594,6 +594,13 @@ private fun DiagnosticPanel(
                     style = MaterialTheme.typography.titleSmall
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(onClick = onToggleSortOrder) {
+                        Text(
+                            stringResource(
+                                if (newestFirst) R.string.newest_first else R.string.newest_last
+                            )
+                        )
+                    }
                     IconButton(
                         onClick = onClear,
                         enabled = items.isNotEmpty()
@@ -601,13 +608,6 @@ private fun DiagnosticPanel(
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = stringResource(R.string.clear_action_log)
-                        )
-                    }
-                    OutlinedButton(onClick = onToggleSortOrder) {
-                        Text(
-                            stringResource(
-                                if (newestFirst) R.string.newest_first else R.string.newest_last
-                            )
                         )
                     }
                 }
