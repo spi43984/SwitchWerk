@@ -141,6 +141,7 @@
     <string name="configuration_processing">Konfiguration wird verarbeitet …</string>
     <string name="export">Export</string>
     <string name="export_configuration">Exportieren</string>
+    <string name="include_passwords">Passwörter einschließen</string>
     <string name="export_with_passwords">Exportieren mit Passwörtern</string>
     <string name="import_title">Import</string>
     <string name="import_file">Datei importieren</string>
@@ -163,11 +164,13 @@
     <string name="import_action">Importieren</string>
     <string name="import_summary_wifi_profiles">WLAN-Profile: %1$d neu, %2$d überschrieben</string>
     <string name="import_summary_devices">Geräte: %1$d neu, %2$d überschrieben</string>
-    <string name="import_summary_passwords">Passwörter: %1$d enthalten, %2$d werden gelöscht</string>
+    <string name="import_summary_passwords">Passwortfelder: %1$d mit Wert, %2$d leer</string>
     <string name="import_summary_local_wifi_profiles_deleted">%1$d lokale WLAN-Profile werden gelöscht.</string>
     <string name="import_summary_local_devices_deleted">%1$d lokale Geräte werden gelöscht.</string>
-    <string name="import_passwords_title">Import enthält Passwörter</string>
-    <string name="import_passwords_warning">Die Importdatei enthält WLAN-Passwörter im Klartext oder löscht gespeicherte Passwörter. Importiere sie nur aus einer vertrauenswürdigen Quelle.</string>
+    <string name="import_passwords_title">Konfiguration enthält Passwörter</string>
+    <string name="import_passwords_warning">Diese Konfiguration enthält gespeicherte Zugangsdaten. Möchten Sie diese ebenfalls importieren?</string>
+    <string name="import_with_passwords">Mit Passwörtern importieren</string>
+    <string name="import_without_passwords">Ohne Passwörter importieren</string>
 
     <string name="error_profile_name_empty">Profilname darf nicht leer sein</string>
     <string name="error_ssid_empty">SSID darf nicht leer sein</string>

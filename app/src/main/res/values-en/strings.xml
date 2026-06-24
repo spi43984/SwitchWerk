@@ -134,6 +134,7 @@
     <string name="configuration_processing">Processing configuration…</string>
     <string name="export">Export</string>
     <string name="export_configuration">Export</string>
+    <string name="include_passwords">Include passwords</string>
     <string name="export_with_passwords">Export with passwords</string>
     <string name="import_title">Import</string>
     <string name="import_file">Import file</string>
@@ -156,11 +157,13 @@
     <string name="import_action">Import</string>
     <string name="import_summary_wifi_profiles">Wi-Fi profiles: %1$d new, %2$d overwritten</string>
     <string name="import_summary_devices">Devices: %1$d new, %2$d overwritten</string>
-    <string name="import_summary_passwords">Passwords: %1$d included, %2$d will be deleted</string>
+    <string name="import_summary_passwords">Password fields: %1$d with value, %2$d empty</string>
     <string name="import_summary_local_wifi_profiles_deleted">%1$d local Wi-Fi profiles will be deleted.</string>
     <string name="import_summary_local_devices_deleted">%1$d local devices will be deleted.</string>
-    <string name="import_passwords_title">Import contains passwords</string>
-    <string name="import_passwords_warning">The import file contains Wi-Fi passwords in plain text or deletes stored passwords. Only import it from a trusted source.</string>
+    <string name="import_passwords_title">Configuration contains passwords</string>
+    <string name="import_passwords_warning">This configuration contains saved credentials. Do you want to import these as well?</string>
+    <string name="import_with_passwords">Import with passwords</string>
+    <string name="import_without_passwords">Import without passwords</string>
 
     <string name="error_profile_name_empty">Profile name must not be empty</string>
     <string name="error_ssid_empty">SSID must not be empty</string>

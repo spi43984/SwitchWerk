@@ -38,6 +38,9 @@ fun StandardConfigurationDialog(
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
+    secondaryActionText: String? = null,
+    onSecondaryAction: (() -> Unit)? = null,
+    verticalActions: Boolean = false,
     cancelText: String? = null,
     @StringRes infoTitleResourceId: Int? = null,
     @StringRes infoMessageResourceId: Int? = null,
@@ -88,7 +91,10 @@ fun StandardConfigurationDialog(
                         onAction = onAction,
                         cancelText = cancelText ?: stringResource(R.string.cancel),
                         onCancel = onDismissRequest,
-                        actionEnabled = actionEnabled
+                        actionEnabled = actionEnabled,
+                        secondaryActionText = secondaryActionText,
+                        onSecondaryAction = onSecondaryAction,
+                        verticalActions = verticalActions
                     )
                 }
             }
@@ -104,8 +110,38 @@ fun StandardDialogButtons(
     onAction: () -> Unit,
     cancelText: String,
     onCancel: () -> Unit,
-    actionEnabled: Boolean = true
+    actionEnabled: Boolean = true,
+    secondaryActionText: String? = null,
+    onSecondaryAction: (() -> Unit)? = null,
+    verticalActions: Boolean = false
 ) {
+    if (verticalActions) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            StandardActionButton(
+                text = actionText,
+                onClick = onAction,
+                enabled = actionEnabled,
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (secondaryActionText != null && onSecondaryAction != null) {
+                StandardActionButton(
+                    text = secondaryActionText,
+                    onClick = onSecondaryAction,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            StandardActionButton(
+                text = cancelText,
+                onClick = onCancel,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        return
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,6 +157,15 @@ fun StandardDialogButtons(
                 .weight(1f)
                 .fillMaxHeight()
         )
+        if (secondaryActionText != null && onSecondaryAction != null) {
+            StandardActionButton(
+                text = secondaryActionText,
+                onClick = onSecondaryAction,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+        }
         StandardActionButton(
             text = cancelText,
             onClick = onCancel,

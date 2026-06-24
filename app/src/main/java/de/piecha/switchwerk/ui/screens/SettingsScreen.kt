@@ -105,6 +105,7 @@ fun SettingsScreen(
     var showQrImportModeDialog by remember { mutableStateOf(initialUiState.showQrImportModeDialog) }
     var showUrlImportDialog by remember { mutableStateOf(initialUiState.showUrlImportDialog) }
     var showPasswordExportWarning by remember { mutableStateOf(initialUiState.showPasswordExportWarning) }
+    var exportIncludesPasswords by remember { mutableStateOf(initialUiState.exportIncludesPasswords) }
     var openSwipeItemId by remember { mutableStateOf(initialUiState.openSwipeItemId) }
     var pendingImportConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
 
@@ -121,20 +122,16 @@ fun SettingsScreen(
                 showQrImportModeDialog = showQrImportModeDialog,
                 showUrlImportDialog = showUrlImportDialog,
                 showPasswordExportWarning = showPasswordExportWarning,
+                exportIncludesPasswords = exportIncludesPasswords,
                 openSwipeItemId = openSwipeItemId
             )
         )
     }
 
-    val exportWithoutPasswordsLauncher = rememberLauncherForActivityResult(
+    val exportConfigurationLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
-        uri?.let { viewModel.exportConfiguration(it, includePasswords = false) }
-    }
-    val exportWithPasswordsLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        uri?.let { viewModel.exportConfiguration(it, includePasswords = true) }
+        uri?.let { viewModel.exportConfiguration(it, includePasswords = exportIncludesPasswords) }
     }
     val importFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -344,14 +341,17 @@ fun SettingsScreen(
                 ) {
                     ImportExportSection(
                         isTransferInProgress = uiState.isTransferInProgress,
+                        includePasswords = exportIncludesPasswords,
+                        onIncludePasswordsChange = { exportIncludesPasswords = it },
                         onExportClick = {
                             runAfterClosingSwipe {
                                 viewModel.clearStatusMessage()
-                                exportWithoutPasswordsLauncher.launch(EXPORT_FILE_NAME)
+                                if (exportIncludesPasswords) {
+                                    showPasswordExportWarning = true
+                                } else {
+                                    exportConfigurationLauncher.launch(EXPORT_FILE_NAME)
+                                }
                             }
-                        },
-                        onExportWithPasswordsClick = {
-                            runAfterClosingSwipe { showPasswordExportWarning = true }
                         },
                         onImportFileClick = {
                             runAfterClosingSwipe { showFileImportModeDialog = true }
@@ -372,7 +372,7 @@ fun SettingsScreen(
         PasswordExportWarningDialog(
             onExport = {
                 showPasswordExportWarning = false
-                exportWithPasswordsLauncher.launch(EXPORT_FILE_NAME)
+                exportConfigurationLauncher.launch(EXPORT_FILE_NAME)
             },
             onCancel = {
                 showPasswordExportWarning = false
@@ -502,7 +502,8 @@ fun SettingsScreen(
 
     if (uiState.showImportPasswordWarning) {
         PasswordImportWarningDialog(
-            onImport = viewModel::confirmPasswordImport,
+            onImportWithPasswords = viewModel::confirmPasswordImport,
+            onImportWithoutPasswords = viewModel::confirmImportWithoutPasswords,
             onCancel = viewModel::cancelPendingImport
         )
     }
@@ -519,6 +520,7 @@ data class SettingsScreenUiState(
     val showQrImportModeDialog: Boolean = false,
     val showUrlImportDialog: Boolean = false,
     val showPasswordExportWarning: Boolean = false,
+    val exportIncludesPasswords: Boolean = false,
     val openSwipeItemId: String? = null
 )
 
@@ -1070,8 +1072,9 @@ private fun WifiProfileForm(
 @Composable
 private fun ImportExportSection(
     isTransferInProgress: Boolean,
+    includePasswords: Boolean,
+    onIncludePasswordsChange: (Boolean) -> Unit,
     onExportClick: () -> Unit,
-    onExportWithPasswordsClick: () -> Unit,
     onImportFileClick: () -> Unit,
     onImportUrlClick: () -> Unit,
     onScanQrCodeClick: () -> Unit
@@ -1105,17 +1108,25 @@ private fun ImportExportSection(
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.export), style = MaterialTheme.typography.titleSmall)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                        .clickable { onIncludePasswordsChange(!includePasswords) },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(stringResource(R.string.include_passwords))
+                    Switch(
+                        checked = includePasswords,
+                        onCheckedChange = onIncludePasswordsChange
+                    )
+                }
                 StandardActionButton(
                     text = stringResource(R.string.export_configuration),
                     onClick = onExportClick,
                     modifier = Modifier.fillMaxWidth()
                 )
-                StandardActionButton(
-                    text = stringResource(R.string.export_with_passwords),
-                    onClick = onExportWithPasswordsClick,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 Text(stringResource(R.string.import_title), style = MaterialTheme.typography.titleSmall)
@@ -1302,14 +1313,18 @@ private fun ImportSummaryDialog(
 
 @Composable
 private fun PasswordImportWarningDialog(
-    onImport: () -> Unit,
+    onImportWithPasswords: () -> Unit,
+    onImportWithoutPasswords: () -> Unit,
     onCancel: () -> Unit
 ) {
     StandardConfigurationDialog(
         title = stringResource(R.string.import_passwords_title),
         onDismissRequest = onCancel,
-        actionText = stringResource(R.string.import_action),
-        onAction = onImport
+        actionText = stringResource(R.string.import_with_passwords),
+        onAction = onImportWithPasswords,
+        secondaryActionText = stringResource(R.string.import_without_passwords),
+        onSecondaryAction = onImportWithoutPasswords,
+        verticalActions = true
     ) {
         Text(stringResource(R.string.import_passwords_warning))
     }

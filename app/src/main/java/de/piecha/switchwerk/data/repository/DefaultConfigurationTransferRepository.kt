@@ -98,7 +98,8 @@ class DefaultConfigurationTransferRepository(
 
     override suspend fun applyImport(
         preparedImport: PreparedConfigurationImport,
-        mode: ConfigurationImportMode
+        mode: ConfigurationImportMode,
+        includePasswords: Boolean
     ) {
         withContext(Dispatchers.IO) {
             validator.validate(preparedImport.document)
@@ -114,7 +115,9 @@ class DefaultConfigurationTransferRepository(
             if (mode == ConfigurationImportMode.REPLACE) {
                 oldWifiProfileIds.forEach { credentialStore.deletePassword(it) }
             }
-            applyImportedPasswords(preparedImport.document)
+            if (includePasswords) {
+                applyImportedPasswords(preparedImport.document)
+            }
             applyImportedAppSettings(preparedImport.document)
         }
     }

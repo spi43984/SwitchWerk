@@ -45,7 +45,6 @@ Alle übrigen Konfigurationsdaten werden exportiert.
 Wenn aktiviert:
 
 * Passwortdaten werden exportiert
-* Die Exportdatei kennzeichnet, dass Passwortdaten enthalten sind.
 
 ### Import
 
@@ -120,16 +119,6 @@ Passwortdaten werden wie alle anderen Konfigurationsdaten importiert.
 ## Architektur
 
 ### Exportmodell
-
-Das Exportmodell soll kennzeichnen, ob Passwortdaten enthalten sind.
-
-Beispiel:
-
-```json
-{
-  "containsPasswords": true
-}
-```
 
 Passwortfelder werden nur serialisiert, wenn der Export mit Passwörtern gewählt wurde.
 

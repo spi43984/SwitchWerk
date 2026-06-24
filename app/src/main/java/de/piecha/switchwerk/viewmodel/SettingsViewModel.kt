@@ -421,12 +421,16 @@ class SettingsViewModel(
                 showImportPasswordWarning = true
             )
         } else {
-            applyPendingImport()
+            applyPendingImport(includePasswords = false)
         }
     }
 
     fun confirmPasswordImport() {
-        applyPendingImport()
+        applyPendingImport(includePasswords = true)
+    }
+
+    fun confirmImportWithoutPasswords() {
+        applyPendingImport(includePasswords = false)
     }
 
     fun cancelPendingImport() {
@@ -760,7 +764,7 @@ class SettingsViewModel(
         }
     }
 
-    private fun applyPendingImport() {
+    private fun applyPendingImport(includePasswords: Boolean) {
         val prepared = pendingImport ?: return
         val mode = _uiState.value.importMode ?: return
         pendingImport = null
@@ -775,7 +779,8 @@ class SettingsViewModel(
             runCatching {
                 configurationTransferRepository.applyImport(
                     preparedImport = prepared,
-                    mode = mode
+                    mode = mode,
+                    includePasswords = includePasswords
                 )
             }.onSuccess {
                 _uiState.value = _uiState.value.copy(
