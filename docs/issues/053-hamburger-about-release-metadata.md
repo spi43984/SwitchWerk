@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: GUI / Navigation / About / Release-Metadaten
 
@@ -46,14 +46,14 @@ Das offene Hamburger-Menü und das About-Menü sollen die aktuelle App-Version u
 
 ## Akzeptanzkriterien
 
-- [ ] Hamburger-Menü zeigt unten rechtsbündig die Version.
-- [ ] Hamburger-Menü zeigt darunter das Release-Datum.
-- [ ] Hamburger-Menü zeigt darunter klein das bestehende About-Icon.
-- [ ] About-Menü zeigt unterhalb der Version das Release-Datum.
-- [ ] Texte sind auf Deutsch und Englisch konsistent gepflegt.
-- [ ] Darstellung passt in Portrait und Landscape.
-- [ ] Light Mode und Dark Mode funktionieren weiterhin.
-- [ ] Build erfolgreich.
+- [x] Hamburger-Menü zeigt unten rechtsbündig die Version.
+- [x] Hamburger-Menü zeigt darunter das Release-Datum.
+- [x] Hamburger-Menü zeigt darunter klein das bestehende About-Icon.
+- [x] About-Menü zeigt unterhalb der Version das Release-Datum.
+- [x] Texte sind auf Deutsch und Englisch konsistent gepflegt.
+- [x] Darstellung passt in Portrait und Landscape.
+- [x] Light Mode und Dark Mode funktionieren weiterhin.
+- [x] Build erfolgreich.
 
 ## Testhinweise
 
@@ -64,3 +64,10 @@ Das offene Hamburger-Menü und das About-Menü sollen die aktuelle App-Version u
 - Portrait und Landscape testen.
 - Deutsch und Englisch testen.
 - Light Mode und Dark Mode testen.
+
+## Abschluss
+
+- GitHub-Issue: #112
+- Pull Request: #113
+- Merge-Commit: `d01d402`
+- Host-Build, Installation und die manuellen Prüfungen wurden bestätigt.

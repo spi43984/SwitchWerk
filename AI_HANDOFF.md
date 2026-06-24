@@ -4,6 +4,23 @@ Stand: 24. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 053 „Hamburger And About Release Metadata“ ist veröffentlicht und
+abgeschlossen.
+
+- GitHub-Issue: #112
+- Pull Request: #113
+- Merge-Commit: `d01d402`
+- Das Hamburger-Menü zeigt unter den kompakten Navigationseinträgen die
+  laufende App-Version, das Release-Datum und das bestehende About-Icon. Der
+  untere Bereich bleibt auf kleinen Displays responsiv, sodass keine
+  Navigationseinträge überdeckt werden. Version und Datum stehen direkt über
+  dem Icon; die deutschen und englischen Texte sind gepflegt.
+- Das About-Menü zeigt das Release-Datum unter der Version; die redundante
+  Bezeichnung unter dem Icon wurde entfernt.
+- Host-Build, Installation und manuelle Menüprüfungen wurden bestätigt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 019
+  „Configurable WiFi List Sorting“.
+
 Issue 054 „App Icon Replacement“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #110
