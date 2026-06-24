@@ -73,18 +73,18 @@ Aus dem Ausgangsbild sind alle notwendigen Android-Icon-Ressourcen zu erzeugen b
 
 ## Akzeptanzkriterien
 
-- [ ] Codex hat vor der Implementierung das zu verwendende Ausgangsbild und den gewünschten Speicherort abgefragt oder bereits eindeutig vorhandene Angaben bestätigt.
-- [ ] Neues App-Icon ist fest in der App konfiguriert.
-- [ ] Adaptive Icon funktioniert korrekt.
-- [ ] Launcher-Icons wurden in allen notwendigen Dichten erzeugt bzw. ersetzt.
-- [ ] Runde Icon-Variante wurde berücksichtigt, falls im Projekt vorhanden.
-- [ ] Icon erscheint korrekt im Android Launcher.
-- [ ] Icon erscheint korrekt in den Systemeinstellungen/App-Infos.
-- [ ] Bestehende About-/Hilfe-Darstellung bleibt funktionsfähig.
-- [ ] Keine Änderung an Paketname, App-Name, Versionierung oder Signing.
-- [ ] Keine neue externe Abhängigkeit.
-- [ ] Verwendetes Ausgangsbild und erzeugte Dateien sind im Issue dokumentiert.
-- [ ] Build erfolgreich.
+- [x] Codex hat vor der Implementierung das zu verwendende Ausgangsbild und den gewünschten Speicherort abgefragt oder bereits eindeutig vorhandene Angaben bestätigt.
+- [x] Neues App-Icon ist fest in der App konfiguriert.
+- [x] Adaptive Icon funktioniert korrekt.
+- [x] Launcher-Icons wurden in allen notwendigen Dichten erzeugt bzw. ersetzt.
+- [x] Runde Icon-Variante wurde berücksichtigt, falls im Projekt vorhanden.
+- [x] Icon erscheint korrekt im Android Launcher.
+- [x] Icon erscheint korrekt in den Systemeinstellungen/App-Infos.
+- [x] Bestehende About-/Hilfe-Darstellung bleibt funktionsfähig.
+- [x] Keine Änderung an Paketname, App-Name, Versionierung oder Signing.
+- [x] Keine neue externe Abhängigkeit.
+- [x] Verwendetes Ausgangsbild und erzeugte Dateien sind im Issue dokumentiert.
+- [x] Build erfolgreich.
 
 ## Testhinweise
 
@@ -104,7 +104,22 @@ Aus dem Ausgangsbild sind alle notwendigen Android-Icon-Ressourcen zu erzeugen b
 
 Nach der Implementierung hier ergänzen:
 
-- verwendetes Ausgangsbild:
-- Ablageort der Quell-/Referenzdatei:
+- verwendetes Ausgangsbild: `Kabelblitz_gelb.png`
+- Ablageort der Quell-/Referenzdatei: `docs/assets/icons/Kabelblitz_gelb.png`
 - erzeugte oder ersetzte Ressourcen:
-- manuelle Prüfung auf Gerät:
+  - `drawable-nodpi/ic_launcher_foreground.png` als adaptiver Vordergrund
+  - `drawable-nodpi/ic_launcher_monochrome.png` als monochrome Ebene für
+    unterstützte Android-Themed-Icons, erzeugt aus
+    `Kabelblitz_mono_simple3.png`
+  - `drawable/ic_launcher_background.xml` als adaptiver Hintergrund (`#0E1010`)
+  - `mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher.png`
+  - `mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher_round.png`
+  - Die bestehenden adaptiven XML-Definitionen für Android 8+
+    (`mipmap-anydpi-v26/ic_launcher.xml` und `ic_launcher_round.xml`) bleiben
+    unverändert. Die Android-13+-Varianten unter `mipmap-anydpi-v33/` ergänzen
+    die monochrome Ebene; die Manifest-Verweise bleiben unverändert.
+- manuelle Prüfung auf Gerät: Debug-Build, Installation, Launcher- und
+  App-Info-Darstellung sowie About-/Hilfe-Bereich wurden auf dem Ubuntu-Host
+  erfolgreich bestätigt. Die Android-13+-Monochrom-Variante ist eingebunden;
+  ein leichtes Abschneiden äußerer Kabelenden durch Launcher-Masken ist
+  akzeptiert.
