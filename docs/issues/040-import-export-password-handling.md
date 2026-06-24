@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-* Status: offen
+* Status: abgeschlossen
 * Priorität: P1
 * Typ: Backup / Sicherheit
 
@@ -156,17 +156,17 @@ Die sichere Abbruchaktion steht rechts neben „Importieren“.
 
 ## Akzeptanzkriterien
 
-* [ ] Export ohne Passwörter enthält keine Zugangsdaten
-* [ ] Export mit Passwörtern enthält Zugangsdaten
-* [ ] Passwortdaten werden zuverlässig erkannt
-* [ ] Passwortimport ist bei passworthaltigen Dateien standardmäßig deaktiviert
-* [ ] Die Zusammenfassung zeigt die Auswirkungen der Passwortauswahl
-* [ ] Import mit Passwörtern übernimmt Passwortdaten
-* [ ] Import ohne Passwörter übernimmt keine Passwortdaten
-* [ ] Vorhandene Passwörter bleiben bei „Ergänzen/Überschreiben“ erhalten
-* [ ] Neue Datensätze bleiben ohne Passwort, wenn ohne Passwörter importiert wird
-* [ ] Abbrechen beendet den Import ohne Änderungen
-* [ ] Bestehende Exportdateien bleiben kompatibel
+* [x] Export ohne Passwörter enthält keine Zugangsdaten
+* [x] Export mit Passwörtern enthält Zugangsdaten
+* [x] Passwortdaten werden zuverlässig erkannt
+* [x] Passwortimport ist bei passworthaltigen Dateien standardmäßig deaktiviert
+* [x] Die Zusammenfassung zeigt die Auswirkungen der Passwortauswahl
+* [x] Import mit Passwörtern übernimmt Passwortdaten
+* [x] Import ohne Passwörter übernimmt keine Passwortdaten
+* [x] Vorhandene Passwörter bleiben bei „Ergänzen/Überschreiben“ erhalten
+* [x] Neue Datensätze bleiben ohne Passwort, wenn ohne Passwörter importiert wird
+* [x] Abbrechen beendet den Import ohne Änderungen
+* [x] Bestehende Exportdateien bleiben kompatibel
 
 ## Testhinweise
 

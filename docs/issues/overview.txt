@@ -61,7 +61,7 @@ es verändert die Priorisierungslogik nicht.
 | 037 | P2 | offen | GitHub Release Update Support |
 | 038 | P0 | abgeschlossen | Dialog Keyboard Handling |
 | 039 | P0 | abgeschlossen | Unified List Interactions |
-| 040 | P1 | offen | Import/Export Password Handling |
+| 040 | P1 | abgeschlossen | Import/Export Password Handling |
 | 041 | P2 | offen | Dashboard Drag And Drop |
 | 042 | P1 | offen | Action Cancellation And Fast-Fail WiFi |
 | 043 | P0 | abgeschlossen | Verify Issue 036 Lint And Codex Session |
@@ -77,19 +77,18 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 040 Import/Export Password Handling
-2. 042 Action Cancellation And Fast-Fail WiFi
-3. 019 Configurable WiFi List Sorting
-4. 021 HTTP/HTTPS Device Actions
-5. 022 Request Body And Content-Type Support
-6. 031 Import Enforces Unique WiFi Profile Names
-7. 032 Room Schema And Migration Test Coverage
-8. 037 GitHub Release Update Support
-9. 041 Dashboard Drag And Drop
-10. 024 Authenticated Import Sources Backlog
-11. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-12. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-13. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-14. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-15. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047, 048 und 049)
-16. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 050)
+1. 042 Action Cancellation And Fast-Fail WiFi
+2. 019 Configurable WiFi List Sorting
+3. 021 HTTP/HTTPS Device Actions
+4. 022 Request Body And Content-Type Support
+5. 031 Import Enforces Unique WiFi Profile Names
+6. 032 Room Schema And Migration Test Coverage
+7. 037 GitHub Release Update Support
+8. 041 Dashboard Drag And Drop
+9. 024 Authenticated Import Sources Backlog
+10. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+11. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+12. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+13. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+14. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047, 048 und 049)
+15. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 050)

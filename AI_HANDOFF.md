@@ -4,6 +4,24 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 040 „Import/Export Password Handling“ ist veröffentlicht und abgeschlossen.
+
+- GitHub-Issue: #106
+- Pull Request: #107
+- Merge-Commit: `a98d2fe`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 042
+  „Action Cancellation And Fast-Fail WiFi“.
+- Der Backup-Export enthält Passwörter ausschließlich nach expliziter Aktivierung
+  des standardmäßig deaktivierten Schalters. Ohne diese Aktivierung werden keine
+  Passwortfelder serialisiert.
+- Ein einzelner Importdialog führt durch Quelle, Importoptionen und eine
+  dynamische Zusammenfassung. Passwortfelder werden standardmäßig ignoriert;
+  die aktivierbare Übernahme zeigt ihre Auswirkungen einschließlich leerer
+  Löschanweisungen vor dem Import. Die Zusammenfassung wird beim Wechsel des
+  Importmodus ohne erneutes Einlesen aktualisiert.
+- Der Benutzer hat Build, Unit-Tests und die manuellen Import-/Export- und
+  Dialogszenarien erfolgreich bestätigt.
+
 Issue 034 „Collapsible Action Details Panel“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #104
