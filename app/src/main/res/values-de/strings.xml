@@ -20,6 +20,7 @@
     <string name="about_switchwerk">Über SwitchWerk</string>
     <string name="about_description">SwitchWerk steuert kompatible Geräte im lokalen Netzwerk, auch wenn sie sonst nicht über ein WLAN-Netzwerk oder das Internet erreichbar sind. Dazu verbindet sich die App direkt mit dem Access Point des zu steuernden Geräts. Die Konfiguration bleibt auf diesem Gerät.</string>
     <string name="version_value">Version %1$s</string>
+    <string name="release_date">Veröffentlicht am 23. Juni 2026</string>
     <string name="open_github_project">GitHub-Projekt öffnen</string>
 
     <string name="settings_tab_wifi_profiles">WLAN-Profile</string>

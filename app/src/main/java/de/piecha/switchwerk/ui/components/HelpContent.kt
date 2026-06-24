@@ -66,9 +66,9 @@ fun AboutContent(versionName: String, modifier: Modifier = Modifier) {
                     contentScale = ContentScale.Fit
                 )
             }
-            Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.about_description))
             Text(stringResource(R.string.version_value, versionName))
+            Text(stringResource(R.string.release_date))
             Text(stringResource(R.string.about_author))
             Text(stringResource(R.string.about_license))
             StandardActionButton(

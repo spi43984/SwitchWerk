@@ -25,6 +25,8 @@ Das offene Hamburger-Menü und das About-Menü sollen die aktuelle App-Version u
 ### About-Menü
 
 - Im About-Menü unterhalb der Version zusätzlich das Datum der Release-Version anzeigen.
+- Die redundante Bezeichnung „Über SwitchWerk“ unterhalb des About-Icons entfällt;
+  die Seitenüberschrift bleibt maßgeblich.
 - Darstellung in Light Mode und Dark Mode prüfen.
 - Das bestehende About-Icon weiterverwenden.
 

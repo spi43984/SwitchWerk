@@ -2,13 +2,18 @@ package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
@@ -26,6 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -42,6 +50,10 @@ fun AppMenuLayout(
     content: @Composable (openMenu: () -> Unit) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val versionName = remember(context) {
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         content { isExpanded = true }
@@ -93,6 +105,41 @@ fun AppMenuLayout(
                                 onOpenAbout()
                             }
                         )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.version_value, versionName),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.End,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = stringResource(R.string.release_date),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.End,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Image(
+                                    painter = painterResource(R.drawable.about_logo),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(988f / 1050f),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -114,7 +161,10 @@ fun AppOverflowMenu(onClick: () -> Unit) {
 private fun MenuItem(text: String, onClick: () -> Unit) {
     TextButton(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(36.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
     ) {
         Text(
             text = text,
