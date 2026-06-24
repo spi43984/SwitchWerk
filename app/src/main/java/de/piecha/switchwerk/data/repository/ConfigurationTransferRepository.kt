@@ -21,10 +21,12 @@ data class ConfigurationImportSummary(
 
 data class PreparedConfigurationImport(
     val document: ConfigurationDocument,
-    val summary: ConfigurationImportSummary
+    val summary: ConfigurationImportSummary,
+    val summariesByMode: Map<ConfigurationImportMode, ConfigurationImportSummary> = emptyMap()
 ) {
-    val containsPasswordChanges: Boolean
-        get() = summary.passwordsIncluded > 0 || summary.passwordsDeleted > 0
+    fun summaryFor(mode: ConfigurationImportMode): ConfigurationImportSummary {
+        return summariesByMode[mode] ?: summary
+    }
 }
 
 interface ConfigurationTransferRepository {
@@ -42,6 +44,7 @@ interface ConfigurationTransferRepository {
 
     suspend fun applyImport(
         preparedImport: PreparedConfigurationImport,
-        mode: ConfigurationImportMode
+        mode: ConfigurationImportMode,
+        includePasswords: Boolean
     )
 }

@@ -21,6 +21,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -38,11 +40,20 @@ fun StandardConfigurationDialog(
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
+    scrollToBottom: Boolean = false,
     cancelText: String? = null,
     @StringRes infoTitleResourceId: Int? = null,
     @StringRes infoMessageResourceId: Int? = null,
     content: @Composable () -> Unit
 ) {
+    val scrollState = rememberScrollState()
+    LaunchedEffect(scrollToBottom) {
+        if (scrollToBottom) {
+            withFrameNanos { }
+            withFrameNanos { }
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+    }
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -78,7 +89,7 @@ fun StandardConfigurationDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f, fill = false)
-                            .verticalScroll(rememberScrollState()),
+                            .verticalScroll(scrollState),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         content()

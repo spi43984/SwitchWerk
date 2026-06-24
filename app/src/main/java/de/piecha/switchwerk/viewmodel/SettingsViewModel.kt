@@ -79,7 +79,6 @@ data class SettingsUiState(
     val isTransferInProgress: Boolean = false,
     val importSummary: ConfigurationImportSummary? = null,
     val importMode: ConfigurationImportMode? = null,
-    val showImportPasswordWarning: Boolean = false,
     val appSettings: AppSettings = AppSettings()
 )
 
@@ -413,28 +412,23 @@ class SettingsViewModel(
         )
     }
 
-    fun confirmImportSummary() {
+    fun updateImportMode(mode: ConfigurationImportMode) {
         val prepared = pendingImport ?: return
-        if (prepared.containsPasswordChanges) {
-            _uiState.value = _uiState.value.copy(
-                importSummary = null,
-                showImportPasswordWarning = true
-            )
-        } else {
-            applyPendingImport()
-        }
+        _uiState.value = _uiState.value.copy(
+            importMode = mode,
+            importSummary = prepared.summaryFor(mode)
+        )
     }
 
-    fun confirmPasswordImport() {
-        applyPendingImport()
+    fun confirmImport(includePasswords: Boolean) {
+        applyPendingImport(includePasswords)
     }
 
     fun cancelPendingImport() {
         pendingImport = null
         _uiState.value = _uiState.value.copy(
             importSummary = null,
-            importMode = null,
-            showImportPasswordWarning = false
+            importMode = null
         )
     }
 
@@ -737,6 +731,7 @@ class SettingsViewModel(
         }
         _uiState.value = _uiState.value.copy(
             isTransferInProgress = true,
+            importSummary = null,
             errorMessage = null,
             statusMessage = null
         )
@@ -760,14 +755,13 @@ class SettingsViewModel(
         }
     }
 
-    private fun applyPendingImport() {
+    private fun applyPendingImport(includePasswords: Boolean) {
         val prepared = pendingImport ?: return
         val mode = _uiState.value.importMode ?: return
         pendingImport = null
         _uiState.value = _uiState.value.copy(
             isTransferInProgress = true,
             importSummary = null,
-            showImportPasswordWarning = false,
             errorMessage = null,
             statusMessage = null
         )
@@ -775,7 +769,8 @@ class SettingsViewModel(
             runCatching {
                 configurationTransferRepository.applyImport(
                     preparedImport = prepared,
-                    mode = mode
+                    mode = mode,
+                    includePasswords = includePasswords
                 )
             }.onSuccess {
                 _uiState.value = _uiState.value.copy(

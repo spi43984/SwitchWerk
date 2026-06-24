@@ -12,6 +12,7 @@ import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
+import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
@@ -90,6 +91,75 @@ class SettingsViewModelTest {
             R.string.error_invalid_qr_url,
             (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
         )
+    }
+
+    @Test
+    fun passwordImportCanExcludePasswords() = runTest(dispatcher) {
+        val transferRepository = FakeConfigurationTransferRepository(
+            preparedDocument = passwordConfigurationDocument()
+        )
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
+        runCurrent()
+        viewModel.confirmImport(includePasswords = false)
+        runCurrent()
+
+        assertEquals(false, transferRepository.lastIncludePasswords)
+    }
+
+    @Test
+    fun passwordImportCanIncludePasswords() = runTest(dispatcher) {
+        val transferRepository = FakeConfigurationTransferRepository(
+            preparedDocument = passwordConfigurationDocument()
+        )
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
+        runCurrent()
+        viewModel.confirmImport(includePasswords = true)
+        runCurrent()
+
+        assertEquals(true, transferRepository.lastIncludePasswords)
+    }
+
+    @Test
+    fun cancellingPreparedImportDoesNotApplyChanges() = runTest(dispatcher) {
+        val transferRepository = FakeConfigurationTransferRepository(
+            preparedDocument = passwordConfigurationDocument()
+        )
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
+        runCurrent()
+        viewModel.cancelPendingImport()
+        runCurrent()
+
+        assertEquals(null, transferRepository.lastIncludePasswords)
+        assertEquals(null, viewModel.uiState.value.importSummary)
+    }
+
+    @Test
+    fun changingImportModeUpdatesPreparedImportSummary() = runTest(dispatcher) {
+        val mergeSummary = importSummary(wifiProfilesNew = 1, localWifiProfilesDeleted = 0)
+        val replaceSummary = importSummary(wifiProfilesNew = 2, localWifiProfilesDeleted = 3)
+        val transferRepository = FakeConfigurationTransferRepository(
+            summariesByMode = mapOf(
+                ConfigurationImportMode.MERGE to mergeSummary,
+                ConfigurationImportMode.REPLACE to replaceSummary
+            )
+        )
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
+        runCurrent()
+        viewModel.updateImportMode(ConfigurationImportMode.REPLACE)
+
+        assertEquals(replaceSummary, viewModel.uiState.value.importSummary)
     }
 
     @Test
@@ -411,9 +481,17 @@ class SettingsViewModelTest {
         override suspend fun deleteDevice(deviceId: String) = Unit
     }
 
-    private class FakeConfigurationTransferRepository : ConfigurationTransferRepository {
+    private class FakeConfigurationTransferRepository(
+        private val preparedDocument: ConfigurationDocument = ConfigurationDocument(
+            schemaVersion = CONFIGURATION_SCHEMA_VERSION,
+            wifiProfiles = emptyList(),
+            devices = emptyList()
+        ),
+        private val summariesByMode: Map<ConfigurationImportMode, ConfigurationImportSummary> = emptyMap()
+    ) : ConfigurationTransferRepository {
         var lastUrl: String? = null
         var lastMode: ConfigurationImportMode? = null
+        var lastIncludePasswords: Boolean? = null
 
         override suspend fun exportToUri(uri: Uri, includePasswords: Boolean) = Unit
 
@@ -433,17 +511,16 @@ class SettingsViewModelTest {
 
         override suspend fun applyImport(
             preparedImport: PreparedConfigurationImport,
-            mode: ConfigurationImportMode
-        ) = Unit
+            mode: ConfigurationImportMode,
+            includePasswords: Boolean
+        ) {
+            lastIncludePasswords = includePasswords
+        }
 
         private fun preparedImport(): PreparedConfigurationImport {
             return PreparedConfigurationImport(
-                document = ConfigurationDocument(
-                    schemaVersion = CONFIGURATION_SCHEMA_VERSION,
-                    wifiProfiles = emptyList(),
-                    devices = emptyList()
-                ),
-                summary = ConfigurationImportSummary(
+                document = preparedDocument,
+                summary = summariesByMode[ConfigurationImportMode.MERGE] ?: ConfigurationImportSummary(
                     wifiProfilesNew = 0,
                     wifiProfilesOverwritten = 0,
                     devicesNew = 0,
@@ -452,8 +529,42 @@ class SettingsViewModelTest {
                     passwordsDeleted = 0,
                     localWifiProfilesDeleted = 0,
                     localDevicesDeleted = 0
-                )
+                ),
+                summariesByMode = summariesByMode
             )
         }
+    }
+
+    private fun importSummary(
+        wifiProfilesNew: Int = 0,
+        localWifiProfilesDeleted: Int = 0
+    ): ConfigurationImportSummary {
+        return ConfigurationImportSummary(
+            wifiProfilesNew = wifiProfilesNew,
+            wifiProfilesOverwritten = 0,
+            devicesNew = 0,
+            devicesOverwritten = 0,
+            passwordsIncluded = 0,
+            passwordsDeleted = 0,
+            localWifiProfilesDeleted = localWifiProfilesDeleted,
+            localDevicesDeleted = 0
+        )
+    }
+
+    private fun passwordConfigurationDocument(): ConfigurationDocument {
+        return ConfigurationDocument(
+            schemaVersion = CONFIGURATION_SCHEMA_VERSION,
+            wifiProfiles = listOf(
+                ConfigurationWifiProfile(
+                    id = "wifi-1",
+                    name = "Home",
+                    ssid = "Home",
+                    securityType = "WPA2_PSK",
+                    password = "secret",
+                    isPasswordPresent = true
+                )
+            ),
+            devices = emptyList()
+        )
     }
 }
