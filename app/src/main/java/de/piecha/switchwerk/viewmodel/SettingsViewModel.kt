@@ -23,6 +23,8 @@ import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import de.piecha.switchwerk.ui.StringProvider
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
@@ -121,6 +123,13 @@ class SettingsViewModel(
 
     fun setDiagnosticsNewestFirst(diagnosticsNewestFirst: Boolean) {
         appSettingsRepository.setDiagnosticsNewestFirst(diagnosticsNewestFirst)
+    }
+
+    fun setWifiProfileSorting(
+        criterion: WifiProfileSortCriterion,
+        direction: WifiProfileSortDirection
+    ) {
+        appSettingsRepository.setWifiProfileSorting(criterion, direction)
     }
 
     fun startNewWifiProfile() {
@@ -704,7 +713,11 @@ class SettingsViewModel(
             wifiProfileRepository.observeWifiProfiles().collect { profiles ->
                 val current = _uiState.value
                 _uiState.value = current.copy(
-                    wifiProfiles = profiles,
+                    wifiProfiles = sortWifiProfiles(
+                        profiles,
+                        current.appSettings.wifiProfileSortCriterion,
+                        current.appSettings.wifiProfileSortDirection
+                    ),
                     deviceForm = current.deviceForm.copy(
                         connections = current.deviceForm.connections.mapNotNull { connection ->
                             val profile = profiles.firstOrNull { it.id == connection.wifiProfileId }
@@ -821,7 +834,10 @@ class SettingsViewModel(
         viewModelScope.launch {
             deviceRepository.observeDevices().collect { devices ->
                 _uiState.value = _uiState.value.copy(
-                    devices = devices.sortedBy { it.sortOrder },
+                    devices = devices.sortedWith(
+                        compareBy<Device, String>(String.CASE_INSENSITIVE_ORDER) { it.name }
+                            .thenBy { it.id }
+                    ),
                     errorMessage = null
                 )
             }
@@ -831,9 +847,36 @@ class SettingsViewModel(
     private fun observeAppSettings() {
         viewModelScope.launch {
             appSettingsRepository.settings.collect { settings ->
-                _uiState.value = _uiState.value.copy(appSettings = settings)
+                _uiState.value = _uiState.value.copy(
+                    appSettings = settings,
+                    wifiProfiles = sortWifiProfiles(
+                        _uiState.value.wifiProfiles,
+                        settings.wifiProfileSortCriterion,
+                        settings.wifiProfileSortDirection
+                    )
+                )
             }
         }
+    }
+
+    private fun sortWifiProfiles(
+        profiles: List<WifiProfile>,
+        criterion: WifiProfileSortCriterion,
+        direction: WifiProfileSortDirection
+    ): List<WifiProfile> {
+        val valueComparator = String.CASE_INSENSITIVE_ORDER
+        val primaryComparator = compareBy<WifiProfile, String>(valueComparator) {
+                when (criterion) {
+                    WifiProfileSortCriterion.PROFILE_NAME -> it.name
+                    WifiProfileSortCriterion.SSID -> it.ssid
+                }
+            }
+        val comparator = if (direction == WifiProfileSortDirection.DESCENDING) {
+            primaryComparator.reversed()
+        } else {
+            primaryComparator
+        }
+        return profiles.sortedWith(comparator.thenBy { it.id })
     }
 
     private fun updateDeviceForm(update: (DeviceFormState) -> DeviceFormState) {

@@ -40,7 +40,7 @@ es verändert die Priorisierungslogik nicht.
 | 016 | -- | abgeschlossen | Edit Items By Name Click |
 | 017 | -- | abgeschlossen | Unique WiFi Profile Name |
 | 018 | -- | abgeschlossen | Adaptive WiFi Security Fallback |
-| 019 | P2 | offen | Configurable WiFi List Sorting |
+| 019 | P2 | abgeschlossen | Configurable WiFi List Sorting |
 | 020 | P1 | abgeschlossen | Device Assigned WiFi Order |
 | 021 | P2 | offen | HTTP/HTTPS Device Actions |
 | 022 | P2 | offen | Request Body And Content-Type Support |
@@ -79,16 +79,15 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 019 Configurable WiFi List Sorting
-2. 021 HTTP/HTTPS Device Actions
-3. 022 Request Body And Content-Type Support
-4. 031 Import Enforces Unique WiFi Profile Names
-5. 032 Room Schema And Migration Test Coverage
-6. 037 GitHub Release Update Support
-7. 041 Dashboard Drag And Drop
-8. 024 Authenticated Import Sources Backlog
-9. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-10. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-11. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-12. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-13. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 050)
+1. 021 HTTP/HTTPS Device Actions
+2. 022 Request Body And Content-Type Support
+3. 031 Import Enforces Unique WiFi Profile Names
+4. 032 Room Schema And Migration Test Coverage
+5. 037 GitHub Release Update Support
+6. 041 Dashboard Drag And Drop
+7. 024 Authenticated Import Sources Backlog
+8. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+9. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+10. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+11. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+12. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 050)

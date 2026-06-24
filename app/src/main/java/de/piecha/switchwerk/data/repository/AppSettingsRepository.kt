@@ -6,6 +6,8 @@ import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import kotlinx.coroutines.flow.StateFlow
 
 interface AppSettingsRepository {
@@ -22,6 +24,11 @@ interface AppSettingsRepository {
     fun setDiagnosticsNewestFirst(diagnosticsNewestFirst: Boolean)
 
     fun setDashboardLayoutMode(dashboardLayoutMode: DashboardLayoutMode)
+
+    fun setWifiProfileSorting(
+        criterion: WifiProfileSortCriterion,
+        direction: WifiProfileSortDirection
+    )
 }
 
 class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepository {
@@ -66,6 +73,20 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         )
     }
 
+    override fun setWifiProfileSorting(
+        criterion: WifiProfileSortCriterion,
+        direction: WifiProfileSortDirection
+    ) {
+        preferences.edit()
+            .putString(KEY_WIFI_PROFILE_SORT_CRITERION, criterion.name)
+            .putString(KEY_WIFI_PROFILE_SORT_DIRECTION, direction.name)
+            .apply()
+        mutableSettings.value = mutableSettings.value.copy(
+            wifiProfileSortCriterion = criterion,
+            wifiProfileSortDirection = direction
+        )
+    }
+
     private fun loadSettings(): AppSettings {
         return AppSettings(
             themeMode = preferences.getEnum(KEY_THEME_MODE, AppThemeMode.SYSTEM),
@@ -82,6 +103,14 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
             dashboardLayoutMode = preferences.getEnum(
                 KEY_DASHBOARD_LAYOUT_MODE,
                 DashboardLayoutMode.LIST
+            ),
+            wifiProfileSortCriterion = preferences.getEnum(
+                KEY_WIFI_PROFILE_SORT_CRITERION,
+                WifiProfileSortCriterion.PROFILE_NAME
+            ),
+            wifiProfileSortDirection = preferences.getEnum(
+                KEY_WIFI_PROFILE_SORT_DIRECTION,
+                WifiProfileSortDirection.ASCENDING
             )
         )
     }
@@ -102,5 +131,7 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         const val KEY_DETAIL_PANEL_HEIGHT = "detail_panel_height"
         const val KEY_DIAGNOSTICS_NEWEST_FIRST = "diagnostics_newest_first"
         const val KEY_DASHBOARD_LAYOUT_MODE = "dashboard_layout_mode"
+        const val KEY_WIFI_PROFILE_SORT_CRITERION = "wifi_profile_sort_criterion"
+        const val KEY_WIFI_PROFILE_SORT_DIRECTION = "wifi_profile_sort_direction"
     }
 }
