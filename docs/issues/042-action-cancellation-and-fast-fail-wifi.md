@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: WLAN / UX / Geräteaktion
 - Bereich: Dashboard / WLAN-Verbindung / HTTP-RPC-Aufruf
@@ -132,20 +132,38 @@ Aktion durch Benutzer abgebrochen
 
 ## Akzeptanzkriterien
 
-- [ ] Benutzer kann laufende Geräteaktionen abbrechen.
-- [ ] Dashboard zeigt während laufender Aktion Spinner oder gleichwertigen Ladezustand.
-- [ ] Dashboard zeigt während laufender Aktion eine klare Abbrechen-Aktion.
-- [ ] Abbruch beendet nur den aktuellen Schaltvorgang.
-- [ ] Abbruch ändert keine WLAN-Reihenfolge.
-- [ ] Abbruch löscht keine Konfiguration.
-- [ ] Nach Abbruch bleiben keine hängenden NetworkCallbacks zurück.
-- [ ] Nach Abbruch bleiben keine hängenden HTTP/RPC-Aufrufe zurück.
-- [ ] WLAN-Reihenfolge bleibt unverändert.
-- [ ] Alle zugeordneten WLANs bleiben grundsätzlich nutzbar.
-- [ ] Fast-Fail reduziert unnötige Wartezeiten.
-- [ ] Nicht sichtbare SSIDs werden nur vorsichtig behandelt und nicht dauerhaft ausgeschlossen.
-- [ ] Bestehende fachliche Schaltlogik bleibt unverändert.
-- [ ] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+- [x] Benutzer kann laufende Geräteaktionen abbrechen.
+- [x] Dashboard zeigt während laufender Aktion Spinner oder gleichwertigen Ladezustand.
+- [x] Dashboard zeigt während laufender Aktion eine klare Abbrechen-Aktion.
+- [x] Abbruch beendet nur den aktuellen Schaltvorgang.
+- [x] Abbruch ändert keine WLAN-Reihenfolge.
+- [x] Abbruch löscht keine Konfiguration.
+- [x] Nach Abbruch bleiben keine hängenden NetworkCallbacks zurück.
+- [x] Nach Abbruch bleiben keine hängenden HTTP/RPC-Aufrufe zurück.
+- [x] WLAN-Reihenfolge bleibt unverändert.
+- [x] Alle zugeordneten WLANs bleiben grundsätzlich nutzbar.
+- [x] Fast-Fail reduziert unnötige Wartezeiten.
+- [x] Nicht sichtbare SSIDs werden nur vorsichtig behandelt und nicht dauerhaft ausgeschlossen.
+- [x] Bestehende fachliche Schaltlogik bleibt unverändert.
+- [x] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+
+## Abschluss
+
+- GitHub-Issue: #108
+- Pull Request: #109
+- Merge-Commit: `48e6f73`
+- Während einer laufenden Aktion zeigt die vollständige Geräte-Kachel einen
+  Spinner links unten und ein X rechts unten. Die Kachel wird beim Start und
+  nach dem Öffnen der Aktionsdetails erneut ins Sichtfeld gescrollt.
+- Ein Abbruch betrifft nur die Aktion des ausgewählten Geräts, zeigt eine
+  Rückmeldung sowie einen Diagnoseeintrag und gibt WLAN-Callbacks, HTTP/RPC-
+  Aufrufe und die DNS-Auflösung frei. Ein Android-DNS-Resolver, der einen
+  Thread-Interrupt ignoriert, verzögert den UI-Abbruch nicht mehr.
+- Die WLAN-Fallback-Reihenfolge und die Menge möglicher Profile bleiben
+  unverändert. WLAN deaktiviert sowie Android-`Unavailable`- und
+  Security-Fehler werden ohne zusätzliche Wartezeit behandelt.
+- Der Benutzer hat `lintDebug`, `testDebugUnitTest`, `clean assembleDebug`,
+  `installDebug` und die manuellen Abbruchtests erfolgreich bestätigt.
 
 ## Testhinweise
 

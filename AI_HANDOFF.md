@@ -1,8 +1,26 @@
 # AI Handoff
 
-Stand: 22. Juni 2026
+Stand: 24. Juni 2026
 
 ## Aktuelle Arbeit
+
+Issue 042 „Action Cancellation And Fast-Fail WiFi“ ist veröffentlicht und
+abgeschlossen.
+
+- GitHub-Issue: #108
+- Pull Request: #109
+- Merge-Commit: `48e6f73`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 054
+  „App Icon Replacement“.
+- Laufende Geräteaktionen sind pro Gerät abbrechbar. Die aktive Kachel wird
+  bei Start sowie beim Öffnen der Aktionsdetails ins Sichtfeld gescrollt und
+  zeigt Spinner links unten sowie ein X rechts unten. Der Abbruch zeigt eine
+  lokale Rückmeldung und einen Diagnoseeintrag.
+- Coroutine-Cancellation gibt aktive WLAN-Callbacks und HTTP/RPC-Aufrufe frei.
+  DNS-Cancellation bleibt für die UI sofort wirksam, auch wenn ein Android-
+  Resolver seinen Thread-Interrupt bis zum eigenen Timeout ignoriert.
+- Der Benutzer hat `lintDebug`, `testDebugUnitTest`, `clean assembleDebug`,
+  `installDebug` sowie die manuellen Abbruchszenarien erfolgreich bestätigt.
 
 Issue 040 „Import/Export Password Handling“ ist veröffentlicht und abgeschlossen.
 
