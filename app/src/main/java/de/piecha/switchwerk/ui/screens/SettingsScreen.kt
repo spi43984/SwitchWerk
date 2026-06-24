@@ -1,6 +1,8 @@
 package de.piecha.switchwerk.ui.screens
 
 import android.Manifest
+import android.content.Intent
+import android.provider.Settings
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -66,6 +68,7 @@ import com.journeyapps.barcodescanner.ScanOptions
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
@@ -409,12 +412,19 @@ fun SettingsScreen(
             ssid = uiState.form.ssid,
             password = uiState.form.password,
             isPasswordVisible = uiState.form.isPasswordVisible,
+            connectionMode = uiState.form.connectionMode,
+            visibleSsids = uiState.form.visibleSsids,
             errorMessage = uiState.errorMessage,
             onNameChange = viewModel::updateWifiProfileName,
             onSsidChange = viewModel::updateWifiProfileSsid,
             onPasswordChange = viewModel::updateWifiProfilePassword,
             onClearPasswordClick = viewModel::clearWifiProfilePassword,
             onTogglePasswordVisibility = viewModel::toggleWifiPasswordVisibility,
+            onConnectionModeChange = viewModel::updateWifiConnectionMode,
+            onLoadVisibleSsids = viewModel::loadVisibleSsids,
+            onOpenAndroidWifiSettings = {
+                context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            },
             onSaveClick = viewModel::saveWifiProfile,
             onCancelClick = viewModel::cancelWifiProfileEdit
         )
@@ -868,12 +878,17 @@ private fun WifiProfileDialog(
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
+    connectionMode: WifiConnectionMode,
+    visibleSsids: List<String>,
     errorMessage: UiText?,
     onNameChange: (String) -> Unit,
     onSsidChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onClearPasswordClick: () -> Unit,
     onTogglePasswordVisibility: () -> Unit,
+    onConnectionModeChange: (WifiConnectionMode) -> Unit,
+    onLoadVisibleSsids: () -> Unit,
+    onOpenAndroidWifiSettings: () -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
@@ -892,12 +907,17 @@ private fun WifiProfileDialog(
             ssid = ssid,
             password = password,
             isPasswordVisible = isPasswordVisible,
+            connectionMode = connectionMode,
+            visibleSsids = visibleSsids,
             errorMessage = errorMessage,
             onNameChange = onNameChange,
             onSsidChange = onSsidChange,
             onPasswordChange = onPasswordChange,
             onClearPasswordClick = onClearPasswordClick,
-            onTogglePasswordVisibility = onTogglePasswordVisibility
+            onTogglePasswordVisibility = onTogglePasswordVisibility,
+            onConnectionModeChange = onConnectionModeChange,
+            onLoadVisibleSsids = onLoadVisibleSsids,
+            onOpenAndroidWifiSettings = onOpenAndroidWifiSettings
         )
     }
 }
@@ -908,12 +928,17 @@ private fun WifiProfileForm(
     ssid: String,
     password: String,
     isPasswordVisible: Boolean,
+    connectionMode: WifiConnectionMode,
+    visibleSsids: List<String>,
     errorMessage: UiText?,
     onNameChange: (String) -> Unit,
     onSsidChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onClearPasswordClick: () -> Unit,
     onTogglePasswordVisibility: () -> Unit,
+    onConnectionModeChange: (WifiConnectionMode) -> Unit,
+    onLoadVisibleSsids: () -> Unit,
+    onOpenAndroidWifiSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -936,6 +961,37 @@ private fun WifiProfileForm(
             modifier = Modifier.fillMaxWidth()
         )
 
+        WifiConnectionMode.entries.forEach { mode ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = connectionMode == mode,
+                    onClick = { onConnectionModeChange(mode) }
+                )
+                Text(
+                    text = stringResource(
+                        if (mode == WifiConnectionMode.SWITCHWERK_MANAGED) {
+                            R.string.wifi_connection_mode_switchwerk_managed
+                        } else {
+                            R.string.wifi_connection_mode_android_managed
+                        }
+                    )
+                )
+            }
+        }
+
+        StandardActionButton(
+            text = stringResource(R.string.select_visible_wifi_ssid),
+            onClick = onLoadVisibleSsids,
+            modifier = Modifier.fillMaxWidth()
+        )
+        visibleSsids.forEach { visibleSsid ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = ssid == visibleSsid, onClick = { onSsidChange(visibleSsid) })
+                Text(visibleSsid)
+            }
+        }
+
+        if (connectionMode == WifiConnectionMode.SWITCHWERK_MANAGED) {
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
@@ -977,6 +1033,17 @@ private fun WifiProfileForm(
             onClick = onClearPasswordClick,
             modifier = Modifier.fillMaxWidth()
         )
+        } else {
+            Text(
+                text = stringResource(R.string.android_managed_wifi_info),
+                style = MaterialTheme.typography.bodySmall
+            )
+            StandardActionButton(
+                text = stringResource(R.string.open_android_wifi_settings),
+                onClick = onOpenAndroidWifiSettings,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
         OutlinedTextField(
             value = name,

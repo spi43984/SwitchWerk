@@ -7,6 +7,8 @@ sealed interface DeviceActionResult {
 
     data object WifiConnectionFailed : DeviceActionResult
 
+    data class AndroidManagedWifiNotActive(val ssid: String) : DeviceActionResult
+
     data object WifiPermissionDenied : DeviceActionResult
 
     data object WifiDisabled : DeviceActionResult

@@ -2,9 +2,11 @@ package de.piecha.switchwerk
 
 import android.graphics.Color
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -20,7 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.ui.screens.SettingsScreen
 import de.piecha.switchwerk.ui.screens.SettingsSection
 import de.piecha.switchwerk.ui.screens.SettingsScreenUiState
@@ -31,6 +38,7 @@ import de.piecha.switchwerk.ui.theme.SwitchWerkTheme
 import de.piecha.switchwerk.ui.AppLocaleController
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.viewmodel.MainViewModel
+import de.piecha.switchwerk.viewmodel.MainUiEvent
 import org.koin.android.ext.android.inject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -212,6 +220,16 @@ private fun SwitchWerkAppContent(
     var selectedSettingsSection by remember {
         mutableStateOf(initialSettingsSection)
     }
+    var pendingAndroidWifiSsid by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+
+    LaunchedEffect(mainViewModel) {
+        mainViewModel.events.collect { event ->
+            if (event is MainUiEvent.ConfirmOpenAndroidWifiSettings) {
+                pendingAndroidWifiSsid = event.ssid
+            }
+        }
+    }
 
     SideEffect {
         onNavigationStateChanged(currentScreen, helpReturnScreen, selectedSettingsSection)
@@ -250,6 +268,27 @@ private fun SwitchWerkAppContent(
 
         AppScreen.About -> AboutScreen(
             onNavigateBack = { currentScreen = AppScreen.Dashboard }
+        )
+    }
+
+    pendingAndroidWifiSsid?.let { ssid ->
+        AlertDialog(
+            onDismissRequest = { pendingAndroidWifiSsid = null },
+            title = { Text(stringResource(R.string.android_managed_wifi_switch_title)) },
+            text = { Text(stringResource(R.string.android_managed_wifi_switch_message, ssid)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    pendingAndroidWifiSsid = null
+                    context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                }) {
+                    Text(stringResource(R.string.open_android_wifi_settings))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingAndroidWifiSsid = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
         )
     }
 }

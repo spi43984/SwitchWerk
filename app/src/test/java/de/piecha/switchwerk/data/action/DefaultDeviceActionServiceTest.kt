@@ -14,6 +14,7 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 import java.net.ConnectException
 import java.net.SocketException
@@ -31,6 +32,54 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 
 class DefaultDeviceActionServiceTest {
+
+    @Test
+    fun androidManagedWifiUsesActiveNetworkWithoutRequestingWifi() = runBlocking {
+        val activeNetwork = mock(Network::class.java)
+        val wifiService = FakeWifiConnectionService(activeNetwork = activeNetwork)
+        val httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+        val service = createService(
+            profiles = listOf(
+                WifiProfile(
+                    id = "wifi-1",
+                    ssid = "Office",
+                    connectionMode = WifiConnectionMode.ANDROID_MANAGED
+                )
+            ),
+            wifiService = wifiService,
+            httpService = httpService
+        )
+
+        assertEquals(
+            DeviceActionResult.Success,
+            service.execute(device(connections = listOf(DeviceConnection("wifi-1", "192.168.1.10"))))
+        )
+        assertTrue(wifiService.requestedSsids.isEmpty())
+        assertEquals(0, wifiService.disconnectCount)
+        assertSame(activeNetwork, httpService.calls.single().network)
+    }
+
+    @Test
+    fun androidManagedWifiReportsInactiveTargetWithoutRequestingWifi() = runBlocking {
+        val wifiService = FakeWifiConnectionService()
+        val service = createService(
+            profiles = listOf(
+                WifiProfile(
+                    id = "wifi-1",
+                    ssid = "Office",
+                    connectionMode = WifiConnectionMode.ANDROID_MANAGED
+                )
+            ),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(ArrayDeque())
+        )
+
+        assertEquals(
+            DeviceActionResult.AndroidManagedWifiNotActive("Office"),
+            service.execute(device(connections = listOf(DeviceConnection("wifi-1", "192.168.1.10"))))
+        )
+        assertTrue(wifiService.requestedSsids.isEmpty())
+    }
 
     @Test
     fun actionUsesOnlyExplicitlyRequestedWifiNetwork() = runBlocking {
@@ -106,6 +155,11 @@ class DefaultDeviceActionServiceTest {
         assertEquals(
             listOf(
                 DeviceActionDiagnosticEvent.ActionStarted,
+                DeviceActionDiagnosticEvent.WifiProfileAttempt(
+                    profileName = "Device WiFi",
+                    index = 1,
+                    total = 1
+                ),
                 DeviceActionDiagnosticEvent.WifiRequestStarted("Device WiFi"),
                 DeviceActionDiagnosticEvent.WifiFound,
                 DeviceActionDiagnosticEvent.WifiConnected,
@@ -755,7 +809,8 @@ class DefaultDeviceActionServiceTest {
 
     private class FakeWifiConnectionService(
         private val results: ArrayDeque<WifiConnectionResult> = ArrayDeque(),
-        private val detectedSecurityTypes: Set<WifiSecurityType>? = null
+        private val detectedSecurityTypes: Set<WifiSecurityType>? = null,
+        private val activeNetwork: Network? = null
     ) : WifiConnectionService {
         val requestedSsids = mutableListOf<String>()
         val requestedSecurityTypes = mutableListOf<WifiSecurityType>()
@@ -765,6 +820,8 @@ class DefaultDeviceActionServiceTest {
         override suspend fun detectedSecurityTypes(ssid: String): Set<WifiSecurityType>? {
             return detectedSecurityTypes
         }
+
+        override fun activeWifiNetworkForSsid(ssid: String): Network? = activeNetwork
 
         override suspend fun connect(
             ssid: String,

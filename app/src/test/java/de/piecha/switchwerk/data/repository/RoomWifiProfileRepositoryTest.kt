@@ -5,6 +5,8 @@ import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
 import de.piecha.switchwerk.domain.model.WifiSecurityType
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
+import de.piecha.switchwerk.domain.model.WifiProfile
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -20,6 +22,7 @@ class RoomWifiProfileRepositoryTest {
             id = "wifi-1",
             name = "Device WiFi",
             ssid = "Device WiFi",
+            connectionMode = WifiConnectionMode.SWITCHWERK_MANAGED.name,
             securityType = "WPA3_SAE",
             securityTypeVerifiedLocally = false
         )
@@ -58,6 +61,32 @@ class RoomWifiProfileRepositoryTest {
 
         verify(deviceConnectionDao).deleteForWifiProfile("wifi-1")
         verify(wifiProfileDao).deleteById("wifi-1")
+        verify(credentialStore).deletePassword("wifi-1")
+    }
+
+    @Test
+    fun androidManagedProfileDeletesExistingPasswordWhenSaved() = runBlocking {
+        val wifiProfileDao = mock(WifiProfileDao::class.java)
+        val credentialStore = mock(WifiCredentialStore::class.java)
+        `when`(wifiProfileDao.getAll()).thenReturn(emptyList())
+        `when`(wifiProfileDao.getById("wifi-1")).thenReturn(null)
+        val repository = RoomWifiProfileRepository(
+            wifiProfileDao = wifiProfileDao,
+            deviceConnectionDao = mock(DeviceConnectionDao::class.java),
+            credentialStore = credentialStore
+        )
+
+        repository.saveWifiProfile(
+            profile = WifiProfile(
+                id = "wifi-1",
+                name = "Office",
+                ssid = "Office",
+                connectionMode = WifiConnectionMode.ANDROID_MANAGED
+            ),
+            password = "secret",
+            shouldUpdatePassword = true
+        )
+
         verify(credentialStore).deletePassword("wifi-1")
     }
 }

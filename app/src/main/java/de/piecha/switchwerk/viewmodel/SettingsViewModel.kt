@@ -12,6 +12,7 @@ import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
+import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
@@ -21,6 +22,7 @@ import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.ui.StringProvider
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
@@ -38,7 +40,9 @@ data class WifiProfileFormState(
     val password: String = "",
     val hasSavedPassword: Boolean = false,
     val isPasswordVisible: Boolean = false,
-    val isPasswordChanged: Boolean = false
+    val isPasswordChanged: Boolean = false,
+    val connectionMode: WifiConnectionMode = WifiConnectionMode.SWITCHWERK_MANAGED,
+    val visibleSsids: List<String> = emptyList()
 )
 
 data class DeviceConnectionFormState(
@@ -84,6 +88,7 @@ class SettingsViewModel(
     private val deviceRepository: DeviceRepository,
     private val configurationTransferRepository: ConfigurationTransferRepository,
     private val appSettingsRepository: AppSettingsRepository,
+    private val wifiConnectionService: WifiConnectionService,
     private val stringProvider: StringProvider
 ) : ViewModel() {
 
@@ -133,7 +138,8 @@ class SettingsViewModel(
             form = WifiProfileFormState(
                 id = profile.id,
                 name = profile.name,
-                ssid = profile.ssid
+                ssid = profile.ssid,
+                connectionMode = profile.connectionMode
             ),
             isEditingWifiProfile = true,
             isEditingDevice = false,
@@ -192,6 +198,32 @@ class SettingsViewModel(
             ),
             errorMessage = null
         )
+    }
+
+    fun updateWifiConnectionMode(connectionMode: WifiConnectionMode) {
+        val form = _uiState.value.form
+        _uiState.value = _uiState.value.copy(
+            form = form.copy(
+                connectionMode = connectionMode,
+                password = if (connectionMode == WifiConnectionMode.ANDROID_MANAGED) "" else form.password,
+                hasSavedPassword = if (connectionMode == WifiConnectionMode.ANDROID_MANAGED) false else form.hasSavedPassword,
+                isPasswordVisible = false,
+                isPasswordChanged = form.isPasswordChanged ||
+                    connectionMode == WifiConnectionMode.ANDROID_MANAGED
+            ),
+            errorMessage = null
+        )
+    }
+
+    fun loadVisibleSsids() {
+        viewModelScope.launch {
+            val visibleSsids = runCatching { wifiConnectionService.visibleSsids() }
+                .getOrDefault(emptySet())
+                .sorted()
+            _uiState.value = _uiState.value.copy(
+                form = _uiState.value.form.copy(visibleSsids = visibleSsids)
+            )
+        }
     }
 
     fun clearWifiProfilePassword() {
@@ -268,13 +300,15 @@ class SettingsViewModel(
                     id = form.id ?: UUID.randomUUID().toString(),
                     name = trimmedName,
                     ssid = trimmedSsid,
+                    connectionMode = form.connectionMode,
                     lastSuccessfulSecurityType = existingProfile?.lastSuccessfulSecurityType
                 )
 
                 wifiProfileRepository.saveWifiProfile(
                     profile = profile,
                     password = if (form.isPasswordChanged) form.password.takeIf { it.isNotEmpty() } else null,
-                    shouldUpdatePassword = form.isPasswordChanged
+                    shouldUpdatePassword = form.isPasswordChanged ||
+                        form.connectionMode == WifiConnectionMode.ANDROID_MANAGED
                 )
             }.onSuccess {
                 _uiState.value = _uiState.value.copy(

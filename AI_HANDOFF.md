@@ -4,6 +4,35 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 033 „Android-managed WiFi networks“ ist implementiert, aber noch nicht
+veröffentlicht oder abgeschlossen.
+
+- GitHub-Issue: #101
+- Feature-Branch: `android-managed-wifi-networks`
+- `WifiProfile` besitzt den Verbindungsmodus `SWITCHWERK_MANAGED` oder
+  `ANDROID_MANAGED`; die Room-Migration 5→6 ergänzt das Feld mit dem sicheren
+  Standard `SWITCHWERK_MANAGED`.
+- Android-verwaltete Profile speichern keine Zugangsdaten: Beim Speichern wird
+  ein vorhandenes Passwort aus dem verschlüsselten Store entfernt. Die
+  Einstellungen blenden das Passwortfeld aus, erklären den Android-verwalteten
+  Ablauf, öffnen die Android-WLAN-Einstellungen und übernehmen SSIDs aus
+  sichtbaren Scan-Ergebnissen.
+- Eine Geräteaktion sucht bei Android-verwalteten Profilen unter allen von
+  Android bekannten aktiven WLAN-Netzwerken das WLAN für den HTTP/RPC-Aufruf.
+  Die aktuelle SSID wird dabei über `WifiManager.connectionInfo` ermittelt,
+  nicht über die pro Netzwerk gelieferten `NetworkCapabilities`. Damit bleibt
+  der Aufruf korrekt, wenn Mobilfunk oder ein VPN das Android-Standardnetzwerk
+  ist. Andernfalls wird ohne
+  `WifiNetworkSpecifier`-Anfrage eine verständliche Fehlermeldung
+  zurückgegeben.
+- Ist ein Android-verwaltetes Ziel-WLAN nicht aktiv, öffnet die UI nach der
+  Aktion nach einer Bestätigung die Android-WLAN-Einstellungen. Der Dialog
+  nennt die Ziel-SSID ausschließlich lokal im UI. Die Aktionsdetails enthalten vor
+  jedem Verbindungsversuch die Profilzuordnung und ihre Position in der
+  konfigurierten Reihenfolge, ohne SSIDs zu protokollieren.
+- Noch vor Veröffentlichung: Host-Prüfungen und manuelle Tests bestätigen;
+  danach nur auf ausdrückliche Anforderung committen, pushen oder PR erstellen.
+
 Issue 030 „WiFi Profile Deletion Safety“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #98

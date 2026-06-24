@@ -1,9 +1,14 @@
 package de.piecha.switchwerk.data.network
 
+import android.net.Network
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 
 interface WifiConnectionService {
     suspend fun detectedSecurityTypes(ssid: String): Set<WifiSecurityType>? = null
+
+    suspend fun visibleSsids(): Set<String> = emptySet()
+
+    fun activeWifiNetworkForSsid(ssid: String): Network? = null
 
     suspend fun connect(
         ssid: String,

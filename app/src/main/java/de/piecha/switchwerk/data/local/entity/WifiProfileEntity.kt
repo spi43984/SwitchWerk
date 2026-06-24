@@ -8,6 +8,7 @@ data class WifiProfileEntity(
     @PrimaryKey val id: String,
     val name: String,
     val ssid: String,
+    val connectionMode: String = "SWITCHWERK_MANAGED",
     val securityType: String?,
     val securityTypeVerifiedLocally: Boolean
 )
