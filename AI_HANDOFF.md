@@ -4,11 +4,13 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 033 „Android-managed WiFi networks“ ist implementiert, aber noch nicht
-veröffentlicht oder abgeschlossen.
+Issue 033 „Android-managed WiFi networks“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #101
-- Feature-Branch: `android-managed-wifi-networks`
+- Pull Request: #102
+- Merge-Commit: `f287ed8`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 034
+  „Collapsible Action Details Panel“.
 - `WifiProfile` besitzt den Verbindungsmodus `SWITCHWERK_MANAGED` oder
   `ANDROID_MANAGED`; die Room-Migration 5→6 ergänzt das Feld mit dem sicheren
   Standard `SWITCHWERK_MANAGED`.
@@ -30,8 +32,8 @@ veröffentlicht oder abgeschlossen.
   nennt die Ziel-SSID ausschließlich lokal im UI. Die Aktionsdetails enthalten vor
   jedem Verbindungsversuch die Profilzuordnung und ihre Position in der
   konfigurierten Reihenfolge, ohne SSIDs zu protokollieren.
-- Noch vor Veröffentlichung: Host-Prüfungen und manuelle Tests bestätigen;
-  danach nur auf ausdrückliche Anforderung committen, pushen oder PR erstellen.
+- Der Benutzer hat Build, Installation und manuelle Prüfungen der verbundenen,
+  nicht verbundenen und Android-verwalteten WLAN-Flows erfolgreich bestätigt.
 
 Issue 030 „WiFi Profile Deletion Safety“ ist veröffentlicht und abgeschlossen.
 

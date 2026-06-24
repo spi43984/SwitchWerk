@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: Open
+- Status: Completed
 - Priority: P1
 - Type: Feature
 - Area: WiFi
