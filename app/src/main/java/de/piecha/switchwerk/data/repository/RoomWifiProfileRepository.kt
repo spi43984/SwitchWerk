@@ -5,6 +5,7 @@ import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -54,7 +55,9 @@ class RoomWifiProfileRepository(
             )
         )
 
-        if (shouldUpdatePassword) {
+        if (profile.connectionMode == WifiConnectionMode.ANDROID_MANAGED) {
+            credentialStore.deletePassword(profile.id)
+        } else if (shouldUpdatePassword) {
             if (password == null) {
                 credentialStore.deletePassword(profile.id)
             } else {
@@ -102,6 +105,7 @@ class RoomWifiProfileRepository(
             id = id,
             ssid = ssid,
             name = name,
+            connectionMode = connectionMode.toConnectionMode(),
             lastSuccessfulSecurityType = WifiSecurityType.fromStorageValue(securityType),
             isSecurityTypeVerifiedLocally = securityTypeVerifiedLocally
         )
@@ -115,6 +119,7 @@ class RoomWifiProfileRepository(
             id = id,
             name = name,
             ssid = ssid,
+            connectionMode = connectionMode.name,
             securityType = lastSuccessfulSecurityType?.storageValue ?: existingSecurityType,
             securityTypeVerifiedLocally = if (lastSuccessfulSecurityType != null) {
                 isSecurityTypeVerifiedLocally
@@ -122,5 +127,10 @@ class RoomWifiProfileRepository(
                 existingSecurityTypeVerifiedLocally
             }
         )
+    }
+
+    private fun String.toConnectionMode(): WifiConnectionMode {
+        return runCatching { WifiConnectionMode.valueOf(this) }
+            .getOrDefault(WifiConnectionMode.SWITCHWERK_MANAGED)
     }
 }

@@ -9,6 +9,7 @@ import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
 import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
+import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.domain.model.ApiCall
@@ -20,6 +21,7 @@ import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiSecurityType
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.ui.StringProvider
 import de.piecha.switchwerk.ui.UiText
 import kotlinx.coroutines.Dispatchers
@@ -132,6 +134,26 @@ class SettingsViewModelTest {
         viewModel.updateWifiProfileSsid(" Shelly Garage ")
 
         assertEquals("Shelly Garage (2)", viewModel.uiState.value.form.name)
+    }
+
+    @Test
+    fun androidManagedWifiProfileIsSavedWithoutPassword() = runTest(dispatcher) {
+        val wifiRepository = FakeWifiProfileRepository()
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = wifiRepository
+        )
+        runCurrent()
+
+        viewModel.startNewWifiProfile()
+        viewModel.updateWifiProfileSsid("Office")
+        viewModel.updateWifiConnectionMode(WifiConnectionMode.ANDROID_MANAGED)
+        viewModel.saveWifiProfile()
+        runCurrent()
+
+        assertEquals(WifiConnectionMode.ANDROID_MANAGED, wifiRepository.savedProfiles.single().connectionMode)
+        assertTrue(wifiRepository.lastPasswordUpdate?.shouldUpdatePassword == true)
+        assertEquals(null, wifiRepository.lastPasswordUpdate?.password)
     }
 
     @Test
@@ -296,6 +318,17 @@ class SettingsViewModelTest {
             deviceRepository = deviceRepository,
             configurationTransferRepository = transferRepository,
             appSettingsRepository = appSettingsRepository,
+            wifiConnectionService = object : WifiConnectionService {
+                override suspend fun connect(
+                    ssid: String,
+                    password: String?,
+                    securityType: WifiSecurityType,
+                    timeoutMillis: Long,
+                    onProgress: (de.piecha.switchwerk.data.network.WifiConnectionProgress) -> Unit
+                ) = de.piecha.switchwerk.data.network.WifiConnectionResult.Unavailable
+
+                override fun disconnect() = Unit
+            },
             stringProvider = FakeStringProvider
         )
     }
@@ -324,6 +357,7 @@ class SettingsViewModelTest {
     ) : WifiProfileRepository {
         val savedProfiles = mutableListOf<WifiProfile>()
         val deletedProfileIds = mutableListOf<String>()
+        var lastPasswordUpdate: PasswordUpdate? = null
 
         override fun observeWifiProfiles(): Flow<List<WifiProfile>> = flowOf(profiles)
 
@@ -335,6 +369,7 @@ class SettingsViewModelTest {
             shouldUpdatePassword: Boolean
         ) {
             savedProfiles += profile
+            lastPasswordUpdate = PasswordUpdate(password, shouldUpdatePassword)
         }
 
         override suspend fun getPassword(id: String): String? = null
@@ -352,6 +387,11 @@ class SettingsViewModelTest {
             deletedProfileIds += id
         }
     }
+
+    private data class PasswordUpdate(
+        val password: String?,
+        val shouldUpdatePassword: Boolean
+    )
 
     private class FakeDeviceRepository(
         private val devices: List<Device> = emptyList()

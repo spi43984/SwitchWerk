@@ -60,6 +60,52 @@ class AndroidWifiConnectionService(
     }
 
     @Suppress("DEPRECATION")
+    override suspend fun visibleSsids(): Set<String> {
+        if (!wifiManager.isWifiEnabled) return emptySet()
+        try {
+            wifiManager.startScan()
+        } catch (_: SecurityException) {
+            return emptySet()
+        } catch (_: RuntimeException) {
+            return emptySet()
+        }
+        return try {
+            wifiManager.scanResults
+                .asSequence()
+                .mapNotNull { it.SSID.normalizedSsid() }
+                .toSet()
+        } catch (_: SecurityException) {
+            emptySet()
+        } catch (_: RuntimeException) {
+            emptySet()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun activeWifiNetworkForSsid(ssid: String): Network? {
+        @Suppress("DEPRECATION")
+        val connectedSsid = wifiManager.connectionInfo?.ssid.normalizedSsid()
+        if (connectedSsid != ssid.trim()) {
+            return null
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return connectivityManager.activeNetwork
+        }
+
+        return runCatching {
+            connectivityManager.allNetworks.firstOrNull { network ->
+                val capabilities = connectivityManager.getNetworkCapabilities(network)
+                    ?: return@firstOrNull false
+                if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    return@firstOrNull false
+                }
+                true
+            }
+        }.getOrNull()
+    }
+
+    @Suppress("DEPRECATION")
     private fun readDetectedSecurityTypes(ssid: String): Set<WifiSecurityType>? {
         val matchingResults = try {
             wifiManager.scanResults.filter { result -> result.SSID == ssid }
@@ -342,6 +388,11 @@ class AndroidWifiConnectionService(
         progress: WifiConnectionProgress
     ) {
         runCatching { callback(progress) }
+    }
+
+    private fun String?.normalizedSsid(): String? {
+        return this?.removeSurrounding("\"")?.trim()
+            ?.takeIf { it.isNotEmpty() && it != WifiManager.UNKNOWN_SSID }
     }
 
     internal class NetworkReadiness {

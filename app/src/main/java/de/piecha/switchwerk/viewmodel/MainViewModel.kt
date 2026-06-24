@@ -27,8 +27,11 @@ import java.util.Locale
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 sealed interface DeviceActionUiState {
@@ -37,6 +40,10 @@ sealed interface DeviceActionUiState {
     data class Success(val message: UiText) : DeviceActionUiState
 
     data class Error(val message: UiText) : DeviceActionUiState
+}
+
+sealed interface MainUiEvent {
+    data class ConfirmOpenAndroidWifiSettings(val ssid: String) : MainUiEvent
 }
 
 sealed interface DiagnosticListItem {
@@ -81,6 +88,8 @@ class MainViewModel(
         )
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+    private val _events = MutableSharedFlow<MainUiEvent>()
+    val events: SharedFlow<MainUiEvent> = _events.asSharedFlow()
     private val actionJobs = mutableMapOf<String, Job>()
     private val actionStateResetJobs = mutableMapOf<String, Job>()
     private var wifiProfiles: List<WifiProfile> = emptyList()
@@ -144,6 +153,9 @@ class MainViewModel(
             }
             val resultState = result.toUiState()
             updateDeviceActionState(device.id, resultState)
+            if (result is DeviceActionResult.AndroidManagedWifiNotActive) {
+                _events.emit(MainUiEvent.ConfirmOpenAndroidWifiSettings(result.ssid))
+            }
             when (resultState) {
                 is DeviceActionUiState.Success -> scheduleActionStateReset(
                     deviceId = device.id,
@@ -317,6 +329,9 @@ class MainViewModel(
         return when (this) {
             DeviceActionDiagnosticEvent.ActionStarted ->
                 uiText(R.string.diagnostic_action_started, deviceName)
+            is DeviceActionDiagnosticEvent.WifiProfileAttempt -> {
+                uiText(R.string.diagnostic_wifi_profile_attempt, index, total, profileName)
+            }
             is DeviceActionDiagnosticEvent.WifiRequestStarted -> {
                 uiText(R.string.diagnostic_wifi_request_started, profileName)
             }
@@ -391,6 +406,9 @@ class MainViewModel(
 
             DeviceActionResult.WifiConnectionFailed -> {
                 DeviceActionUiState.Error(uiText(R.string.action_wifi_unreachable))
+            }
+            is DeviceActionResult.AndroidManagedWifiNotActive -> {
+                DeviceActionUiState.Error(uiText(R.string.action_android_managed_wifi_not_active))
             }
 
             DeviceActionResult.WifiPermissionDenied -> {

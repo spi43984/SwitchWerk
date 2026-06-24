@@ -5,6 +5,12 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 sealed interface DeviceActionDiagnosticEvent {
     data object ActionStarted : DeviceActionDiagnosticEvent
 
+    data class WifiProfileAttempt(
+        val profileName: String,
+        val index: Int,
+        val total: Int
+    ) : DeviceActionDiagnosticEvent
+
     data class WifiRequestStarted(val profileName: String) : DeviceActionDiagnosticEvent
 
     data object WifiSecurityDetectionStarted : DeviceActionDiagnosticEvent

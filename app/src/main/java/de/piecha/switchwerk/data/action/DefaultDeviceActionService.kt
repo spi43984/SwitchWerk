@@ -15,6 +15,7 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 import java.net.ConnectException
 import java.net.NoRouteToHostException
@@ -78,6 +79,39 @@ class DefaultDeviceActionService(
 
         var lastFailure: DeviceActionResult = DeviceActionResult.WifiConnectionFailed
         for ((index, connectionWithProfile) in availableConnections.withIndex()) {
+            emitDiagnostic(
+                onDiagnosticEvent,
+                DeviceActionDiagnosticEvent.WifiProfileAttempt(
+                    profileName = connectionWithProfile.profile.name,
+                    index = index + 1,
+                    total = availableConnections.size
+                )
+            )
+            if (connectionWithProfile.profile.connectionMode == WifiConnectionMode.ANDROID_MANAGED) {
+                val activeNetwork = wifiConnectionService.activeWifiNetworkForSsid(
+                    connectionWithProfile.profile.ssid
+                ) ?: return DeviceActionResult.AndroidManagedWifiNotActive(
+                    connectionWithProfile.profile.ssid
+                )
+                when (
+                    val outcome = callApi(
+                        connection = connectionWithProfile.connection,
+                        apiCall = device.apiCall,
+                        network = activeNetwork,
+                        onDiagnosticEvent = onDiagnosticEvent
+                    )
+                ) {
+                    ApiCallOutcome.Success -> {
+                        emitDiagnostic(onDiagnosticEvent, DeviceActionDiagnosticEvent.RequestSucceeded)
+                        return DeviceActionResult.Success
+                    }
+                    is ApiCallOutcome.Terminal -> return outcome.result
+                    is ApiCallOutcome.TryNextNetwork -> {
+                        lastFailure = DeviceActionResult.NetworkError(outcome.reason)
+                        continue
+                    }
+                }
+            }
             val password = wifiProfileRepository.getPassword(connectionWithProfile.profile.id)
             logInfo("Starting explicit WiFi profile attempt ${index + 1}/${availableConnections.size}")
 

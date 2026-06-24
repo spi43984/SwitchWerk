@@ -4,6 +4,9 @@ import android.net.LinkAddress
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
+import android.os.Build
 import java.net.InetAddress
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -13,6 +16,38 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 class AndroidWifiConnectionServiceTest {
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun androidManagedLookupUsesMatchingWifiNetworkWhenItIsNotTheActiveNetwork() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        val activeMobileNetwork = mock(Network::class.java)
+        val matchingWifiNetwork = mock(Network::class.java)
+        val mobileCapabilities = mock(NetworkCapabilities::class.java)
+        val wifiCapabilities = mock(NetworkCapabilities::class.java)
+        `when`(mobileCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(false)
+        `when`(wifiCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true)
+        val connectivityManager = mock(ConnectivityManager::class.java)
+        `when`(connectivityManager.activeNetwork).thenReturn(activeMobileNetwork)
+        `when`(connectivityManager.allNetworks).thenReturn(
+            arrayOf(activeMobileNetwork, matchingWifiNetwork)
+        )
+        `when`(connectivityManager.getNetworkCapabilities(activeMobileNetwork))
+            .thenReturn(mobileCapabilities)
+        `when`(connectivityManager.getNetworkCapabilities(matchingWifiNetwork))
+            .thenReturn(wifiCapabilities)
+        val wifiManager = mock(WifiManager::class.java)
+        val wifiInfo = mock(android.net.wifi.WifiInfo::class.java)
+        `when`(wifiManager.connectionInfo).thenReturn(wifiInfo)
+        `when`(wifiInfo.ssid).thenReturn("\"Office\"")
+        val service = AndroidWifiConnectionService(
+            connectivityManager = connectivityManager,
+            wifiManager = wifiManager,
+            proximityConfirmationStore = WifiProximityConfirmationStore()
+        )
+
+        assertSame(matchingWifiNetwork, service.activeWifiNetworkForSsid("Office"))
+    }
 
     @Test
     fun readinessWaitsForWifiCapabilitiesAndIpRegardlessOfCallbackOrder() {
