@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: GUI / Dashboard
 
@@ -65,19 +65,31 @@ Der Bereich öffnet automatisch auf die konfigurierte Höhe aus Issue 023, wenn:
 
 ## Akzeptanzkriterien
 
-- [ ] Detailanzeige aus: kein Aktionsdetails-Bereich sichtbar
-- [ ] Detailanzeige ein und keine Meldungen: nur eine kompakte Zeile sichtbar
-- [ ] Start einer Geräteaktion öffnet den Bereich automatisch
-- [ ] Neue Aktionsmeldung öffnet den Bereich automatisch
-- [ ] Klick auf minimierte Zeile öffnet den Bereich
-- [ ] Klick auf Titel `Aktionsdetails` minimiert den Bereich
-- [ ] Minimieren löscht keine Meldungen
-- [ ] Mülleimer-Button löscht weiterhin nur die Meldungen
-- [ ] Beim Verlassen der App wird der Bereich minimiert
-- [ ] Konfigurierte Höhe 20 % / 30 % / 40 % wird beim Öffnen weiterhin respektiert
-- [ ] Bedienung bleibt auf kleinen Displays nutzbar
-- [ ] Dark Mode und Light Mode funktionieren weiterhin
-- [ ] Build erfolgreich
+- [x] Detailanzeige aus: kein Aktionsdetails-Bereich sichtbar
+- [x] Detailanzeige ein und keine Meldungen: nur eine kompakte Zeile sichtbar
+- [x] Start einer Geräteaktion öffnet den Bereich automatisch
+- [x] Neue Aktionsmeldung öffnet den Bereich automatisch
+- [x] Klick auf minimierte Zeile öffnet den Bereich
+- [x] Klick auf Titel `Aktionsdetails` minimiert den Bereich
+- [x] Minimieren löscht keine Meldungen
+- [x] Mülleimer-Button löscht weiterhin nur die Meldungen
+- [x] Beim Verlassen der App wird der Bereich minimiert
+- [x] Konfigurierte Höhe 20 % / 30 % / 40 % wird beim Öffnen weiterhin respektiert
+- [x] Bedienung bleibt auf kleinen Displays nutzbar
+- [x] Dark Mode und Light Mode funktionieren weiterhin
+- [x] Build erfolgreich
+
+## Abschluss
+
+- GitHub-Issue: #104
+- Pull Request: #105
+- Merge-Commit: `30ee5e8`
+- Der Bereich verwendet ausschließlich lokalen Compose-UI-State. Er wird bei
+  neuen Meldungen oder einer laufenden Aktion geöffnet und bei `ON_PAUSE`
+  minimiert; Einstellungen, Diagnosemeldungen und Aktionslogik bleiben
+  unverändert.
+- Die Host-Prüfungen für Build, Installation und die manuellen Tests wurden
+  erfolgreich bestätigt.
 
 ## Testhinweise
 

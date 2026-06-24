@@ -4,6 +4,21 @@ Stand: 22. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 034 „Collapsible Action Details Panel“ ist veröffentlicht und abgeschlossen.
+
+- GitHub-Issue: #104
+- Pull Request: #105
+- Merge-Commit: `30ee5e8`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 040
+  „Import/Export Password Handling“.
+- Aktionsdetails verwenden lokalen Compose-UI-State: Bei keiner Aktion und
+  keinen Meldungen bleibt nur eine kompakte, erklärende Leiste sichtbar.
+  Aktionen und neue Meldungen öffnen den Bereich, der Titel minimiert ihn und
+  `ON_PAUSE` setzt ihn wieder zurück. Das Leeren über den Mülleimer entfernt
+  ausschließlich Meldungen.
+- Die Host-Prüfungen für Build, Installation und manuelle Szenarien wurden
+  erfolgreich bestätigt.
+
 Issue 033 „Android-managed WiFi networks“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #101
