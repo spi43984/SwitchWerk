@@ -712,11 +712,13 @@ class DefaultDeviceActionServiceTest {
             httpService = SuspendingHttpApiCallService()
         )
 
+        val events = mutableListOf<DeviceActionDiagnosticEvent>()
         val job = launch {
             service.execute(
                 device(
                     connections = listOf(DeviceConnection("wifi-1", "device.local"))
-                )
+                ),
+                events::add
             )
         }
         while (wifiService.requestedSsids.isEmpty()) {
@@ -726,6 +728,9 @@ class DefaultDeviceActionServiceTest {
         job.cancelAndJoin()
 
         assertEquals(1, wifiService.disconnectCount)
+        assertTrue(events.contains(DeviceActionDiagnosticEvent.ActionStarted))
+        assertTrue(!events.contains(DeviceActionDiagnosticEvent.RequestFailed))
+        assertTrue(!events.contains(DeviceActionDiagnosticEvent.ActionCompleted))
     }
 
     private fun createService(

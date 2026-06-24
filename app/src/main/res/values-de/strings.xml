@@ -57,6 +57,7 @@
     <string name="move_device_backward">Gerät eine Position nach hinten verschieben</string>
     <string name="switching">Schaltet…</string>
     <string name="executing">Wird ausgeführt…</string>
+    <string name="cancel_action">Aktion abbrechen</string>
     <string name="clear_action_log">Aktionsprotokoll löschen</string>
     <string name="no_device_action_yet">Noch keine Geräteaktion ausgeführt</string>
 
@@ -196,6 +197,7 @@
     <string name="diagnostic_device_unreachable">IP-Adresse des Geräts ist nicht erreichbar</string>
     <string name="diagnostic_request_succeeded">Geräteaktion erfolgreich abgeschlossen</string>
     <string name="diagnostic_request_failed">Anfrage fehlgeschlagen</string>
+    <string name="diagnostic_action_cancelled">Aktion durch Benutzer abgebrochen</string>
     <string name="diagnostic_timeout_wifi_request">Timeout bei der WLAN-Anforderung; keine Verbindung hergestellt</string>
     <string name="diagnostic_timeout_wifi">Timeout beim WLAN-Verbindungsaufbau</string>
     <string name="diagnostic_timeout_dns">Timeout bei der DNS-Auflösung</string>
@@ -216,6 +218,7 @@
     <string name="action_vpn_blocked">Zugriff durch VPN oder Firewall blockiert</string>
     <string name="action_network_error">Netzwerkzugriff zum Gerät fehlgeschlagen</string>
     <string name="action_failed">Geräteaktion fehlgeschlagen</string>
+    <string name="action_cancelled">Aktion abgebrochen</string>
     <string name="wifi_proximity_nearby">WLAN in der Nähe</string>
     <string name="wifi_proximity_not_nearby">WLAN-Verbindung nicht möglich</string>
     <string name="wifi_proximity_unknown">WLAN noch nicht bestätigt</string>

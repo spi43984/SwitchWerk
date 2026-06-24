@@ -20,7 +20,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Show information</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view\n• Arrows change the order\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings and help</string>
+    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view\n• Arrows change the order\n• The X at the bottom right cancels a running action\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings and help</string>
     <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance and action details\n• Backup: save or import configuration</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Choose appearance and language\n• Show or hide action details</string>
@@ -28,7 +28,7 @@
     <string name="password_storage_info">Wi-Fi passwords are stored encrypted on this device. They are not sent to a cloud service and are not shown in action details.</string>
     <string name="hostname_ip_info">Enter the device\'s local address in its assigned Wi-Fi network, for example 192.168.33.1 or a hostname resolved on the local network. No internet connection is required.</string>
     <string name="api_call_info">The HTTP/RPC call is appended to the local device address. Use only a path supported by the device, for example /relay/0?turn=on.</string>
-    <string name="action_details_info">• Shows Wi-Fi connection, timeout, and HTTP status\n• Tap the compact bar to open it\n• Tap the Action details title in the open panel to minimize it\n• Local progress only\n• Passwords are not logged</string>
+    <string name="action_details_info">• Shows Wi-Fi connection, timeout, and HTTP status\n• The X at the bottom right cancels the running action\n• Tap the compact bar to open it\n• Tap the Action details title in the open panel to minimize it\n• Local progress only\n• Passwords are not logged</string>
     <string name="wifi_profiles_info_title">Manage Wi-Fi profiles</string>
     <string name="devices_info_title">Manage devices</string>
     <string name="list_interaction_info">• Use + to add an entry\n• Tap an entry to edit it\n• Swipe left or right to delete it\n• Confirm deletion afterwards</string>
@@ -47,7 +47,7 @@
     <string name="help_getting_started_title">Setup</string>
     <string name="help_getting_started_text">• Create a Wi-Fi profile\n• Add a device with address and API call\n• Run the action</string>
     <string name="help_connection_title">Connection and troubleshooting</string>
-    <string name="help_connection_text">• The status point confirms a Wi-Fi connection, not physical Wi-Fi proximity\n• Green: Wi-Fi connection confirmed\n• Red: Android could not establish the specific Wi-Fi request\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID alone does not confirm a connection\n• A device access point may interrupt internet access\n• HTTP errors come from the device</string>
+    <string name="help_connection_text">• The status point confirms a Wi-Fi connection, not physical Wi-Fi proximity\n• Green: Wi-Fi connection confirmed\n• Red: Android could not establish the specific Wi-Fi request\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID alone does not confirm a connection\n• The X at the bottom right cancels a running action and its Wi-Fi request\n• Android\'s system dialog cannot be closed by SwitchWerk\n• A device access point may interrupt internet access\n• HTTP errors come from the device</string>
     <string name="help_privacy_title">Permissions and privacy</string>
     <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
 
@@ -86,6 +86,7 @@
     <string name="move_device_backward">Move device one position backward</string>
     <string name="switching">Switching…</string>
     <string name="executing">Executing…</string>
+    <string name="cancel_action">Cancel action</string>
     <string name="clear_action_log">Clear action log</string>
     <string name="no_device_action_yet">No device action has been run yet</string>
 
@@ -225,6 +226,7 @@
     <string name="diagnostic_device_unreachable">The device IP address is unreachable</string>
     <string name="diagnostic_request_succeeded">Device action completed successfully</string>
     <string name="diagnostic_request_failed">Request failed</string>
+    <string name="diagnostic_action_cancelled">Action cancelled by user</string>
     <string name="diagnostic_timeout_wifi_request">Wi-Fi request timed out; no connection established</string>
     <string name="diagnostic_timeout_wifi">Wi-Fi connection attempt timed out</string>
     <string name="diagnostic_timeout_dns">DNS resolution timed out</string>
@@ -245,6 +247,7 @@
     <string name="action_vpn_blocked">Access blocked by VPN or firewall</string>
     <string name="action_network_error">Failed to access device over the network</string>
     <string name="action_failed">Device action failed</string>
+    <string name="action_cancelled">Action cancelled</string>
     <string name="wifi_proximity_nearby">Wi-Fi nearby</string>
     <string name="wifi_proximity_not_nearby">Wi-Fi connection unavailable</string>
     <string name="wifi_proximity_unknown">Wi-Fi not yet confirmed</string>

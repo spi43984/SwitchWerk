@@ -6,8 +6,13 @@ import java.net.HttpURLConnection
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.net.URL
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import okhttp3.OkHttpClient
@@ -125,6 +130,41 @@ class OkHttpApiCallServiceTest {
         val result = service.resolveHost("missing.local", network)
 
         assertTrue(result is DnsResolutionResult.Error)
+    }
+
+    @Test
+    fun cancellingDnsResolutionReturnsWithoutWaitingForTheResolver() = runBlocking {
+        val network = mock(Network::class.java)
+        val resolverStarted = CompletableDeferred<Unit>()
+        val allowResolverToFinish = CountDownLatch(1)
+        `when`(network.getAllByName("slow.local")).thenAnswer {
+            resolverStarted.complete(Unit)
+            while (true) {
+                try {
+                    if (allowResolverToFinish.await(10L, TimeUnit.MILLISECONDS)) {
+                        break
+                    }
+                } catch (_: InterruptedException) {
+                    // Some Android DNS implementations ignore interruption until their timeout.
+                }
+            }
+            emptyArray<InetAddress>()
+        }
+
+        val job = launch {
+            service.resolveHost("slow.local", network)
+        }
+        resolverStarted.await()
+
+        try {
+            withTimeout(1_000L) {
+                job.cancelAndJoin()
+            }
+
+            assertTrue(job.isCancelled)
+        } finally {
+            allowResolverToFinish.countDown()
+        }
     }
 
     @Test
