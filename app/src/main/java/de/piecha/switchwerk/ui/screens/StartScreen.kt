@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -39,10 +41,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,6 +60,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.lifecycle.Lifecycle
@@ -82,12 +91,39 @@ fun StartScreen(
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val screenPadding = if (isLandscape) 12.dp else 24.dp
     val lifecycleOwner = LocalLifecycleOwner.current
+    val showActionDetails = uiState.appSettings.showActionDetails && !isLandscape
+    val isDeviceActionRunning = uiState.deviceActionStates.values.any {
+        it == DeviceActionUiState.Loading
+    }
+    val diagnosticMessageCount = uiState.diagnosticItems.count {
+        it is DiagnosticListItem.Message
+    }
+    var isActionDetailsExpanded by remember { mutableStateOf(false) }
+    var previousDiagnosticMessageCount by remember {
+        mutableIntStateOf(diagnosticMessageCount)
+    }
+
+    LaunchedEffect(showActionDetails, isDeviceActionRunning) {
+        if (showActionDetails && isDeviceActionRunning) {
+            isActionDetailsExpanded = true
+        }
+    }
+
+    LaunchedEffect(diagnosticMessageCount) {
+        if (showActionDetails && diagnosticMessageCount > previousDiagnosticMessageCount) {
+            isActionDetailsExpanded = true
+        }
+        previousDiagnosticMessageCount = diagnosticMessageCount
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> viewModel.startWifiProximityMonitoring()
-                Lifecycle.Event.ON_PAUSE -> viewModel.stopWifiProximityMonitoring()
+                Lifecycle.Event.ON_PAUSE -> {
+                    isActionDetailsExpanded = false
+                    viewModel.stopWifiProximityMonitoring()
+                }
                 else -> Unit
             }
         }
@@ -134,8 +170,7 @@ fun StartScreen(
 
             Column(modifier = Modifier.weight(1f)) {
                 val detailHeight = uiState.appSettings.detailPanelHeight.fraction
-                val showActionDetails = uiState.appSettings.showActionDetails && !isLandscape
-                val deviceAreaWeight = if (showActionDetails) {
+                val deviceAreaWeight = if (showActionDetails && isActionDetailsExpanded) {
                     1f - detailHeight
                 } else {
                     1f
@@ -169,13 +204,20 @@ fun StartScreen(
 
                 if (showActionDetails) {
                     Spacer(modifier = Modifier.height(12.dp))
-                    DiagnosticPanel(
-                        items = uiState.diagnosticItems,
-                        newestFirst = uiState.appSettings.diagnosticsNewestFirst,
-                        onClear = viewModel::clearDiagnosticMessages,
-                        onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
-                        modifier = Modifier.weight(detailHeight)
-                    )
+                    if (isActionDetailsExpanded) {
+                        DiagnosticPanel(
+                            items = uiState.diagnosticItems,
+                            newestFirst = uiState.appSettings.diagnosticsNewestFirst,
+                            onClear = viewModel::clearDiagnosticMessages,
+                            onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
+                            onMinimize = { isActionDetailsExpanded = false },
+                            modifier = Modifier.weight(detailHeight)
+                        )
+                    } else {
+                        CollapsedActionDetailsPanel(
+                            onExpand = { isActionDetailsExpanded = true }
+                        )
+                    }
                 }
             }
         }
@@ -571,6 +613,7 @@ private fun DiagnosticPanel(
     newestFirst: Boolean,
     onClear: () -> Unit,
     onToggleSortOrder: () -> Unit,
+    onMinimize: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -591,9 +634,12 @@ private fun DiagnosticPanel(
             ) {
                 Text(
                     text = stringResource(R.string.action_details),
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.clickable(onClick = onMinimize)
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     OutlinedButton(onClick = onToggleSortOrder) {
                         Text(
                             stringResource(
@@ -601,14 +647,25 @@ private fun DiagnosticPanel(
                             )
                         )
                     }
-                    IconButton(
-                        onClick = onClear,
-                        enabled = items.isNotEmpty()
+                    Spacer(modifier = Modifier.width(8.dp))
+                    InfoHint(
+                        titleResourceId = R.string.action_details,
+                        messageResourceId = R.string.action_details_info
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    CompositionLocalProvider(
+                        LocalMinimumInteractiveComponentSize provides Dp.Unspecified
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(R.string.clear_action_log)
-                        )
+                        IconButton(
+                            onClick = onClear,
+                            enabled = items.isNotEmpty(),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(R.string.clear_action_log)
+                            )
+                        }
                     }
                 }
             }
@@ -639,6 +696,37 @@ private fun DiagnosticPanel(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CollapsedActionDetailsPanel(
+    onExpand: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onExpand)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 12.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.action_details),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 12.dp)
+            )
+            InfoHint(
+                titleResourceId = R.string.action_details,
+                messageResourceId = R.string.action_details_info
+            )
         }
     }
 }
