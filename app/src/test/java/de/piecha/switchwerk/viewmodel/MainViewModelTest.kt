@@ -100,6 +100,37 @@ class MainViewModelTest {
     }
 
     @Test
+    fun cancelActionStopsOnlyTheSelectedDeviceActionAndShowsCancellation() = runTest(dispatcher) {
+        val firstDevice = device(id = "device-1", sortOrder = 0)
+        val secondDevice = device(id = "device-2", sortOrder = 1)
+        val actionService = WaitingDeviceActionService()
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(listOf(firstDevice, secondDevice)),
+            deviceActionService = actionService,
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService()
+        )
+        runCurrent()
+
+        viewModel.executeDeviceAction(firstDevice)
+        runCurrent()
+        viewModel.cancelDeviceAction(firstDevice.id)
+        runCurrent()
+
+        val actionState = viewModel.uiState.value.deviceActionStates[firstDevice.id]
+            as DeviceActionUiState.Error
+        assertEquals(R.string.action_cancelled, (actionState.message as UiText.Resource).resourceId)
+        assertEquals(null, viewModel.uiState.value.deviceActionStates[secondDevice.id])
+        val cancellationDiagnostic = viewModel.uiState.value.diagnosticItems
+            .filterIsInstance<DiagnosticListItem.Message>()
+            .last()
+            .text as UiText.Resource
+        val diagnosticMessage = cancellationDiagnostic.arguments[2] as UiText.Resource
+        assertEquals(R.string.diagnostic_action_cancelled, diagnosticMessage.resourceId)
+    }
+
+    @Test
     fun moveDeviceDownPersistsReorderedDeviceIds() = runTest(dispatcher) {
         val repository = FakeDeviceRepository(
             listOf(

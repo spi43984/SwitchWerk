@@ -14,6 +14,7 @@ import kotlin.coroutines.resume
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -43,10 +44,27 @@ class OkHttpApiCallService(
 
         return try {
             withTimeoutOrNull(timeoutMillis) {
-                runInterruptible(Dispatchers.IO) {
-                    network.getAllByName(host)
+                suspendCancellableCoroutine { continuation ->
+                    val resolverJob = CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+                        val result = try {
+                            runInterruptible {
+                                network.getAllByName(host)
+                            }
+                            DnsResolutionResult.Success
+                        } catch (exception: CancellationException) {
+                            throw exception
+                        } catch (exception: Exception) {
+                            DnsResolutionResult.Error(exception)
+                        }
+
+                        if (continuation.isActive) {
+                            continuation.resume(result)
+                        }
+                    }
+                    continuation.invokeOnCancellation {
+                        resolverJob.cancel()
+                    }
                 }
-                DnsResolutionResult.Success
             } ?: DnsResolutionResult.Timeout
         } catch (exception: CancellationException) {
             throw exception

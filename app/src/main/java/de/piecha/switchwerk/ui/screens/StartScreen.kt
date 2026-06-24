@@ -30,8 +30,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
@@ -95,6 +97,9 @@ fun StartScreen(
     val isDeviceActionRunning = uiState.deviceActionStates.values.any {
         it == DeviceActionUiState.Loading
     }
+    val runningDeviceId = uiState.deviceActionStates.entries
+        .lastOrNull { it.value == DeviceActionUiState.Loading }
+        ?.key
     val diagnosticMessageCount = uiState.diagnosticItems.count {
         it is DiagnosticListItem.Message
     }
@@ -184,7 +189,10 @@ fun StartScreen(
                             devices = devices,
                             actionStates = uiState.deviceActionStates,
                             wifiProximityStatuses = uiState.wifiProximityStatuses,
+                            runningDeviceId = runningDeviceId,
+                            isActionDetailsExpanded = isActionDetailsExpanded,
                             onDeviceActionClick = viewModel::executeDeviceAction,
+                            onCancelDeviceActionClick = viewModel::cancelDeviceAction,
                             onMoveUpClick = viewModel::moveDeviceUp,
                             onMoveDownClick = viewModel::moveDeviceDown,
                             modifier = Modifier.weight(deviceAreaWeight)
@@ -194,7 +202,10 @@ fun StartScreen(
                             devices = devices,
                             actionStates = uiState.deviceActionStates,
                             wifiProximityStatuses = uiState.wifiProximityStatuses,
+                            runningDeviceId = runningDeviceId,
+                            isActionDetailsExpanded = isActionDetailsExpanded,
                             onDeviceActionClick = viewModel::executeDeviceAction,
+                            onCancelDeviceActionClick = viewModel::cancelDeviceAction,
                             onMoveUpClick = viewModel::moveDeviceUp,
                             onMoveDownClick = viewModel::moveDeviceDown,
                             modifier = Modifier.weight(deviceAreaWeight)
@@ -336,13 +347,26 @@ private fun DeviceList(
     devices: List<Device>,
     actionStates: Map<String, DeviceActionUiState>,
     wifiProximityStatuses: Map<String, DeviceWifiProximityStatus>,
+    runningDeviceId: String?,
+    isActionDetailsExpanded: Boolean,
     onDeviceActionClick: (Device) -> Unit,
+    onCancelDeviceActionClick: (String) -> Unit,
     onMoveUpClick: (String) -> Unit,
     onMoveDownClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+
+    LaunchedEffect(runningDeviceId, isActionDetailsExpanded) {
+        val runningDeviceIndex = devices.indexOfFirst { it.id == runningDeviceId }
+        if (runningDeviceIndex >= 0) {
+            listState.animateScrollToItem(runningDeviceIndex)
+        }
+    }
+
     LazyColumn(
         modifier = modifier,
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(
@@ -357,6 +381,7 @@ private fun DeviceList(
                 canMoveUp = devices.indexOf(device) > 0,
                 canMoveDown = devices.indexOf(device) < devices.lastIndex,
                 onActionClick = { onDeviceActionClick(device) },
+                onCancelActionClick = { onCancelDeviceActionClick(device.id) },
                 onMoveUpClick = { onMoveUpClick(device.id) },
                 onMoveDownClick = { onMoveDownClick(device.id) }
             )
@@ -369,14 +394,27 @@ private fun DeviceWidgetGrid(
     devices: List<Device>,
     actionStates: Map<String, DeviceActionUiState>,
     wifiProximityStatuses: Map<String, DeviceWifiProximityStatus>,
+    runningDeviceId: String?,
+    isActionDetailsExpanded: Boolean,
     onDeviceActionClick: (Device) -> Unit,
+    onCancelDeviceActionClick: (String) -> Unit,
     onMoveUpClick: (String) -> Unit,
     onMoveDownClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+
+    LaunchedEffect(runningDeviceId, isActionDetailsExpanded) {
+        val runningDeviceIndex = devices.indexOfFirst { it.id == runningDeviceId }
+        if (runningDeviceIndex >= 0) {
+            gridState.animateScrollToItem(runningDeviceIndex)
+        }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 140.dp),
         modifier = modifier,
+        state = gridState,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -392,6 +430,7 @@ private fun DeviceWidgetGrid(
                 canMoveUp = devices.indexOf(device) > 0,
                 canMoveDown = devices.indexOf(device) < devices.lastIndex,
                 onActionClick = { onDeviceActionClick(device) },
+                onCancelActionClick = { onCancelDeviceActionClick(device.id) },
                 onMoveUpClick = { onMoveUpClick(device.id) },
                 onMoveDownClick = { onMoveDownClick(device.id) }
             )
@@ -407,6 +446,7 @@ private fun DeviceWidget(
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onActionClick: () -> Unit,
+    onCancelActionClick: () -> Unit,
     onMoveUpClick: () -> Unit,
     onMoveDownClick: () -> Unit
 ) {
@@ -435,6 +475,7 @@ private fun DeviceWidget(
                 canMoveUp = canMoveUp,
                 canMoveDown = canMoveDown,
                 onActionClick = onActionClick,
+                onCancelActionClick = onCancelActionClick,
                 onMoveUpClick = onMoveUpClick,
                 onMoveDownClick = onMoveDownClick
             )
@@ -447,6 +488,7 @@ private fun DeviceActionFooter(
     actionState: DeviceActionUiState?,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
+    onCancelActionClick: () -> Unit,
     onMoveUpClick: () -> Unit,
     onMoveDownClick: () -> Unit
 ) {
@@ -459,7 +501,27 @@ private fun DeviceActionFooter(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (actionState == null) {
+        if (actionState == DeviceActionUiState.Loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            CompositionLocalProvider(
+                LocalMinimumInteractiveComponentSize provides Dp.Unspecified
+            ) {
+                IconButton(
+                    onClick = onCancelActionClick,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.cancel_action)
+                    )
+                }
+            }
+        } else if (actionState == null) {
             Spacer(modifier = Modifier.weight(1f))
         } else if (actionState is DeviceActionUiState.Success) {
             DeviceActionStatus(
@@ -503,6 +565,7 @@ private fun DeviceActionArea(
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onActionClick: () -> Unit,
+    onCancelActionClick: () -> Unit,
     onMoveUpClick: () -> Unit,
     onMoveDownClick: () -> Unit
 ) {
@@ -546,6 +609,7 @@ private fun DeviceActionArea(
                 actionState = actionState,
                 canMoveUp = canMoveUp,
                 canMoveDown = canMoveDown,
+                onCancelActionClick = onCancelActionClick,
                 onMoveUpClick = onMoveUpClick,
                 onMoveDownClick = onMoveDownClick
             )
@@ -739,6 +803,7 @@ private fun DeviceCard(
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onActionClick: () -> Unit,
+    onCancelActionClick: () -> Unit,
     onMoveUpClick: () -> Unit,
     onMoveDownClick: () -> Unit
 ) {
@@ -768,6 +833,7 @@ private fun DeviceCard(
                 canMoveUp = canMoveUp,
                 canMoveDown = canMoveDown,
                 onActionClick = onActionClick,
+                onCancelActionClick = onCancelActionClick,
                 onMoveUpClick = onMoveUpClick,
                 onMoveDownClick = onMoveDownClick
             )

@@ -300,6 +300,7 @@ class AndroidWifiConnectionService(
                     }
                     logWarning("WiFi request id=$requestId event=$event")
                     clearActiveCallback(this)
+                    unregisterCallback(this)
                     if (continuation.isActive) {
                         continuation.resume(
                             if (timedOut) {

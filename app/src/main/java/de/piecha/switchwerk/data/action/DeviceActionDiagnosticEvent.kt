@@ -52,6 +52,8 @@ sealed interface DeviceActionDiagnosticEvent {
 
     data object RequestFailed : DeviceActionDiagnosticEvent
 
+    data object ActionCancelled : DeviceActionDiagnosticEvent
+
     data class Timeout(val stage: DiagnosticStage) : DeviceActionDiagnosticEvent
 
     data object ActionCompleted : DeviceActionDiagnosticEvent

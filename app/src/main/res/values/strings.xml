@@ -20,7 +20,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen und Hilfe</string>
+    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen und Hilfe</string>
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung und Aktionsdetails\n• Backup: Konfiguration sichern oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Aktionsdetails ein- oder ausblenden</string>
@@ -28,7 +28,7 @@
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
     <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• Beispiel: /relay/0?turn=on</string>
-    <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
+    <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
     <string name="wifi_profiles_info_title">WLAN-Profile verwalten</string>
     <string name="devices_info_title">Geräte verwalten</string>
     <string name="list_interaction_info">• + legt einen neuen Eintrag an\n• Eintrag antippen zum Bearbeiten\n• Nach links oder rechts wischen zum Löschen\n• Löschen anschließend bestätigen</string>
@@ -47,7 +47,7 @@
     <string name="help_getting_started_title">Schnellstart</string>
     <string name="help_getting_started_text">• WLAN-Profil anlegen\n• Gerät mit Adresse und API-Aufruf hinzufügen\n• Aktion starten</string>
     <string name="help_connection_title">Verbindung</string>
-    <string name="help_connection_text">• Der Statuspunkt bestätigt eine WLAN-Verbindung, nicht die physische WLAN-Nähe\n• Grün: WLAN-Verbindung bestätigt\n• Rot: Android konnte die konkrete WLAN-Anfrage nicht verbinden\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID allein bestätigt keine Verbindung\n• Geräte-AP kann Internetzugang unterbrechen\n• HTTP-Fehler kommen vom Gerät</string>
+    <string name="help_connection_text">• Der Statuspunkt bestätigt eine WLAN-Verbindung, nicht die physische WLAN-Nähe\n• Grün: WLAN-Verbindung bestätigt\n• Rot: Android konnte die konkrete WLAN-Anfrage nicht verbinden\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID allein bestätigt keine Verbindung\n• X rechts unten bricht eine laufende Aktion und ihre WLAN-Anfrage ab\n• Androids Systemdialog kann nicht durch SwitchWerk beendet werden\n• Geräte-AP kann Internetzugang unterbrechen\n• HTTP-Fehler kommen vom Gerät</string>
     <string name="help_privacy_title">Datenschutz</string>
     <string name="help_privacy_text">• ausschließlich lokal\n• keine Konten, Cloud oder Tracking\n• WLAN- und Standortrechte nur für WLAN-Funktionen</string>
 
@@ -86,6 +86,7 @@
     <string name="move_device_backward">Gerät eine Position nach hinten verschieben</string>
     <string name="switching">Schaltet…</string>
     <string name="executing">Wird ausgeführt…</string>
+    <string name="cancel_action">Aktion abbrechen</string>
     <string name="clear_action_log">Aktionsprotokoll löschen</string>
     <string name="no_device_action_yet">Noch keine Geräteaktion ausgeführt</string>
 
@@ -233,6 +234,7 @@
     <string name="diagnostic_device_unreachable">IP-Adresse des Geräts ist nicht erreichbar</string>
     <string name="diagnostic_request_succeeded">Gerät erfolgreich geschaltet</string>
     <string name="diagnostic_request_failed">Anfrage fehlgeschlagen</string>
+    <string name="diagnostic_action_cancelled">Aktion durch Benutzer abgebrochen</string>
     <string name="diagnostic_timeout_wifi_request">Timeout bei der WLAN-Anforderung; keine Verbindung hergestellt</string>
     <string name="diagnostic_timeout_wifi">Timeout beim WLAN-Verbindungsaufbau</string>
     <string name="diagnostic_timeout_dns">Timeout bei der DNS-Auflösung</string>
@@ -254,6 +256,7 @@
     <string name="action_vpn_blocked">VPN oder Firewall blockiert Zugriff</string>
     <string name="action_network_error">Netzwerkzugriff zum Gerät fehlgeschlagen</string>
     <string name="action_failed">Geräteaktion fehlgeschlagen</string>
+    <string name="action_cancelled">Aktion abgebrochen</string>
     <string name="wifi_proximity_nearby">WLAN in der Nähe</string>
     <string name="wifi_proximity_not_nearby">WLAN-Verbindung nicht möglich</string>
     <string name="wifi_proximity_unknown">WLAN noch nicht bestätigt</string>

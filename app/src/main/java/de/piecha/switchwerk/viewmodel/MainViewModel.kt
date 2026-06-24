@@ -24,6 +24,7 @@ import de.piecha.switchwerk.ui.uiText
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -91,6 +92,7 @@ class MainViewModel(
     private val _events = MutableSharedFlow<MainUiEvent>()
     val events: SharedFlow<MainUiEvent> = _events.asSharedFlow()
     private val actionJobs = mutableMapOf<String, Job>()
+    private val userCancelledActionIds = mutableSetOf<String>()
     private val actionStateResetJobs = mutableMapOf<String, Job>()
     private var wifiProfiles: List<WifiProfile> = emptyList()
     private var wifiProximitySnapshot = WifiProximitySnapshot()
@@ -136,43 +138,69 @@ class MainViewModel(
         actionStateResetJobs.remove(device.id)?.cancel()
         updateDeviceActionState(device.id, DeviceActionUiState.Loading)
         actionJobs[device.id] = viewModelScope.launch {
-            var previousDiagnosticAtNanos: Long? = null
-            val result = deviceActionService.execute(device) { event ->
-                val nowNanos = System.nanoTime()
-                val elapsedMillis = previousDiagnosticAtNanos?.let { previous ->
-                    ((nowNanos - previous) / NANOS_PER_MILLISECOND).coerceAtLeast(0L)
-                } ?: 0L
-                previousDiagnosticAtNanos = nowNanos
-                if (event == DeviceActionDiagnosticEvent.ActionStarted) {
-                    appendActionSeparator()
+            try {
+                var previousDiagnosticAtNanos: Long? = null
+                val result = deviceActionService.execute(device) { event ->
+                    val nowNanos = System.nanoTime()
+                    val elapsedMillis = previousDiagnosticAtNanos?.let { previous ->
+                        ((nowNanos - previous) / NANOS_PER_MILLISECOND).coerceAtLeast(0L)
+                    } ?: 0L
+                    previousDiagnosticAtNanos = nowNanos
+                    if (event == DeviceActionDiagnosticEvent.ActionStarted) {
+                        appendActionSeparator()
+                    }
+                    appendDiagnosticMessage(
+                        message = event.toUserMessage(device.name),
+                        elapsedMillis = elapsedMillis
+                    )
+                }
+                val resultState = result.toUiState()
+                updateDeviceActionState(device.id, resultState)
+                if (result is DeviceActionResult.AndroidManagedWifiNotActive) {
+                    _events.emit(MainUiEvent.ConfirmOpenAndroidWifiSettings(result.ssid))
+                }
+                when (resultState) {
+                    is DeviceActionUiState.Success -> scheduleActionStateReset(
+                        deviceId = device.id,
+                        state = resultState,
+                        delayMillis = ACTION_SUCCESS_DISPLAY_MILLIS
+                    )
+                    is DeviceActionUiState.Error -> scheduleActionStateReset(
+                        deviceId = device.id,
+                        state = resultState,
+                        delayMillis = ACTION_ERROR_DISPLAY_MILLIS
+                    )
+                    DeviceActionUiState.Loading -> Unit
+                }
+            } catch (exception: CancellationException) {
+                if (device.id !in userCancelledActionIds) {
+                    throw exception
                 }
                 appendDiagnosticMessage(
-                    message = event.toUserMessage(device.name),
-                    elapsedMillis = elapsedMillis
+                    message = DeviceActionDiagnosticEvent.ActionCancelled.toUserMessage(device.name),
+                    elapsedMillis = 0L
                 )
-            }
-            val resultState = result.toUiState()
-            updateDeviceActionState(device.id, resultState)
-            if (result is DeviceActionResult.AndroidManagedWifiNotActive) {
-                _events.emit(MainUiEvent.ConfirmOpenAndroidWifiSettings(result.ssid))
-            }
-            when (resultState) {
-                is DeviceActionUiState.Success -> scheduleActionStateReset(
+                val cancelledState = DeviceActionUiState.Error(uiText(R.string.action_cancelled))
+                updateDeviceActionState(device.id, cancelledState)
+                scheduleActionStateReset(
                     deviceId = device.id,
-                    state = resultState,
-                    delayMillis = ACTION_SUCCESS_DISPLAY_MILLIS
-                )
-                is DeviceActionUiState.Error -> scheduleActionStateReset(
-                    deviceId = device.id,
-                    state = resultState,
+                    state = cancelledState,
                     delayMillis = ACTION_ERROR_DISPLAY_MILLIS
                 )
-                DeviceActionUiState.Loading -> Unit
+                throw exception
             }
         }.also { job ->
             job.invokeOnCompletion {
                 actionJobs.remove(device.id, job)
+                userCancelledActionIds.remove(device.id)
             }
+        }
+    }
+
+    fun cancelDeviceAction(deviceId: String) {
+        actionJobs[deviceId]?.takeIf(Job::isActive)?.let { job ->
+            userCancelledActionIds += deviceId
+            job.cancel()
         }
     }
 
@@ -378,6 +406,7 @@ class MainViewModel(
             DeviceActionDiagnosticEvent.RequestSucceeded ->
                 uiText(R.string.diagnostic_request_succeeded)
             DeviceActionDiagnosticEvent.RequestFailed -> uiText(R.string.diagnostic_request_failed)
+            DeviceActionDiagnosticEvent.ActionCancelled -> uiText(R.string.diagnostic_action_cancelled)
             is DeviceActionDiagnosticEvent.Timeout -> when (stage) {
                 DiagnosticStage.WIFI_REQUEST -> {
                     uiText(R.string.diagnostic_timeout_wifi_request)
