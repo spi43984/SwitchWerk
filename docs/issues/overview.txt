@@ -15,6 +15,11 @@ Abgeschlossene Issues bleiben zur Dokumentation erhalten und werden nicht für d
 
 Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktiviert werden.
 
+Die Priorität bleibt eine globale Einordnung. Für zusammenhängende
+plattformbezogene Backlogs dokumentiert das Metadatenfeld
+`<Plattform>-Phase` die verbindliche Reihenfolge innerhalb dieses Backlogs;
+es verändert die Priorisierungslogik nicht.
+
 | ID | Prio | Status | Titel |
 |---:|:----:|--------|-------|
 | 001 | -- | abgeschlossen | Configuration Domain Foundation |
@@ -63,6 +68,12 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 | 044 | P0 | abgeschlossen | GitHub Actions Resource Optimization |
 | 045 | P0 | abgeschlossen | WiFi Proximity Indicator Stabilization |
 | 046 | P0 | abgeschlossen | UI State And Orientation Polish |
+| 047 | P4 | Backlog | iOS: WLAN/AP/HTTP Feasibility |
+| 048 | P4 | Backlog | iOS: Shared Config & Translation Model |
+| 049 | P4 | Backlog | iOS: App Foundation SwiftUI |
+| 050 | P4 | Backlog | iOS: Shelly HTTP/RPC Client |
+| 051 | P4 | Backlog | iOS: WLAN Join Flow |
+| 052 | P4 | Backlog | iOS: Development Workflow, Toolchain & Delivery |
 
 ## Empfohlene Umsetzungsreihenfolge
 
@@ -77,3 +88,9 @@ Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktivi
 9. 037 GitHub Release Update Support
 10. 041 Dashboard Drag And Drop
 11. 024 Authenticated Import Sources Backlog
+12. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+13. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+14. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+15. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+16. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047, 048 und 049)
+17. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 050)
