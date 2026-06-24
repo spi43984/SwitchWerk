@@ -4,11 +4,13 @@ Stand: 24. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 054 „App Icon Replacement“ ist auf Branch `app-icon-replacement`
-implementiert und auf dem Host geprüft, aber noch nicht veröffentlicht oder
-abgeschlossen.
+Issue 054 „App Icon Replacement“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #110
+- Pull Request: #111
+- Merge-Commit: `59cf775`
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 053
+  „Hamburger And About Release Metadata“.
 - `docs/assets/icons/Kabelblitz_gelb.png` ist die im Repository verbleibende
   Quell- und Referenzdatei. Sie ersetzt die Android-Launcher-Rasterressourcen
   in allen fünf Dichten sowie den adaptiven Vordergrund. Der adaptive
@@ -17,8 +19,7 @@ abgeschlossen.
   `docs/assets/icons/Kabelblitz_mono_simple3.png` als monochrome Ebene; die
   Android-8+-Varianten und Manifest-Verweise bleiben unverändert.
 - Host-Build, Installation sowie Prüfung in Launcher, App-Info und
-  About-/Hilfe-Bereich wurden erfolgreich bestätigt. Nicht committen oder
-  veröffentlichen ohne ausdrückliche Benutzeranweisung.
+  About-/Hilfe-Bereich wurden erfolgreich bestätigt.
 
 Issue 042 „Action Cancellation And Fast-Fail WiFi“ ist veröffentlicht und
 abgeschlossen.
