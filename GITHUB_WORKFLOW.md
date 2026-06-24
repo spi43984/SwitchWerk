@@ -79,6 +79,18 @@ Grundsatz:
 Planungsdatei ≠ GitHub-Issue
 ```
 
+Plattformbezogene Planungs-Issues werden ebenfalls zunächst ausschließlich
+lokal geführt. Insbesondere bleiben iOS-Planungs-Issues unter `docs/issues/`,
+bis eine iOS-Implementierung ausdrücklich beauftragt wird. Erst dann wird nach
+dem üblichen Workflow geprüft, ob ein zugehöriges GitHub-Issue und ein
+Implementierungs-Branch erforderlich sind.
+
+Die Spalte `Prio` in `docs/issues/overview.txt` bleibt die globale
+Priorisierung. Eine verbindliche Reihenfolge innerhalb eines
+plattformbezogenen Backlogs wird zusätzlich über ein Metadatenfeld wie
+`iOS-Phase: 1 von 6` in den lokalen Issue-Dateien dokumentiert und ersetzt
+oder erweitert nicht die Werte `P0` bis `P4`.
+
 `ai-context.md` nur ändern, wenn dauerhafter Projektkontext, Projektentscheidungen oder langfristige Projektregeln betroffen sind.
 
 `AI_HANDOFF.md` nur ändern, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
