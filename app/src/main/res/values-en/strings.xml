@@ -41,6 +41,7 @@
     <string name="about_switchwerk">About SwitchWerk</string>
     <string name="about_description">SwitchWerk controls Shelly and other devices directly on the local network. The configuration remains on this device.</string>
     <string name="version_value">Version %1$s</string>
+    <string name="release_date">Released 23 June 2026</string>
     <string name="about_author">Developed by spi</string>
     <string name="about_license">License: GNU AGPL-3.0-or-later</string>
     <string name="open_github_project">Open GitHub project</string>

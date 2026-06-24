@@ -41,6 +41,7 @@
     <string name="about_switchwerk">Über SwitchWerk</string>
     <string name="about_description">SwitchWerk controls compatible devices on the local network, including devices that are not otherwise reachable through a Wi-Fi network or the internet. It connects directly to the access point of the device being controlled. Your configuration stays on this device.</string>
     <string name="version_value">Version %1$s</string>
+    <string name="release_date">Veröffentlicht am 23. Juni 2026</string>
     <string name="about_author">Entwickelt von spi</string>
     <string name="about_license">Lizenz: GNU AGPL-3.0-or-later</string>
     <string name="open_github_project">GitHub-Projekt öffnen</string>
