@@ -193,10 +193,33 @@ class DefaultConfigurationTransferRepository(
 
         val existingWifiProfileIds = wifiProfileDao.getAll().map { it.id }.toSet()
         val existingDeviceIds = deviceDao.getAll().map { it.id }.toSet()
+
+        val summariesByMode = ConfigurationImportMode.entries.associateWith { importMode ->
+            createImportSummary(
+                document = document,
+                mode = importMode,
+                existingWifiProfileIds = existingWifiProfileIds,
+                existingDeviceIds = existingDeviceIds
+            )
+        }
+
+        return PreparedConfigurationImport(
+            document = document,
+            summary = requireNotNull(summariesByMode[mode]),
+            summariesByMode = summariesByMode
+        )
+    }
+
+    private fun createImportSummary(
+        document: ConfigurationDocument,
+        mode: ConfigurationImportMode,
+        existingWifiProfileIds: Set<String>,
+        existingDeviceIds: Set<String>
+    ): ConfigurationImportSummary {
         val importedWifiProfileIds = document.wifiProfiles.map { it.id }.toSet()
         val importedDeviceIds = document.devices.map { it.id }.toSet()
 
-        val summary = when (mode) {
+        return when (mode) {
             ConfigurationImportMode.MERGE -> ConfigurationImportSummary(
                 wifiProfilesNew = importedWifiProfileIds.count { it !in existingWifiProfileIds },
                 wifiProfilesOverwritten = importedWifiProfileIds.count { it in existingWifiProfileIds },
@@ -219,11 +242,6 @@ class DefaultConfigurationTransferRepository(
                 localDevicesDeleted = existingDeviceIds.size
             )
         }
-
-        return PreparedConfigurationImport(
-            document = document,
-            summary = summary
-        )
     }
 
     private suspend fun replaceConfiguration(document: ConfigurationDocument) {

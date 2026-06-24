@@ -21,6 +21,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -38,14 +40,20 @@ fun StandardConfigurationDialog(
     onAction: () -> Unit,
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
-    secondaryActionText: String? = null,
-    onSecondaryAction: (() -> Unit)? = null,
-    verticalActions: Boolean = false,
+    scrollToBottom: Boolean = false,
     cancelText: String? = null,
     @StringRes infoTitleResourceId: Int? = null,
     @StringRes infoMessageResourceId: Int? = null,
     content: @Composable () -> Unit
 ) {
+    val scrollState = rememberScrollState()
+    LaunchedEffect(scrollToBottom) {
+        if (scrollToBottom) {
+            withFrameNanos { }
+            withFrameNanos { }
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+    }
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -81,7 +89,7 @@ fun StandardConfigurationDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f, fill = false)
-                            .verticalScroll(rememberScrollState()),
+                            .verticalScroll(scrollState),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         content()
@@ -91,10 +99,7 @@ fun StandardConfigurationDialog(
                         onAction = onAction,
                         cancelText = cancelText ?: stringResource(R.string.cancel),
                         onCancel = onDismissRequest,
-                        actionEnabled = actionEnabled,
-                        secondaryActionText = secondaryActionText,
-                        onSecondaryAction = onSecondaryAction,
-                        verticalActions = verticalActions
+                        actionEnabled = actionEnabled
                     )
                 }
             }
@@ -110,38 +115,8 @@ fun StandardDialogButtons(
     onAction: () -> Unit,
     cancelText: String,
     onCancel: () -> Unit,
-    actionEnabled: Boolean = true,
-    secondaryActionText: String? = null,
-    onSecondaryAction: (() -> Unit)? = null,
-    verticalActions: Boolean = false
+    actionEnabled: Boolean = true
 ) {
-    if (verticalActions) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            StandardActionButton(
-                text = actionText,
-                onClick = onAction,
-                enabled = actionEnabled,
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (secondaryActionText != null && onSecondaryAction != null) {
-                StandardActionButton(
-                    text = secondaryActionText,
-                    onClick = onSecondaryAction,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            StandardActionButton(
-                text = cancelText,
-                onClick = onCancel,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        return
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -157,15 +132,6 @@ fun StandardDialogButtons(
                 .weight(1f)
                 .fillMaxHeight()
         )
-        if (secondaryActionText != null && onSecondaryAction != null) {
-            StandardActionButton(
-                text = secondaryActionText,
-                onClick = onSecondaryAction,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-            )
-        }
         StandardActionButton(
             text = cancelText,
             onClick = onCancel,

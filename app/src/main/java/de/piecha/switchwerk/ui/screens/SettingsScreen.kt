@@ -1,13 +1,18 @@
 package de.piecha.switchwerk.ui.screens
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
+import android.provider.OpenableColumns
+import android.view.inputmethod.InputMethodManager
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +49,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,6 +62,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -63,6 +71,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import de.piecha.switchwerk.data.repository.ConfigurationImportMode
@@ -95,15 +105,15 @@ fun SettingsScreen(
     val context = LocalContext.current
     val scanQrCodeText = stringResource(R.string.scan_qr_code)
     val uiState by viewModel.uiState.collectAsState()
-    var pendingFileImportMode by remember { mutableStateOf(initialUiState.pendingFileImportMode) }
-    var pendingQrImportMode by remember { mutableStateOf(initialUiState.pendingQrImportMode) }
-    var fileImportMode by remember { mutableStateOf(initialUiState.fileImportMode) }
-    var qrImportMode by remember { mutableStateOf(initialUiState.qrImportMode) }
-    var urlImportMode by remember { mutableStateOf(initialUiState.urlImportMode) }
+    var importMode by remember { mutableStateOf(initialUiState.importMode) }
     var urlImportValue by remember { mutableStateOf(initialUiState.urlImportValue) }
-    var showFileImportModeDialog by remember { mutableStateOf(initialUiState.showFileImportModeDialog) }
-    var showQrImportModeDialog by remember { mutableStateOf(initialUiState.showQrImportModeDialog) }
-    var showUrlImportDialog by remember { mutableStateOf(initialUiState.showUrlImportDialog) }
+    var fileImportUri by remember { mutableStateOf(initialUiState.fileImportUri) }
+    var fileImportReference by remember { mutableStateOf(initialUiState.fileImportReference) }
+    var showImportConfigurationDialog by remember {
+        mutableStateOf(initialUiState.showImportConfigurationDialog)
+    }
+    var importSource by remember { mutableStateOf(initialUiState.importSource) }
+    var importPasswords by remember { mutableStateOf(false) }
     var showPasswordExportWarning by remember { mutableStateOf(initialUiState.showPasswordExportWarning) }
     var exportIncludesPasswords by remember { mutableStateOf(initialUiState.exportIncludesPasswords) }
     var openSwipeItemId by remember { mutableStateOf(initialUiState.openSwipeItemId) }
@@ -112,15 +122,12 @@ fun SettingsScreen(
     SideEffect {
         onUiStateChanged(
             SettingsScreenUiState(
-                pendingFileImportMode = pendingFileImportMode,
-                pendingQrImportMode = pendingQrImportMode,
-                fileImportMode = fileImportMode,
-                qrImportMode = qrImportMode,
-                urlImportMode = urlImportMode,
+                importMode = importMode,
                 urlImportValue = urlImportValue,
-                showFileImportModeDialog = showFileImportModeDialog,
-                showQrImportModeDialog = showQrImportModeDialog,
-                showUrlImportDialog = showUrlImportDialog,
+                fileImportUri = fileImportUri,
+                fileImportReference = fileImportReference,
+                showImportConfigurationDialog = showImportConfigurationDialog,
+                importSource = importSource,
                 showPasswordExportWarning = showPasswordExportWarning,
                 exportIncludesPasswords = exportIncludesPasswords,
                 openSwipeItemId = openSwipeItemId
@@ -136,7 +143,11 @@ fun SettingsScreen(
     val importFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
-        uri?.let { viewModel.prepareImportFromFile(it, pendingFileImportMode) }
+        uri?.let {
+            importSource = ImportSource.FILE
+            fileImportUri = it.toString()
+            fileImportReference = it.displayReference(context)
+        }
     }
     val qrScanLauncher = rememberLauncherForActivityResult(
         contract = ScanContract()
@@ -145,7 +156,7 @@ fun SettingsScreen(
         if (content == null) {
             viewModel.reportQrScanCancelled()
         } else {
-            viewModel.prepareImportFromQrCode(content, pendingQrImportMode)
+            viewModel.prepareImportFromQrCode(content, importMode)
         }
     }
     fun launchQrScanner() {
@@ -353,14 +364,11 @@ fun SettingsScreen(
                                 }
                             }
                         },
-                        onImportFileClick = {
-                            runAfterClosingSwipe { showFileImportModeDialog = true }
-                        },
-                        onImportUrlClick = {
-                            runAfterClosingSwipe { showUrlImportDialog = true }
-                        },
-                        onScanQrCodeClick = {
-                            runAfterClosingSwipe { showQrImportModeDialog = true }
+                        onImportClick = {
+                            runAfterClosingSwipe {
+                                importPasswords = false
+                                showImportConfigurationDialog = true
+                            }
                         }
                     )
                 }
@@ -430,32 +438,31 @@ fun SettingsScreen(
         )
     }
 
-    if (showFileImportModeDialog) {
-        ImportModeDialog(
-            continueText = stringResource(R.string.select_file),
-            mode = fileImportMode,
-            onModeChange = { fileImportMode = it },
-            onContinue = { mode ->
-                pendingFileImportMode = mode
-                showFileImportModeDialog = false
+    if (showImportConfigurationDialog) {
+        ImportConfigurationDialog(
+            source = importSource,
+            url = urlImportValue,
+            fileUri = fileImportUri,
+            fileReference = fileImportReference,
+            isPreparing = uiState.isTransferInProgress,
+            summary = uiState.importSummary,
+            mode = uiState.importMode ?: importMode,
+            importPasswords = importPasswords,
+            onSelectUrl = {
+                importSource = ImportSource.URL
+                importPasswords = false
+                viewModel.cancelPendingImport()
+            },
+            onPickFile = {
+                importPasswords = false
+                viewModel.cancelPendingImport()
                 importFileLauncher.launch(arrayOf("application/json", "text/json", "text/plain"))
             },
-            onCancel = {
-                showFileImportModeDialog = false
-            }
-        )
-    }
-
-    if (showQrImportModeDialog) {
-        ImportModeDialog(
-            continueText = stringResource(R.string.scan_qr_code),
-            mode = qrImportMode,
-            onModeChange = { qrImportMode = it },
-            onContinue = { mode ->
-                pendingQrImportMode = mode
-                showQrImportModeDialog = false
-                if (
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+            onScanQrCode = {
+                importSource = ImportSource.QR_CODE
+                importPasswords = false
+                viewModel.cancelPendingImport()
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
                     PackageManager.PERMISSION_GRANTED
                 ) {
                     launchQrScanner()
@@ -463,66 +470,47 @@ fun SettingsScreen(
                     cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             },
-            onCancel = {
-                showQrImportModeDialog = false
-            }
-        )
-    }
-
-    if (showUrlImportDialog) {
-        UrlImportDialog(
-            url = urlImportValue,
-            mode = urlImportMode,
             onUrlChange = { urlImportValue = it },
-            onModeChange = { urlImportMode = it },
-            onImport = { url, mode ->
-                showUrlImportDialog = false
-                viewModel.prepareImportFromUrl(url, mode)
+            onLoadUrl = { viewModel.prepareImportFromUrl(urlImportValue, importMode) },
+            onLoadFile = { viewModel.prepareImportFromFile(Uri.parse(fileImportUri), importMode) },
+            onModeChange = { mode ->
+                importMode = mode
+                viewModel.updateImportMode(mode)
             },
-            onCancel = {
-                showUrlImportDialog = false
-            }
-        )
-    }
-
-    uiState.importSummary?.let { summary ->
-        ImportSummaryDialog(
-            summary = summary,
-            mode = uiState.importMode ?: ConfigurationImportMode.MERGE,
-            onImport = {
+            onImportPasswordsChange = { importPasswords = it },
+            onImport = { summary ->
+                showImportConfigurationDialog = false
                 confirmImportWithOptionalScanPermission(
                     importsWifiProfiles =
                         summary.wifiProfilesNew + summary.wifiProfilesOverwritten > 0,
-                    confirmImport = viewModel::confirmImportSummary
+                    confirmImport = { viewModel.confirmImport(importPasswords) }
                 )
             },
-            onCancel = viewModel::cancelPendingImport
-        )
-    }
-
-    if (uiState.showImportPasswordWarning) {
-        PasswordImportWarningDialog(
-            onImportWithPasswords = viewModel::confirmPasswordImport,
-            onImportWithoutPasswords = viewModel::confirmImportWithoutPasswords,
-            onCancel = viewModel::cancelPendingImport
+            onCancel = {
+                showImportConfigurationDialog = false
+                viewModel.cancelPendingImport()
+            }
         )
     }
 }
 
 data class SettingsScreenUiState(
-    val pendingFileImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
-    val pendingQrImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
-    val fileImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
-    val qrImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
-    val urlImportMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
+    val importMode: ConfigurationImportMode = ConfigurationImportMode.MERGE,
     val urlImportValue: String = "",
-    val showFileImportModeDialog: Boolean = false,
-    val showQrImportModeDialog: Boolean = false,
-    val showUrlImportDialog: Boolean = false,
+    val fileImportUri: String = "",
+    val fileImportReference: String = "",
+    val showImportConfigurationDialog: Boolean = false,
+    val importSource: ImportSource? = null,
     val showPasswordExportWarning: Boolean = false,
     val exportIncludesPasswords: Boolean = false,
     val openSwipeItemId: String? = null
 )
+
+enum class ImportSource {
+    FILE,
+    URL,
+    QR_CODE
+}
 
 enum class SettingsSection(val titleResourceId: Int) {
     WIFI_PROFILES(R.string.settings_tab_wifi_profiles),
@@ -1075,9 +1063,7 @@ private fun ImportExportSection(
     includePasswords: Boolean,
     onIncludePasswordsChange: (Boolean) -> Unit,
     onExportClick: () -> Unit,
-    onImportFileClick: () -> Unit,
-    onImportUrlClick: () -> Unit,
-    onScanQrCodeClick: () -> Unit
+    onImportClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -1107,7 +1093,6 @@ private fun ImportExportSection(
             }
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(R.string.export), style = MaterialTheme.typography.titleSmall)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1128,21 +1113,9 @@ private fun ImportExportSection(
                     modifier = Modifier.fillMaxWidth()
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                Text(stringResource(R.string.import_title), style = MaterialTheme.typography.titleSmall)
                 StandardActionButton(
-                    text = stringResource(R.string.import_file),
-                    onClick = onImportFileClick,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                StandardActionButton(
-                    text = stringResource(R.string.import_url),
-                    onClick = onImportUrlClick,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                StandardActionButton(
-                    text = stringResource(R.string.import_qr_code),
-                    onClick = onScanQrCodeClick,
+                    text = stringResource(R.string.import_configuration),
+                    onClick = onImportClick,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -1166,88 +1139,15 @@ private fun PasswordExportWarningDialog(
 }
 
 @Composable
-private fun ImportModeDialog(
-    continueText: String,
-    mode: ConfigurationImportMode,
-    onModeChange: (ConfigurationImportMode) -> Unit,
-    onContinue: (ConfigurationImportMode) -> Unit,
-    onCancel: () -> Unit
-) {
-    StandardConfigurationDialog(
-        title = stringResource(R.string.choose_import_mode),
-        onDismissRequest = onCancel,
-        actionText = continueText,
-        onAction = { onContinue(mode) }
-    ) {
-        ImportModeSelection(
-            mode = mode,
-            onModeChange = onModeChange
-        )
-    }
-}
-
-@Composable
-private fun UrlImportDialog(
-    url: String,
-    mode: ConfigurationImportMode,
-    onUrlChange: (String) -> Unit,
-    onModeChange: (ConfigurationImportMode) -> Unit,
-    onImport: (String, ConfigurationImportMode) -> Unit,
-    onCancel: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    StandardConfigurationDialog(
-        title = stringResource(R.string.import_from_https),
-        onDismissRequest = onCancel,
-        actionText = stringResource(R.string.check_import),
-        onAction = { onImport(url, mode) },
-        actionEnabled = url.isNotBlank()
-    ) {
-        OutlinedTextField(
-            value = url,
-            onValueChange = onUrlChange,
-            label = { Text(stringResource(R.string.https_url)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            modifier = Modifier.fillMaxWidth()
-        )
-        ImportModeSelection(
-            mode = mode,
-            onModeChange = onModeChange
-        )
-    }
-}
-
-@Composable
-private fun ImportModeSelection(
-    mode: ConfigurationImportMode,
-    onModeChange: (ConfigurationImportMode) -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        ImportModeOption(
-            selected = mode == ConfigurationImportMode.MERGE,
-            title = stringResource(R.string.import_mode_merge),
-            description = stringResource(R.string.import_mode_merge_description),
-            onClick = { onModeChange(ConfigurationImportMode.MERGE) }
-        )
-        ImportModeOption(
-            selected = mode == ConfigurationImportMode.REPLACE,
-            title = stringResource(R.string.import_mode_replace),
-            description = stringResource(R.string.import_mode_replace_description),
-            onClick = { onModeChange(ConfigurationImportMode.REPLACE) }
-        )
-    }
-}
-
-@Composable
 private fun ImportModeOption(
     selected: Boolean,
     title: String,
     description: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
         RadioButton(
@@ -1262,71 +1162,280 @@ private fun ImportModeOption(
 }
 
 @Composable
-private fun ImportSummaryDialog(
+private fun ImportSummaryContent(
     summary: ConfigurationImportSummary,
     mode: ConfigurationImportMode,
-    onImport: () -> Unit,
-    onCancel: () -> Unit
+    importPasswords: Boolean
 ) {
-    val wifiProfilesText = stringResource(
-        R.string.import_summary_wifi_profiles,
-        summary.wifiProfilesNew,
-        summary.wifiProfilesOverwritten
-    )
-    val devicesText = stringResource(
-        R.string.import_summary_devices,
-        summary.devicesNew,
-        summary.devicesOverwritten
-    )
-    val passwordsText = stringResource(
-        R.string.import_summary_passwords,
-        summary.passwordsIncluded,
-        summary.passwordsDeleted
-    )
-    val deletedWifiProfilesText = stringResource(
-        R.string.import_summary_local_wifi_profiles_deleted,
-        summary.localWifiProfilesDeleted
-    )
-    val deletedDevicesText = stringResource(
-        R.string.import_summary_local_devices_deleted,
-        summary.localDevicesDeleted
-    )
-    val text = buildString {
-        appendLine(wifiProfilesText)
-        appendLine(devicesText)
-        appendLine(passwordsText)
-        if (mode == ConfigurationImportMode.REPLACE) {
-            appendLine()
-            appendLine(deletedWifiProfilesText)
-            append(deletedDevicesText)
-        }
+    val wifiProfilesText = if (mode == ConfigurationImportMode.REPLACE) {
+        stringResource(
+            R.string.import_summary_replace_value,
+            summary.wifiProfilesNew,
+            summary.localWifiProfilesDeleted
+        )
+    } else {
+        stringResource(
+            R.string.import_summary_merge_value,
+            summary.wifiProfilesNew,
+            summary.wifiProfilesOverwritten
+        )
     }
-    StandardConfigurationDialog(
-        title = stringResource(R.string.import_summary_title),
-        onDismissRequest = onCancel,
-        actionText = stringResource(R.string.import_action),
-        onAction = onImport
-    ) {
-        Text(text)
+    val devicesText = if (mode == ConfigurationImportMode.REPLACE) {
+        stringResource(
+            R.string.import_summary_replace_value,
+            summary.devicesNew,
+            summary.localDevicesDeleted
+        )
+    } else {
+        stringResource(
+            R.string.import_summary_merge_value,
+            summary.devicesNew,
+            summary.devicesOverwritten
+        )
+    }
+    val passwordsText = when {
+        summary.passwordsIncluded + summary.passwordsDeleted == 0 -> {
+            stringResource(R.string.import_summary_no_password_fields)
+        }
+        importPasswords -> stringResource(
+            R.string.import_summary_passwords_enabled,
+            summary.passwordsIncluded,
+            summary.passwordsDeleted
+        )
+        else -> stringResource(
+            R.string.import_summary_passwords_disabled,
+            summary.passwordsIncluded + summary.passwordsDeleted
+        )
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        ImportSummaryRow(stringResource(R.string.import_summary_wifi_profiles_label), wifiProfilesText)
+        ImportSummaryRow(stringResource(R.string.import_summary_devices_label), devicesText)
+        ImportSummaryRow(stringResource(R.string.import_summary_passwords_label), passwordsText)
     }
 }
 
 @Composable
-private fun PasswordImportWarningDialog(
-    onImportWithPasswords: () -> Unit,
-    onImportWithoutPasswords: () -> Unit,
+private fun ImportSummaryRow(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(0.35f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(0.65f)
+        )
+    }
+}
+
+@Composable
+private fun ImportConfigurationDialog(
+    source: ImportSource?,
+    url: String,
+    fileUri: String,
+    fileReference: String,
+    isPreparing: Boolean,
+    summary: ConfigurationImportSummary?,
+    mode: ConfigurationImportMode,
+    importPasswords: Boolean,
+    onSelectUrl: () -> Unit,
+    onPickFile: () -> Unit,
+    onScanQrCode: () -> Unit,
+    onUrlChange: (String) -> Unit,
+    onLoadUrl: () -> Unit,
+    onLoadFile: () -> Unit,
+    onModeChange: (ConfigurationImportMode) -> Unit,
+    onImportPasswordsChange: (Boolean) -> Unit,
+    onImport: (ConfigurationImportSummary) -> Unit,
     onCancel: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
+    val view = LocalView.current
+    val importModeFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(isPreparing) {
+        if (isPreparing) {
+            focusManager.clearFocus(force = true)
+            keyboardController?.hide()
+            context.getSystemService(InputMethodManager::class.java)
+                ?.hideSoftInputFromWindow(view.windowToken, 0)
+            ViewCompat.getWindowInsetsController(view)?.hide(WindowInsetsCompat.Type.ime())
+        }
+    }
+    val containsPasswordFields = summary?.let {
+        it.passwordsIncluded + it.passwordsDeleted > 0
+    } == true
     StandardConfigurationDialog(
-        title = stringResource(R.string.import_passwords_title),
+        title = stringResource(R.string.import_configuration),
         onDismissRequest = onCancel,
-        actionText = stringResource(R.string.import_with_passwords),
-        onAction = onImportWithPasswords,
-        secondaryActionText = stringResource(R.string.import_without_passwords),
-        onSecondaryAction = onImportWithoutPasswords,
-        verticalActions = true
+        actionText = stringResource(R.string.import_action),
+        onAction = { summary?.let(onImport) },
+        actionEnabled = summary != null && !isPreparing,
+        scrollToBottom = summary != null
     ) {
-        Text(stringResource(R.string.import_passwords_warning))
+        Text(stringResource(R.string.import_step_source), style = MaterialTheme.typography.titleSmall)
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 32.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                SourceOptionRow(
+                    title = stringResource(R.string.import_file),
+                    selected = source == ImportSource.FILE,
+                    onClick = onPickFile
+                )
+                SourceOptionRow(
+                    title = stringResource(R.string.import_url),
+                    selected = source == ImportSource.URL,
+                    onClick = onSelectUrl
+                )
+                SourceOptionRow(
+                    title = stringResource(R.string.import_qr_code),
+                    selected = source == ImportSource.QR_CODE,
+                    onClick = onScanQrCode
+                )
+            }
+        }
+        if (source == ImportSource.URL) {
+            OutlinedTextField(
+                value = url,
+                onValueChange = onUrlChange,
+                label = { Text(stringResource(R.string.https_url)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            StandardActionButton(
+                text = stringResource(R.string.load_configuration),
+                onClick = {
+                    focusManager.clearFocus(force = true)
+                    keyboardController?.hide()
+                    context.getSystemService(InputMethodManager::class.java)
+                        ?.hideSoftInputFromWindow(view.windowToken, 0)
+                    importModeFocusRequester.requestFocus()
+                    onLoadUrl()
+                },
+                enabled = url.isNotBlank(),
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else if (source == ImportSource.FILE) {
+            OutlinedTextField(
+                value = fileReference,
+                onValueChange = {},
+                label = { Text(stringResource(R.string.selected_file)) },
+                readOnly = true,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            StandardActionButton(
+                text = stringResource(R.string.load_configuration),
+                onClick = {
+                    importModeFocusRequester.requestFocus()
+                    onLoadFile()
+                },
+                enabled = fileUri.isNotBlank(),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        HorizontalDivider()
+        Text(stringResource(R.string.import_step_options), style = MaterialTheme.typography.titleSmall)
+        ImportModeOption(
+            selected = mode == ConfigurationImportMode.MERGE,
+            title = stringResource(R.string.import_mode_merge),
+            description = stringResource(R.string.import_mode_merge_description),
+            onClick = { onModeChange(ConfigurationImportMode.MERGE) },
+            modifier = Modifier
+                .focusRequester(importModeFocusRequester)
+                .focusable()
+        )
+        ImportModeOption(
+            selected = mode == ConfigurationImportMode.REPLACE,
+            title = stringResource(R.string.import_mode_replace),
+            description = stringResource(R.string.import_mode_replace_description),
+            onClick = { onModeChange(ConfigurationImportMode.REPLACE) }
+        )
+        if (containsPasswordFields) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clickable { onImportPasswordsChange(!importPasswords) },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.import_passwords_switch))
+                Switch(
+                    checked = importPasswords,
+                    onCheckedChange = onImportPasswordsChange
+                )
+            }
+            Text(
+                text = stringResource(
+                    if (importPasswords) {
+                        R.string.import_passwords_enabled_hint
+                    } else {
+                        R.string.import_passwords_disabled_hint
+                    }
+                ),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
+        HorizontalDivider()
+        Text(stringResource(R.string.import_step_summary), style = MaterialTheme.typography.titleSmall)
+        if (isPreparing) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                Text(stringResource(R.string.configuration_processing))
+            }
+        } else if (summary == null) {
+            Text(stringResource(R.string.import_select_source_hint))
+        } else {
+            ImportSummaryContent(summary, mode, importPasswords)
+        }
+    }
+}
+
+@Composable
+private fun SourceOptionRow(
+    title: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(selected = selected, onClick = onClick)
+        Text(title, modifier = Modifier.padding(start = 6.dp))
+    }
+}
+
+private fun Uri.displayReference(context: Context): String {
+    val displayName = context.contentResolver.query(
+        this,
+        arrayOf(OpenableColumns.DISPLAY_NAME),
+        null,
+        null,
+        null
+    )?.use { cursor ->
+        val column = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (column >= 0 && cursor.moveToFirst()) cursor.getString(column) else null
+    }
+    val decodedPath = path?.let(Uri::decode)?.trimEnd('/')
+    return when {
+        decodedPath != null && displayName != null -> {
+            if (decodedPath.endsWith("/$displayName")) decodedPath else "$decodedPath/$displayName"
+        }
+        decodedPath != null -> decodedPath
+        displayName != null -> displayName
+        else -> toString()
     }
 }
 

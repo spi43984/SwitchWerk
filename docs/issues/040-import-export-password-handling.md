@@ -56,23 +56,10 @@ Der Import erfolgt ohne zusätzliche Passwortwarnung.
 
 #### Konfiguration mit Passwörtern
 
-Es erscheint ein Sicherheitsdialog.
-
-Titel:
-
-Konfiguration enthält Passwörter
-
-Text:
-
-Diese Konfiguration enthält gespeicherte Zugangsdaten. Möchten Sie diese ebenfalls importieren?
-
-Buttons:
-
-* Mit Passwörtern importieren
-* Ohne Passwörter importieren
-* Abbrechen
-
-Die Auswahl gilt für den gesamten Importvorgang.
+Der Importdialog zeigt einen standardmäßig deaktivierten Schalter
+„Passwörter importieren“. Die Auswahl gilt für den gesamten Importvorgang.
+Die Import-Zusammenfassung passt sich der Auswahl an und erklärt, ob
+Passwortfelder übernommen, als Löschanweisung verarbeitet oder ignoriert werden.
 
 ## Importregeln
 
@@ -143,16 +130,14 @@ Bei includePasswords = false:
 
 ### Import
 
-Sichere Abbruchaktion rechts gemäß Projektregel.
+Ein einzelner Dialog gliedert den Ablauf in drei nummerierte Bereiche:
 
-Links:
+1. Quelle: Datei, HTTPS-URL oder QR-Code
+2. Importoptionen: Ergänzen/Überschreiben oder Alles ersetzen sowie bei
+   Passwortdaten der Schalter „Passwörter importieren“
+3. Import-Zusammenfassung: Vorschau der Auswirkungen der gewählten Optionen
 
-* Mit Passwörtern importieren
-* Ohne Passwörter importieren
-
-Rechts:
-
-* Abbrechen
+Die sichere Abbruchaktion steht rechts neben „Importieren“.
 
 ## Nicht Bestandteil
 
@@ -174,7 +159,8 @@ Rechts:
 * [ ] Export ohne Passwörter enthält keine Zugangsdaten
 * [ ] Export mit Passwörtern enthält Zugangsdaten
 * [ ] Passwortdaten werden zuverlässig erkannt
-* [ ] Sicherheitsdialog erscheint bei passworthaltigen Dateien
+* [ ] Passwortimport ist bei passworthaltigen Dateien standardmäßig deaktiviert
+* [ ] Die Zusammenfassung zeigt die Auswirkungen der Passwortauswahl
 * [ ] Import mit Passwörtern übernimmt Passwortdaten
 * [ ] Import ohne Passwörter übernimmt keine Passwortdaten
 * [ ] Vorhandene Passwörter bleiben bei „Ergänzen/Überschreiben“ erhalten

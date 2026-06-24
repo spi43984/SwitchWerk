@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.ui.screens.SettingsScreen
 import de.piecha.switchwerk.ui.screens.SettingsSection
 import de.piecha.switchwerk.ui.screens.SettingsScreenUiState
+import de.piecha.switchwerk.ui.screens.ImportSource
 import de.piecha.switchwerk.ui.screens.StartScreen
 import de.piecha.switchwerk.ui.screens.HelpScreen
 import de.piecha.switchwerk.ui.screens.AboutScreen
@@ -52,15 +53,12 @@ private enum class AppScreen {
 private const val STATE_CURRENT_SCREEN = "current_screen"
 private const val STATE_HELP_RETURN_SCREEN = "help_return_screen"
 private const val STATE_SETTINGS_SECTION = "settings_section"
-private const val STATE_PENDING_FILE_IMPORT_MODE = "pending_file_import_mode"
-private const val STATE_PENDING_QR_IMPORT_MODE = "pending_qr_import_mode"
-private const val STATE_FILE_IMPORT_MODE = "file_import_mode"
-private const val STATE_QR_IMPORT_MODE = "qr_import_mode"
-private const val STATE_URL_IMPORT_MODE = "url_import_mode"
+private const val STATE_IMPORT_MODE = "import_mode"
 private const val STATE_URL_IMPORT_VALUE = "url_import_value"
-private const val STATE_SHOW_FILE_IMPORT_MODE_DIALOG = "show_file_import_mode_dialog"
-private const val STATE_SHOW_QR_IMPORT_MODE_DIALOG = "show_qr_import_mode_dialog"
-private const val STATE_SHOW_URL_IMPORT_DIALOG = "show_url_import_dialog"
+private const val STATE_FILE_IMPORT_URI = "file_import_uri"
+private const val STATE_FILE_IMPORT_REFERENCE = "file_import_reference"
+private const val STATE_SHOW_IMPORT_CONFIGURATION_DIALOG = "show_import_configuration_dialog"
+private const val STATE_IMPORT_SOURCE = "import_source"
 private const val STATE_SHOW_PASSWORD_EXPORT_WARNING = "show_password_export_warning"
 private const val STATE_OPEN_SWIPE_ITEM_ID = "open_swipe_item_id"
 
@@ -140,15 +138,12 @@ class MainActivity : ComponentActivity() {
         outState.putString(STATE_CURRENT_SCREEN, currentScreenForRestoration.name)
         outState.putString(STATE_HELP_RETURN_SCREEN, helpReturnScreenForRestoration.name)
         outState.putString(STATE_SETTINGS_SECTION, selectedSettingsSectionForRestoration.name)
-        outState.putString(STATE_PENDING_FILE_IMPORT_MODE, settingsScreenUiStateForRestoration.pendingFileImportMode.name)
-        outState.putString(STATE_PENDING_QR_IMPORT_MODE, settingsScreenUiStateForRestoration.pendingQrImportMode.name)
-        outState.putString(STATE_FILE_IMPORT_MODE, settingsScreenUiStateForRestoration.fileImportMode.name)
-        outState.putString(STATE_QR_IMPORT_MODE, settingsScreenUiStateForRestoration.qrImportMode.name)
-        outState.putString(STATE_URL_IMPORT_MODE, settingsScreenUiStateForRestoration.urlImportMode.name)
+        outState.putString(STATE_IMPORT_MODE, settingsScreenUiStateForRestoration.importMode.name)
         outState.putString(STATE_URL_IMPORT_VALUE, settingsScreenUiStateForRestoration.urlImportValue)
-        outState.putBoolean(STATE_SHOW_FILE_IMPORT_MODE_DIALOG, settingsScreenUiStateForRestoration.showFileImportModeDialog)
-        outState.putBoolean(STATE_SHOW_QR_IMPORT_MODE_DIALOG, settingsScreenUiStateForRestoration.showQrImportModeDialog)
-        outState.putBoolean(STATE_SHOW_URL_IMPORT_DIALOG, settingsScreenUiStateForRestoration.showUrlImportDialog)
+        outState.putString(STATE_FILE_IMPORT_URI, settingsScreenUiStateForRestoration.fileImportUri)
+        outState.putString(STATE_FILE_IMPORT_REFERENCE, settingsScreenUiStateForRestoration.fileImportReference)
+        outState.putBoolean(STATE_SHOW_IMPORT_CONFIGURATION_DIALOG, settingsScreenUiStateForRestoration.showImportConfigurationDialog)
+        outState.putString(STATE_IMPORT_SOURCE, settingsScreenUiStateForRestoration.importSource?.name)
         outState.putBoolean(STATE_SHOW_PASSWORD_EXPORT_WARNING, settingsScreenUiStateForRestoration.showPasswordExportWarning)
         outState.putString(STATE_OPEN_SWIPE_ITEM_ID, settingsScreenUiStateForRestoration.openSwipeItemId)
         super.onSaveInstanceState(outState)
@@ -184,15 +179,14 @@ private fun Bundle?.restoreSettingsSection(key: String, fallback: SettingsSectio
 
 private fun Bundle?.restoreSettingsScreenUiState(): SettingsScreenUiState {
     return SettingsScreenUiState(
-        pendingFileImportMode = restoreImportMode(STATE_PENDING_FILE_IMPORT_MODE),
-        pendingQrImportMode = restoreImportMode(STATE_PENDING_QR_IMPORT_MODE),
-        fileImportMode = restoreImportMode(STATE_FILE_IMPORT_MODE),
-        qrImportMode = restoreImportMode(STATE_QR_IMPORT_MODE),
-        urlImportMode = restoreImportMode(STATE_URL_IMPORT_MODE),
+        importMode = restoreImportMode(STATE_IMPORT_MODE),
         urlImportValue = this?.getString(STATE_URL_IMPORT_VALUE).orEmpty(),
-        showFileImportModeDialog = this?.getBoolean(STATE_SHOW_FILE_IMPORT_MODE_DIALOG) ?: false,
-        showQrImportModeDialog = this?.getBoolean(STATE_SHOW_QR_IMPORT_MODE_DIALOG) ?: false,
-        showUrlImportDialog = this?.getBoolean(STATE_SHOW_URL_IMPORT_DIALOG) ?: false,
+        fileImportUri = this?.getString(STATE_FILE_IMPORT_URI).orEmpty(),
+        fileImportReference = this?.getString(STATE_FILE_IMPORT_REFERENCE).orEmpty(),
+        showImportConfigurationDialog = this?.getBoolean(STATE_SHOW_IMPORT_CONFIGURATION_DIALOG) ?: false,
+        importSource = this?.getString(STATE_IMPORT_SOURCE)?.let { name ->
+            ImportSource.entries.firstOrNull { it.name == name }
+        },
         showPasswordExportWarning = this?.getBoolean(STATE_SHOW_PASSWORD_EXPORT_WARNING) ?: false,
         openSwipeItemId = this?.getString(STATE_OPEN_SWIPE_ITEM_ID)
     )

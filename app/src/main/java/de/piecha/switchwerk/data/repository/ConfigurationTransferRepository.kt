@@ -21,12 +21,12 @@ data class ConfigurationImportSummary(
 
 data class PreparedConfigurationImport(
     val document: ConfigurationDocument,
-    val summary: ConfigurationImportSummary
+    val summary: ConfigurationImportSummary,
+    val summariesByMode: Map<ConfigurationImportMode, ConfigurationImportSummary> = emptyMap()
 ) {
-    val containsPasswordChanges: Boolean
-        get() = document.wifiProfiles.any { it.isPasswordPresent } ||
-            summary.passwordsIncluded > 0 ||
-            summary.passwordsDeleted > 0
+    fun summaryFor(mode: ConfigurationImportMode): ConfigurationImportSummary {
+        return summariesByMode[mode] ?: summary
+    }
 }
 
 interface ConfigurationTransferRepository {

@@ -94,7 +94,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun passwordImportWarningCanImportWithoutPasswords() = runTest(dispatcher) {
+    fun passwordImportCanExcludePasswords() = runTest(dispatcher) {
         val transferRepository = FakeConfigurationTransferRepository(
             preparedDocument = passwordConfigurationDocument()
         )
@@ -103,18 +103,14 @@ class SettingsViewModelTest {
 
         viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
         runCurrent()
-        viewModel.confirmImportSummary()
-
-        assertTrue(viewModel.uiState.value.showImportPasswordWarning)
-
-        viewModel.confirmImportWithoutPasswords()
+        viewModel.confirmImport(includePasswords = false)
         runCurrent()
 
         assertEquals(false, transferRepository.lastIncludePasswords)
     }
 
     @Test
-    fun passwordImportWarningCanImportWithPasswords() = runTest(dispatcher) {
+    fun passwordImportCanIncludePasswords() = runTest(dispatcher) {
         val transferRepository = FakeConfigurationTransferRepository(
             preparedDocument = passwordConfigurationDocument()
         )
@@ -123,15 +119,14 @@ class SettingsViewModelTest {
 
         viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
         runCurrent()
-        viewModel.confirmImportSummary()
-        viewModel.confirmPasswordImport()
+        viewModel.confirmImport(includePasswords = true)
         runCurrent()
 
         assertEquals(true, transferRepository.lastIncludePasswords)
     }
 
     @Test
-    fun cancellingPasswordImportDoesNotApplyChanges() = runTest(dispatcher) {
+    fun cancellingPreparedImportDoesNotApplyChanges() = runTest(dispatcher) {
         val transferRepository = FakeConfigurationTransferRepository(
             preparedDocument = passwordConfigurationDocument()
         )
@@ -140,12 +135,31 @@ class SettingsViewModelTest {
 
         viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
         runCurrent()
-        viewModel.confirmImportSummary()
         viewModel.cancelPendingImport()
         runCurrent()
 
         assertEquals(null, transferRepository.lastIncludePasswords)
-        assertFalse(viewModel.uiState.value.showImportPasswordWarning)
+        assertEquals(null, viewModel.uiState.value.importSummary)
+    }
+
+    @Test
+    fun changingImportModeUpdatesPreparedImportSummary() = runTest(dispatcher) {
+        val mergeSummary = importSummary(wifiProfilesNew = 1, localWifiProfilesDeleted = 0)
+        val replaceSummary = importSummary(wifiProfilesNew = 2, localWifiProfilesDeleted = 3)
+        val transferRepository = FakeConfigurationTransferRepository(
+            summariesByMode = mapOf(
+                ConfigurationImportMode.MERGE to mergeSummary,
+                ConfigurationImportMode.REPLACE to replaceSummary
+            )
+        )
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", ConfigurationImportMode.MERGE)
+        runCurrent()
+        viewModel.updateImportMode(ConfigurationImportMode.REPLACE)
+
+        assertEquals(replaceSummary, viewModel.uiState.value.importSummary)
     }
 
     @Test
@@ -472,7 +486,8 @@ class SettingsViewModelTest {
             schemaVersion = CONFIGURATION_SCHEMA_VERSION,
             wifiProfiles = emptyList(),
             devices = emptyList()
-        )
+        ),
+        private val summariesByMode: Map<ConfigurationImportMode, ConfigurationImportSummary> = emptyMap()
     ) : ConfigurationTransferRepository {
         var lastUrl: String? = null
         var lastMode: ConfigurationImportMode? = null
@@ -505,7 +520,7 @@ class SettingsViewModelTest {
         private fun preparedImport(): PreparedConfigurationImport {
             return PreparedConfigurationImport(
                 document = preparedDocument,
-                summary = ConfigurationImportSummary(
+                summary = summariesByMode[ConfigurationImportMode.MERGE] ?: ConfigurationImportSummary(
                     wifiProfilesNew = 0,
                     wifiProfilesOverwritten = 0,
                     devicesNew = 0,
@@ -514,9 +529,26 @@ class SettingsViewModelTest {
                     passwordsDeleted = 0,
                     localWifiProfilesDeleted = 0,
                     localDevicesDeleted = 0
-                )
+                ),
+                summariesByMode = summariesByMode
             )
         }
+    }
+
+    private fun importSummary(
+        wifiProfilesNew: Int = 0,
+        localWifiProfilesDeleted: Int = 0
+    ): ConfigurationImportSummary {
+        return ConfigurationImportSummary(
+            wifiProfilesNew = wifiProfilesNew,
+            wifiProfilesOverwritten = 0,
+            devicesNew = 0,
+            devicesOverwritten = 0,
+            passwordsIncluded = 0,
+            passwordsDeleted = 0,
+            localWifiProfilesDeleted = localWifiProfilesDeleted,
+            localDevicesDeleted = 0
+        )
     }
 
     private fun passwordConfigurationDocument(): ConfigurationDocument {
