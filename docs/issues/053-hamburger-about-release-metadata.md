@@ -18,7 +18,7 @@ Das offene Hamburger-Menü und das About-Menü sollen die aktuelle App-Version u
   - Version
   - Release-Datum
 - Version und Datum stehen jeweils in einer eigenen Zeile.
-- Darunter wird klein das Icon aus dem About-Menü angezeigt.
+- Darunter wird das App-Icon so angezeigt, dass es das Menü in der Breite ausfüllt.
 - Die Darstellung muss in das Menü passen und darf keine Navigationseinträge verdrängen oder überdecken.
 - Deutsch und Englisch konsistent pflegen.
 
