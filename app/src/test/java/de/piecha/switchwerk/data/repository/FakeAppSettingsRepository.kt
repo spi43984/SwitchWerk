@@ -5,6 +5,8 @@ import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -40,6 +42,16 @@ class FakeAppSettingsRepository(
     override fun setDashboardLayoutMode(dashboardLayoutMode: DashboardLayoutMode) {
         mutableSettings.value = mutableSettings.value.copy(
             dashboardLayoutMode = dashboardLayoutMode
+        )
+    }
+
+    override fun setWifiProfileSorting(
+        criterion: WifiProfileSortCriterion,
+        direction: WifiProfileSortDirection
+    ) {
+        mutableSettings.value = mutableSettings.value.copy(
+            wifiProfileSortCriterion = criterion,
+            wifiProfileSortDirection = direction
         )
     }
 }

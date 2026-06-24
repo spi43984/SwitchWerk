@@ -87,6 +87,11 @@
 
     <string name="name_and_ssid">Name\nSSID</string>
     <string name="add_wifi_profile">WLAN-Profil hinzufügen</string>
+    <string name="wifi_profile_sort_current">WLAN-Profile sortieren: %1$s</string>
+    <string name="wifi_profile_sort_profile_name_ascending">Profilname A-Z</string>
+    <string name="wifi_profile_sort_profile_name_descending">Profilname Z-A</string>
+    <string name="wifi_profile_sort_ssid_ascending">SSID A-Z</string>
+    <string name="wifi_profile_sort_ssid_descending">SSID Z-A</string>
     <string name="more_wifi_profiles_above">Weitere WLAN-Profile oberhalb</string>
     <string name="more_wifi_profiles_below">Weitere WLAN-Profile unterhalb</string>
     <string name="no_wifi_profiles_configured">Keine WLAN-Profile konfiguriert.</string>

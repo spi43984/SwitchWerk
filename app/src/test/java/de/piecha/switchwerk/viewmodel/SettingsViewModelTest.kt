@@ -23,6 +23,8 @@ import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiSecurityType
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import de.piecha.switchwerk.ui.StringProvider
 import de.piecha.switchwerk.ui.UiText
 import kotlinx.coroutines.Dispatchers
@@ -375,6 +377,87 @@ class SettingsViewModelTest {
             viewModel.uiState.value.appSettings.detailPanelHeight
         )
         assertFalse(viewModel.uiState.value.appSettings.diagnosticsNewestFirst)
+    }
+
+    @Test
+    fun wifiProfilesAreSortedCaseInsensitivelyBySelectedCriterionAndId() = runTest(dispatcher) {
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(
+                profiles = listOf(
+                    WifiProfile(id = "wifi-2", name = "alpha", ssid = "Zulu"),
+                    WifiProfile(id = "wifi-1", name = "Alpha", ssid = "Bravo"),
+                    WifiProfile(id = "wifi-3", name = "Beta", ssid = "alpha")
+                )
+            )
+        )
+        runCurrent()
+
+        assertEquals(
+            listOf("wifi-1", "wifi-2", "wifi-3"),
+            viewModel.uiState.value.wifiProfiles.map { it.id }
+        )
+
+        viewModel.setWifiProfileSorting(
+            WifiProfileSortCriterion.SSID,
+            WifiProfileSortDirection.ASCENDING
+        )
+        runCurrent()
+
+        assertEquals(
+            listOf("wifi-3", "wifi-1", "wifi-2"),
+            viewModel.uiState.value.wifiProfiles.map { it.id }
+        )
+        assertEquals(
+            WifiProfileSortCriterion.SSID,
+            viewModel.uiState.value.appSettings.wifiProfileSortCriterion
+        )
+        assertEquals(
+            WifiProfileSortDirection.ASCENDING,
+            viewModel.uiState.value.appSettings.wifiProfileSortDirection
+        )
+
+        viewModel.setWifiProfileSorting(
+            WifiProfileSortCriterion.SSID,
+            WifiProfileSortDirection.DESCENDING
+        )
+        runCurrent()
+
+        assertEquals(
+            listOf("wifi-2", "wifi-1", "wifi-3"),
+            viewModel.uiState.value.wifiProfiles.map { it.id }
+        )
+
+        viewModel.setWifiProfileSorting(
+            WifiProfileSortCriterion.PROFILE_NAME,
+            WifiProfileSortDirection.DESCENDING
+        )
+        runCurrent()
+
+        assertEquals(
+            listOf("wifi-3", "wifi-1", "wifi-2"),
+            viewModel.uiState.value.wifiProfiles.map { it.id }
+        )
+    }
+
+    @Test
+    fun devicesAreSortedCaseInsensitivelyByName() = runTest(dispatcher) {
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            deviceRepository = FakeDeviceRepository(
+                devices = listOf(
+                    device(id = "device-z", name = "Zulu", wifiProfileId = "wifi-1"),
+                    device(id = "device-A", name = "alpha", wifiProfileId = "wifi-1"),
+                    device(id = "device-1", name = "Alpha", wifiProfileId = "wifi-1")
+                )
+            )
+        )
+        runCurrent()
+
+        assertEquals(
+            listOf("device-1", "device-A", "device-z"),
+            viewModel.uiState.value.devices.map { it.id }
+        )
     }
 
     private fun settingsViewModel(

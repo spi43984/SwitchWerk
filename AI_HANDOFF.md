@@ -4,6 +4,26 @@ Stand: 24. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 019 „Configurable WiFi List Sorting“ ist auf dem Branch
+`configurable-wifi-list-sorting` implementiert, vom Benutzer erfolgreich
+geprüft und auf dessen Anweisung abgeschlossen; die Änderungen sind noch nicht
+veröffentlicht.
+
+- GitHub-Issue: #115
+- WLAN-Profile werden im `SettingsViewModel` nach dem persistent gespeicherten
+  Kriterium Profilname oder SSID auf- oder absteigend sortiert; beide Vergleiche sind
+  groß-/kleinschreibungsunabhängig und verwenden die Profil-ID als zweiten
+  Sortierschlüssel. Die Geräteverwaltung zeigt Geräte unabhängig von
+  `sortOrder` alphabetisch nach sichtbarem Gerätenamen.
+- Die WLAN-Liste besitzt zwischen Info- und Plus-Schaltfläche ein Sortiermenü
+  mit markiertem aktivem Kriterium und aktiver Richtung. In der Geräteverwaltung gibt es kein
+  Sortier-Icon.
+- Im Container waren `lintDebug` (0 Fehler, 93 vorhandene Warnungen) und
+  `testDebugUnitTest` erfolgreich; der Benutzer hat die Prüfungen erfolgreich
+  bestätigt. GitHub-Issue #114 wurde als Duplikat von #115 geschlossen.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 021
+  „HTTP/HTTPS Device Actions“.
+
 Issue 053 „Hamburger And About Release Metadata“ ist veröffentlicht und
 abgeschlossen.
 

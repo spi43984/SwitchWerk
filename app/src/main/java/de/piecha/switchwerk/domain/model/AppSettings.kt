@@ -23,11 +23,23 @@ enum class DashboardLayoutMode {
     WIDGETS
 }
 
+enum class WifiProfileSortCriterion {
+    PROFILE_NAME,
+    SSID
+}
+
+enum class WifiProfileSortDirection {
+    ASCENDING,
+    DESCENDING
+}
+
 data class AppSettings(
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val language: AppLanguage = AppLanguage.SYSTEM,
     val showActionDetails: Boolean = false,
     val detailPanelHeight: DetailPanelHeight = DetailPanelHeight.THIRTY_PERCENT,
     val diagnosticsNewestFirst: Boolean = true,
-    val dashboardLayoutMode: DashboardLayoutMode = DashboardLayoutMode.LIST
+    val dashboardLayoutMode: DashboardLayoutMode = DashboardLayoutMode.LIST,
+    val wifiProfileSortCriterion: WifiProfileSortCriterion = WifiProfileSortCriterion.PROFILE_NAME,
+    val wifiProfileSortDirection: WifiProfileSortDirection = WifiProfileSortDirection.ASCENDING
 )

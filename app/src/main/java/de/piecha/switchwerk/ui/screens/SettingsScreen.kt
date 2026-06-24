@@ -32,12 +32,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
@@ -79,6 +82,8 @@ import de.piecha.switchwerk.data.repository.ConfigurationImportMode
 import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
@@ -288,10 +293,13 @@ fun SettingsScreen(
             when (selectedSection) {
                 SettingsSection.WIFI_PROFILES -> WifiProfileManagementSection(
                     profiles = uiState.wifiProfiles,
+                    sortCriterion = uiState.appSettings.wifiProfileSortCriterion,
+                    sortDirection = uiState.appSettings.wifiProfileSortDirection,
                     openSwipeItemId = openSwipeItemId,
                     onOpenSwipeItem = { openSwipeItemId = it },
                     onCloseSwipeItem = { openSwipeItemId = null },
                     onAddClick = { runAfterClosingSwipe(viewModel::startNewWifiProfile) },
+                    onSortingChange = viewModel::setWifiProfileSorting,
                     onEditClick = viewModel::startEditWifiProfile,
                     onDeleteClick = viewModel::requestWifiProfileDeletion,
                     modifier = Modifier.fillMaxSize()
@@ -672,14 +680,19 @@ private fun RadioOptionRow(
 @Composable
 private fun WifiProfileManagementSection(
     profiles: List<WifiProfile>,
+    sortCriterion: WifiProfileSortCriterion,
+    sortDirection: WifiProfileSortDirection,
     openSwipeItemId: String?,
     onOpenSwipeItem: (String) -> Unit,
     onCloseSwipeItem: () -> Unit,
     onAddClick: () -> Unit,
+    onSortingChange: (WifiProfileSortCriterion, WifiProfileSortDirection) -> Unit,
     onEditClick: (WifiProfile) -> Unit,
     onDeleteClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isSortMenuExpanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -698,6 +711,48 @@ private fun WifiProfileManagementSection(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 InfoHint(R.string.wifi_profiles_info_title, R.string.list_interaction_info)
+                Box {
+                    IconButton(
+                        onClick = { isSortMenuExpanded = true },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = stringResource(
+                                R.string.wifi_profile_sort_current,
+                                stringResource(sortCriterion.sortOptionLabelResourceId(sortDirection))
+                            )
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = isSortMenuExpanded,
+                        onDismissRequest = { isSortMenuExpanded = false }
+                    ) {
+                        WifiProfileSortCriterion.entries.forEach { criterion ->
+                            WifiProfileSortDirection.entries.forEach { direction ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        stringResource(
+                                            criterion.sortOptionLabelResourceId(direction)
+                                        )
+                                    )
+                                },
+                                onClick = {
+                                    onSortingChange(criterion, direction)
+                                    isSortMenuExpanded = false
+                                },
+                                trailingIcon = {
+                                    RadioButton(
+                                        selected = criterion == sortCriterion && direction == sortDirection,
+                                        onClick = null
+                                    )
+                                }
+                            )
+                            }
+                        }
+                    }
+                }
                 IconButton(onClick = onAddClick, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.Filled.Add,
@@ -716,6 +771,20 @@ private fun WifiProfileManagementSection(
             onDeleteClick = onDeleteClick,
             modifier = Modifier.weight(1f)
         )
+    }
+}
+
+@androidx.annotation.StringRes
+private fun WifiProfileSortCriterion.sortOptionLabelResourceId(
+    direction: WifiProfileSortDirection
+): Int = when (this) {
+    WifiProfileSortCriterion.PROFILE_NAME -> when (direction) {
+        WifiProfileSortDirection.ASCENDING -> R.string.wifi_profile_sort_profile_name_ascending
+        WifiProfileSortDirection.DESCENDING -> R.string.wifi_profile_sort_profile_name_descending
+    }
+    WifiProfileSortCriterion.SSID -> when (direction) {
+        WifiProfileSortDirection.ASCENDING -> R.string.wifi_profile_sort_ssid_ascending
+        WifiProfileSortDirection.DESCENDING -> R.string.wifi_profile_sort_ssid_descending
     }
 }
 
