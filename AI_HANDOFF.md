@@ -4,6 +4,22 @@ Stand: 24. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 054 „App Icon Replacement“ ist auf Branch `app-icon-replacement`
+implementiert und auf dem Host geprüft, aber noch nicht veröffentlicht oder
+abgeschlossen.
+
+- GitHub-Issue: #110
+- `docs/assets/icons/Kabelblitz_gelb.png` ist die im Repository verbleibende
+  Quell- und Referenzdatei. Sie ersetzt die Android-Launcher-Rasterressourcen
+  in allen fünf Dichten sowie den adaptiven Vordergrund. Der adaptive
+  Hintergrund verwendet jetzt `#0E1010`. Für Android-13+-Themed-Icons
+  verwenden die `mipmap-anydpi-v33`-Varianten zusätzlich
+  `docs/assets/icons/Kabelblitz_mono_simple3.png` als monochrome Ebene; die
+  Android-8+-Varianten und Manifest-Verweise bleiben unverändert.
+- Host-Build, Installation sowie Prüfung in Launcher, App-Info und
+  About-/Hilfe-Bereich wurden erfolgreich bestätigt. Nicht committen oder
+  veröffentlichen ohne ausdrückliche Benutzeranweisung.
+
 Issue 042 „Action Cancellation And Fast-Fail WiFi“ ist veröffentlicht und
 abgeschlossen.
 
