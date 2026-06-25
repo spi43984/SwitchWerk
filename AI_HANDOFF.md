@@ -90,8 +90,8 @@ vom Benutzer als ok bestätigt, aber noch nicht veröffentlicht.
   anschließend als ok bestätigt.
 - Die lokale Issue-Datei und `docs/issues/overview.txt` sind auf
   `abgeschlossen` gesetzt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 022
-  „Request Body And Content-Type Support“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 031
+  „Import Enforces Unique WiFi Profile Names“.
 
 Issue 056 „Keyboard Options For Technical Device Inputs“ ist veröffentlicht und
 abgeschlossen.
