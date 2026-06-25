@@ -5,6 +5,7 @@ import de.piecha.switchwerk.data.local.dao.DeviceDao
 import de.piecha.switchwerk.data.local.entity.DeviceConnectionEntity
 import de.piecha.switchwerk.data.local.entity.DeviceEntity
 import de.piecha.switchwerk.domain.model.ApiCall
+import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
@@ -81,7 +82,9 @@ class RoomDeviceRepository(
             protocol = DeviceProtocol.valueOf(apiProtocol),
             apiCall = ApiCall(
                 method = ApiMethod.valueOf(apiMethod),
-                path = apiPath
+                path = apiPath,
+                requestBody = apiRequestBody,
+                contentType = ApiContentType.valueOf(apiContentType)
             ),
             connections = connections.map { it.toDomain() },
             sortOrder = sortOrder
@@ -96,6 +99,8 @@ class RoomDeviceRepository(
             apiProtocol = protocol.name,
             apiMethod = apiCall.method.name,
             apiPath = apiCall.path,
+            apiRequestBody = apiCall.requestBody,
+            apiContentType = apiCall.contentType.name,
             sortOrder = sortOrder
         )
     }

@@ -424,7 +424,8 @@ class DefaultDeviceActionService(
 
             ApiMethod.POST -> httpApiCallService.post(
                 url = url,
-                body = apiCall.optionalPayload,
+                body = apiCall.requestBody,
+                contentType = apiCall.contentType.value,
                 network = network
             )
         }

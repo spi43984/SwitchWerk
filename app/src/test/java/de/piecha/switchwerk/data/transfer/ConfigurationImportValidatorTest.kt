@@ -1,5 +1,6 @@
 package de.piecha.switchwerk.data.transfer
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -39,6 +40,23 @@ class ConfigurationImportValidatorTest {
                 appSettings = null
             )
         )
+    }
+
+    @Test
+    fun actionWithoutRequestBodyAndContentTypeUsesCompatibleDefaults() {
+        val action = ConfigurationDeviceAction(
+            method = "POST",
+            path = "/rpc/action"
+        )
+
+        validator.validate(
+            validDocument(
+                devices = listOf(device().copy(action = action))
+            )
+        )
+
+        assertEquals(null, action.requestBody)
+        assertEquals("APPLICATION_JSON", action.contentType)
     }
 
     @Test
@@ -215,6 +233,39 @@ class ConfigurationImportValidatorTest {
                 protocol = "FTP",
                 method = "GET",
                 path = "/rpc/action"
+            )
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(validDocument(devices = listOf(device)))
+        }
+    }
+
+    @Test
+    fun supportedActionContentTypesAreAccepted() {
+        validator.validate(
+            validDocument(
+                devices = listOf(
+                    device().copy(
+                        action = ConfigurationDeviceAction(
+                            method = "POST",
+                            path = "/rpc/action",
+                            requestBody = "line 1\nline 2",
+                            contentType = "TEXT_PLAIN"
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    @Test
+    fun unsupportedActionContentTypeIsRejected() {
+        val device = validDocument().devices.single().copy(
+            action = ConfigurationDeviceAction(
+                method = "POST",
+                path = "/rpc/action",
+                contentType = "APPLICATION_XML"
             )
         )
 

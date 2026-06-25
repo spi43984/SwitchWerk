@@ -10,6 +10,7 @@ import de.piecha.switchwerk.data.network.WifiConnectionResult
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.domain.model.ApiCall
+import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
@@ -419,7 +420,38 @@ class DefaultDeviceActionServiceTest {
         assertEquals(2, wifiService.disconnectCount)
         assertEquals("POST", httpService.calls.single().method)
         assertEquals("""{"on":true}""", httpService.calls.single().body)
+        assertEquals("application/json", httpService.calls.single().contentType)
         assertSame(secondNetwork, httpService.calls.single().network)
+    }
+
+    @Test
+    fun postUsesConfiguredRequestBodyAndContentType() = runBlocking {
+        val requestedNetwork = mock(Network::class.java)
+        val httpService = FakeHttpApiCallService(
+            results = ArrayDeque(listOf(successResult()))
+        )
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(requestedNetwork)))
+            ),
+            httpService = httpService
+        )
+
+        val result = service.execute(
+            device(
+                method = ApiMethod.POST,
+                payload = "line 1\nline 2",
+                contentType = ApiContentType.TEXT_PLAIN,
+                connections = listOf(DeviceConnection("wifi-1", "device.local"))
+            )
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals("POST", httpService.calls.single().method)
+        assertEquals("line 1\nline 2", httpService.calls.single().body)
+        assertEquals("text/plain", httpService.calls.single().contentType)
+        assertSame(requestedNetwork, httpService.calls.single().network)
     }
 
     @Test
@@ -897,6 +929,7 @@ class DefaultDeviceActionServiceTest {
         protocol: DeviceProtocol = DeviceProtocol.HTTP,
         method: ApiMethod = ApiMethod.GET,
         payload: String? = null,
+        contentType: ApiContentType = ApiContentType.APPLICATION_JSON,
         path: String = "/rpc/action",
         connections: List<DeviceConnection>
     ): Device {
@@ -908,7 +941,8 @@ class DefaultDeviceActionServiceTest {
             apiCall = ApiCall(
                 method = method,
                 path = path,
-                optionalPayload = payload
+                requestBody = payload.orEmpty(),
+                contentType = contentType
             ),
             connections = connections,
             sortOrder = 0
@@ -1017,7 +1051,7 @@ class DefaultDeviceActionServiceTest {
             network: Network?,
             timeoutMillis: Long
         ): HttpApiCallResult {
-            calls += ApiCallRecord("GET", url, null, network)
+            calls += ApiCallRecord("GET", url, null, null, network)
             return results.removeFirst()
         }
 
@@ -1028,7 +1062,7 @@ class DefaultDeviceActionServiceTest {
             network: Network?,
             timeoutMillis: Long
         ): HttpApiCallResult {
-            calls += ApiCallRecord("POST", url, body, network)
+            calls += ApiCallRecord("POST", url, body, contentType, network)
             return results.removeFirst()
         }
     }
@@ -1059,6 +1093,7 @@ class DefaultDeviceActionServiceTest {
         val method: String,
         val url: String,
         val body: String?,
+        val contentType: String?,
         val network: Network?
     )
 }

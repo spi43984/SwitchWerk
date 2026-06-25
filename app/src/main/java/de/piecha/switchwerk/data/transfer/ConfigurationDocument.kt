@@ -36,7 +36,9 @@ data class ConfigurationDevice(
 data class ConfigurationDeviceAction(
     val protocol: String = "HTTP",
     val method: String,
-    val path: String
+    val path: String,
+    val requestBody: String? = null,
+    val contentType: String = "APPLICATION_JSON"
 )
 
 data class ConfigurationDeviceConnection(
@@ -44,4 +46,4 @@ data class ConfigurationDeviceConnection(
     val host: String
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 3
+const val CONFIGURATION_SCHEMA_VERSION = 4

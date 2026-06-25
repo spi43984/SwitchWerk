@@ -55,6 +55,10 @@ class ConfigurationJsonCodec {
                     writer.name("protocol").value(device.action.protocol)
                     writer.name("method").value(device.action.method)
                     writer.name("path").value(device.action.path)
+                    device.action.requestBody?.let { requestBody ->
+                        writer.name("requestBody").value(requestBody)
+                    }
+                    writer.name("contentType").value(device.action.contentType)
                     writer.endObject()
                     writer.name("connections")
                     writer.beginArray()
@@ -234,6 +238,8 @@ class ConfigurationJsonCodec {
         var protocol: String? = null
         var method: String? = null
         var path: String? = null
+        var requestBody: String? = null
+        var contentType: String? = null
 
         beginObject()
         while (hasNext()) {
@@ -241,6 +247,15 @@ class ConfigurationJsonCodec {
                 "protocol" -> protocol = nextString()
                 "method" -> method = nextString()
                 "path" -> path = nextString()
+                "requestBody" -> {
+                    requestBody = if (peek() == JsonToken.NULL) {
+                        nextNull()
+                        null
+                    } else {
+                        nextString()
+                    }
+                }
+                "contentType" -> contentType = nextString()
                 else -> skipValue()
             }
         }
@@ -249,7 +264,9 @@ class ConfigurationJsonCodec {
         return ConfigurationDeviceAction(
             protocol = protocol ?: "HTTP",
             method = requireField(method, "devices.action.method"),
-            path = requireField(path, "devices.action.path")
+            path = requireField(path, "devices.action.path"),
+            requestBody = requestBody,
+            contentType = contentType ?: "APPLICATION_JSON"
         )
     }
 

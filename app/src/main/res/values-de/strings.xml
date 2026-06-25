@@ -100,8 +100,10 @@
     <string name="more_devices_below">Weitere Geräte unterhalb</string>
     <string name="button_label">Button-Beschriftung</string>
     <string name="api_call">API-Aufruf</string>
+    <string name="api_request_body">Request-Body</string>
     <string name="selected_device_protocol">✓ %1$s</string>
     <string name="selected_api_method">✓ %1$s</string>
+    <string name="selected_api_content_type">✓ %1$s</string>
     <string name="add_wifi_assignment">WLAN-Zuordnung hinzufügen</string>
     <string name="edit_wifi_assignment">WLAN-Zuordnung bearbeiten</string>
     <string name="delete_wifi_assignment">WLAN-Zuordnung löschen</string>
@@ -210,6 +212,7 @@
     <string name="error_api_call_empty">API-Aufruf darf nicht leer sein</string>
     <string name="error_api_method_invalid">API-Methode ist ungültig</string>
     <string name="error_api_protocol_invalid">Geräteprotokoll ist ungültig</string>
+    <string name="error_api_content_type_invalid">Content-Type ist ungültig</string>
     <string name="error_device_save">Gerät konnte nicht gespeichert werden</string>
     <string name="error_device_delete">Gerät konnte nicht gelöscht werden</string>
     <string name="error_device_order">Gerätereihenfolge konnte nicht geändert werden</string>

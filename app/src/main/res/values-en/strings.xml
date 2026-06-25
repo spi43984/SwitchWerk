@@ -100,8 +100,10 @@
     <string name="more_devices_below">More devices below</string>
     <string name="button_label">Button label</string>
     <string name="api_call">API call</string>
+    <string name="api_request_body">Request body</string>
     <string name="selected_device_protocol">✓ %1$s</string>
     <string name="selected_api_method">✓ %1$s</string>
+    <string name="selected_api_content_type">✓ %1$s</string>
     <string name="add_wifi_assignment">Add Wi-Fi assignment</string>
     <string name="edit_wifi_assignment">Edit Wi-Fi assignment</string>
     <string name="delete_wifi_assignment">Delete Wi-Fi assignment</string>
@@ -210,6 +212,7 @@
     <string name="error_api_call_empty">API call must not be empty</string>
     <string name="error_api_method_invalid">API method is invalid</string>
     <string name="error_api_protocol_invalid">Device protocol is invalid</string>
+    <string name="error_api_content_type_invalid">Content-Type is invalid</string>
     <string name="error_device_save">Device could not be saved</string>
     <string name="error_device_delete">Device could not be deleted</string>
     <string name="error_device_order">Device order could not be changed</string>
