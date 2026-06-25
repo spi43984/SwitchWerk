@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P2
 - Typ: Geräteaktion / Netzwerk
 
@@ -37,12 +37,12 @@ ausgeführt werden.
 
 ## Akzeptanzkriterien
 
-- [ ] Geräte speichern ein Protokoll
-- [ ] HTTP-Geräte funktionieren weiterhin
-- [ ] HTTPS-Geräte können konfiguriert werden
-- [ ] API-Aufrufe verwenden das konfigurierte Protokoll
-- [ ] TLS-Fehler werden verständlich angezeigt
-- [ ] Keine sensiblen Zertifikatsdaten werden geloggt
+- [x] Geräte speichern ein Protokoll
+- [x] HTTP-Geräte funktionieren weiterhin
+- [x] HTTPS-Geräte können konfiguriert werden
+- [x] API-Aufrufe verwenden das konfigurierte Protokoll
+- [x] TLS-Fehler werden verständlich angezeigt
+- [x] Keine sensiblen Zertifikatsdaten werden geloggt
 
 ## Testhinweise
 

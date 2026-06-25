@@ -4,11 +4,11 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 021 „HTTP/HTTPS Device Actions“ ist auf dem Branch
-`http-https-device-actions` implementiert, aber noch nicht vom Host geprüft und
-nicht veröffentlicht.
+Issue 021 „HTTP/HTTPS Device Actions“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #119
+- Pull Request: #120
+- Merge-Commit: `1ad5f99`
 - Geräte besitzen jetzt ein explizites Protokoll `HTTP` oder `HTTPS`.
   Bestehende Room-Datenbanken migrieren von Version 6 auf 7 und erhalten für
   vorhandene Geräte den Default `HTTP`.
@@ -38,10 +38,10 @@ nicht veröffentlicht.
 - Der Benutzer hat bestätigt, dass Export und Import den
   Android-/SwitchWerk-verwalteten WLAN-Modus korrekt berücksichtigen.
 - Im Container waren `./gradlew testDebugUnitTest` und `./gradlew lintDebug`
-  erfolgreich. Die Host-Prüfungen `clean assembleDebug`, `installDebug` und
-  manuelle HTTP-/HTTPS-/TLS-Szenarien stehen noch aus.
-- Issue-Datei und `docs/issues/overview.txt` wurden nicht auf abgeschlossen
-  gesetzt.
+  erfolgreich. Der Benutzer hat die Host-Prüfungen sowie die manuellen
+  HTTP-/HTTPS-/TLS-Szenarien erfolgreich bestätigt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 056
+  „Keyboard Options For Technical Device Inputs“.
 
 Issue 055 „App Icon In Settings And About“ ist veröffentlicht und
 abgeschlossen.
@@ -59,8 +59,8 @@ abgeschlossen.
   Ratio, Abstände, Version und Release-Datum bleiben unverändert.
 - Im Container waren `lintDebug` und `testDebugUnitTest` erfolgreich. Der
   Benutzer hat die Host-Prüfungen und die Menüprüfung bestätigt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 021
-  „HTTP/HTTPS Device Actions“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 056
+  „Keyboard Options For Technical Device Inputs“.
 
 Issue 019 „Configurable WiFi List Sorting“ ist auf dem Branch
 `configurable-wifi-list-sorting` implementiert, vom Benutzer erfolgreich
@@ -79,8 +79,8 @@ veröffentlicht.
 - Im Container waren `lintDebug` (0 Fehler, 93 vorhandene Warnungen) und
   `testDebugUnitTest` erfolgreich; der Benutzer hat die Prüfungen erfolgreich
   bestätigt. GitHub-Issue #114 wurde als Duplikat von #115 geschlossen.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 021
-  „HTTP/HTTPS Device Actions“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 056
+  „Keyboard Options For Technical Device Inputs“.
 
 Issue 053 „Hamburger And About Release Metadata“ ist veröffentlicht und
 abgeschlossen.
