@@ -11,5 +11,7 @@ data class DeviceEntity(
     val apiProtocol: String,
     val apiMethod: String,
     val apiPath: String,
+    val apiRequestBody: String,
+    val apiContentType: String,
     val sortOrder: Int
 )

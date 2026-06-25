@@ -78,8 +78,49 @@ class OkHttpApiCallServiceTest {
         assertTrue(result is HttpApiCallResult.Success)
         val request = server.takeRequest()
         assertEquals("POST", request.method)
-        assertEquals("application/json; charset=utf-8", request.headers["Content-Type"])
+        assertEquals("application/json", request.headers["Content-Type"])
         assertEquals("""{"id":0,"on":true}""", request.body?.utf8())
+    }
+
+    @Test
+    fun postSendsConfiguredContentTypeAndMultilineBody() = runBlocking {
+        server.enqueue(
+            MockResponse.Builder()
+                .code(204)
+                .build()
+        )
+
+        val result = service.post(
+            url = server.url("/plain").toString(),
+            body = "line 1\nline 2",
+            contentType = "text/plain"
+        )
+
+        assertTrue(result is HttpApiCallResult.Success)
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("text/plain", request.headers["Content-Type"])
+        assertEquals("line 1\nline 2", request.body?.utf8())
+    }
+
+    @Test
+    fun postAllowsEmptyBody() = runBlocking {
+        server.enqueue(
+            MockResponse.Builder()
+                .code(204)
+                .build()
+        )
+
+        val result = service.post(
+            url = server.url("/empty").toString(),
+            body = ""
+        )
+
+        assertTrue(result is HttpApiCallResult.Success)
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("application/json", request.headers["Content-Type"])
+        assertEquals("", request.body?.utf8())
     }
 
     @Test

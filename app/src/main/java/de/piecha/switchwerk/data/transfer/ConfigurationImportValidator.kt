@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.data.transfer
 
 import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DeviceProtocol
@@ -73,6 +74,11 @@ class ConfigurationImportValidator {
                 ApiMethod.entries.any { method -> method.name == device.action.method }
             ) {
                 "Unbekannte API-Methode: ${device.action.method}"
+            }
+            require(
+                ApiContentType.entries.any { contentType -> contentType.name == device.action.contentType }
+            ) {
+                "Nicht unterstützter Content-Type: ${device.action.contentType}"
             }
 
             requireUniqueIds(

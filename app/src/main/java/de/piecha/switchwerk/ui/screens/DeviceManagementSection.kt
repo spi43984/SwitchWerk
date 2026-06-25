@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
+import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceProtocol
@@ -89,6 +90,8 @@ fun DeviceManagementSection(
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
+    onApiRequestBodyChange: (String) -> Unit,
+    onApiContentTypeChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
@@ -109,6 +112,8 @@ fun DeviceManagementSection(
             onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
+            onApiRequestBodyChange = onApiRequestBodyChange,
+            onApiContentTypeChange = onApiContentTypeChange,
             onAddConnection = onAddConnection,
             onUpdateConnection = onUpdateConnection,
             onDeleteConnection = onDeleteConnection,
@@ -169,6 +174,8 @@ private fun DeviceEditDialog(
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
+    onApiRequestBodyChange: (String) -> Unit,
+    onApiContentTypeChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
@@ -201,6 +208,8 @@ private fun DeviceEditDialog(
             onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
+            onApiRequestBodyChange = onApiRequestBodyChange,
+            onApiContentTypeChange = onApiContentTypeChange,
             onAddConnection = onAddConnection,
             onUpdateConnection = onUpdateConnection,
             onDeleteConnection = onDeleteConnection,
@@ -394,6 +403,8 @@ private fun DeviceForm(
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
+    onApiRequestBodyChange: (String) -> Unit,
+    onApiContentTypeChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
     onUpdateConnection: (String, String, String) -> Unit,
     onDeleteConnection: (String) -> Unit,
@@ -485,6 +496,45 @@ private fun DeviceForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(apiPathFocusRequester)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val isPostMethod = form.apiMethod == ApiMethod.POST.name
+            ApiContentType.entries.forEach { contentType ->
+                OutlinedButton(
+                    onClick = {
+                        onApiContentTypeChange(contentType.name)
+                    },
+                    enabled = isPostMethod,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = if (form.apiContentType == contentType.name) {
+                            stringResource(R.string.selected_api_content_type, contentType.value)
+                        } else {
+                            contentType.value
+                        }
+                    )
+                }
+            }
+        }
+
+        OutlinedTextField(
+            value = form.apiRequestBody,
+            onValueChange = onApiRequestBodyChange,
+            label = { Text(stringResource(R.string.api_request_body)) },
+            minLines = 4,
+            maxLines = 8,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Default
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
 
         DeviceConnectionList(

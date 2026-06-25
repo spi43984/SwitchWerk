@@ -4,6 +4,31 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 022 „Request Body And Content-Type Support“ ist auf dem Branch
+`request-body-content-type-support` lokal implementiert, aber noch nicht
+veröffentlicht oder abgeschlossen.
+
+- GitHub-Issue: #127
+- Geräteaktionen speichern jetzt zusätzlich einen optionalen Request-Body und
+  einen Content-Type (`application/json` oder `text/plain`).
+- Die Gerätebearbeitung bietet eine Content-Type-Auswahl und ein mehrzeiliges
+  Request-Body-Feld. Compose reicht nur Formularereignisse ans ViewModel weiter;
+  Netzwerklogik bleibt im Service.
+- POST-Anfragen senden den gespeicherten Body und den konfigurierten
+  Content-Type. Leere Bodies bleiben erlaubt. GET bleibt unverändert.
+- Room wurde von Version 7 auf 8 migriert. Vorhandene Geräte erhalten einen
+  leeren Body und den Default `APPLICATION_JSON`.
+- Import/Export wurde auf Schema-Version 4 erweitert. Ältere Konfigurationen
+  ohne Request-Body und Content-Type importieren weiterhin mit leerem Body und
+  Default `APPLICATION_JSON`.
+- Request-Bodies werden nicht geloggt; Logs und Diagnosen enthalten weiterhin
+  nur Methode, Adresse, Status und Fehlerkategorien.
+- Im Container waren gezielte Tests für Action-Service, OkHttp-Service und
+  Import-Validator sowie `./gradlew testDebugUnitTest` und
+  `./gradlew lintDebug` erfolgreich.
+- Noch offen: Host-Prüfungen `./gradlew clean assembleDebug`,
+  `./gradlew installDebug` und manuelle Geräte-/Import-/Export-Szenarien.
+
 String-Pflege zu den heute abgeschlossenen Issues 055, 021 und 056 wurde lokal
 erledigt.
 

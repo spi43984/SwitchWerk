@@ -107,7 +107,11 @@ class OkHttpApiCallService(
                 requestBuilder = {
                     Request.Builder()
                         .url(url)
-                        .post((body ?: "").toRequestBody(contentType.toMediaType()))
+                        .post(
+                            body.orEmpty()
+                                .toByteArray(Charsets.UTF_8)
+                                .toRequestBody(contentType.toMediaType())
+                        )
                         .build()
                 },
                 timeoutMillis = timeoutMillis

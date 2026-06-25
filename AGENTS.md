@@ -164,9 +164,11 @@ Für jede Implementierung eines bestehenden fachlichen Issues gilt zunächst:
 6. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
    vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
 7. Ausschließlich den vereinbarten Issue-Scope implementieren.
-8. Änderungen und Diff prüfen.
-9. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
-10. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
+8. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
+   und aktualisieren, damit die UI-Erklärung zum tatsächlichen Verhalten passt.
+9. Änderungen und Diff prüfen.
+10. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
+11. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
     auf dem Host ausgeben.
 
 Mindestens auf dem Host zu prüfen:
@@ -209,6 +211,7 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 
 - [ ] `docs/issues/<issue>.md` aktualisiert
 - [ ] `docs/issues/overview.txt` aktualisiert
+- [ ] Hilfe-, Info- und Tooltip-Texte bei neuen oder geänderten Funktionen geprüft und bei Bedarf aktualisiert
 - [ ] `ai-context.md` bei geändertem dauerhaftem Projektkontext aktualisiert
 - [ ] `AI_HANDOFF.md` aktualisiert, falls aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss
 - [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt

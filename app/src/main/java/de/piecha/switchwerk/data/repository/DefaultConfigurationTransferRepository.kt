@@ -161,7 +161,9 @@ class DefaultConfigurationTransferRepository(
                     action = ConfigurationDeviceAction(
                         protocol = device.apiProtocol,
                         method = device.apiMethod,
-                        path = device.apiPath
+                        path = device.apiPath,
+                        requestBody = device.apiRequestBody.ifEmpty { null },
+                        contentType = device.apiContentType
                     ),
                     connections = connections
                         .filter { it.deviceId == device.id }
@@ -324,6 +326,8 @@ class DefaultConfigurationTransferRepository(
             apiProtocol = action.protocol,
             apiMethod = action.method,
             apiPath = action.path,
+            apiRequestBody = action.requestBody.orEmpty(),
+            apiContentType = action.contentType,
             sortOrder = sortOrder
         )
     }

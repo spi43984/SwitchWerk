@@ -14,6 +14,7 @@ import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.domain.model.ApiCall
+import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.AppLanguage
@@ -62,6 +63,8 @@ data class DeviceFormState(
     val apiProtocol: String = DeviceProtocol.HTTP.name,
     val apiMethod: String = ApiMethod.GET.name,
     val apiPath: String = "",
+    val apiRequestBody: String = "",
+    val apiContentType: String = ApiContentType.APPLICATION_JSON.name,
     val connections: List<DeviceConnectionFormState> = emptyList()
 )
 
@@ -469,6 +472,8 @@ class SettingsViewModel(
                 apiProtocol = device.protocol.name,
                 apiMethod = device.apiCall.method.name,
                 apiPath = device.apiCall.path,
+                apiRequestBody = device.apiCall.requestBody,
+                apiContentType = device.apiCall.contentType.name,
                 connections = device.connections.map { connection ->
                     val profile = _uiState.value.wifiProfiles.firstOrNull {
                         it.id == connection.wifiProfileId
@@ -513,6 +518,14 @@ class SettingsViewModel(
 
     fun updateDeviceApiPath(apiPath: String) {
         updateDeviceForm { it.copy(apiPath = apiPath) }
+    }
+
+    fun updateDeviceApiRequestBody(apiRequestBody: String) {
+        updateDeviceForm { it.copy(apiRequestBody = apiRequestBody) }
+    }
+
+    fun updateDeviceApiContentType(apiContentType: String) {
+        updateDeviceForm { it.copy(apiContentType = apiContentType) }
     }
 
     fun addDeviceConnection(wifiProfileId: String, host: String) {
@@ -641,6 +654,13 @@ class SettingsViewModel(
             return
         }
 
+        val apiContentType = runCatching {
+            ApiContentType.valueOf(form.apiContentType)
+        }.getOrElse {
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_api_content_type_invalid))
+            return
+        }
+
         val sortOrder = form.id?.let { existingId ->
             _uiState.value.devices.firstOrNull { it.id == existingId }?.sortOrder
         } ?: ((_uiState.value.devices.maxOfOrNull { it.sortOrder } ?: 0) + 1)
@@ -655,7 +675,9 @@ class SettingsViewModel(
                         protocol = apiProtocol,
                         apiCall = ApiCall(
                             method = apiMethod,
-                            path = trimmedApiPath
+                            path = trimmedApiPath,
+                            requestBody = form.apiRequestBody,
+                            contentType = apiContentType
                         ),
                         connections = form.connections.map {
                             DeviceConnection(
