@@ -94,6 +94,23 @@ class ConfigurationImportValidator {
         }
     }
 
+    fun validateMerge(
+        document: ConfigurationDocument,
+        existingWifiProfileNamesById: Map<String, String>
+    ) {
+        val existingProfileIdsByName = existingWifiProfileNamesById.entries.associateBy(
+            keySelector = { (_, name) -> name.normalizedProfileName() },
+            valueTransform = { (id, _) -> id }
+        )
+
+        document.wifiProfiles.forEach { profile ->
+            val existingProfileId = existingProfileIdsByName[profile.name.normalizedProfileName()]
+            require(existingProfileId == null || existingProfileId == profile.id) {
+                "Import abgebrochen: WLAN-Profilname \"${profile.name.trim()}\" existiert bereits lokal."
+            }
+        }
+    }
+
     private fun requireUniqueIds(ids: List<String>, type: String) {
         require(ids.size == ids.toSet().size) {
             "Doppelte IDs für $type"
@@ -107,7 +124,7 @@ class ConfigurationImportValidator {
     }
 
     private fun requireUniqueNames(names: List<String>, type: String) {
-        val normalizedNames = names.map { it.trim().lowercase() }
+        val normalizedNames = names.map { it.normalizedProfileName() }
         require(normalizedNames.size == normalizedNames.toSet().size) {
             "Doppelte Namen für $type"
         }
@@ -117,3 +134,5 @@ class ConfigurationImportValidator {
         val SUPPORTED_SECURITY_TYPES = setOf("WPA2_PSK", "WPA3_SAE")
     }
 }
+
+private fun String.normalizedProfileName(): String = trim().lowercase()

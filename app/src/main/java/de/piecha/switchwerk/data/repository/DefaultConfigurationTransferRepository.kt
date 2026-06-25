@@ -102,13 +102,20 @@ class DefaultConfigurationTransferRepository(
         includePasswords: Boolean
     ) {
         withContext(Dispatchers.IO) {
-            validator.validate(preparedImport.document)
+            val document = preparedImport.document.normalizedForImport()
+            validator.validate(document)
+            if (mode == ConfigurationImportMode.MERGE) {
+                validator.validateMerge(
+                    document = document,
+                    existingWifiProfileNamesById = wifiProfileDao.getAll().associate { it.id to it.name }
+                )
+            }
             val oldWifiProfileIds = wifiProfileDao.getAll().map { it.id }
 
             database.withTransaction {
                 when (mode) {
-                    ConfigurationImportMode.REPLACE -> replaceConfiguration(preparedImport.document)
-                    ConfigurationImportMode.MERGE -> mergeConfiguration(preparedImport.document)
+                    ConfigurationImportMode.REPLACE -> replaceConfiguration(document)
+                    ConfigurationImportMode.MERGE -> mergeConfiguration(document)
                 }
             }
 
@@ -116,9 +123,9 @@ class DefaultConfigurationTransferRepository(
                 oldWifiProfileIds.forEach { credentialStore.deletePassword(it) }
             }
             if (includePasswords) {
-                applyImportedPasswords(preparedImport.document)
+                applyImportedPasswords(document)
             }
-            applyImportedAppSettings(preparedImport.document)
+            applyImportedAppSettings(document)
         }
     }
 
@@ -192,10 +199,17 @@ class DefaultConfigurationTransferRepository(
                     "Importdatei enthält kein gültiges JSON",
                     error
                 )
-            }
+            }.normalizedForImport()
         validator.validate(document)
 
-        val existingWifiProfileIds = wifiProfileDao.getAll().map { it.id }.toSet()
+        val existingWifiProfiles = wifiProfileDao.getAll()
+        if (mode == ConfigurationImportMode.MERGE) {
+            validator.validateMerge(
+                document = document,
+                existingWifiProfileNamesById = existingWifiProfiles.associate { it.id to it.name }
+            )
+        }
+        val existingWifiProfileIds = existingWifiProfiles.map { it.id }.toSet()
         val existingDeviceIds = deviceDao.getAll().map { it.id }.toSet()
 
         val summariesByMode = ConfigurationImportMode.entries.associateWith { importMode ->
@@ -440,6 +454,17 @@ class DefaultConfigurationTransferRepository(
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
         const val GOOGLE_DRIVE_HOST = "google.com"
     }
+}
+
+internal fun ConfigurationDocument.normalizedForImport(): ConfigurationDocument {
+    return copy(
+        wifiProfiles = wifiProfiles.map { profile ->
+            profile.copy(
+                name = profile.name.trim(),
+                ssid = profile.ssid.trim()
+            )
+        }
+    )
 }
 
 internal fun nextcloudDownloadUrl(url: HttpUrl): HttpUrl? {

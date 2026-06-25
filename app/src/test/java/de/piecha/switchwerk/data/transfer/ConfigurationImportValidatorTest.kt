@@ -147,6 +147,34 @@ class ConfigurationImportValidatorTest {
     }
 
     @Test
+    fun mergeRejectsImportedWifiProfileNameThatExistsLocallyForAnotherProfile() {
+        val error = assertThrows(IllegalArgumentException::class.java) {
+            validator.validateMerge(
+                document = validDocument(
+                    wifiProfiles = listOf(
+                        wifiProfile(id = "wifi-imported", name = " garage ")
+                    )
+                ),
+                existingWifiProfileNamesById = mapOf("wifi-local" to "Garage")
+            )
+        }
+
+        assertTrue(error.message.orEmpty().contains("existiert bereits lokal"))
+    }
+
+    @Test
+    fun mergeAllowsImportedWifiProfileNameThatBelongsToSameLocalProfile() {
+        validator.validateMerge(
+            document = validDocument(
+                wifiProfiles = listOf(
+                    wifiProfile(id = "wifi-1", name = " garage ")
+                )
+            ),
+            existingWifiProfileNamesById = mapOf("wifi-1" to "GARAGE")
+        )
+    }
+
+    @Test
     fun duplicateWifiProfileSsidsAreAcceptedWhenNamesAreUnique() {
         validator.validate(
             validDocument(
