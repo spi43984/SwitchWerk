@@ -172,27 +172,29 @@ ohne bei jedem Push erneut erzeugt zu werden.
 6. GitHub-Issue-Nummer notieren.
 7. Fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
 8. Implementieren.
-9. Build und Installation auf dem Host testen:
+9. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
+   und aktualisieren, damit die UI-Erklärung zum tatsächlichen Verhalten passt.
+10. Build und Installation auf dem Host testen:
 
        ./gradlew clean assembleDebug
        ./gradlew installDebug
 
-10. Ohne ausdrückliche Veröffentlichungsanforderung nicht committen, pushen oder einen Pull Request erstellen.
-11. Nach ausdrücklicher Veröffentlichungsanforderung auf dem Feature-Branch committen.
-12. Feature-Branch pushen.
-13. Pull Request erstellen.
-14. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
-15. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
-16. Lokale Issue-Datei unter `docs/issues` abhaken.
-17. `docs/issues/overview.txt` aktualisieren.
-18. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
-19. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
-20. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
-21. Dokumentationsänderungen committen und pushen.
-22. Zugehöriges GitHub-Issue erst danach schließen.
-23. Branch lokal löschen.
-24. Branch remote löschen.
-25. Remote-Referenzen bereinigen.
+11. Ohne ausdrückliche Veröffentlichungsanforderung nicht committen, pushen oder einen Pull Request erstellen.
+12. Nach ausdrücklicher Veröffentlichungsanforderung auf dem Feature-Branch committen.
+13. Feature-Branch pushen.
+14. Pull Request erstellen.
+15. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
+16. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+17. Lokale Issue-Datei unter `docs/issues` abhaken.
+18. `docs/issues/overview.txt` aktualisieren.
+19. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
+20. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
+21. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
+22. Dokumentationsänderungen committen und pushen.
+23. Zugehöriges GitHub-Issue erst danach schließen.
+24. Branch lokal löschen.
+25. Branch remote löschen.
+26. Remote-Referenzen bereinigen.
 
 ## Verbindliche Issue-Abschluss-Checkliste
 
@@ -200,6 +202,7 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 
 * [ ] `docs/issues/<issue>.md` aktualisiert
 * [ ] `docs/issues/overview.txt` aktualisiert
+* [ ] Hilfe-, Info- und Tooltip-Texte bei neuen oder geänderten Funktionen geprüft und bei Bedarf aktualisiert
 * [ ] `ai-context.md` bei geändertem dauerhaftem Projektkontext aktualisiert
 * [ ] `AI_HANDOFF.md` aktualisiert, falls aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss
 * [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt
