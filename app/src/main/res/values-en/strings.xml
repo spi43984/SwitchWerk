@@ -117,6 +117,11 @@
 
     <string name="name_and_ssid">Name\nSSID</string>
     <string name="add_wifi_profile">Add Wi-Fi profile</string>
+    <string name="wifi_profile_sort_current">Sort Wi-Fi profiles: %1$s</string>
+    <string name="wifi_profile_sort_profile_name_ascending">Profile name A-Z</string>
+    <string name="wifi_profile_sort_profile_name_descending">Profile name Z-A</string>
+    <string name="wifi_profile_sort_ssid_ascending">SSID A-Z</string>
+    <string name="wifi_profile_sort_ssid_descending">SSID Z-A</string>
     <string name="more_wifi_profiles_above">More Wi-Fi profiles above</string>
     <string name="more_wifi_profiles_below">More Wi-Fi profiles below</string>
     <string name="no_wifi_profiles_configured">No Wi-Fi profiles configured.</string>
@@ -132,6 +137,13 @@
     <string name="toggle_password_visibility">Show or hide password</string>
     <string name="password_hint">An empty password is allowed. The existing password is only retained if the asterisks remain unchanged.</string>
     <string name="clear_password">Clear password</string>
+    <string name="wifi_connection_mode_switchwerk_managed">SwitchWerk manages this Wi-Fi network</string>
+    <string name="wifi_connection_mode_android_managed">Android manages this Wi-Fi network</string>
+    <string name="android_managed_wifi_info">This Wi-Fi network must be configured and connected in Android. SwitchWerk does not store credentials.</string>
+    <string name="open_android_wifi_settings">Open Android Wi-Fi settings</string>
+    <string name="android_managed_wifi_switch_title">Connect target Wi-Fi</string>
+    <string name="android_managed_wifi_switch_message">Please connect to the Wi-Fi network “%1$s” in Android. Then return to SwitchWerk and run the device action again.</string>
+    <string name="select_visible_wifi_ssid">Select SSID from visible Wi-Fi networks</string>
 
     <string name="backup_description">Save configurations as a JSON file or import them from a trusted source.</string>
     <string name="configuration_processing">Processing configuration…</string>
@@ -209,6 +221,7 @@
 
     <string name="diagnostic_entry">%1$s (+%2$d ms) %3$s</string>
     <string name="diagnostic_action_started">Device action “%1$s” started</string>
+    <string name="diagnostic_wifi_profile_attempt">Wi-Fi assignment %1$d of %2$d: profile “%3$s”</string>
     <string name="diagnostic_wifi_request_started">Wi-Fi request for profile “%1$s” started</string>
     <string name="diagnostic_wifi_security_started">Detecting Wi-Fi security type</string>
     <string name="diagnostic_wifi_security_succeeded">Wi-Fi security type detected</string>
@@ -239,6 +252,7 @@
     <string name="action_success">Success</string>
     <string name="action_no_wifi">No Wi-Fi profile configured for device</string>
     <string name="action_wifi_unreachable">Assigned Wi-Fi network is unavailable</string>
+    <string name="action_android_managed_wifi_not_active">Android-managed Wi-Fi is not active. Please connect to the target Wi-Fi network in Android.</string>
     <string name="action_wifi_permission_denied">Wi-Fi connection is not permitted</string>
     <string name="action_wifi_disabled">Wi-Fi is disabled</string>
     <string name="action_wifi_missing_password">Wi-Fi password is missing. Save it again in the Wi-Fi profile.</string>

@@ -4,13 +4,19 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
-Deutsche String-Pflege zu den heute abgeschlossenen Issues 055, 021 und 056
-wurde lokal erledigt.
+String-Pflege zu den heute abgeschlossenen Issues 055, 021 und 056 wurde lokal
+erledigt.
 
 - `values-de/strings.xml` enthält jetzt die fehlenden deutschen Info-, Hilfe-
   und About-Strings aus `values/strings.xml`.
 - Insbesondere `device_dialog_info` enthält jetzt den Hinweis
   „HTTP oder HTTPS wählen“.
+- `values-de/strings.xml` und `values-en/strings.xml` enthalten außerdem die
+  fehlenden WLAN-Sortier-, Android-managed-WLAN-, Diagnose- und
+  Action-Fehlertexte aus dem Default.
+- `values-de/strings.xml` hat ein schließendes `</resources>`; der
+  Resource-Namensvergleich von `values-de` und `values-en` gegen den Default
+  zeigt keine fehlenden Namen mehr.
 - Die Issue-021-Strings `selected_device_protocol`,
   `error_api_protocol_invalid` und `action_tls_certificate_error` wurden in
   `values-de`, `values` und `values-en` gezielt geprüft; in `values-de` waren
