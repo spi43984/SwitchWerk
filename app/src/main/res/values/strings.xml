@@ -27,7 +27,7 @@
     <string name="backup_info">• Export speichert die lokale Konfiguration\n• Passwörter nur bewusst exportieren\n• Import nur aus vertrauenswürdigen Quellen</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
-    <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• Beispiel: /relay/0?turn=on</string>
+    <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /relay/0?turn=on</string>
     <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
     <string name="wifi_profiles_info_title">WLAN-Profile verwalten</string>
     <string name="devices_info_title">Geräte verwalten</string>
@@ -35,7 +35,7 @@
     <string name="wifi_profile_dialog_info_title">WLAN-Profil</string>
     <string name="wifi_profile_dialog_info">• SSID des Ziel-WLANs eintragen\n• Name muss eindeutig sein\n• Passwort bleibt verschlüsselt auf dem Gerät</string>
     <string name="device_dialog_info_title">Gerät</string>
-    <string name="device_dialog_info">• Namen und Button-Beschriftung festlegen\n• HTTP oder HTTPS wählen\n• HTTP/RPC-Methode und -Pfad eintragen\n• WLAN-Zuordnungen bestimmen die Verbindungsreihenfolge</string>
+    <string name="device_dialog_info">• Namen und Button-Beschriftung festlegen\n• HTTP oder HTTPS wählen\n• HTTP/RPC-Methode und -Pfad eintragen\n• Für POST optional Request-Body und Content-Type wählen\n• WLAN-Zuordnungen bestimmen die Verbindungsreihenfolge</string>
     <string name="wifi_assignment_dialog_info_title">WLAN-Zuordnung</string>
     <string name="wifi_assignment_dialog_info">• WLAN-Profil für das Gerät auswählen\n• lokale Geräteadresse eintragen\n• kein Internetzugang erforderlich</string>
     <string name="about_switchwerk">Über SwitchWerk</string>
