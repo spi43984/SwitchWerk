@@ -14,6 +14,7 @@ import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiSecurityType
@@ -21,10 +22,12 @@ import java.net.ConnectException
 import java.net.NoRouteToHostException
 import java.net.SocketException
 import java.net.UnknownHostException
+import java.security.cert.CertificateException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import javax.net.ssl.SSLException
 
 class DefaultDeviceActionService(
     private val wifiProfileRepository: WifiProfileRepository,
@@ -96,6 +99,7 @@ class DefaultDeviceActionService(
                 when (
                     val outcome = callApi(
                         connection = connectionWithProfile.connection,
+                        protocol = device.protocol,
                         apiCall = device.apiCall,
                         network = activeNetwork,
                         onDiagnosticEvent = onDiagnosticEvent
@@ -134,6 +138,7 @@ class DefaultDeviceActionService(
                         when (
                             val outcome = callApi(
                                 connection = connectionWithProfile.connection,
+                                protocol = device.protocol,
                                 apiCall = device.apiCall,
                                 network = connectionResult.network,
                                 onDiagnosticEvent = onDiagnosticEvent
@@ -349,11 +354,12 @@ class DefaultDeviceActionService(
 
     private suspend fun callApi(
         connection: DeviceConnection,
+        protocol: DeviceProtocol,
         apiCall: ApiCall,
         network: Network,
         onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
     ): ApiCallOutcome {
-        val url = buildUrl(connection.host, apiCall.path)
+        val url = buildUrl(connection.host, protocol, apiCall.path)
             ?: return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
         val parsedUrl = url.toHttpUrlOrNull()
             ?: return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
@@ -447,6 +453,10 @@ class DefaultDeviceActionService(
 
             is HttpApiCallResult.NetworkError -> {
                 val reason = result.cause.toNetworkFailureReason()
+                if (reason == NetworkFailureReason.TLS_CERTIFICATE) {
+                    logWarning("Bound HTTPS call failed: ${result.cause.javaClass.simpleName}")
+                    return ApiCallOutcome.Terminal(DeviceActionResult.TlsCertificateError)
+                }
                 when (reason) {
                     NetworkFailureReason.DNS -> emitDiagnostic(
                         onDiagnosticEvent,
@@ -457,6 +467,7 @@ class DefaultDeviceActionService(
                         onDiagnosticEvent,
                         DeviceActionDiagnosticEvent.DeviceNotReachable
                     )
+                    NetworkFailureReason.TLS_CERTIFICATE,
                     NetworkFailureReason.VPN_BLOCKED,
                     NetworkFailureReason.OTHER -> Unit
                 }
@@ -476,14 +487,8 @@ class DefaultDeviceActionService(
         }
     }
 
-    private fun buildUrl(host: String, path: String): String? {
-        val normalizedHost = host.trim().let {
-            if (it.startsWith("http://") || it.startsWith("https://")) {
-                it
-            } else {
-                "http://$it"
-            }
-        }
+    private fun buildUrl(host: String, protocol: DeviceProtocol, path: String): String? {
+        val normalizedHost = "${protocol.scheme}://${host.trim().removeHttpScheme()}"
         val baseUrl = "${normalizedHost.trimEnd('/')}/".toHttpUrlOrNull() ?: return null
         return baseUrl.resolve(path.trim().trimStart('/'))?.toString()
     }
@@ -501,6 +506,10 @@ class DefaultDeviceActionService(
         return if (url.port == defaultPort) url.host else "${url.host}:${url.port}"
     }
 
+    private fun String.removeHttpScheme(): String {
+        return removePrefix("http://").removePrefix("https://")
+    }
+
     private fun String.isIpAddress(): Boolean {
         if (contains(':')) {
             return true
@@ -516,6 +525,8 @@ class DefaultDeviceActionService(
         var current: Throwable? = this
         while (current != null) {
             when (current) {
+                is SSLException,
+                is CertificateException -> return NetworkFailureReason.TLS_CERTIFICATE
                 is UnknownHostException -> return NetworkFailureReason.DNS
                 is NoRouteToHostException -> return NetworkFailureReason.NO_ROUTE
                 is ConnectException -> return NetworkFailureReason.CONNECTION

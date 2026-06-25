@@ -4,6 +4,45 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 021 „HTTP/HTTPS Device Actions“ ist auf dem Branch
+`http-https-device-actions` implementiert, aber noch nicht vom Host geprüft und
+nicht veröffentlicht.
+
+- GitHub-Issue: #119
+- Geräte besitzen jetzt ein explizites Protokoll `HTTP` oder `HTTPS`.
+  Bestehende Room-Datenbanken migrieren von Version 6 auf 7 und erhalten für
+  vorhandene Geräte den Default `HTTP`.
+- Die Gerätebearbeitung bietet eine Protokollauswahl. Das ViewModel speichert
+  das Protokoll im Domain-Modell; Compose enthält keine Netzwerklogik.
+- URL-Erzeugung und HTTP/RPC-Aufruf erfolgen weiterhin im
+  `DefaultDeviceActionService`, verwenden aber das konfigurierte Protokoll. Eine
+  eventuell im Hostfeld vorhandene HTTP-/HTTPS-Angabe wird durch das explizite
+  Geräteprotokoll ersetzt.
+- TLS-/Zertifikatsfehler werden als eigener Action-Fehler behandelt und mit
+  einer verständlichen Meldung angezeigt. Logs enthalten nur Exception-Klasse
+  und Fehlerkategorie, keine Zertifikatsdetails.
+- Die App besitzt jetzt eine Android-Network-Security-Config, die neben
+  System-CAs auch vom Benutzer installierte CAs als Trust-Anker zulässt. Damit
+  können lokale HTTPS-Geräte mit selbstsignierter, aber in Android importierter
+  CA geprüft werden, ohne Zertifikatsprüfung zu umgehen.
+- Der Benutzer hat den HTTPS-Test mit lokalem nginx und in Android
+  importierter CA erfolgreich bestätigt.
+- Konfigurationsexport/-import speichert das Protokoll in der Geräteaktion,
+  erhöht die Schema-Version auf 3 und importiert ältere Konfigurationen ohne
+  Protokoll weiterhin mit Default `HTTP`.
+- Beim Gerätetest wurde eine bestehende Import/Export-Lücke gefunden und auf
+  diesem Branch korrigiert: Der WLAN-Verbindungsmodus
+  `SWITCHWERK_MANAGED`/`ANDROID_MANAGED` wird jetzt pro WLAN-Profil exportiert,
+  validiert und importiert. Ältere Backups ohne Feld importieren weiterhin mit
+  Default `SWITCHWERK_MANAGED`.
+- Der Benutzer hat bestätigt, dass Export und Import den
+  Android-/SwitchWerk-verwalteten WLAN-Modus korrekt berücksichtigen.
+- Im Container waren `./gradlew testDebugUnitTest` und `./gradlew lintDebug`
+  erfolgreich. Die Host-Prüfungen `clean assembleDebug`, `installDebug` und
+  manuelle HTTP-/HTTPS-/TLS-Szenarien stehen noch aus.
+- Issue-Datei und `docs/issues/overview.txt` wurden nicht auf abgeschlossen
+  gesetzt.
+
 Issue 055 „App Icon In Settings And About“ ist veröffentlicht und
 abgeschlossen.
 

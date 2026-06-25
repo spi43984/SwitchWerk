@@ -25,7 +25,7 @@ class ConfigurationImportValidatorTest {
     @Test
     fun unsupportedSchemaVersionIsRejected() {
         val error = assertThrows(IllegalArgumentException::class.java) {
-            validator.validate(validDocument().copy(schemaVersion = 3))
+            validator.validate(validDocument().copy(schemaVersion = CONFIGURATION_SCHEMA_VERSION + 1))
         }
 
         assertTrue(error.message.orEmpty().contains("schemaVersion"))
@@ -159,6 +159,26 @@ class ConfigurationImportValidatorTest {
     }
 
     @Test
+    fun androidManagedWifiConnectionModeIsAccepted() {
+        validator.validate(
+            validDocument(
+                wifiProfiles = listOf(wifiProfile(connectionMode = "ANDROID_MANAGED"))
+            )
+        )
+    }
+
+    @Test
+    fun unsupportedWifiConnectionModeIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument(
+                    wifiProfiles = listOf(wifiProfile(connectionMode = "EXTERNAL"))
+                )
+            )
+        }
+    }
+
+    @Test
     fun connectionToUnknownWifiProfileIsRejected() {
         val device = validDocument().devices.single().copy(
             connections = listOf(
@@ -188,6 +208,21 @@ class ConfigurationImportValidatorTest {
         }
     }
 
+    @Test
+    fun unsupportedDeviceProtocolIsRejected() {
+        val device = validDocument().devices.single().copy(
+            action = ConfigurationDeviceAction(
+                protocol = "FTP",
+                method = "GET",
+                path = "/rpc/action"
+            )
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(validDocument(devices = listOf(device)))
+        }
+    }
+
     private fun validDocument(
         wifiProfiles: List<ConfigurationWifiProfile> = listOf(wifiProfile()),
         devices: List<ConfigurationDevice> = listOf(device())
@@ -203,6 +238,7 @@ class ConfigurationImportValidatorTest {
         id: String = "wifi-1",
         name: String = "Home",
         ssid: String = "Home",
+        connectionMode: String = "SWITCHWERK_MANAGED",
         securityType: String? = "WPA2_PSK",
         password: String? = null,
         isPasswordPresent: Boolean = false
@@ -211,6 +247,7 @@ class ConfigurationImportValidatorTest {
             id = id,
             name = name,
             ssid = ssid,
+            connectionMode = connectionMode,
             securityType = securityType,
             password = password,
             isPasswordPresent = isPasswordPresent

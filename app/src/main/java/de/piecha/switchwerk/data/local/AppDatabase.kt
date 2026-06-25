@@ -17,7 +17,7 @@ import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
         WifiProfileEntity::class,
         DeviceConnectionEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -147,6 +147,17 @@ abstract class AppDatabase : RoomDatabase() {
                     """
                     ALTER TABLE wifi_profiles
                     ADD COLUMN connectionMode TEXT NOT NULL DEFAULT 'SWITCHWERK_MANAGED'
+                    """.trimIndent()
+                )
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    ALTER TABLE devices
+                    ADD COLUMN apiProtocol TEXT NOT NULL DEFAULT 'HTTP'
                     """.trimIndent()
                 )
             }

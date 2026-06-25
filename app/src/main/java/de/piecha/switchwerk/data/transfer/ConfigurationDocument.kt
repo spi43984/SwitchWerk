@@ -19,6 +19,7 @@ data class ConfigurationWifiProfile(
     val id: String,
     val name: String,
     val ssid: String,
+    val connectionMode: String = "SWITCHWERK_MANAGED",
     val securityType: String?,
     val password: String? = null,
     val isPasswordPresent: Boolean = false
@@ -33,6 +34,7 @@ data class ConfigurationDevice(
 )
 
 data class ConfigurationDeviceAction(
+    val protocol: String = "HTTP",
     val method: String,
     val path: String
 )
@@ -42,4 +44,4 @@ data class ConfigurationDeviceConnection(
     val host: String
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 2
+const val CONFIGURATION_SCHEMA_VERSION = 3

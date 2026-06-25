@@ -3,7 +3,9 @@ package de.piecha.switchwerk.data.transfer
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.WifiConnectionMode
 
 class ConfigurationImportValidator {
 
@@ -43,6 +45,11 @@ class ConfigurationImportValidator {
             requireNotBlank(profile.id, "WLAN-Profil-ID")
             requireNotBlank(profile.name, "WLAN-Profilname")
             requireNotBlank(profile.ssid, "SSID")
+            require(
+                WifiConnectionMode.entries.any { mode -> mode.name == profile.connectionMode }
+            ) {
+                "Nicht unterstützter WLAN-Verbindungsmodus: ${profile.connectionMode}"
+            }
             profile.securityType?.let { securityType ->
                 requireNotBlank(securityType, "WLAN-Sicherheitstyp")
                 require(securityType in SUPPORTED_SECURITY_TYPES) {
@@ -57,6 +64,11 @@ class ConfigurationImportValidator {
             requireNotBlank(device.name, "Gerätename")
             requireNotBlank(device.actionLabel, "Button-Beschriftung")
             requireNotBlank(device.action.path, "API-Aufruf")
+            require(
+                DeviceProtocol.entries.any { protocol -> protocol.name == device.action.protocol }
+            ) {
+                "Unbekanntes Geräteprotokoll: ${device.action.protocol}"
+            }
             require(
                 ApiMethod.entries.any { method -> method.name == device.action.method }
             ) {

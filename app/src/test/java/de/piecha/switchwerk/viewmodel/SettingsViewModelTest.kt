@@ -17,6 +17,7 @@ import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
@@ -351,6 +352,25 @@ class SettingsViewModelTest {
             listOf("wifi-2", "wifi-1"),
             deviceRepository.savedDevice?.connections?.map { it.wifiProfileId }
         )
+    }
+
+    @Test
+    fun selectedDeviceProtocolIsSaved() = runTest(dispatcher) {
+        val deviceRepository = FakeDeviceRepository()
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            deviceRepository = deviceRepository
+        )
+        runCurrent()
+
+        viewModel.startNewDevice()
+        viewModel.updateDeviceName("Shelly")
+        viewModel.updateDeviceApiProtocol(DeviceProtocol.HTTPS.name)
+        viewModel.addDeviceConnection("wifi-1", "192.168.33.1")
+        viewModel.saveDevice()
+        runCurrent()
+
+        assertEquals(DeviceProtocol.HTTPS, deviceRepository.savedDevice?.protocol)
     }
 
     @Test

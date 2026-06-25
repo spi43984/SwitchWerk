@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.components.InfoHint
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
@@ -69,6 +70,7 @@ fun DeviceManagementSection(
     onDeleteClick: (String) -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
+    onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
@@ -88,6 +90,7 @@ fun DeviceManagementSection(
             onCloseSwipeItem = onCloseSwipeItem,
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
+            onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
             onAddConnection = onAddConnection,
@@ -147,6 +150,7 @@ private fun DeviceEditDialog(
     onCloseSwipeItem: () -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
+    onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
@@ -178,6 +182,7 @@ private fun DeviceEditDialog(
             onCloseSwipeItem = onCloseSwipeItem,
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
+            onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
             onAddConnection = onAddConnection,
@@ -370,6 +375,7 @@ private fun DeviceForm(
     onCloseSwipeItem: () -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
+    onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
     onAddConnection: (String, String) -> Unit,
@@ -412,6 +418,26 @@ private fun DeviceForm(
                 .fillMaxWidth()
                 .focusRequester(actionLabelFocusRequester)
         )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            DeviceProtocol.entries.forEach { protocol ->
+                OutlinedButton(
+                    onClick = {
+                        onApiProtocolChange(protocol.name)
+                    }
+                ) {
+                    Text(
+                        text = if (form.apiProtocol == protocol.name) {
+                            stringResource(R.string.selected_device_protocol, protocol.name)
+                        } else {
+                            protocol.name
+                        }
+                    )
+                }
+            }
+        }
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)

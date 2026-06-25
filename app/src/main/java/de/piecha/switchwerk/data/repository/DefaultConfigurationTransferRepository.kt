@@ -143,6 +143,7 @@ class DefaultConfigurationTransferRepository(
                     id = profile.id,
                     name = profile.name,
                     ssid = profile.ssid,
+                    connectionMode = profile.connectionMode,
                     securityType = profile.securityType,
                     password = if (includePasswords) {
                         credentialStore.getPassword(profile.id).orEmpty()
@@ -158,6 +159,7 @@ class DefaultConfigurationTransferRepository(
                     name = device.name,
                     actionLabel = device.actionLabel,
                     action = ConfigurationDeviceAction(
+                        protocol = device.apiProtocol,
                         method = device.apiMethod,
                         path = device.apiPath
                     ),
@@ -308,6 +310,7 @@ class DefaultConfigurationTransferRepository(
             id = id,
             name = name,
             ssid = ssid,
+            connectionMode = connectionMode,
             securityType = securityType,
             securityTypeVerifiedLocally = false
         )
@@ -318,6 +321,7 @@ class DefaultConfigurationTransferRepository(
             id = id,
             name = name,
             actionLabel = actionLabel,
+            apiProtocol = action.protocol,
             apiMethod = action.method,
             apiPath = action.path,
             sortOrder = sortOrder

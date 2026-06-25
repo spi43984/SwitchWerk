@@ -464,11 +464,18 @@ class MainViewModel(
                 DeviceActionUiState.Error(uiText(R.string.action_invalid_address))
             }
 
+            DeviceActionResult.TlsCertificateError -> {
+                DeviceActionUiState.Error(uiText(R.string.action_tls_certificate_error))
+            }
+
             is DeviceActionResult.NetworkError -> {
                 val detail = when (reason) {
                     NetworkFailureReason.DNS -> uiText(R.string.action_dns_error)
                     NetworkFailureReason.CONNECTION -> uiText(R.string.action_connection_error)
                     NetworkFailureReason.NO_ROUTE -> uiText(R.string.action_no_route)
+                    NetworkFailureReason.TLS_CERTIFICATE -> {
+                        uiText(R.string.action_tls_certificate_error)
+                    }
                     NetworkFailureReason.VPN_BLOCKED -> {
                         uiText(R.string.action_vpn_blocked)
                     }
