@@ -137,6 +137,13 @@
     <string name="toggle_password_visibility">Passwort anzeigen oder verbergen</string>
     <string name="password_hint">Leeres Passwort ist erlaubt. Vorhandenes Passwort bleibt nur erhalten, wenn die Sternchen unverändert bleiben.</string>
     <string name="clear_password">Passwort leeren</string>
+    <string name="wifi_connection_mode_switchwerk_managed">SwitchWerk verwaltet dieses WLAN</string>
+    <string name="wifi_connection_mode_android_managed">Android verwaltet dieses WLAN</string>
+    <string name="android_managed_wifi_info">Dieses WLAN muss in Android eingerichtet und verbunden sein. SwitchWerk speichert keine Zugangsdaten.</string>
+    <string name="open_android_wifi_settings">Android-WLAN-Einstellungen öffnen</string>
+    <string name="android_managed_wifi_switch_title">Ziel-WLAN verbinden</string>
+    <string name="android_managed_wifi_switch_message">Bitte verbinde dich in Android mit dem WLAN „%1$s“. Danach kehre zu SwitchWerk zurück und starte die Geräteaktion erneut.</string>
+    <string name="select_visible_wifi_ssid">SSID aus sichtbaren WLANs auswählen</string>
 
     <string name="backup_description">Konfigurationen als JSON-Datei sichern oder aus einer vertrauenswürdigen Quelle importieren.</string>
     <string name="configuration_processing">Konfiguration wird verarbeitet …</string>
@@ -214,6 +221,7 @@
 
     <string name="diagnostic_entry">%1$s (+%2$d ms) %3$s</string>
     <string name="diagnostic_action_started">Geräteaktion „%1$s“ gestartet</string>
+    <string name="diagnostic_wifi_profile_attempt">WLAN-Zuordnung %1$d von %2$d: Profil „%3$s“</string>
     <string name="diagnostic_wifi_request_started">WLAN-Anforderung für Profil „%1$s“ gestartet</string>
     <string name="diagnostic_wifi_security_started">WLAN-Sicherheitstyp wird ermittelt</string>
     <string name="diagnostic_wifi_security_succeeded">WLAN-Sicherheitstyp erkannt</string>
@@ -244,6 +252,7 @@
     <string name="action_success">Erfolg</string>
     <string name="action_no_wifi">Kein WLAN für Gerät konfiguriert</string>
     <string name="action_wifi_unreachable">Zugeordnetes WLAN nicht verfügbar</string>
+    <string name="action_android_managed_wifi_not_active">Android-verwaltetes WLAN ist nicht aktiv. Bitte in Android mit dem Ziel-WLAN verbinden.</string>
     <string name="action_wifi_permission_denied">WLAN-Verbindung nicht erlaubt</string>
     <string name="action_wifi_disabled">WLAN ist deaktiviert</string>
     <string name="action_wifi_missing_password">WLAN-Passwort fehlt. Bitte im WLAN-Profil neu speichern.</string>
