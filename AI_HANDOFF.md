@@ -4,11 +4,12 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 022 „Request Body And Content-Type Support“ ist auf dem Branch
-`request-body-content-type-support` lokal implementiert, aber noch nicht
-veröffentlicht oder abgeschlossen.
+Issue 022 „Request Body And Content-Type Support“ ist veröffentlicht und
+abgeschlossen.
 
 - GitHub-Issue: #127
+- Pull Request: #128
+- Merge-Commit: `173bfba`
 - Geräteaktionen speichern jetzt zusätzlich einen optionalen Request-Body und
   einen Content-Type (`application/json` oder `text/plain`).
 - Die Gerätebearbeitung bietet eine Content-Type-Auswahl und ein mehrzeiliges
@@ -16,18 +17,26 @@ veröffentlicht oder abgeschlossen.
   Netzwerklogik bleibt im Service.
 - POST-Anfragen senden den gespeicherten Body und den konfigurierten
   Content-Type. Leere Bodies bleiben erlaubt. GET bleibt unverändert.
+- Die Content-Type-Auswahl ist nur bei `POST` aktiv; bei `GET` ist sie sichtbar,
+  aber deaktiviert. `application/json` bleibt der Standardwert.
 - Room wurde von Version 7 auf 8 migriert. Vorhandene Geräte erhalten einen
   leeren Body und den Default `APPLICATION_JSON`.
 - Import/Export wurde auf Schema-Version 4 erweitert. Ältere Konfigurationen
   ohne Request-Body und Content-Type importieren weiterhin mit leerem Body und
   Default `APPLICATION_JSON`.
+- Hilfe-/Infotexte im Gerätebereich wurden aktualisiert. Zusätzlich steht im
+  Workflow jetzt verbindlich, dass Hilfe-, Info- und Tooltip-Texte bei neuen
+  oder geänderten Funktionen geprüft und bei Bedarf aktualisiert werden.
 - Request-Bodies werden nicht geloggt; Logs und Diagnosen enthalten weiterhin
   nur Methode, Adresse, Status und Fehlerkategorien.
 - Im Container waren gezielte Tests für Action-Service, OkHttp-Service und
   Import-Validator sowie `./gradlew testDebugUnitTest` und
   `./gradlew lintDebug` erfolgreich.
-- Noch offen: Host-Prüfungen `./gradlew clean assembleDebug`,
-  `./gradlew installDebug` und manuelle Geräte-/Import-/Export-Szenarien.
+- Der Benutzer hat die Funktion anschließend als erfolgreich bestätigt.
+- Die lokale Issue-Datei und `docs/issues/overview.txt` sind auf
+  `abgeschlossen` gesetzt; GitHub-Issue #127 ist geschlossen.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 031
+  „Import Enforces Unique WiFi Profile Names“.
 
 String-Pflege zu den heute abgeschlossenen Issues 055, 021 und 056 wurde lokal
 erledigt.
