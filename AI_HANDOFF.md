@@ -4,6 +4,23 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 056 „Keyboard Options For Technical Device Inputs“ ist implementiert und
+vom Benutzer erfolgreich geprüft; Veröffentlichung und Abschluss laufen auf
+dessen Anweisung.
+
+- GitHub-Issue: #121
+- Branch: `keyboard-options-technical-inputs`
+- Technische Eingaben im Gerätebereich verwenden jetzt passende
+  `KeyboardOptions`: Der API-Aufruf und Hostname/IP deaktivieren Autokorrektur
+  sowie automatische Großschreibung und verwenden `KeyboardType.Uri`, damit
+  technische Zeichen wie `.`, `/` und Pfadbestandteile besser erreichbar sind.
+- Bestehende Fokus-, Done-, Speichern- und Abbrechen-Logik blieb unverändert.
+- Im Container waren `./gradlew lintDebug` und `./gradlew testDebugUnitTest`
+  erfolgreich. Der Benutzer hat das Issue anschließend als erfolgreich
+  bestätigt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 057
+  „Encrypted Storage Restore Start Crash“.
+
 Issue 021 „HTTP/HTTPS Device Actions“ ist veröffentlicht und abgeschlossen.
 
 - GitHub-Issue: #119

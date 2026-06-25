@@ -42,6 +42,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
@@ -55,6 +57,20 @@ import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
 import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
 import de.piecha.switchwerk.viewmodel.DeviceFormState
+
+private val technicalPathKeyboardOptions = KeyboardOptions(
+    capitalization = KeyboardCapitalization.None,
+    autoCorrectEnabled = false,
+    keyboardType = KeyboardType.Uri,
+    imeAction = ImeAction.Done
+)
+
+private val hostKeyboardOptions = KeyboardOptions(
+    capitalization = KeyboardCapitalization.None,
+    autoCorrectEnabled = false,
+    keyboardType = KeyboardType.Uri,
+    imeAction = ImeAction.Done
+)
 
 @Composable
 fun DeviceManagementSection(
@@ -464,7 +480,7 @@ private fun DeviceForm(
             onValueChange = onApiPathChange,
             label = { Text(stringResource(R.string.api_call)) },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardOptions = technicalPathKeyboardOptions,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             modifier = Modifier
                 .fillMaxWidth()
@@ -835,7 +851,7 @@ private fun ConnectionEditDialog(
                 onValueChange = { host = it },
                 label = { Text(stringResource(R.string.hostname_ip)) },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = hostKeyboardOptions,
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 modifier = Modifier.fillMaxWidth()
             )
