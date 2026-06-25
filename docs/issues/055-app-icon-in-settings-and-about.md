@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Branding / UI / Android Resources
 
@@ -41,13 +41,13 @@ Issue 054 hat das offizielle App-Icon ersetzt. In der App selbst werden im Einst
 
 ## Akzeptanzkriterien
 
-- [ ] Einstellungsmenü verwendet das aktuelle App-Icon.
-- [ ] About-Menü verwendet das aktuelle App-Icon.
-- [ ] Größe und Position bleiben unverändert.
-- [ ] Version und Release-Datum bleiben unverändert.
-- [ ] Launcher-Icon bleibt unverändert.
-- [ ] Keine neue externe Abhängigkeit.
-- [ ] Build erfolgreich.
+- [x] Einstellungsmenü verwendet das aktuelle App-Icon.
+- [x] About-Menü verwendet das aktuelle App-Icon.
+- [x] Größe und Position bleiben unverändert.
+- [x] Version und Release-Datum bleiben unverändert.
+- [x] Launcher-Icon bleibt unverändert.
+- [x] Keine neue externe Abhängigkeit.
+- [x] Build erfolgreich.
 
 ## Testhinweise
 
@@ -66,5 +66,17 @@ Build:
 Nach der Implementierung ergänzen:
 
 - betroffene Dateien:
-- verwendete Icon-Ressource:
-- manuelle Prüfung:
+  - `app/src/main/java/de/piecha/switchwerk/ui/components/AppOverflowMenu.kt`
+  - `app/src/main/java/de/piecha/switchwerk/ui/components/HelpContent.kt`
+  - `app/src/main/res/drawable-nodpi/ic_launcher_foreground.png`
+  - `app/src/main/res/mipmap-*/ic_launcher*.png`
+  - `docs/assets/icons/Kabelblitz_gelb.png`
+- entfernte alte Icon-Dateien:
+  - `app/src/main/res/drawable-nodpi/about_logo.png`
+  - `docs/assets/icons/App_Icon.png`
+  - `docs/assets/icons/App_Icon_transparent.png`
+  - `docs/assets/icons/App_Icon_transparent_weiss.png`
+  - `docs/assets/icons/switchwerk_about.png`
+  - `docs/assets/icons/switchwerk_icons.zip`
+- verwendete Icon-Ressource: `R.drawable.ic_launcher_foreground`
+- manuelle Prüfung: Host-Build, Installation und Menüprüfung vom Benutzer bestätigt.

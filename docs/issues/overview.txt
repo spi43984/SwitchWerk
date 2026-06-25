@@ -76,20 +76,19 @@ es verändert die Priorisierungslogik nicht.
 | 052 | P4 | Backlog | iOS: Development Workflow, Toolchain & Delivery |
 | 053 | P1 | abgeschlossen | Hamburger And About Release Metadata |
 | 054 | P0 | abgeschlossen | App Icon Replacement |
-| 055 | P0 | offen | App Icon In Settings And About |
+| 055 | P0 | abgeschlossen | App Icon In Settings And About |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 055 App Icon In Settings And About
-2. 021 HTTP/HTTPS Device Actions
-3. 022 Request Body And Content-Type Support
-4. 031 Import Enforces Unique WiFi Profile Names
-5. 032 Room Schema And Migration Test Coverage
-6. 037 GitHub Release Update Support
-7. 041 Dashboard Drag And Drop
-8. 024 Authenticated Import Sources Backlog
-9. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-10. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-11. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-12. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-13. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+1. 021 HTTP/HTTPS Device Actions
+2. 022 Request Body And Content-Type Support
+3. 031 Import Enforces Unique WiFi Profile Names
+4. 032 Room Schema And Migration Test Coverage
+5. 037 GitHub Release Update Support
+6. 041 Dashboard Drag And Drop
+7. 024 Authenticated Import Sources Backlog
+8. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+9. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+10. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+11. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+12. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
