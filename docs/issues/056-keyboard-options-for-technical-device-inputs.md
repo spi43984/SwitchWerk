@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / Eingabeformulare
 - Bereich: Gerätebearbeitung / Geräte-WLAN-Zuordnung
@@ -82,15 +82,15 @@ Betroffene Stellen:
 
 ## Akzeptanzkriterien
 
-- [ ] Hostname/IP-Felder deaktivieren Autokorrektur.
-- [ ] Hostname/IP-Felder deaktivieren automatische Großschreibung.
-- [ ] Hostname/IP-Eingaben wie `server.domain.com` und `192.0.2.10` werden
+- [x] Hostname/IP-Felder deaktivieren Autokorrektur.
+- [x] Hostname/IP-Felder deaktivieren automatische Großschreibung.
+- [x] Hostname/IP-Eingaben wie `server.domain.com` und `192.0.2.10` werden
       nicht durch Tastaturautomatismen erschwert.
-- [ ] API-Pfad-Feld deaktiviert Autokorrektur.
-- [ ] API-Pfad-Feld deaktiviert automatische Großschreibung.
-- [ ] API-Pfad-Feld verwendet ein für Pfade geeignetes Tastaturlayout mit gut
+- [x] API-Pfad-Feld deaktiviert Autokorrektur.
+- [x] API-Pfad-Feld deaktiviert automatische Großschreibung.
+- [x] API-Pfad-Feld verwendet ein für Pfade geeignetes Tastaturlayout mit gut
       erreichbarem `/`, soweit durch Android/Compose steuerbar.
-- [ ] Bestehende Fokus- und Speichern-/Abbrechen-Bedienung aus Issue 038 bleibt
+- [x] Bestehende Fokus- und Speichern-/Abbrechen-Bedienung aus Issue 038 bleibt
       unverändert.
 
 ## Testhinweise
