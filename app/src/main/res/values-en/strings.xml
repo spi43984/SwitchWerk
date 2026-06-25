@@ -35,7 +35,7 @@
     <string name="wifi_profile_dialog_info_title">Wi-Fi profile</string>
     <string name="wifi_profile_dialog_info">• Enter the target Wi-Fi SSID\n• The name must be unique\n• The password remains encrypted on the device</string>
     <string name="device_dialog_info_title">Device</string>
-    <string name="device_dialog_info">• Set the name and button label\n• Enter the HTTP/RPC method and path\n• Wi-Fi assignments define the connection order</string>
+    <string name="device_dialog_info">• Set the name and button label\n• Choose HTTP or HTTPS\n• Enter the HTTP/RPC method and path\n• Wi-Fi assignments define the connection order</string>
     <string name="wifi_assignment_dialog_info_title">Wi-Fi assignment</string>
     <string name="wifi_assignment_dialog_info">• Select a Wi-Fi profile for the device\n• Enter the local device address\n• No internet access is required</string>
     <string name="about_switchwerk">About SwitchWerk</string>
@@ -100,6 +100,7 @@
     <string name="more_devices_below">More devices below</string>
     <string name="button_label">Button label</string>
     <string name="api_call">API call</string>
+    <string name="selected_device_protocol">✓ %1$s</string>
     <string name="selected_api_method">✓ %1$s</string>
     <string name="add_wifi_assignment">Add Wi-Fi assignment</string>
     <string name="edit_wifi_assignment">Edit Wi-Fi assignment</string>
@@ -196,6 +197,7 @@
     <string name="error_button_label_empty">Button label must not be empty</string>
     <string name="error_api_call_empty">API call must not be empty</string>
     <string name="error_api_method_invalid">API method is invalid</string>
+    <string name="error_api_protocol_invalid">Device protocol is invalid</string>
     <string name="error_device_save">Device could not be saved</string>
     <string name="error_device_delete">Device could not be deleted</string>
     <string name="error_device_order">Device order could not be changed</string>
@@ -242,6 +244,7 @@
     <string name="action_http_error">Device returned HTTP error %1$d</string>
     <string name="action_timeout">Device action timed out</string>
     <string name="action_invalid_address">Stored device address is invalid</string>
+    <string name="action_tls_certificate_error">The device HTTPS certificate could not be verified</string>
     <string name="action_dns_error">Device hostname cannot be resolved</string>
     <string name="action_connection_error">Device is unreachable on the network</string>
     <string name="action_no_route">No route to device</string>

@@ -20,6 +20,7 @@ import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
@@ -58,6 +59,7 @@ data class DeviceFormState(
     val id: String? = null,
     val name: String = "",
     val actionLabel: String = "",
+    val apiProtocol: String = DeviceProtocol.HTTP.name,
     val apiMethod: String = ApiMethod.GET.name,
     val apiPath: String = "",
     val connections: List<DeviceConnectionFormState> = emptyList()
@@ -464,6 +466,7 @@ class SettingsViewModel(
                 id = device.id,
                 name = device.name,
                 actionLabel = device.actionLabel,
+                apiProtocol = device.protocol.name,
                 apiMethod = device.apiCall.method.name,
                 apiPath = device.apiCall.path,
                 connections = device.connections.map { connection ->
@@ -502,6 +505,10 @@ class SettingsViewModel(
 
     fun updateDeviceApiMethod(apiMethod: String) {
         updateDeviceForm { it.copy(apiMethod = apiMethod) }
+    }
+
+    fun updateDeviceApiProtocol(apiProtocol: String) {
+        updateDeviceForm { it.copy(apiProtocol = apiProtocol) }
     }
 
     fun updateDeviceApiPath(apiPath: String) {
@@ -627,6 +634,13 @@ class SettingsViewModel(
             return
         }
 
+        val apiProtocol = runCatching {
+            DeviceProtocol.valueOf(form.apiProtocol)
+        }.getOrElse {
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_api_protocol_invalid))
+            return
+        }
+
         val sortOrder = form.id?.let { existingId ->
             _uiState.value.devices.firstOrNull { it.id == existingId }?.sortOrder
         } ?: ((_uiState.value.devices.maxOfOrNull { it.sortOrder } ?: 0) + 1)
@@ -638,6 +652,7 @@ class SettingsViewModel(
                         id = form.id ?: UUID.randomUUID().toString(),
                         name = trimmedName,
                         actionLabel = trimmedActionLabel,
+                        protocol = apiProtocol,
                         apiCall = ApiCall(
                             method = apiMethod,
                             path = trimmedApiPath

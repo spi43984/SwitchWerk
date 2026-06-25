@@ -13,6 +13,7 @@ import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiSecurityType
@@ -30,6 +31,7 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
+import javax.net.ssl.SSLHandshakeException
 
 class DefaultDeviceActionServiceTest {
 
@@ -241,6 +243,79 @@ class DefaultDeviceActionServiceTest {
             httpService.calls.single().url
         )
         assertSame(requestedNetwork, httpService.calls.single().network)
+    }
+
+    @Test
+    fun configuredHttpsProtocolIsUsedForApiCall() = runBlocking {
+        val requestedNetwork = mock(Network::class.java)
+        val httpService = FakeHttpApiCallService(
+            results = ArrayDeque(listOf(successResult()))
+        )
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(requestedNetwork)))
+            ),
+            httpService = httpService
+        )
+
+        val result = service.execute(
+            device(
+                protocol = DeviceProtocol.HTTPS,
+                path = "/rpc/Switch.Toggle?id=0",
+                connections = listOf(DeviceConnection("wifi-1", "192.168.33.1"))
+            )
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals(
+            "https://192.168.33.1/rpc/Switch.Toggle?id=0",
+            httpService.calls.single().url
+        )
+    }
+
+    @Test
+    fun tlsCertificateFailureIsReportedWithoutRetryingAnotherWifi() = runBlocking {
+        val firstNetwork = mock(Network::class.java)
+        val secondNetwork = mock(Network::class.java)
+        val wifiService = FakeWifiConnectionService(
+            results = ArrayDeque(
+                listOf(
+                    WifiConnectionResult.Success(firstNetwork),
+                    WifiConnectionResult.Success(secondNetwork)
+                )
+            )
+        )
+        val service = createService(
+            profiles = listOf(
+                WifiProfile("wifi-1", "First WiFi"),
+                WifiProfile("wifi-2", "Second WiFi")
+            ),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(
+                ArrayDeque(
+                    listOf(
+                        HttpApiCallResult.NetworkError(
+                            SSLHandshakeException("certificate validation failed")
+                        )
+                    )
+                )
+            )
+        )
+
+        val result = service.execute(
+            device(
+                protocol = DeviceProtocol.HTTPS,
+                connections = listOf(
+                    DeviceConnection("wifi-1", "first.local"),
+                    DeviceConnection("wifi-2", "second.local")
+                )
+            )
+        )
+
+        assertEquals(DeviceActionResult.TlsCertificateError, result)
+        assertEquals(listOf("First WiFi"), wifiService.requestedSsids)
+        assertEquals(1, wifiService.disconnectCount)
     }
 
     @Test
@@ -758,6 +833,7 @@ class DefaultDeviceActionServiceTest {
     }
 
     private fun device(
+        protocol: DeviceProtocol = DeviceProtocol.HTTP,
         method: ApiMethod = ApiMethod.GET,
         payload: String? = null,
         path: String = "/rpc/action",
@@ -767,6 +843,7 @@ class DefaultDeviceActionServiceTest {
             id = "device-1",
             name = "Device",
             actionLabel = "Switch",
+            protocol = protocol,
             apiCall = ApiCall(
                 method = method,
                 path = path,

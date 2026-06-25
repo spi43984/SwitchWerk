@@ -8,6 +8,7 @@ data class DeviceEntity(
     @PrimaryKey val id: String,
     val name: String,
     val actionLabel: String,
+    val apiProtocol: String,
     val apiMethod: String,
     val apiPath: String,
     val sortOrder: Int

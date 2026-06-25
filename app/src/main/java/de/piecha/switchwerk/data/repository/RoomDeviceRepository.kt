@@ -8,6 +8,7 @@ import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceProtocol
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -77,6 +78,7 @@ class RoomDeviceRepository(
             id = id,
             name = name,
             actionLabel = actionLabel,
+            protocol = DeviceProtocol.valueOf(apiProtocol),
             apiCall = ApiCall(
                 method = ApiMethod.valueOf(apiMethod),
                 path = apiPath
@@ -91,6 +93,7 @@ class RoomDeviceRepository(
             id = id,
             name = name,
             actionLabel = actionLabel,
+            apiProtocol = protocol.name,
             apiMethod = apiCall.method.name,
             apiPath = apiCall.path,
             sortOrder = sortOrder

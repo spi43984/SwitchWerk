@@ -318,6 +318,7 @@ fun SettingsScreen(
                     onDeleteClick = viewModel::deleteDevice,
                     onNameChange = viewModel::updateDeviceName,
                     onActionLabelChange = viewModel::updateDeviceActionLabel,
+                    onApiProtocolChange = viewModel::updateDeviceApiProtocol,
                     onApiMethodChange = viewModel::updateDeviceApiMethod,
                     onApiPathChange = viewModel::updateDeviceApiPath,
                     onAddConnection = viewModel::addDeviceConnection,

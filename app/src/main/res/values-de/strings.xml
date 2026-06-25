@@ -71,6 +71,7 @@
     <string name="more_devices_below">Weitere Geräte unterhalb</string>
     <string name="button_label">Button-Beschriftung</string>
     <string name="api_call">API-Aufruf</string>
+    <string name="selected_device_protocol">✓ %1$s</string>
     <string name="selected_api_method">✓ %1$s</string>
     <string name="add_wifi_assignment">WLAN-Zuordnung hinzufügen</string>
     <string name="edit_wifi_assignment">WLAN-Zuordnung bearbeiten</string>
@@ -172,6 +173,7 @@
     <string name="error_button_label_empty">Button-Beschriftung darf nicht leer sein</string>
     <string name="error_api_call_empty">API-Aufruf darf nicht leer sein</string>
     <string name="error_api_method_invalid">API-Methode ist ungültig</string>
+    <string name="error_api_protocol_invalid">Geräteprotokoll ist ungültig</string>
     <string name="error_device_save">Gerät konnte nicht gespeichert werden</string>
     <string name="error_device_delete">Gerät konnte nicht gelöscht werden</string>
     <string name="error_device_order">Gerätereihenfolge konnte nicht geändert werden</string>
@@ -218,6 +220,7 @@
     <string name="action_http_error">Gerät meldet HTTP-Fehler %1$d</string>
     <string name="action_timeout">Zeitüberschreitung bei der Geräteaktion</string>
     <string name="action_invalid_address">Gespeicherte Geräteadresse ungültig</string>
+    <string name="action_tls_certificate_error">HTTPS-Zertifikat des Geräts konnte nicht geprüft werden</string>
     <string name="action_dns_error">Gerätename nicht auflösbar</string>
     <string name="action_connection_error">Gerät im Netzwerk nicht erreichbar</string>
     <string name="action_no_route">Keine Route zum Gerät</string>

@@ -33,6 +33,7 @@ class ConfigurationJsonCodec {
                     writer.name("id").value(profile.id)
                     writer.name("name").value(profile.name)
                     writer.name("ssid").value(profile.ssid)
+                    writer.name("connectionMode").value(profile.connectionMode)
                     profile.securityType?.let { securityType ->
                         writer.name("securityType").value(securityType)
                     }
@@ -51,6 +52,7 @@ class ConfigurationJsonCodec {
                     writer.name("actionLabel").value(device.actionLabel)
                     writer.name("action")
                     writer.beginObject()
+                    writer.name("protocol").value(device.action.protocol)
                     writer.name("method").value(device.action.method)
                     writer.name("path").value(device.action.path)
                     writer.endObject()
@@ -145,6 +147,7 @@ class ConfigurationJsonCodec {
             var id: String? = null
             var name: String? = null
             var ssid: String? = null
+            var connectionMode: String? = null
             var securityType: String? = null
             var password: String? = null
             var isPasswordPresent = false
@@ -155,6 +158,7 @@ class ConfigurationJsonCodec {
                     "id" -> id = nextString()
                     "name" -> name = nextString()
                     "ssid" -> ssid = nextString()
+                    "connectionMode" -> connectionMode = nextString()
                     "securityType" -> {
                         securityType = if (peek() == JsonToken.NULL) {
                             nextNull()
@@ -181,6 +185,7 @@ class ConfigurationJsonCodec {
                 id = requireField(id, "wifiProfiles.id"),
                 name = name ?: requiredSsid,
                 ssid = requiredSsid,
+                connectionMode = connectionMode ?: "SWITCHWERK_MANAGED",
                 securityType = securityType,
                 password = password,
                 isPasswordPresent = isPasswordPresent
@@ -226,12 +231,14 @@ class ConfigurationJsonCodec {
     }
 
     private fun JsonReader.readAction(): ConfigurationDeviceAction {
+        var protocol: String? = null
         var method: String? = null
         var path: String? = null
 
         beginObject()
         while (hasNext()) {
             when (nextName()) {
+                "protocol" -> protocol = nextString()
                 "method" -> method = nextString()
                 "path" -> path = nextString()
                 else -> skipValue()
@@ -240,6 +247,7 @@ class ConfigurationJsonCodec {
         endObject()
 
         return ConfigurationDeviceAction(
+            protocol = protocol ?: "HTTP",
             method = requireField(method, "devices.action.method"),
             path = requireField(path, "devices.action.path")
         )
