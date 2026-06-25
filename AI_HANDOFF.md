@@ -4,12 +4,12 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
-Issue 056 „Keyboard Options For Technical Device Inputs“ ist implementiert und
-vom Benutzer erfolgreich geprüft; Veröffentlichung und Abschluss laufen auf
-dessen Anweisung.
+Issue 056 „Keyboard Options For Technical Device Inputs“ ist veröffentlicht und
+abgeschlossen.
 
 - GitHub-Issue: #121
-- Branch: `keyboard-options-technical-inputs`
+- Pull Request: #122
+- Merge-Commit: `cd21a4f`
 - Technische Eingaben im Gerätebereich verwenden jetzt passende
   `KeyboardOptions`: Der API-Aufruf und Hostname/IP deaktivieren Autokorrektur
   sowie automatische Großschreibung und verwenden `KeyboardType.Uri`, damit
