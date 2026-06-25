@@ -20,6 +20,8 @@ sealed interface WifiConnectionResult {
 
     data object WifiDisabled : WifiConnectionResult
 
+    data object MissingPassword : WifiConnectionResult
+
     data object UnsupportedAndroidVersion : WifiConnectionResult
 
     data class Error(val cause: Throwable) : WifiConnectionResult

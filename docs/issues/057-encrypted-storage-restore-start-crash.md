@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / Stabilität
 - Bereich: App-Start / verschlüsselte lokale Speicherung
@@ -68,13 +68,40 @@ Zu prüfen:
 
 ## Akzeptanzkriterien
 
-- [ ] App startet nach Deinstallation und Neuinstallation ohne manuelles Löschen des App-Speichers.
-- [ ] App startet auch dann, wenn verschlüsselte Credential-Daten nicht entschlüsselbar sind.
-- [ ] Nicht wiederherstellbare WLAN-Passwörter werden kontrolliert verworfen.
-- [ ] Nicht sensible Konfigurationen bleiben soweit möglich erhalten.
-- [ ] Es werden keine Passwörter, SSIDs, Hosts, IP-Adressen oder Tokens geloggt.
-- [ ] Der Nutzer kann betroffene WLAN-Passwörter nach dem Start erneut speichern.
-- [ ] Bestehende Credential-Speicherung funktioniert nach dem Fix weiterhin.
+- [x] App startet nach Deinstallation und Neuinstallation ohne manuelles Löschen des App-Speichers.
+- [x] App startet auch dann, wenn verschlüsselte Credential-Daten nicht entschlüsselbar sind.
+- [x] Nicht wiederherstellbare WLAN-Passwörter werden kontrolliert verworfen.
+- [x] Nicht sensible Konfigurationen bleiben soweit möglich erhalten.
+- [x] Es werden keine Passwörter, SSIDs, Hosts, IP-Adressen oder Tokens geloggt.
+- [x] Der Nutzer kann betroffene WLAN-Passwörter nach dem Start erneut speichern.
+- [x] Bestehende Credential-Speicherung funktioniert nach dem Fix weiterhin.
+
+## Umsetzung
+
+- Android-Backup-Regeln schließen die nicht wiederherstellbaren verschlüsselten
+  WLAN-Credential-SharedPreferences und AndroidX-Security-Keysets aus.
+- `EncryptedWifiCredentialStore` fängt bekannte Crypto-/Keystore-/Security- und
+  IO-Fehler bei Initialisierung sowie späterem Lesen oder Schreiben ab, löscht
+  kontrolliert nur die betroffenen Credential-Dateien und initialisiert den
+  Store einmal neu.
+- Nicht wiederherstellbare WLAN-Passwörter werden verworfen; Room-Daten und
+  nicht sensible App-Konfigurationen bleiben erhalten.
+- Wenn ein SwitchWerk-verwaltetes WLAN laut erkanntem oder lokal verifiziert
+  gespeichertem Sicherheitstyp ein Passwort erwartet, aber kein Passwort mehr
+  gespeichert ist, startet die App keinen aussichtslosen Android-WLAN-Request
+  und zeigt eine neutrale Passwort-fehlt-Meldung. Passwortlose/offene WLANs
+  bleiben möglich, wenn kein geschützter Sicherheitstyp ermittelt oder
+  gespeichert ist.
+- Es wurden keine neuen externen Abhängigkeiten eingeführt.
+
+## Prüfungen
+
+- `./gradlew testDebugUnitTest`
+- `./gradlew lintDebug`
+- `git diff --check`
+- Host: `./gradlew installDebug`
+- Host: Start per `adb shell monkey -p de.piecha.switchwerk 1`
+- Host: Logcat-Prüfung ohne `AndroidRuntime`-Crash
 
 ## Testhinweise
 

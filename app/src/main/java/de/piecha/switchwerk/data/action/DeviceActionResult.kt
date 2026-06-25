@@ -13,6 +13,8 @@ sealed interface DeviceActionResult {
 
     data object WifiDisabled : DeviceActionResult
 
+    data object MissingWifiPassword : DeviceActionResult
+
     data object UnsupportedAndroidVersion : DeviceActionResult
 
     data class HttpError(val statusCode: Int) : DeviceActionResult

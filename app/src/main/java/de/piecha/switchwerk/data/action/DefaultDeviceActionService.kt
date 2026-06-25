@@ -162,6 +162,14 @@ class DefaultDeviceActionService(
                         return DeviceActionResult.WifiPermissionDenied
                     }
 
+                    WifiConnectionResult.MissingPassword -> {
+                        emitDiagnostic(
+                            onDiagnosticEvent,
+                            DeviceActionDiagnosticEvent.MissingWifiPassword
+                        )
+                        lastFailure = DeviceActionResult.MissingWifiPassword
+                    }
+
                     WifiConnectionResult.WifiDisabled -> {
                         emitDiagnostic(
                             onDiagnosticEvent,
@@ -220,6 +228,9 @@ class DefaultDeviceActionService(
             }
         }
         val startedAtNanos = System.nanoTime()
+        if (password.isNullOrEmpty() && requiresPassword(profile, detectedSecurityTypes)) {
+            return WifiConnectionResult.MissingPassword
+        }
         val securityTypes = securityAttemptOrder(
             preferredSecurityType = profile.lastSuccessfulSecurityType,
             detectedSecurityTypes = detectedSecurityTypes
@@ -270,6 +281,7 @@ class DefaultDeviceActionService(
 
                 WifiConnectionResult.PermissionDenied,
                 WifiConnectionResult.WifiDisabled,
+                WifiConnectionResult.MissingPassword,
                 WifiConnectionResult.UnsupportedAndroidVersion -> return connectionResult
 
                 WifiConnectionResult.Timeout,
@@ -554,6 +566,7 @@ class DefaultDeviceActionService(
             WifiConnectionResult.Timeout -> "Timeout"
             WifiConnectionResult.NetworkRequestTimeout -> "NetworkRequestTimeout"
             WifiConnectionResult.Unavailable -> "Unavailable"
+            WifiConnectionResult.MissingPassword -> "MissingPassword"
             WifiConnectionResult.PermissionDenied -> "PermissionDenied"
             WifiConnectionResult.WifiDisabled -> "WifiDisabled"
             WifiConnectionResult.UnsupportedAndroidVersion -> "UnsupportedAndroidVersion"
@@ -569,6 +582,24 @@ class DefaultDeviceActionService(
             return true
         }
         return false
+    }
+
+    private fun requiresPassword(
+        profile: WifiProfile,
+        detectedSecurityTypes: Set<WifiSecurityType>?
+    ): Boolean {
+        if (!detectedSecurityTypes.isNullOrEmpty()) {
+            return detectedSecurityTypes.any { it.requiresPassword() }
+        }
+        return profile.isSecurityTypeVerifiedLocally &&
+            profile.lastSuccessfulSecurityType?.requiresPassword() == true
+    }
+
+    private fun WifiSecurityType.requiresPassword(): Boolean {
+        return when (this) {
+            WifiSecurityType.WPA2,
+            WifiSecurityType.WPA3 -> true
+        }
     }
 
     private fun logInfo(message: String) {

@@ -379,6 +379,9 @@ class MainViewModel(
                 uiText(R.string.diagnostic_wifi_failed)
             }
             DeviceActionDiagnosticEvent.WifiDisabled -> uiText(R.string.diagnostic_wifi_disabled)
+            DeviceActionDiagnosticEvent.MissingWifiPassword -> {
+                uiText(R.string.diagnostic_wifi_missing_password)
+            }
             is DeviceActionDiagnosticEvent.DeviceAddress -> {
                 uiText(R.string.diagnostic_device_address, address)
             }
@@ -446,6 +449,10 @@ class MainViewModel(
 
             DeviceActionResult.WifiDisabled -> {
                 DeviceActionUiState.Error(uiText(R.string.action_wifi_disabled))
+            }
+
+            DeviceActionResult.MissingWifiPassword -> {
+                DeviceActionUiState.Error(uiText(R.string.action_wifi_missing_password))
             }
 
             DeviceActionResult.UnsupportedAndroidVersion -> {

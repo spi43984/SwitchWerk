@@ -133,6 +133,67 @@ class DefaultDeviceActionServiceTest {
     }
 
     @Test
+    fun protectedWifiWithoutSavedPasswordDoesNotRequestWifi() = runBlocking {
+        val wifiService = FakeWifiConnectionService(
+            detectedSecurityTypes = setOf(WifiSecurityType.WPA2)
+        )
+        val service = createService(
+            wifiProfileRepository = FakeWifiProfileRepository(
+                profiles = listOf(
+                    WifiProfile(
+                        id = "wifi-1",
+                        ssid = "Device WiFi",
+                        isSecurityTypeVerifiedLocally = false
+                    )
+                ),
+                passwords = emptyMap()
+            ),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(ArrayDeque())
+        )
+        val events = mutableListOf<DeviceActionDiagnosticEvent>()
+
+        val result = service.execute(
+            device(connections = listOf(DeviceConnection("wifi-1", "192.0.2.10"))),
+            events::add
+        )
+
+        assertEquals(DeviceActionResult.MissingWifiPassword, result)
+        assertTrue(wifiService.requestedSsids.isEmpty())
+        assertTrue(events.contains(DeviceActionDiagnosticEvent.MissingWifiPassword))
+    }
+
+    @Test
+    fun missingPasswordDoesNotBlockWifiWhenSecurityTypeIsUnknown() = runBlocking {
+        val requestedNetwork = mock(Network::class.java)
+        val wifiService = FakeWifiConnectionService(
+            results = ArrayDeque(listOf(WifiConnectionResult.Success(requestedNetwork))),
+            detectedSecurityTypes = null
+        )
+        val service = createService(
+            wifiProfileRepository = FakeWifiProfileRepository(
+                profiles = listOf(
+                    WifiProfile(
+                        id = "wifi-1",
+                        ssid = "Device WiFi",
+                        isSecurityTypeVerifiedLocally = false
+                    )
+                ),
+                passwords = emptyMap()
+            ),
+            wifiService = wifiService,
+            httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+        )
+
+        val result = service.execute(
+            device(connections = listOf(DeviceConnection("wifi-1", "192.0.2.10")))
+        )
+
+        assertEquals(DeviceActionResult.Success, result)
+        assertEquals(listOf("Device WiFi"), wifiService.requestedSsids)
+    }
+
+    @Test
     fun diagnosticsShowCompleteWifiDnsAndHttpSequence() = runBlocking {
         val network = mock(Network::class.java)
         val service = createService(
@@ -859,7 +920,10 @@ class DefaultDeviceActionServiceTest {
     }
 
     private class FakeWifiProfileRepository(
-        private val profiles: List<WifiProfile>
+        private val profiles: List<WifiProfile>,
+        private val passwords: Map<String, String?> = profiles.associate { profile ->
+            profile.id to "password-${profile.id}"
+        }
     ) : WifiProfileRepository {
         val savedSecurityTypes = mutableMapOf<String, WifiSecurityType>()
 
@@ -873,9 +937,9 @@ class DefaultDeviceActionServiceTest {
             shouldUpdatePassword: Boolean
         ) = Unit
 
-        override suspend fun getPassword(id: String): String? = "password-$id"
+        override suspend fun getPassword(id: String): String? = passwords[id]
 
-        override suspend fun hasPassword(id: String): Boolean = true
+        override suspend fun hasPassword(id: String): Boolean = !passwords[id].isNullOrEmpty()
 
         override suspend fun updateLastSuccessfulSecurityType(
             id: String,

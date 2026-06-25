@@ -218,6 +218,7 @@
     <string name="diagnostic_ip_received">IP address received</string>
     <string name="diagnostic_wifi_failed">Wi-Fi connection failed</string>
     <string name="diagnostic_wifi_disabled">Wi-Fi is disabled</string>
+    <string name="diagnostic_wifi_missing_password">Wi-Fi password is missing</string>
     <string name="diagnostic_device_address">Device address: %1$s</string>
     <string name="diagnostic_http_get_started">HTTP/RPC GET to %1$s started</string>
     <string name="diagnostic_http_post_started">HTTP/RPC POST to %1$s started</string>
@@ -240,6 +241,7 @@
     <string name="action_wifi_unreachable">Assigned Wi-Fi network is unavailable</string>
     <string name="action_wifi_permission_denied">Wi-Fi connection is not permitted</string>
     <string name="action_wifi_disabled">Wi-Fi is disabled</string>
+    <string name="action_wifi_missing_password">Wi-Fi password is missing. Save it again in the Wi-Fi profile.</string>
     <string name="action_android_unsupported">Android does not support this Wi-Fi connection method</string>
     <string name="action_http_error">Device returned HTTP error %1$d</string>
     <string name="action_timeout">Device action timed out</string>
