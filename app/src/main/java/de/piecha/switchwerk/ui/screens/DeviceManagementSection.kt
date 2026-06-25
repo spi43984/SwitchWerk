@@ -502,11 +502,13 @@ private fun DeviceForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            val isPostMethod = form.apiMethod == ApiMethod.POST.name
             ApiContentType.entries.forEach { contentType ->
                 OutlinedButton(
                     onClick = {
                         onApiContentTypeChange(contentType.name)
                     },
+                    enabled = isPostMethod,
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
