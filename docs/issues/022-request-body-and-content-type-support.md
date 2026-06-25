@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P2
 - Typ: Geräteaktion / API
 
@@ -45,15 +45,31 @@ Weitere Content-Types können später ergänzt werden.
 
 ## Akzeptanzkriterien
 
-- [ ] Geräteaktionen können einen Request-Body speichern
-- [ ] Mehrzeilige Eingabe ist möglich
-- [ ] Geräteaktionen speichern einen Content-Type
-- [ ] POST-Anfragen übertragen den gespeicherten Body
-- [ ] POST-Anfragen übertragen den konfigurierten Content-Type
-- [ ] Leere Bodies funktionieren weiterhin
-- [ ] Vorhandene Geräte bleiben kompatibel
-- [ ] Fehlerhafte Requests werden verständlich angezeigt
-- [ ] Request-Bodies werden nicht im Klartext geloggt
+- [x] Geräteaktionen können einen Request-Body speichern
+- [x] Mehrzeilige Eingabe ist möglich
+- [x] Geräteaktionen speichern einen Content-Type
+- [x] POST-Anfragen übertragen den gespeicherten Body
+- [x] POST-Anfragen übertragen den konfigurierten Content-Type
+- [x] Leere Bodies funktionieren weiterhin
+- [x] Vorhandene Geräte bleiben kompatibel
+- [x] Fehlerhafte Requests werden verständlich angezeigt
+- [x] Request-Bodies werden nicht im Klartext geloggt
+
+## Abschlussnotizen
+
+- GitHub-Issue: #127
+- Geräteaktionen speichern optionalen Request-Body und Content-Type.
+- Unterstützte Content-Types: `application/json` und `text/plain`.
+- Content-Type-Auswahl ist in der UI nur bei `POST` aktiv; bei `GET` bleibt sie
+  sichtbar, aber deaktiviert.
+- `application/json` ist der Standardwert.
+- Room-Migration 7 -> 8 ergänzt leeren Body und `APPLICATION_JSON` für
+  vorhandene Geräte.
+- Import/Export-Schema-Version 4 speichert Request-Body und Content-Type;
+  ältere Konfigurationen bleiben kompatibel.
+- Hilfe-, Info- und Tooltip-Texte wurden geprüft; relevante Hilfe-/Infotexte
+  im Gerätebereich wurden aktualisiert.
+- Request-Bodies werden nicht geloggt.
 
 ## Testhinweise
 
