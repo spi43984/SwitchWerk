@@ -4,6 +4,21 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
+Deutsche String-Pflege zu den heute abgeschlossenen Issues 055, 021 und 056
+wurde lokal erledigt.
+
+- `values-de/strings.xml` enthält jetzt die fehlenden deutschen Info-, Hilfe-
+  und About-Strings aus `values/strings.xml`.
+- Insbesondere `device_dialog_info` enthält jetzt den Hinweis
+  „HTTP oder HTTPS wählen“.
+- Die Issue-021-Strings `selected_device_protocol`,
+  `error_api_protocol_invalid` und `action_tls_certificate_error` wurden in
+  `values-de`, `values` und `values-en` gezielt geprüft; in `values-de` waren
+  sie bereits vorhanden.
+- Es wurden keine UI-, Kotlin-, Architektur- oder Funktionsänderungen gemacht.
+- Im Container waren `./gradlew lintDebug` und
+  `./gradlew testDebugUnitTest` erfolgreich.
+
 Issue 057 „Encrypted Storage Restore Start Crash“ ist lokal abgeschlossen und
 vom Benutzer als ok bestätigt, aber noch nicht veröffentlicht.
 
