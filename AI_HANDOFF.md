@@ -4,6 +4,40 @@ Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
 
+Issue 057 „Encrypted Storage Restore Start Crash“ ist lokal abgeschlossen und
+vom Benutzer als ok bestätigt, aber noch nicht veröffentlicht.
+
+- GitHub-Issue: #123
+- Der `EncryptedWifiCredentialStore` initialisiert
+  `EncryptedSharedPreferences` jetzt über eine Recovery-Schicht. Bekannte
+  Crypto-/Keystore-/Security-/IO-Fehler aus der Initialisierung oder beim
+  späteren Lesen/Schreiben löschen kontrolliert nur die betroffenen
+  Credential-/AndroidX-Security-Keyset-SharedPreferences und initialisieren den
+  Store einmal neu.
+- Nicht wiederherstellbare WLAN-Passwörter werden dabei verworfen; Room-Daten
+  und sonstige App-Konfigurationen bleiben unangetastet.
+- Nach dem manuellen Gerätetest wurde ergänzt: Wenn ein SwitchWerk-verwaltetes
+  WLAN laut erkanntem oder lokal verifiziert gespeichertem Sicherheitstyp ein
+  Passwort erwartet, aber nach Restore/Neuinstallation kein Passwort mehr
+  gespeichert ist, startet die App keinen aussichtslosen Android-WLAN-Request
+  mehr. Stattdessen zeigt sie eine neutrale Meldung zum fehlenden WLAN-Passwort.
+  Passwortlose/offene WLANs bleiben möglich, wenn kein geschützter
+  Sicherheitstyp ermittelt oder gespeichert ist.
+- Android Auto Backup und Android-12+-Data-Extraction schließen
+  `wifi_credentials.xml` sowie die bekannten AndroidX-Security-Keyset-
+  SharedPreferences aus Cloud-Backup und Gerätetransfer aus.
+- Es wurden keine sensiblen Daten geloggt und keine neue Abhängigkeit
+  eingeführt.
+- Im Container waren `./gradlew testDebugUnitTest` und `./gradlew lintDebug`
+  erfolgreich. Der Benutzer hat `./gradlew installDebug` und den Start per
+  `adb shell monkey -p de.piecha.switchwerk 1` auf dem Host bestätigt; es wurde
+  kein `AndroidRuntime`-Crash gemeldet. Der Benutzer hat den Fix und das Issue
+  anschließend als ok bestätigt.
+- Die lokale Issue-Datei und `docs/issues/overview.txt` sind auf
+  `abgeschlossen` gesetzt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 022
+  „Request Body And Content-Type Support“.
+
 Issue 056 „Keyboard Options For Technical Device Inputs“ ist veröffentlicht und
 abgeschlossen.
 

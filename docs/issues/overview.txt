@@ -78,19 +78,18 @@ es verändert die Priorisierungslogik nicht.
 | 054 | P0 | abgeschlossen | App Icon Replacement |
 | 055 | P0 | abgeschlossen | App Icon In Settings And About |
 | 056 | P0 | abgeschlossen | Keyboard Options For Technical Device Inputs |
-| 057 | P0 | offen | Encrypted Storage Restore Start Crash |
+| 057 | P0 | abgeschlossen | Encrypted Storage Restore Start Crash |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 057 Encrypted Storage Restore Start Crash
-2. 022 Request Body And Content-Type Support
-3. 031 Import Enforces Unique WiFi Profile Names
-4. 032 Room Schema And Migration Test Coverage
-5. 037 GitHub Release Update Support
-6. 041 Dashboard Drag And Drop
-7. 024 Authenticated Import Sources Backlog
-8. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-9. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-10. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-11. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-12. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+1. 022 Request Body And Content-Type Support
+2. 031 Import Enforces Unique WiFi Profile Names
+3. 032 Room Schema And Migration Test Coverage
+4. 037 GitHub Release Update Support
+5. 041 Dashboard Drag And Drop
+6. 024 Authenticated Import Sources Backlog
+7. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+8. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+9. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+10. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+11. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)

@@ -231,6 +231,7 @@
     <string name="diagnostic_ip_received">IP-Adresse erhalten</string>
     <string name="diagnostic_wifi_failed">WLAN-Verbindung fehlgeschlagen</string>
     <string name="diagnostic_wifi_disabled">WLAN ist deaktiviert</string>
+    <string name="diagnostic_wifi_missing_password">WLAN-Passwort fehlt</string>
     <string name="diagnostic_device_address">Geräteadresse: %1$s</string>
     <string name="diagnostic_http_get_started">HTTP/RPC GET an %1$s gestartet</string>
     <string name="diagnostic_http_post_started">HTTP/RPC POST an %1$s gestartet</string>
@@ -254,6 +255,7 @@
     <string name="action_android_managed_wifi_not_active">Android-verwaltetes WLAN ist nicht aktiv. Bitte in Android mit dem Ziel-WLAN verbinden.</string>
     <string name="action_wifi_permission_denied">WLAN-Verbindung nicht erlaubt</string>
     <string name="action_wifi_disabled">WLAN ist deaktiviert</string>
+    <string name="action_wifi_missing_password">WLAN-Passwort fehlt. Bitte im WLAN-Profil neu speichern.</string>
     <string name="action_android_unsupported">Android unterstützt WLAN-Verbindung nicht</string>
     <string name="action_http_error">Gerät meldet HTTP-Fehler %1$d</string>
     <string name="action_timeout">Zeitüberschreitung beim Schalten</string>

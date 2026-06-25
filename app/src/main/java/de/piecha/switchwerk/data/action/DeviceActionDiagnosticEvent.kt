@@ -29,6 +29,8 @@ sealed interface DeviceActionDiagnosticEvent {
 
     data object WifiDisabled : DeviceActionDiagnosticEvent
 
+    data object MissingWifiPassword : DeviceActionDiagnosticEvent
+
     data class DeviceAddress(val address: String) : DeviceActionDiagnosticEvent
 
     data class HttpRequestStarted(
