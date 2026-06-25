@@ -39,7 +39,7 @@ Beispielkonfigurationen schreiben.
 
 Für Beispiele neutrale Platzhalter verwenden:
 
-- Hostname: `server.domain.con`
+- Hostname: `server.domain.com`
 - lokaler Hostname: `device.local`
 - IP-Adresse: `192.0.2.10`
 - WLAN-Name: `Example WiFi`

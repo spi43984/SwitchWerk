@@ -46,7 +46,7 @@ Issue sollte enthalten:
 Issues, Codebeispiele und Testdaten dürfen keine personenbezogenen Daten,
 privaten Domains, realen Hostnamen, realen SSIDs, lokalen IP-Adressen,
 Passwörter, Tokens oder API-Keys enthalten. Für technische Beispiele sind
-neutrale Platzhalter zu verwenden, z. B. `server.domain.con`, `device.local`,
+neutrale Platzhalter zu verwenden, z. B. `server.domain.com`, `device.local`,
 `192.0.2.10` oder `Example WiFi`.
 
 ## Lokale Planungs-Issues

@@ -23,7 +23,7 @@ Beim Erstellen oder Ändern von Code:
 11. Keine personenbezogenen Daten, privaten Domains, realen Hostnamen,
     realen SSIDs, lokalen IP-Adressen oder Zugangsdaten in Code,
     Dokumentation, Issues, Tests oder Beispielkonfigurationen schreiben.
-    Stattdessen neutrale Platzhalter verwenden, z. B. `server.domain.con`,
+    Stattdessen neutrale Platzhalter verwenden, z. B. `server.domain.com`,
     `device.local`, `192.0.2.10` oder `Example WiFi`.
 
 ## Bevorzugte Bibliotheken
