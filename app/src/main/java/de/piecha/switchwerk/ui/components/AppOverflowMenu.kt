@@ -131,7 +131,7 @@ fun AppMenuLayout(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Image(
-                                    painter = painterResource(R.drawable.about_logo),
+                                    painter = painterResource(R.drawable.ic_launcher_foreground),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .fillMaxWidth()

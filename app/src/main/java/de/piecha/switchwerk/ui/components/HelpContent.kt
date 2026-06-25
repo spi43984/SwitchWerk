@@ -57,11 +57,11 @@ fun AboutContent(versionName: String, modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(R.drawable.about_logo),
+                    painter = painterResource(R.drawable.ic_launcher_foreground),
                     contentDescription = stringResource(R.string.app_name),
                     modifier = Modifier
-                        .widthIn(max = 512.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(0.85f)
+                        .widthIn(max = 435.dp)
                         .aspectRatio(988f / 1050f),
                     contentScale = ContentScale.Fit
                 )

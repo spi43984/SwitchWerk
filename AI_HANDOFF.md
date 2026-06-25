@@ -1,8 +1,28 @@
 # AI Handoff
 
-Stand: 24. Juni 2026
+Stand: 25. Juni 2026
 
 ## Aktuelle Arbeit
+
+Issue 055 „App Icon In Settings And About“ ist auf dem Branch
+`app-icon-in-settings-and-about` implementiert, aber noch nicht vom Host gebaut,
+installiert, veröffentlicht oder abgeschlossen.
+
+- GitHub-Issue: #117
+- Das Einstellungs-/Hamburger-Menü und das About-Menü verwenden statt
+  `R.drawable.about_logo` jetzt `R.drawable.ic_launcher_foreground`. Der weiße
+  Außenbereich der aktuellen App-Icon-PNGs wurde transparent gesetzt; alte
+  Nicht-Kabelblitz-Icondateien unter `docs/assets/icons` sowie die unbenutzte
+  App-Ressource `drawable-nodpi/about_logo.png` wurden entfernt. Alle
+  `Kabelblitz*`-Dateien unter `docs/assets/icons` bleiben als Vorlagen
+  erhalten. Im About-Menü ist das Icon 15 Prozent kleiner; Position, Aspect
+  Ratio, Abstände, Version und Release-Datum bleiben unverändert.
+- Im Container waren `lintDebug` und `testDebugUnitTest` erfolgreich. Ein
+  erster parallel gestarteter `lintDebug`-Lauf wurde durch einen gleichzeitigen
+  Kotlin-Incremental-Cache-Zugriff gestört; der danach sequenziell wiederholte
+  Lauf war erfolgreich.
+- Host-Prüfungen stehen noch aus:
+  `./gradlew clean assembleDebug` und `./gradlew installDebug`.
 
 Issue 019 „Configurable WiFi List Sorting“ ist auf dem Branch
 `configurable-wifi-list-sorting` implementiert, vom Benutzer erfolgreich
