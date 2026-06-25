@@ -20,6 +20,11 @@ Beim Erstellen oder Ändern von Code:
 8. Keine sensiblen Daten loggen.
 9. Netzwerkfehler sauber behandeln.
 10. Code einfach und verständlich halten.
+11. Keine personenbezogenen Daten, privaten Domains, realen Hostnamen,
+    realen SSIDs, lokalen IP-Adressen oder Zugangsdaten in Code,
+    Dokumentation, Issues, Tests oder Beispielkonfigurationen schreiben.
+    Stattdessen neutrale Platzhalter verwenden, z. B. `server.domain.con`,
+    `device.local`, `192.0.2.10` oder `Example WiFi`.
 
 ## Bevorzugte Bibliotheken
 
@@ -114,6 +119,9 @@ Für neue lokale Planungs-Issues gilt:
 3. nächste freie lokale Issue-Nummer bestimmen
 4. neue Datei unter `docs/issues` anlegen
 5. `docs/issues/overview.txt` aktualisieren
+6. Beispiele und Testhinweise anonymisieren: keine personenbezogenen Daten,
+   privaten Domains, realen Hostnamen, realen SSIDs, lokalen IP-Adressen,
+   Passwörter, Tokens oder API-Keys verwenden.
 
 Dabei gilt:
 

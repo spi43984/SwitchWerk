@@ -66,8 +66,8 @@ Build:
 Nach der Implementierung ergänzen:
 
 - betroffene Dateien:
-  - `app/src/main/java/de/piecha/switchwerk/ui/components/AppOverflowMenu.kt`
-  - `app/src/main/java/de/piecha/switchwerk/ui/components/HelpContent.kt`
+  - `ui/components/AppOverflowMenu.kt`
+  - `ui/components/HelpContent.kt`
   - `app/src/main/res/drawable-nodpi/ic_launcher_foreground.png`
   - `app/src/main/res/mipmap-*/ic_launcher*.png`
   - `docs/assets/icons/Kabelblitz_gelb.png`

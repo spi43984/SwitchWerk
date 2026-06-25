@@ -84,7 +84,7 @@ Betroffene Stellen:
 
 - [ ] Hostname/IP-Felder deaktivieren Autokorrektur.
 - [ ] Hostname/IP-Felder deaktivieren automatische Großschreibung.
-- [ ] Hostname/IP-Eingaben wie `w3.piecha.intra` und `192.168.248.175` werden
+- [ ] Hostname/IP-Eingaben wie `server.domain.con` und `192.0.2.10` werden
       nicht durch Tastaturautomatismen erschwert.
 - [ ] API-Pfad-Feld deaktiviert Autokorrektur.
 - [ ] API-Pfad-Feld deaktiviert automatische Großschreibung.
@@ -97,8 +97,8 @@ Betroffene Stellen:
 
 - Gerätebearbeitung öffnen und API-Pfad bearbeiten.
 - Geräte-WLAN-Zuordnung öffnen und Hostname/IP bearbeiten.
-- DNS-Name eingeben, z. B. `w3.piecha.intra`.
-- IP-Adresse eingeben, z. B. `192.168.248.175`.
+- DNS-Name eingeben, z. B. `server.domain.con`.
+- IP-Adresse eingeben, z. B. `192.0.2.10`.
 - API-Pfad eingeben, z. B. `/xyz` und `/rpc/Switch.Toggle?id=0`.
 - Prüfen, dass keine Autokorrektur oder automatische Großschreibung eingreift.
 - Prüfen, dass Speichern und Abbrechen weiterhin korrekt funktionieren.

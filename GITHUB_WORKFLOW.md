@@ -43,6 +43,12 @@ Issue sollte enthalten:
 - Sicherheits-/Datenschutzhinweise
 - Testhinweise
 
+Issues, Codebeispiele und Testdaten dürfen keine personenbezogenen Daten,
+privaten Domains, realen Hostnamen, realen SSIDs, lokalen IP-Adressen,
+Passwörter, Tokens oder API-Keys enthalten. Für technische Beispiele sind
+neutrale Platzhalter zu verwenden, z. B. `server.domain.con`, `device.local`,
+`192.0.2.10` oder `Example WiFi`.
+
 ## Lokale Planungs-Issues
 
 Dateien unter `docs/issues/*.md` sind lokale Planungs-Issues und nicht automatisch GitHub-Issues.
@@ -61,6 +67,8 @@ Für neue lokale Planungs-Issues gilt:
 3. nächste freie lokale Issue-Nummer bestimmen
 4. neue Datei unter `docs/issues` anlegen
 5. `docs/issues/overview.txt` aktualisieren
+6. Beispiele und Testhinweise anonymisieren und ausschließlich neutrale
+   Platzhalter verwenden.
 
 Dabei gilt:
 

@@ -31,6 +31,19 @@ Nie loggen:
 - persönliche Daten
 - sensible Gerätekonfiguration
 
+## Code, Dokumentation und Issues
+
+Keine personenbezogenen Daten, privaten Domains, realen Hostnamen, realen SSIDs,
+lokalen IP-Adressen oder Zugangsdaten in Code, Dokumentation, Issues, Tests oder
+Beispielkonfigurationen schreiben.
+
+Für Beispiele neutrale Platzhalter verwenden:
+
+- Hostname: `server.domain.con`
+- lokaler Hostname: `device.local`
+- IP-Adresse: `192.0.2.10`
+- WLAN-Name: `Example WiFi`
+
 ## Speicherung
 
 Unkritisch:
