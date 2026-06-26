@@ -34,8 +34,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,6 +55,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -93,9 +93,11 @@ import de.piecha.switchwerk.domain.model.AppUpdateError
 import de.piecha.switchwerk.domain.model.AppUpdateSnapshot
 import de.piecha.switchwerk.ui.components.SettingsSectionTabs
 import de.piecha.switchwerk.ui.components.InfoHint
+import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.ui.components.StandardActionButton
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
+import de.piecha.switchwerk.ui.components.VerticalScrollIndicator
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.UiText
@@ -362,73 +364,105 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                SettingsSection.SYSTEM -> Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    DisplaySettingsSection(
-                        themeMode = uiState.appSettings.themeMode,
-                        language = uiState.appSettings.language,
-                        onLanguageChange = viewModel::setLanguage,
-                        onThemeModeChange = viewModel::setThemeMode,
-                        showInfoHint = true
-                    )
-                    HorizontalDivider()
-                    UpdateSettingsSection(
-                        snapshot = uiState.updateSnapshot,
-                        downloadState = uiState.updateDownloadState,
-                        isChecking = uiState.isUpdateCheckInProgress,
-                        onCheckClick = viewModel::checkForUpdatesManually,
-                        onDownloadClick = viewModel::downloadUpdate,
-                        onInstallClick = viewModel::installDownloadedUpdate,
-                        onOpenReleasePageClick = viewModel::openAvailableReleasePage
-                    )
-                    HorizontalDivider()
-                    ActionDetailsSettingsSection(
-                        showActionDetails = uiState.appSettings.showActionDetails,
-                        detailPanelHeight = uiState.appSettings.detailPanelHeight,
-                        diagnosticsNewestFirst = uiState.appSettings.diagnosticsNewestFirst,
-                        onShowActionDetailsChange = viewModel::setShowActionDetails,
-                        onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
-                        onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
-                    )
-                    HorizontalDivider()
-                    SystemSetupWizardSection(
-                        onShowSetupWizard = {
-                            viewModel.showSetupWizardAgain()
-                            onShowSetupWizard()
+                SettingsSection.SYSTEM -> {
+                    val sectionScrollState = rememberScrollState()
+                    var sectionViewportHeight by remember { mutableIntStateOf(0) }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .onSizeChanged { sectionViewportHeight = it.height }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(sectionScrollState)
+                                .padding(end = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            DisplaySettingsSection(
+                                themeMode = uiState.appSettings.themeMode,
+                                language = uiState.appSettings.language,
+                                onLanguageChange = viewModel::setLanguage,
+                                onThemeModeChange = viewModel::setThemeMode,
+                                showInfoHint = true
+                            )
+                            HorizontalDivider()
+                            UpdateSettingsSection(
+                                snapshot = uiState.updateSnapshot,
+                                downloadState = uiState.updateDownloadState,
+                                isChecking = uiState.isUpdateCheckInProgress,
+                                onCheckClick = viewModel::checkForUpdatesManually,
+                                onDownloadClick = viewModel::downloadUpdate,
+                                onInstallClick = viewModel::installDownloadedUpdate,
+                                onOpenReleasePageClick = viewModel::openAvailableReleasePage
+                            )
+                            HorizontalDivider()
+                            ActionDetailsSettingsSection(
+                                showActionDetails = uiState.appSettings.showActionDetails,
+                                detailPanelHeight = uiState.appSettings.detailPanelHeight,
+                                diagnosticsNewestFirst = uiState.appSettings.diagnosticsNewestFirst,
+                                onShowActionDetailsChange = viewModel::setShowActionDetails,
+                                onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
+                                onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
+                            )
+                            HorizontalDivider()
+                            SystemSetupWizardSection(
+                                onShowSetupWizard = {
+                                    viewModel.showSetupWizardAgain()
+                                    onShowSetupWizard()
+                                }
+                            )
                         }
-                    )
+                        VerticalScrollIndicator(
+                            scrollState = sectionScrollState,
+                            viewportHeight = sectionViewportHeight,
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        )
+                    }
                 }
 
-                SettingsSection.BACKUP -> Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    ImportExportSection(
-                        isTransferInProgress = uiState.isTransferInProgress,
-                        includePasswords = exportIncludesPasswords,
-                        onIncludePasswordsChange = { exportIncludesPasswords = it },
-                        onExportClick = {
-                            runAfterClosingSwipe {
-                                viewModel.clearStatusMessage()
-                                if (exportIncludesPasswords) {
-                                    showPasswordExportWarning = true
-                                } else {
-                                    launchConfigurationExport(includePasswords = false)
+                SettingsSection.BACKUP -> {
+                    val sectionScrollState = rememberScrollState()
+                    var sectionViewportHeight by remember { mutableIntStateOf(0) }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .onSizeChanged { sectionViewportHeight = it.height }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(sectionScrollState)
+                                .padding(end = 8.dp)
+                        ) {
+                            ImportExportSection(
+                                isTransferInProgress = uiState.isTransferInProgress,
+                                includePasswords = exportIncludesPasswords,
+                                onIncludePasswordsChange = { exportIncludesPasswords = it },
+                                onExportClick = {
+                                    runAfterClosingSwipe {
+                                        viewModel.clearStatusMessage()
+                                        if (exportIncludesPasswords) {
+                                            showPasswordExportWarning = true
+                                        } else {
+                                            launchConfigurationExport(includePasswords = false)
+                                        }
+                                    }
+                                },
+                                onImportClick = {
+                                    runAfterClosingSwipe {
+                                        importPasswords = false
+                                        showImportConfigurationDialog = true
+                                    }
                                 }
-                            }
-                        },
-                        onImportClick = {
-                            runAfterClosingSwipe {
-                                importPasswords = false
-                                showImportConfigurationDialog = true
-                            }
+                            )
                         }
-                    )
+                        VerticalScrollIndicator(
+                            scrollState = sectionScrollState,
+                            viewportHeight = sectionViewportHeight,
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        )
+                    }
                 }
             }
         }
@@ -993,30 +1027,13 @@ private fun WifiProfileList(
     }
 
     val listState = rememberLazyListState()
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollBackward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = stringResource(R.string.more_wifi_profiles_above),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-
+    Box(modifier = modifier) {
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
-                .weight(1f)
+                .fillMaxSize()
+                .padding(end = 8.dp)
                 .clickable(
                     enabled = openSwipeItemId != null,
                     onClick = onCloseSwipeItem
@@ -1046,21 +1063,10 @@ private fun WifiProfileList(
                 )
             }
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollForward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.more_wifi_profiles_below),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
+        LazyListScrollIndicator(
+            listState = listState,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 

@@ -2,8 +2,8 @@
 
 ## Metadaten
 
-- Status: Offen
-- Priorität: P0
+- Status: Abgeschlossen
+- Priorität: P1
 - Typ: UX / UI
 - Bereich: Dialoge / Einstellungen / Compose UI
 
@@ -34,11 +34,14 @@ Dieses Issue soll eine konsistente Anzeige vorschlagen und einführen, die bei l
 - Die Anzeige soll nur erscheinen, wenn tatsächlich gescrollt werden kann.
 - Bei ausreichend Platz ohne Scrollbedarf soll keine zusätzliche Anzeige sichtbar sein.
 - Die Lösung soll möglichst zentral und wiederverwendbar umgesetzt werden.
+- Scrollbare Hilfs-, Info-, Setup- und Menüflächen sollen denselben Scroll-Hinweis verwenden, sofern sie keinen bewusst abweichenden inneren Scroll-Hinweis haben.
+- Das Hamburger-Menü soll zusätzlich zum Schließen über `X` auch durch einen Klick außerhalb des Menüs geschlossen werden können.
 
 ### Betroffene Bereiche
 
 - Lange Dialogfelder, insbesondere `Einstellungen -> System`.
 - Weitere lange Dialoge, sofern sie dieselbe Dialog-Basis oder denselben Mechanismus nutzen.
+- Hilfe, Über SwitchWerk, Setup-Wizard und Hamburger-Menü, sofern deren Inhalt scrollbar ist.
 
 ### UX-Vorgaben
 
@@ -67,19 +70,21 @@ Dieses Issue soll eine konsistente Anzeige vorschlagen und einführen, die bei l
 
 ## Akzeptanzkriterien
 
-- [ ] Lange Dialogfelder zeigen sichtbar an, wenn nach unten gescrollt werden kann.
-- [ ] Lange Dialogfelder zeigen sichtbar an, wenn nach oben gescrollt werden kann.
-- [ ] Die Anzeige verschwindet, wenn in die jeweilige Richtung kein weiterer Inhalt vorhanden ist.
-- [ ] Bei Dialogen ohne Scrollbedarf wird keine Scroll-Anzeige eingeblendet.
-- [ ] `Einstellungen -> System` ist bei langen Inhalten klar als scrollbar erkennbar.
-- [ ] Die Scrollfunktion bei WLAN-Profilen bleibt unverändert.
-- [ ] Die Scrollfunktion bei Geräten bleibt unverändert.
-- [ ] Dialogaktionen bleiben erreichbar und werden durch die Anzeige nicht verdeckt.
-- [ ] Die Lösung funktioniert im Portrait-Modus.
-- [ ] Die Lösung funktioniert im Landscape-Modus.
-- [ ] Die Lösung funktioniert bei großer Android-Schriftgröße.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
-- [ ] Deutsch und Englisch sind bei neuen Texten konsistent gepflegt.
+- [x] Lange Dialogfelder zeigen sichtbar an, wenn nach unten gescrollt werden kann.
+- [x] Lange Dialogfelder zeigen sichtbar an, wenn nach oben gescrollt werden kann.
+- [x] Die Anzeige verschwindet, wenn in die jeweilige Richtung kein weiterer Inhalt vorhanden ist.
+- [x] Bei Dialogen ohne Scrollbedarf wird keine Scroll-Anzeige eingeblendet.
+- [x] `Einstellungen -> System` ist bei langen Inhalten klar als scrollbar erkennbar.
+- [x] Die Scrollfunktion bei WLAN-Profilen bleibt unverändert.
+- [x] Die Scrollfunktion bei Geräten bleibt unverändert.
+- [x] Dialogaktionen bleiben erreichbar und werden durch die Anzeige nicht verdeckt.
+- [x] Die Lösung funktioniert im Portrait-Modus.
+- [x] Die Lösung funktioniert im Landscape-Modus.
+- [x] Die Lösung funktioniert bei großer Android-Schriftgröße.
+- [x] Hilfe, Über SwitchWerk, Setup-Wizard und Hamburger-Menü zeigen bei Scrollbedarf denselben Scroll-Hinweis.
+- [x] Das Hamburger-Menü lässt sich per `X` und per Klick außerhalb des Menüs schließen.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+- [x] Deutsch und Englisch sind bei neuen Texten konsistent gepflegt.
 
 ## Testhinweise
 

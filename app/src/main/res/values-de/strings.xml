@@ -21,7 +21,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen und Hilfe</string>
+    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung, Updates und Aktionsdetails\n• Backup: Konfiguration sichern oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden</string>
