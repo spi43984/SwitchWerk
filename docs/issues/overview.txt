@@ -89,13 +89,13 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 064 Input Validation For Technical Fields
-2. 062 Update Release Notes UI
-3. 063 Scroll-Hinweise für lange Dialogfelder
-4. 041 Dashboard Drag And Drop
-5. 024 Authenticated Import Sources Backlog
-6. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-7. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-8. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-9. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-10. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+1. 062 Update Release Notes UI
+2. 063 Scroll-Hinweise für lange Dialogfelder
+3. 041 Dashboard Drag And Drop
+4. 024 Authenticated Import Sources Backlog
+5. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+6. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+7. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+8. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+9. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+10. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
