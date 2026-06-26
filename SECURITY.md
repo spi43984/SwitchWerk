@@ -4,6 +4,20 @@
 
 Die App steuert lokale Geräte im Heimnetz. Deshalb muss sie verhindern, dass versehentlich Zugangsdaten, interne IPs oder Steuerbefehle nach außen gelangen.
 
+## Sicherheitslücken melden
+
+Sicherheitslücken sollen nicht öffentlich als GitHub Issue mit technischen Details
+gemeldet werden.
+
+Bitte verwende bevorzugt GitHubs private Vulnerability-Reporting-Funktion, sofern
+sie für dieses Repository aktiviert ist. Falls diese Funktion nicht verfügbar ist,
+öffne nur ein allgemeines GitHub Issue ohne technische Details, Zugangsdaten,
+interne IP-Adressen, reale Hostnamen, SSIDs, Tokens oder Exploit-Beschreibung und
+bitte darin um einen geeigneten privaten Meldeweg.
+
+Normale Fehler, Härtungsvorschläge und nicht-sensitive Sicherheitsverbesserungen
+dürfen weiterhin als GitHub Issue gemeldet werden.
+
 ## Grundregeln
 
 - Keine Cloud-Kommunikation ohne ausdrückliche Entscheidung.
