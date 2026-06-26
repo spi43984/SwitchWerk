@@ -13,7 +13,8 @@ Abgeschlossen:
 
 - Issue 063 „Scroll-Hinweise für lange Dialogfelder“
 - GitHub-Issue: #151
-- Feature-Branch: `scroll-hints-long-dialogs`
+- Pull Request: #153
+- Feature-Branch: `scroll-hints-long-dialogs-merge`
 - Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
 - Host-Prüfungen: `./gradlew clean assembleDebug`, `./gradlew installDebug`
 
