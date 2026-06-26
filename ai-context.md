@@ -150,6 +150,14 @@ Die einem Gerät zugeordneten WLAN-Profile werden über Hoch/Runter-Pfeile in di
 verbindliche Verbindungsreihenfolge gebracht. Diese robuste Bedienung wurde nach
 Gerätetests bewusst gegenüber Drag-and-Drop gewählt.
 
+Geräte-WLAN-Zuordnungen verwenden technisch die interne WLAN-Profil-ID, nicht
+den Profilnamen. Beim Merge-Import gilt eine gleiche WLAN-Profil-ID als
+Identität: Das vorhandene lokale Profil wird überschrieben beziehungsweise
+aktualisiert, auch wenn der Profilname abweicht. Ein gleicher Profilname mit
+anderer Profil-ID wird beim Merge-Import abgelehnt. Importierte
+Geräte-Zuordnungen bleiben auf die in der Importdatei referenzierten
+Profil-IDs bezogen.
+
 ---
 
 ## Zielgeräte

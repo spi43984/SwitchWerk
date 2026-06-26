@@ -52,7 +52,7 @@ es verändert die Priorisierungslogik nicht.
 | 028 | P1 | abgeschlossen | Theme Mode Setting |
 | 029 | P1 | abgeschlossen | Language Setting |
 | 030 | P1 | abgeschlossen | WiFi Profile Deletion Safety |
-| 031 | P2 | offen | Import Enforces Unique WiFi Profile Names |
+| 031 | P2 | abgeschlossen | Import Enforces Unique WiFi Profile Names |
 | 032 | P2 | offen | Room Schema And Migration Test Coverage |
 | 033 | P1 | abgeschlossen | Android-managed WiFi networks |
 | 034 | P1 | abgeschlossen | Collapsible Action Details Panel |
@@ -82,13 +82,12 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 031 Import Enforces Unique WiFi Profile Names
-2. 032 Room Schema And Migration Test Coverage
-3. 037 GitHub Release Update Support
-4. 041 Dashboard Drag And Drop
-5. 024 Authenticated Import Sources Backlog
-6. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-7. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-8. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-9. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-10. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+1. 032 Room Schema And Migration Test Coverage
+2. 037 GitHub Release Update Support
+3. 041 Dashboard Drag And Drop
+4. 024 Authenticated Import Sources Backlog
+5. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+6. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+7. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+8. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+9. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)

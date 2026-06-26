@@ -1,10 +1,27 @@
 # AI Handoff
 
-Stand: 25. Juni 2026
+Stand: 26. Juni 2026
 
 ## Aktueller Stand
 
-Keine aktive Implementierung im Codex-Kontext.
+Zuletzt lokal abgeschlossen:
+
+- Issue 031 „Import Enforces Unique WiFi Profile Names“
+- Branch: `import-unique-wifi-profile-names`
+- Import-Fehler beim Laden einer Konfiguration werden im Importdialog angezeigt
+  statt global unter dem Dialog.
+- Hilfe-, Info- und Projektdokumentation erklären jetzt, dass
+  Geräte-WLAN-Zuordnungen über WLAN-Profil-IDs erfolgen, gleiche IDs beim
+  Merge-Import überschrieben werden und gleiche Profilnamen mit anderer ID
+  abgelehnt werden.
+- Container-Prüfung `./gradlew clean assembleDebug` erfolgreich. Benutzer meldete
+  auf dem Host: `assembleDebug` erfolgreich, `installDebug` scheiterte danach
+  mit fehlenden `R.string.help_import_title`/`help_import_text`, vermutlich
+  wegen nicht synchroner String-Ressourcen oder inkrementellem Gradle-Zustand.
+- `docs/issues/031-import-enforces-unique-wifi-profile-names.md` und
+  `docs/issues/overview.txt` sind lokal auf `abgeschlossen` gesetzt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 032
+  „Room Schema And Migration Test Coverage“.
 
 Zuletzt abgeschlossen:
 
