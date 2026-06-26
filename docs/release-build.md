@@ -75,7 +75,8 @@ das offizielle Repository `spi43984/SwitchWerk`, einen sauberen Worktree,
 vorhandene Tags und GitHub-Releases, aktualisiert `versionCode` und
 `versionName`, führt `lintRelease`, `testDebugUnitTest` und
 `clean assembleRelease` aus, verifiziert die APK mit `apksigner`, kopiert sie
-auf den Release-Asset-Namen und lädt sie als `SwitchWerk-<version>.apk` hoch.
+auf den Release-Asset-Namen, öffnet vorgeschlagene Release Notes zur Anpassung
+und lädt sie als `SwitchWerk-<version>.apk` hoch.
 
 GitHub Release ist der vorgesehene erste Verteilungsweg. Ein Play-Store-Upload
 ist nicht Teil dieses Prozesses.
