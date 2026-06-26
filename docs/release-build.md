@@ -74,8 +74,8 @@ Das Skript prüft `keystore.properties`, die darin referenzierte Keystore-Datei,
 das offizielle Repository `spi43984/SwitchWerk`, einen sauberen Worktree,
 vorhandene Tags und GitHub-Releases, aktualisiert `versionCode` und
 `versionName`, führt `lintRelease`, `testDebugUnitTest` und
-`clean assembleRelease` aus, verifiziert die APK mit `apksigner` und lädt sie als
-`SwitchWerk-<version>.apk` hoch.
+`clean assembleRelease` aus, verifiziert die APK mit `apksigner`, kopiert sie
+auf den Release-Asset-Namen und lädt sie als `SwitchWerk-<version>.apk` hoch.
 
 GitHub Release ist der vorgesehene erste Verteilungsweg. Ein Play-Store-Upload
 ist nicht Teil dieses Prozesses.

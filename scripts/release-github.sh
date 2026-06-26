@@ -98,6 +98,7 @@ VERSION_CODE=$(( VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH ))
 TAG="v${VERSION}"
 APK_SOURCE="app/build/outputs/apk/release/app-release.apk"
 APK_NAME="SwitchWerk-${VERSION}.apk"
+APK_UPLOAD_PATH="app/build/outputs/apk/release/${APK_NAME}"
 
 git status
 git switch main
@@ -127,6 +128,7 @@ git diff -- app/build.gradle.kts
 
 test -f "${APK_SOURCE}"
 "${APKSIGNER}" verify --verbose "${APK_SOURCE}"
+cp "${APK_SOURCE}" "${APK_UPLOAD_PATH}"
 
 git status --short
 
@@ -145,7 +147,7 @@ git tag -a "${TAG}" -m "Release ${VERSION}"
 git push origin "${TAG}"
 
 gh release create "${TAG}" \
-  "${APK_SOURCE}#${APK_NAME}" \
+  "${APK_UPLOAD_PATH}" \
   --repo "${OFFICIAL_REPOSITORY}" \
   --title "SwitchWerk ${VERSION}" \
   --generate-notes
