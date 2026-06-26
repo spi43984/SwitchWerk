@@ -73,6 +73,8 @@ import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.ui.components.AppMenuLayout
 import de.piecha.switchwerk.ui.components.AppOverflowMenu
 import de.piecha.switchwerk.ui.components.InfoHint
+import de.piecha.switchwerk.ui.components.LazyGridScrollIndicator
+import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.DeviceWifiProximityStatus
 import de.piecha.switchwerk.viewmodel.DiagnosticListItem
@@ -403,28 +405,36 @@ private fun DeviceList(
         }
     }
 
-    LazyColumn(
-        modifier = modifier,
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(
-            items = devices,
-            key = { device -> device.id }
-        ) { device ->
-            DeviceCard(
-                device = device,
-                actionState = actionStates[device.id],
-                wifiProximityStatus = wifiProximityStatuses[device.id]
-                    ?: DeviceWifiProximityStatus.UNKNOWN,
-                canMoveUp = devices.indexOf(device) > 0,
-                canMoveDown = devices.indexOf(device) < devices.lastIndex,
-                onActionClick = { onDeviceActionClick(device) },
-                onCancelActionClick = { onCancelDeviceActionClick(device.id) },
-                onMoveUpClick = { onMoveUpClick(device.id) },
-                onMoveDownClick = { onMoveDownClick(device.id) }
-            )
+    Box(modifier = modifier) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(end = 8.dp),
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(
+                items = devices,
+                key = { device -> device.id }
+            ) { device ->
+                DeviceCard(
+                    device = device,
+                    actionState = actionStates[device.id],
+                    wifiProximityStatus = wifiProximityStatuses[device.id]
+                        ?: DeviceWifiProximityStatus.UNKNOWN,
+                    canMoveUp = devices.indexOf(device) > 0,
+                    canMoveDown = devices.indexOf(device) < devices.lastIndex,
+                    onActionClick = { onDeviceActionClick(device) },
+                    onCancelActionClick = { onCancelDeviceActionClick(device.id) },
+                    onMoveUpClick = { onMoveUpClick(device.id) },
+                    onMoveDownClick = { onMoveDownClick(device.id) }
+                )
+            }
         }
+        LazyListScrollIndicator(
+            listState = listState,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 
@@ -450,30 +460,38 @@ private fun DeviceWidgetGrid(
         }
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 140.dp),
-        modifier = modifier,
-        state = gridState,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(
-            items = devices,
-            key = { device -> device.id }
-        ) { device ->
-            DeviceWidget(
-                device = device,
-                actionState = actionStates[device.id],
-                wifiProximityStatus = wifiProximityStatuses[device.id]
-                    ?: DeviceWifiProximityStatus.UNKNOWN,
-                canMoveUp = devices.indexOf(device) > 0,
-                canMoveDown = devices.indexOf(device) < devices.lastIndex,
-                onActionClick = { onDeviceActionClick(device) },
-                onCancelActionClick = { onCancelDeviceActionClick(device.id) },
-                onMoveUpClick = { onMoveUpClick(device.id) },
-                onMoveDownClick = { onMoveDownClick(device.id) }
-            )
+    Box(modifier = modifier) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 140.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(end = 8.dp),
+            state = gridState,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(
+                items = devices,
+                key = { device -> device.id }
+            ) { device ->
+                DeviceWidget(
+                    device = device,
+                    actionState = actionStates[device.id],
+                    wifiProximityStatus = wifiProximityStatuses[device.id]
+                        ?: DeviceWifiProximityStatus.UNKNOWN,
+                    canMoveUp = devices.indexOf(device) > 0,
+                    canMoveDown = devices.indexOf(device) < devices.lastIndex,
+                    onActionClick = { onDeviceActionClick(device) },
+                    onCancelActionClick = { onCancelDeviceActionClick(device.id) },
+                    onMoveUpClick = { onMoveUpClick(device.id) },
+                    onMoveDownClick = { onMoveDownClick(device.id) }
+                )
+            }
         }
+        LazyGridScrollIndicator(
+            gridState = gridState,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 

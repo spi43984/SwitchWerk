@@ -2,6 +2,7 @@ package de.piecha.switchwerk.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,14 +18,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.components.AboutContent
+import de.piecha.switchwerk.ui.components.VerticalScrollIndicator
 
 private val AboutScreenPadding = 24.dp
 private val AboutContentPadding = 16.dp
@@ -50,27 +57,41 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
     )
 
     BackHandler(onBack = onNavigateBack)
+    val scrollState = rememberScrollState()
+    var viewportHeight by remember { mutableIntStateOf(0) }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
             .padding(AboutScreenPadding)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .onSizeChanged { viewportHeight = it.height }
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(end = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            IconButton(onClick = onNavigateBack) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+                Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.headlineLarge)
             }
-            Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.headlineLarge)
+            AboutContent(versionName, iconMaxWidth = aboutIconMaxWidth)
         }
-        AboutContent(versionName, iconMaxWidth = aboutIconMaxWidth)
+        VerticalScrollIndicator(
+            scrollState = scrollState,
+            viewportHeight = viewportHeight,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }

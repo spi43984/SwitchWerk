@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -22,8 +23,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -42,6 +48,7 @@ fun SetupWizard(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState(initial = initialScrollPosition)
+    var scrollViewportHeight by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(initialScrollPosition) {
         scrollState.scrollTo(initialScrollPosition)
@@ -77,52 +84,64 @@ fun SetupWizard(
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-                            .verticalScroll(scrollState),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                            .onSizeChanged { scrollViewportHeight = it.height }
                     ) {
-                        WizardBlock(
-                            title = stringResource(R.string.setup_wizard_intro_title)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(scrollState)
+                                .padding(end = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text(stringResource(R.string.setup_wizard_intro_text))
-                            Text(stringResource(R.string.setup_wizard_intro_steps))
-                            Text(stringResource(R.string.setup_wizard_status_lights_text))
-                        }
+                            WizardBlock(
+                                title = stringResource(R.string.setup_wizard_intro_title)
+                            ) {
+                                Text(stringResource(R.string.setup_wizard_intro_text))
+                                Text(stringResource(R.string.setup_wizard_intro_steps))
+                                Text(stringResource(R.string.setup_wizard_status_lights_text))
+                            }
 
-                        WizardBlock(
-                            title = stringResource(R.string.setup_wizard_import_title)
-                        ) {
-                            Text(stringResource(R.string.setup_wizard_import_text))
-                            StandardActionButton(
-                                text = stringResource(R.string.setup_wizard_open_backup),
-                                onClick = { onOpenBackup(scrollState.value) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+                            WizardBlock(
+                                title = stringResource(R.string.setup_wizard_import_title)
+                            ) {
+                                Text(stringResource(R.string.setup_wizard_import_text))
+                                StandardActionButton(
+                                    text = stringResource(R.string.setup_wizard_open_backup),
+                                    onClick = { onOpenBackup(scrollState.value) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
 
-                        WizardBlock(
-                            title = stringResource(R.string.setup_wizard_manual_title)
-                        ) {
-                            Text(stringResource(R.string.setup_wizard_manual_text))
-                            StandardActionButton(
-                                text = stringResource(R.string.setup_wizard_open_wifi_profiles),
-                                onClick = { onOpenWifiProfiles(scrollState.value) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            StandardActionButton(
-                                text = stringResource(R.string.setup_wizard_open_devices),
-                                onClick = { onOpenDevices(scrollState.value) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            StandardActionButton(
-                                text = stringResource(R.string.setup_wizard_open_dashboard),
-                                onClick = { onOpenDashboard(scrollState.value) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                            WizardBlock(
+                                title = stringResource(R.string.setup_wizard_manual_title)
+                            ) {
+                                Text(stringResource(R.string.setup_wizard_manual_text))
+                                StandardActionButton(
+                                    text = stringResource(R.string.setup_wizard_open_wifi_profiles),
+                                    onClick = { onOpenWifiProfiles(scrollState.value) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                StandardActionButton(
+                                    text = stringResource(R.string.setup_wizard_open_devices),
+                                    onClick = { onOpenDevices(scrollState.value) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                StandardActionButton(
+                                    text = stringResource(R.string.setup_wizard_open_dashboard),
+                                    onClick = { onOpenDashboard(scrollState.value) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
+                        VerticalScrollIndicator(
+                            scrollState = scrollState,
+                            viewportHeight = scrollViewportHeight,
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        )
                     }
 
                     Row(

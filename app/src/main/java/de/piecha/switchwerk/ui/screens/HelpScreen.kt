@@ -2,6 +2,7 @@ package de.piecha.switchwerk.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,12 +18,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.components.HelpContent
+import de.piecha.switchwerk.ui.components.VerticalScrollIndicator
 
 @Composable
 fun HelpScreen(
@@ -30,6 +37,8 @@ fun HelpScreen(
     onShowSetupWizard: () -> Unit
 ) {
     BackHandler(onBack = onNavigateBack)
+    val scrollState = rememberScrollState()
+    var viewportHeight by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -50,11 +59,23 @@ fun HelpScreen(
             }
             Text(stringResource(R.string.help), style = MaterialTheme.typography.headlineLarge)
         }
-        HelpContent(
-            onShowSetupWizard = onShowSetupWizard,
+        Box(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
-        )
+                .onSizeChanged { viewportHeight = it.height }
+        ) {
+            HelpContent(
+                onShowSetupWizard = onShowSetupWizard,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(end = 8.dp)
+            )
+            VerticalScrollIndicator(
+                scrollState = scrollState,
+                viewportHeight = viewportHeight,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
     }
 }

@@ -1,6 +1,8 @@
 package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -31,12 +33,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -68,12 +72,22 @@ fun AppMenuLayout(
         content { isExpanded = true }
 
         if (isExpanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { isExpanded = false }
+            )
             Surface(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .offset(x = rightEdgeExtension)
                     .width(220.dp + rightEdgeExtension)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {}
+                    ),
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = 6.dp,
                 shadowElevation = 8.dp
@@ -87,66 +101,81 @@ fun AppMenuLayout(
                             .padding(end = rightEdgeExtension)
                     ) {
                         val menuScrollState = rememberScrollState()
+                        var menuViewportHeight by remember { mutableIntStateOf(0) }
+                        val menuMinHeight = maxHeight
 
-                        Column(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(min = maxHeight)
-                                .verticalScroll(menuScrollState),
-                            horizontalAlignment = Alignment.End,
-                            verticalArrangement = Arrangement.SpaceBetween
+                                .fillMaxHeight()
+                                .onSizeChanged { menuViewportHeight = it.height }
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                IconButton(onClick = { isExpanded = false }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Close,
-                                        contentDescription = stringResource(R.string.menu_close)
-                                    )
-                                }
-                                MenuItem(
-                                    text = stringResource(R.string.settings),
-                                    onClick = {
-                                        isExpanded = false
-                                        onOpenSettings()
-                                    }
-                                )
-                                MenuItem(
-                                    text = if (isUpdateAvailable) {
-                                        stringResource(R.string.update_available_menu)
-                                    } else {
-                                        stringResource(R.string.updates)
-                                    },
-                                    onClick = {
-                                        isExpanded = false
-                                        onOpenUpdates()
-                                    }
-                                )
-                                MenuItem(
-                                    text = stringResource(R.string.help),
-                                    onClick = {
-                                        isExpanded = false
-                                        onOpenHelp()
-                                    }
-                                )
-                                MenuItem(
-                                    text = stringResource(R.string.about_switchwerk),
-                                    onClick = {
-                                        isExpanded = false
-                                        onOpenAbout()
-                                    }
-                                )
-                            }
-
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.End
+                                    .heightIn(min = menuMinHeight)
+                                    .verticalScroll(menuScrollState)
+                                    .padding(end = 8.dp),
+                                horizontalAlignment = Alignment.End,
+                                verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                MenuFooter(versionName = versionName)
+                                Column(
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    IconButton(onClick = { isExpanded = false }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = stringResource(R.string.menu_close)
+                                        )
+                                    }
+                                    MenuItem(
+                                        text = stringResource(R.string.settings),
+                                        onClick = {
+                                            isExpanded = false
+                                            onOpenSettings()
+                                        }
+                                    )
+                                    MenuItem(
+                                        text = if (isUpdateAvailable) {
+                                            stringResource(R.string.update_available_menu)
+                                        } else {
+                                            stringResource(R.string.updates)
+                                        },
+                                        onClick = {
+                                            isExpanded = false
+                                            onOpenUpdates()
+                                        }
+                                    )
+                                    MenuItem(
+                                        text = stringResource(R.string.help),
+                                        onClick = {
+                                            isExpanded = false
+                                            onOpenHelp()
+                                        }
+                                    )
+                                    MenuItem(
+                                        text = stringResource(R.string.about_switchwerk),
+                                        onClick = {
+                                            isExpanded = false
+                                            onOpenAbout()
+                                        }
+                                    )
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    MenuFooter(versionName = versionName)
+                                }
                             }
+                            VerticalScrollIndicator(
+                                scrollState = menuScrollState,
+                                viewportHeight = menuViewportHeight,
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            )
                         }
                     }
                 }

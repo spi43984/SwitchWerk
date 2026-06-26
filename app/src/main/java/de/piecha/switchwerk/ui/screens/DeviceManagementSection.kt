@@ -54,6 +54,7 @@ import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.components.InfoHint
+import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
 import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
@@ -234,30 +235,13 @@ private fun DeviceList(
     }
 
     val listState = rememberLazyListState()
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollBackward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = stringResource(R.string.more_devices_above),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-
+    Box(modifier = modifier) {
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
-                .weight(1f)
+                .fillMaxSize()
+                .padding(end = 8.dp)
                 .clickable(
                     enabled = openSwipeItemId != null,
                     onClick = onCloseSwipeItem
@@ -287,21 +271,10 @@ private fun DeviceList(
                 )
             }
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            if (listState.canScrollForward) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.more_devices_below),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
+        LazyListScrollIndicator(
+            listState = listState,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 
