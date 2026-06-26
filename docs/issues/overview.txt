@@ -84,14 +84,14 @@ es verändert die Priorisierungslogik nicht.
 | 060 | P0 | abgeschlossen | Scrollbares Hamburger-Menü bei Platzmangel |
 | 061 | P0 | abgeschlossen | Import Replace Preserves Wizard State |
 | 062 | P1 | offen | Update Release Notes UI |
-| 063 | P0 | offen | Scroll-Hinweise für lange Dialogfelder |
+| 063 | P1 | offen | Scroll-Hinweise für lange Dialogfelder |
 | 064 | P0 | offen | Input Validation For Technical Fields |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 063 Scroll-Hinweise für lange Dialogfelder
-2. 064 Input Validation For Technical Fields
-3. 062 Update Release Notes UI
+1. 064 Input Validation For Technical Fields
+2. 062 Update Release Notes UI
+3. 063 Scroll-Hinweise für lange Dialogfelder
 4. 041 Dashboard Drag And Drop
 5. 024 Authenticated Import Sources Backlog
 6. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
