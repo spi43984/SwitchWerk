@@ -18,6 +18,9 @@ import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiSecurityType
+import de.piecha.switchwerk.domain.validation.ApiCallValidationResult
+import de.piecha.switchwerk.domain.validation.HostValidationResult
+import de.piecha.switchwerk.domain.validation.TechnicalFieldValidator
 import java.net.ConnectException
 import java.net.NoRouteToHostException
 import java.net.SocketException
@@ -371,6 +374,14 @@ class DefaultDeviceActionService(
         network: Network,
         onDiagnosticEvent: (DeviceActionDiagnosticEvent) -> Unit
     ): ApiCallOutcome {
+        if (
+            TechnicalFieldValidator.validateDeviceConnection(connection) != HostValidationResult.Valid ||
+            TechnicalFieldValidator.validateApiCall(apiCall) != ApiCallValidationResult.Valid
+        ) {
+            logWarning("Stored device request is invalid")
+            return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
+        }
+
         val url = buildUrl(connection.host, protocol, apiCall.path)
             ?: return ApiCallOutcome.Terminal(DeviceActionResult.InvalidRequest)
         val parsedUrl = url.toHttpUrlOrNull()

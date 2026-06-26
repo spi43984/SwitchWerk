@@ -34,6 +34,10 @@ import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
 import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
+import de.piecha.switchwerk.domain.validation.ApiEnumValidationResult
+import de.piecha.switchwerk.domain.validation.ApiPathValidationResult
+import de.piecha.switchwerk.domain.validation.HostValidationResult
+import de.piecha.switchwerk.domain.validation.TechnicalFieldValidator
 import de.piecha.switchwerk.ui.StringProvider
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
@@ -75,7 +79,17 @@ data class DeviceFormState(
     val apiPath: String = "",
     val apiRequestBody: String = "",
     val apiContentType: String = ApiContentType.APPLICATION_JSON.name,
-    val connections: List<DeviceConnectionFormState> = emptyList()
+    val connections: List<DeviceConnectionFormState> = emptyList(),
+    val errors: DeviceFormFieldErrors = DeviceFormFieldErrors()
+)
+
+data class DeviceFormFieldErrors(
+    @StringRes val name: Int? = null,
+    @StringRes val actionLabel: Int? = null,
+    @StringRes val apiPath: Int? = null,
+    @StringRes val apiMethod: Int? = null,
+    @StringRes val apiContentType: Int? = null,
+    @StringRes val host: Int? = null
 )
 
 data class WifiProfileDeletionConfirmation(
@@ -630,19 +644,25 @@ class SettingsViewModel(
         updateDeviceForm { it.copy(apiContentType = apiContentType) }
     }
 
-    fun addDeviceConnection(wifiProfileId: String, host: String) {
-        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == wifiProfileId } ?: return
+    fun addDeviceConnection(wifiProfileId: String, host: String): Boolean {
+        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == wifiProfileId } ?: return false
         val trimmedHost = host.trim()
 
-        if (trimmedHost.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_host_empty))
-            return
+        val hostError = TechnicalFieldValidator.validateHost(trimmedHost).toHostErrorResource()
+        if (hostError != null) {
+            _uiState.value = _uiState.value.copy(
+                deviceForm = _uiState.value.deviceForm.copy(
+                    errors = _uiState.value.deviceForm.errors.copy(host = hostError)
+                ),
+                errorMessage = uiText(hostError)
+            )
+            return false
         }
 
         val form = _uiState.value.deviceForm
         if (form.connections.any { it.wifiProfileId == wifiProfileId }) {
             _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_wifi_already_assigned))
-            return
+            return false
         }
 
         updateDeviceForm {
@@ -655,25 +675,32 @@ class SettingsViewModel(
                 )
             )
         }
+        return true
     }
 
     fun updateDeviceConnection(
         oldWifiProfileId: String,
         newWifiProfileId: String,
         host: String
-    ) {
-        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == newWifiProfileId } ?: return
+    ): Boolean {
+        val profile = _uiState.value.wifiProfiles.firstOrNull { it.id == newWifiProfileId } ?: return false
         val trimmedHost = host.trim()
 
-        if (trimmedHost.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_host_empty))
-            return
+        val hostError = TechnicalFieldValidator.validateHost(trimmedHost).toHostErrorResource()
+        if (hostError != null) {
+            _uiState.value = _uiState.value.copy(
+                deviceForm = _uiState.value.deviceForm.copy(
+                    errors = _uiState.value.deviceForm.errors.copy(host = hostError)
+                ),
+                errorMessage = uiText(hostError)
+            )
+            return false
         }
 
         val form = _uiState.value.deviceForm
         if (oldWifiProfileId != newWifiProfileId && form.connections.any { it.wifiProfileId == newWifiProfileId }) {
             _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_wifi_already_assigned))
-            return
+            return false
         }
 
         updateDeviceForm {
@@ -692,6 +719,7 @@ class SettingsViewModel(
                 }
             )
         }
+        return true
     }
 
     fun deleteDeviceConnection(wifiProfileId: String) {
@@ -727,18 +755,12 @@ class SettingsViewModel(
         val trimmedActionLabel = form.actionLabel.trim()
         val trimmedApiPath = form.apiPath.trim()
 
-        if (trimmedName.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_device_name_empty))
-            return
-        }
-
-        if (trimmedActionLabel.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_button_label_empty))
-            return
-        }
-
-        if (trimmedApiPath.isBlank()) {
-            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_api_call_empty))
+        val formErrors = validateDeviceForm(form, trimmedName, trimmedActionLabel, trimmedApiPath)
+        if (formErrors.hasErrors()) {
+            _uiState.value = _uiState.value.copy(
+                deviceForm = form.copy(errors = formErrors),
+                errorMessage = formErrors.firstError()?.let(::uiText)
+            )
             return
         }
 
@@ -1039,9 +1061,55 @@ class SettingsViewModel(
 
     private fun updateDeviceForm(update: (DeviceFormState) -> DeviceFormState) {
         _uiState.value = _uiState.value.copy(
-            deviceForm = update(_uiState.value.deviceForm),
+            deviceForm = update(_uiState.value.deviceForm).copy(errors = DeviceFormFieldErrors()),
             errorMessage = null
         )
+    }
+
+    private fun validateDeviceForm(
+        form: DeviceFormState,
+        trimmedName: String,
+        trimmedActionLabel: String,
+        trimmedApiPath: String
+    ): DeviceFormFieldErrors {
+        return DeviceFormFieldErrors(
+            name = if (trimmedName.isBlank()) R.string.error_device_name_empty else null,
+            actionLabel = if (trimmedActionLabel.isBlank()) R.string.error_button_label_empty else null,
+            apiPath = TechnicalFieldValidator.validateApiPath(trimmedApiPath).toApiPathErrorResource(),
+            apiMethod = TechnicalFieldValidator.validateApiMethod(form.apiMethod).let {
+                if (it == ApiEnumValidationResult.Valid) null else R.string.error_api_method_invalid
+            },
+            apiContentType = TechnicalFieldValidator.validateContentType(form.apiContentType).let {
+                if (it == ApiEnumValidationResult.Valid) null else R.string.error_api_content_type_invalid
+            },
+            host = form.connections
+                .map { connection -> TechnicalFieldValidator.validateHost(connection.host).toHostErrorResource() }
+                .firstOrNull { it != null }
+        )
+    }
+
+    private fun DeviceFormFieldErrors.hasErrors(): Boolean {
+        return firstError() != null
+    }
+
+    private fun DeviceFormFieldErrors.firstError(): Int? {
+        return name ?: actionLabel ?: apiPath ?: apiMethod ?: apiContentType ?: host
+    }
+
+    private fun ApiPathValidationResult.toApiPathErrorResource(): Int? {
+        return when (this) {
+            ApiPathValidationResult.Valid -> null
+            ApiPathValidationResult.Empty -> R.string.error_api_call_empty
+            ApiPathValidationResult.Invalid -> R.string.error_api_call_invalid
+        }
+    }
+
+    private fun HostValidationResult.toHostErrorResource(): Int? {
+        return when (this) {
+            HostValidationResult.Valid -> null
+            HostValidationResult.Empty -> R.string.error_host_empty
+            HostValidationResult.Invalid -> R.string.error_host_invalid
+        }
     }
 
     private fun String.isValidImportUrl(): Boolean {

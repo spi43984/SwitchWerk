@@ -27,8 +27,8 @@
     <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und Release Notes anzeigen\n• Aktionsdetails ein- oder ausblenden</string>
     <string name="backup_info">• Export speichert die lokale Konfiguration\n• Passwörter nur bewusst exportieren oder importieren\n• Passwort-Schalter gelten nur für die nächste Aktion\n• Import nur aus vertrauenswürdigen Quellen</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
-    <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
-    <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /relay/0?turn=on</string>
+    <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.0.2.10 oder device.local\n• kein Schema, Pfad oder Leerzeichen\n• kein Internet erforderlich</string>
+    <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• keine vollständige URL eintragen\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /rpc/Switch.Toggle?id=0</string>
     <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
     <string name="wifi_profiles_info_title">WLAN-Profile verwalten</string>
     <string name="devices_info_title">Geräte verwalten</string>
@@ -259,10 +259,12 @@
     <string name="default_action_label">Schalten</string>
     <string name="unknown_wifi">Unbekanntes WLAN</string>
     <string name="error_host_empty">Hostname/IP darf nicht leer sein</string>
+    <string name="error_host_invalid">Hostname/IP ist ungültig. Erlaubt sind z. B. 192.0.2.10 oder device.local.</string>
     <string name="error_wifi_already_assigned">Dieses WLAN ist bereits zugeordnet</string>
     <string name="error_device_name_empty">Gerätename darf nicht leer sein</string>
     <string name="error_button_label_empty">Button-Beschriftung darf nicht leer sein</string>
     <string name="error_api_call_empty">API-Aufruf darf nicht leer sein</string>
+    <string name="error_api_call_invalid">API-Aufruf ist ungültig. Trage nur einen sicheren Pfad ein, z. B. /rpc/Switch.Toggle?id=0.</string>
     <string name="error_api_method_invalid">API-Methode ist ungültig</string>
     <string name="error_api_protocol_invalid">Geräteprotokoll ist ungültig</string>
     <string name="error_api_content_type_invalid">Content-Type ist ungültig</string>

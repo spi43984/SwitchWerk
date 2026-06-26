@@ -869,6 +869,29 @@ class DefaultDeviceActionServiceTest {
     }
 
     @Test
+    fun invalidStoredRequestIsRejectedWithoutHttpCall() = runBlocking {
+        val network = mock(Network::class.java)
+        val httpService = FakeHttpApiCallService(ArrayDeque(listOf(successResult())))
+        val service = createService(
+            profiles = listOf(WifiProfile("wifi-1", "Device WiFi")),
+            wifiService = FakeWifiConnectionService(
+                results = ArrayDeque(listOf(WifiConnectionResult.Success(network)))
+            ),
+            httpService = httpService
+        )
+
+        val result = service.execute(
+            device(
+                path = "https://server.domain.com/rpc/action",
+                connections = listOf(DeviceConnection("wifi-1", "device.local"))
+            )
+        )
+
+        assertEquals(DeviceActionResult.InvalidRequest, result)
+        assertTrue(httpService.calls.isEmpty())
+    }
+
+    @Test
     fun cancellationDuringApiCallDisconnectsRequestedWifi() = runBlocking {
         val network = mock(Network::class.java)
         val wifiService = FakeWifiConnectionService(

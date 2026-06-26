@@ -7,6 +7,10 @@ import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
+import de.piecha.switchwerk.domain.validation.ApiEnumValidationResult
+import de.piecha.switchwerk.domain.validation.ApiPathValidationResult
+import de.piecha.switchwerk.domain.validation.HostValidationResult
+import de.piecha.switchwerk.domain.validation.TechnicalFieldValidator
 
 class ConfigurationImportValidator {
 
@@ -65,18 +69,23 @@ class ConfigurationImportValidator {
             requireNotBlank(device.name, "Gerätename")
             requireNotBlank(device.actionLabel, "Button-Beschriftung")
             requireNotBlank(device.action.path, "API-Aufruf")
+            require(TechnicalFieldValidator.validateApiPath(device.action.path) == ApiPathValidationResult.Valid) {
+                "API-Aufruf ist ungültig"
+            }
             require(
                 DeviceProtocol.entries.any { protocol -> protocol.name == device.action.protocol }
             ) {
                 "Unbekanntes Geräteprotokoll: ${device.action.protocol}"
             }
             require(
-                ApiMethod.entries.any { method -> method.name == device.action.method }
+                ApiMethod.entries.any { method -> method.name == device.action.method } &&
+                    TechnicalFieldValidator.validateApiMethod(device.action.method) == ApiEnumValidationResult.Valid
             ) {
                 "Unbekannte API-Methode: ${device.action.method}"
             }
             require(
-                ApiContentType.entries.any { contentType -> contentType.name == device.action.contentType }
+                ApiContentType.entries.any { contentType -> contentType.name == device.action.contentType } &&
+                    TechnicalFieldValidator.validateContentType(device.action.contentType) == ApiEnumValidationResult.Valid
             ) {
                 "Nicht unterstützter Content-Type: ${device.action.contentType}"
             }
@@ -90,6 +99,9 @@ class ConfigurationImportValidator {
                     "Gerät ${device.name} verweist auf ein unbekanntes WLAN-Profil"
                 }
                 requireNotBlank(connection.host, "Hostname/IP")
+                require(TechnicalFieldValidator.validateHost(connection.host) == HostValidationResult.Valid) {
+                    "Hostname/IP ist ungültig"
+                }
             }
         }
     }

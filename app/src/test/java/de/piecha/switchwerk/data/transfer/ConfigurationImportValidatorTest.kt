@@ -241,6 +241,40 @@ class ConfigurationImportValidatorTest {
     }
 
     @Test
+    fun invalidHostIsRejected() {
+        val device = validDocument().devices.single().copy(
+            connections = listOf(
+                ConfigurationDeviceConnection(
+                    wifiProfileId = "wifi-1",
+                    host = "bad host name"
+                )
+            )
+        )
+
+        val error = assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(validDocument(devices = listOf(device)))
+        }
+
+        assertTrue(error.message.orEmpty().contains("Hostname/IP"))
+    }
+
+    @Test
+    fun invalidApiPathIsRejected() {
+        val device = validDocument().devices.single().copy(
+            action = ConfigurationDeviceAction(
+                method = "GET",
+                path = "https://server.domain.com/rpc/action"
+            )
+        )
+
+        val error = assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(validDocument(devices = listOf(device)))
+        }
+
+        assertTrue(error.message.orEmpty().contains("API-Aufruf"))
+    }
+
+    @Test
     fun unsupportedApiMethodIsRejected() {
         val device = validDocument().devices.single().copy(
             action = ConfigurationDeviceAction(
@@ -345,7 +379,7 @@ class ConfigurationImportValidatorTest {
             connections = listOf(
                 ConfigurationDeviceConnection(
                     wifiProfileId = "wifi-1",
-                    host = "192.168.1.10"
+                    host = "192.0.2.10"
                 )
             )
         )

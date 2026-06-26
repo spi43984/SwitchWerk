@@ -2,66 +2,52 @@
 
 Stand: 26. Juni 2026
 
+## Startvorlage
+
+Für die nächste Session zuerst `AI_SESSION_PROMPT.md` verwenden und danach
+`AGENTS.md` sowie diesen Handoff beachten.
+
 ## Aktueller Stand
 
-Abschluss durchgeführt:
+In Arbeit:
 
-- Issue 037 „GitHub Release Update Support“
-- GitHub-Issue: #144
-- Pull Request: #145
-- Feature-Branch: `github-release-update-support`
-- Merge-Commit auf `main`: `489476c1064c02217cd2a122b2097b563797c0d7`
+- Issue 064 „Input Validation For Technical Fields“
+- Lokale GitHub-Prüfung: `gh issue list --state all --search "Input Validation For Technical Fields"` lieferte keinen Treffer.
+- Feature-Branch: `input-validation-technical-fields`
+- Nicht committet, nicht gepusht, kein Pull Request erstellt, kein GitHub-Issue geschlossen.
 
-Umgesetzt und gemergt:
+Umgesetzt:
 
-- Update-Logik außerhalb Compose unter `data/update`.
-- GitHub Releases API für `spi43984/SwitchWerk`.
-- Pre-Releases und Drafts werden ignoriert.
-- APK-Asset wird verbindlich über `SwitchWerk-<version>.apk` erkannt.
-- Versionsvergleich für semantische Versionen.
-- SharedPreferences-Cache mit letzter Prüfung und Tagesbegrenzung für automatische Checks.
-- Manuelle Prüfung in den Einstellungen umgeht die Tagesbegrenzung.
-- Debug-Builds werden nicht als updatefähige Release-Version behandelt.
-- Download-Service speichert APK über app-eigenen Download-Bereich und FileProvider.
-- Android Package Installer wird nur per Benutzer-Intent geöffnet.
-- Einstellungen zeigen installierte Version, verfügbare Version, Release Notes,
-  letzte Prüfung, Fehlerstatus und Downloadfortschritt.
-- Dashboard zeigt einen kompakten Hinweis, wenn ein Update verfügbar ist.
-- Hamburger-Menü enthält `Updates` bzw. bei verfügbarem Update `Update verfügbar`
-  und führt direkt zu `Einstellungen -> System`.
-- Hilfe- und Info-Texte wurden für Deutsch und Englisch um Updates ergänzt.
-- Release-Skript `scripts/release-github.sh` erzwingt das Asset-Format
-  `SwitchWerk-<version>.apk`.
-- Unit-Tests für Versionsvergleich, Release-Auswertung, Asset-Auswahl und
-  Cache-Logik ergänzt.
+- Zentrale technische Validierung unter `domain/validation`.
+- Host/IP/DNS-Validierung mit optionalem Port, ohne Schema, Pfad, Query, Fragment, Userinfo, Leer- oder Steuerzeichen.
+- IPv4 syntaktisch geprüft; rein numerische ungültige IPv4-ähnliche Werte werden nicht als DNS-Name akzeptiert.
+- DNS-/Hostname-Syntax geprüft.
+- API-Pfade validiert; vollständige URLs, schemalose Host-URLs, Fragment, Backslash, Leer-/Steuerzeichen und Dot-Segmente werden abgelehnt.
+- HTTP-Methode und Content-Type werden gegen die vorhandenen Enums geprüft.
+- `SettingsViewModel` validiert vor dem Speichern und übersetzt Fehler in Form-State/String-Ressourcen.
+- Geräteformular zeigt Feldfehler über Material-3-TextField-Fehler und Fehlertexte unter Method-/Content-Type-Auswahl.
+- WLAN-Zuordnungsdialog validiert Hostwerte vor dem Schließen.
+- Importvalidierung nutzt dieselben zentralen Validatoren für Host, API-Pfad, Methode und Content-Type.
+- Geräteaktionen prüfen gespeicherte Altdaten vor dem Request defensiv und behandeln ungültige Requests als `InvalidRequest`.
+- Deutsche und englische Hilfe-/Fehlertexte ergänzt.
+- Unit-Tests für zentrale Validatoren, Importvalidierung und defensive Action-Ausführung ergänzt.
 
-## Prüfungen
+## Prüfungen im Container
 
-Container erfolgreich:
+Erfolgreich:
 
-- `./gradlew lintDebug`
 - `./gradlew testDebugUnitTest`
-- `./gradlew clean assembleDebug`
-- `./gradlew assembleDebug`
-- `bash -n scripts/release-github.sh`
+- `./gradlew lintDebug`
 - `git diff --check`
 
-Host erfolgreich laut Benutzer:
+## Offene Punkte
 
-- `./gradlew clean assembleDebug`
-- `./gradlew installDebug`
+- Host-Build und Installation sind noch nicht durch den Benutzer auf dem Ubuntu-Host bestätigt.
+- Kein Commit/Push/PR erfolgt.
 
-Manuell erfolgreich laut Benutzer:
+## Nächste sinnvolle Schritte
 
-- Release-Build-Test ohne neues GitHub-Release.
-- Hamburger-Menü `Updates` öffnet `Einstellungen -> System`.
-- Update-Fehler wird nur noch im Update-Bereich angezeigt.
-
-## Nächste Session
-
-Nächstes offenes Issue nach `docs/issues/overview.txt`:
-
-1. Issue 041 „Dashboard Drag And Drop“
-
-Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
-GitHub-Issue schließen oder Branch löschen.
+1. Benutzer führt Host-Build und Installation aus:
+   - `./gradlew clean assembleDebug`
+   - `./gradlew installDebug`
+2. Nach erfolgreicher Host-Rückmeldung kann der Benutzer Veröffentlichung/Abschluss ausdrücklich anfordern.

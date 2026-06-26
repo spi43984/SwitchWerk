@@ -53,6 +53,8 @@ import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
+import de.piecha.switchwerk.domain.validation.HostValidationResult
+import de.piecha.switchwerk.domain.validation.TechnicalFieldValidator
 import de.piecha.switchwerk.ui.components.InfoHint
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
@@ -92,8 +94,8 @@ fun DeviceManagementSection(
     onApiPathChange: (String) -> Unit,
     onApiRequestBodyChange: (String) -> Unit,
     onApiContentTypeChange: (String) -> Unit,
-    onAddConnection: (String, String) -> Unit,
-    onUpdateConnection: (String, String, String) -> Unit,
+    onAddConnection: (String, String) -> Boolean,
+    onUpdateConnection: (String, String, String) -> Boolean,
     onDeleteConnection: (String) -> Unit,
     onMoveConnection: (String, Int) -> Unit,
     onSaveClick: () -> Unit,
@@ -176,8 +178,8 @@ private fun DeviceEditDialog(
     onApiPathChange: (String) -> Unit,
     onApiRequestBodyChange: (String) -> Unit,
     onApiContentTypeChange: (String) -> Unit,
-    onAddConnection: (String, String) -> Unit,
-    onUpdateConnection: (String, String, String) -> Unit,
+    onAddConnection: (String, String) -> Boolean,
+    onUpdateConnection: (String, String, String) -> Boolean,
     onDeleteConnection: (String) -> Unit,
     onMoveConnection: (String, Int) -> Unit,
     onSaveClick: () -> Unit,
@@ -405,8 +407,8 @@ private fun DeviceForm(
     onApiPathChange: (String) -> Unit,
     onApiRequestBodyChange: (String) -> Unit,
     onApiContentTypeChange: (String) -> Unit,
-    onAddConnection: (String, String) -> Unit,
-    onUpdateConnection: (String, String, String) -> Unit,
+    onAddConnection: (String, String) -> Boolean,
+    onUpdateConnection: (String, String, String) -> Boolean,
     onDeleteConnection: (String) -> Unit,
     onMoveConnection: (String, Int) -> Unit
 ) {
@@ -424,6 +426,8 @@ private fun DeviceForm(
             value = form.name,
             onValueChange = onNameChange,
             label = { Text(stringResource(R.string.name)) },
+            isError = form.errors.name != null,
+            supportingText = form.errors.name?.let { error -> { Text(stringResource(error)) } },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(
@@ -436,6 +440,8 @@ private fun DeviceForm(
             value = form.actionLabel,
             onValueChange = onActionLabelChange,
             label = { Text(stringResource(R.string.button_label)) },
+            isError = form.errors.actionLabel != null,
+            supportingText = form.errors.actionLabel?.let { error -> { Text(stringResource(error)) } },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(
@@ -485,11 +491,20 @@ private fun DeviceForm(
                 }
             }
         }
+        form.errors.apiMethod?.let { error ->
+            Text(
+                text = stringResource(error),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         OutlinedTextField(
             value = form.apiPath,
             onValueChange = onApiPathChange,
             label = { Text(stringResource(R.string.api_call)) },
+            isError = form.errors.apiPath != null,
+            supportingText = form.errors.apiPath?.let { error -> { Text(stringResource(error)) } },
             singleLine = true,
             keyboardOptions = technicalPathKeyboardOptions,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
@@ -520,6 +535,13 @@ private fun DeviceForm(
                     )
                 }
             }
+        }
+        form.errors.apiContentType?.let { error ->
+            Text(
+                text = stringResource(error),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
 
         OutlinedTextField(
@@ -558,8 +580,8 @@ private fun DeviceConnectionList(
     openSwipeItemId: String?,
     onOpenSwipeItem: (String) -> Unit,
     onCloseSwipeItem: () -> Unit,
-    onAddConnection: (String, String) -> Unit,
-    onUpdateConnection: (String, String, String) -> Unit,
+    onAddConnection: (String, String) -> Boolean,
+    onUpdateConnection: (String, String, String) -> Boolean,
     onDeleteConnection: (String) -> Unit,
     onMoveConnection: (String, Int) -> Unit
 ) {
@@ -574,8 +596,9 @@ private fun DeviceConnectionList(
             usedWifiProfileIds = connections.map { it.wifiProfileId },
             initialConnection = null,
             onSave = { wifiProfileId, host ->
-                onAddConnection(wifiProfileId, host)
-                isAddingConnection = false
+                if (onAddConnection(wifiProfileId, host)) {
+                    isAddingConnection = false
+                }
             },
             onCancel = {
                 isAddingConnection = false
@@ -592,8 +615,9 @@ private fun DeviceConnectionList(
                 .map { it.wifiProfileId },
             initialConnection = connection,
             onSave = { wifiProfileId, host ->
-                onUpdateConnection(connection.wifiProfileId, wifiProfileId, host)
-                editingConnection = null
+                if (onUpdateConnection(connection.wifiProfileId, wifiProfileId, host)) {
+                    editingConnection = null
+                }
             },
             onCancel = {
                 editingConnection = null
@@ -860,12 +884,21 @@ private fun ConnectionEditDialog(
     var host by remember(initialConnection) {
         mutableStateOf(initialConnection?.host.orEmpty())
     }
+    var hostValidationResult by remember(initialConnection) {
+        mutableStateOf<HostValidationResult?>(null)
+    }
 
     StandardConfigurationDialog(
         title = title,
         onDismissRequest = onCancel,
         actionText = stringResource(R.string.save),
-        onAction = { onSave(selectedWifiProfileId, host) },
+        onAction = {
+            val validationResult = TechnicalFieldValidator.validateHost(host)
+            hostValidationResult = validationResult
+            if (validationResult == HostValidationResult.Valid) {
+                onSave(selectedWifiProfileId, host)
+            }
+        },
         actionEnabled = selectedWifiProfileId.isNotBlank() && host.isNotBlank(),
         infoTitleResourceId = R.string.wifi_assignment_dialog_info_title,
         infoMessageResourceId = R.string.wifi_assignment_dialog_info
@@ -898,13 +931,28 @@ private fun ConnectionEditDialog(
 
             OutlinedTextField(
                 value = host,
-                onValueChange = { host = it },
+                onValueChange = {
+                    host = it
+                    hostValidationResult = null
+                },
                 label = { Text(stringResource(R.string.hostname_ip)) },
+                isError = hostValidationResult?.toHostErrorResource() != null,
+                supportingText = hostValidationResult?.toHostErrorResource()?.let { error ->
+                    { Text(stringResource(error)) }
+                },
                 singleLine = true,
                 keyboardOptions = hostKeyboardOptions,
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 modifier = Modifier.fillMaxWidth()
             )
         }
+    }
+}
+
+private fun HostValidationResult.toHostErrorResource(): Int? {
+    return when (this) {
+        HostValidationResult.Valid -> null
+        HostValidationResult.Empty -> R.string.error_host_empty
+        HostValidationResult.Invalid -> R.string.error_host_invalid
     }
 }
