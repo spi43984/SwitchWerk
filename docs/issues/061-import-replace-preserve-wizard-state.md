@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / Regression / UX
 - Bereich: Import/Export / Setup Wizard / AppSettings
@@ -83,13 +83,37 @@ In diesen Fällen darf der Wizard wieder wie beim ersten Start angezeigt werden.
 
 ## Akzeptanzkriterien
 
-- [ ] Beim Import mit **Alles ersetzen** wird der Wizard nicht automatisch angezeigt, nur weil der Datenbestand gelöscht wurde.
-- [ ] Ein zuvor mit **Nicht mehr anzeigen** deaktivierter Wizard bleibt nach dem Replace-Import deaktiviert.
-- [ ] Ein zuvor nur mit **Überspringen** geschlossener Wizard wird durch den Replace-Import nicht dauerhaft deaktiviert oder anderweitig verändert.
-- [ ] Der Wizard-State bleibt beim Replace-Import vor und nach der Aktion identisch.
-- [ ] Import ohne **Alles ersetzen** verändert den Wizard-State ebenfalls nicht.
-- [ ] Manuelles Öffnen über **Einrichtungs-Assistent erneut anzeigen** funktioniert weiterhin.
-- [ ] Echter erster App-Start zeigt den Wizard weiterhin an.
-- [ ] Nach Löschen der App-Daten über Android-Systemeinstellungen darf der Wizard wieder wie beim ersten Start erscheinen.
-- [ ] Nach Deinstallation und Neuinstallation darf der Wizard wieder wie beim ersten Start erscheinen.
-- [ ] Bestehende Tests bzw. neue Regressionstests decken den Replace-Import ohne Wizard-State-Änderung ab.
+- [x] Beim Import mit **Alles ersetzen** wird der Wizard nicht automatisch angezeigt, nur weil der Datenbestand gelöscht wurde.
+- [x] Ein zuvor mit **Nicht mehr anzeigen** deaktivierter Wizard bleibt nach dem Replace-Import deaktiviert.
+- [x] Ein zuvor nur mit **Überspringen** geschlossener Wizard wird durch den Replace-Import nicht dauerhaft deaktiviert oder anderweitig verändert.
+- [x] Der Wizard-State bleibt beim Replace-Import vor und nach der Aktion identisch.
+- [x] Import ohne **Alles ersetzen** verändert den Wizard-State ebenfalls nicht.
+- [x] Manuelles Öffnen über **Einrichtungs-Assistent erneut anzeigen** funktioniert weiterhin.
+- [x] Echter erster App-Start zeigt den Wizard weiterhin an.
+- [x] Nach Löschen der App-Daten über Android-Systemeinstellungen darf der Wizard wieder wie beim ersten Start erscheinen.
+- [x] Nach Deinstallation und Neuinstallation darf der Wizard wieder wie beim ersten Start erscheinen.
+- [x] Bestehende Tests bzw. neue Regressionstests decken den Replace-Import ohne Wizard-State-Änderung ab.
+
+## Umsetzung
+
+- `DefaultConfigurationTransferRepository.applyImport()` setzt den
+  Wizard-State nach einem Replace-Import nicht mehr auf `true`.
+- Importierte AppSettings überschreiben den Wizard-State weiterhin nicht.
+- Die Workflow-Dokumentation wurde ergänzt: Vor jedem `gh issue create` muss
+  GitHub lesend auf ein passendes bestehendes Issue geprüft werden.
+
+## Prüfung
+
+- Container:
+  - `./gradlew lintDebug`
+  - `./gradlew testDebugUnitTest`
+- Host durch Benutzer bestätigt:
+  - `./gradlew clean assembleDebug`
+  - `./gradlew installDebug`
+
+## Abschluss
+
+- GitHub-Issue: #138
+- Duplikat geschlossen: #139
+- Pull Request: #140
+- Merge-Commit: `92a9b17`
