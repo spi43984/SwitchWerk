@@ -1,6 +1,11 @@
 package de.piecha.switchwerk.ui.components
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,10 +15,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
@@ -39,6 +44,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
+
+private val MenuFooterIconMaxWidth = 188.dp
 
 @Composable
 fun AppMenuLayout(
@@ -71,73 +78,61 @@ fun AppMenuLayout(
             ) {
                 Row(modifier = Modifier.fillMaxSize()) {
                     VerticalDivider()
-                    Column(
+                    BoxWithConstraints(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .padding(end = rightEdgeExtension),
-                        horizontalAlignment = Alignment.End
+                            .padding(end = rightEdgeExtension)
                     ) {
-                        IconButton(onClick = { isExpanded = false }) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = stringResource(R.string.menu_close)
-                            )
-                        }
-                        MenuItem(
-                            text = stringResource(R.string.settings),
-                            onClick = {
-                                isExpanded = false
-                                onOpenSettings()
-                            }
-                        )
-                        MenuItem(
-                            text = stringResource(R.string.help),
-                            onClick = {
-                                isExpanded = false
-                                onOpenHelp()
-                            }
-                        )
-                        MenuItem(
-                            text = stringResource(R.string.about_switchwerk),
-                            onClick = {
-                                isExpanded = false
-                                onOpenAbout()
-                            }
-                        )
-                        Box(
+                        val menuScrollState = rememberScrollState()
+
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f),
-                            contentAlignment = Alignment.BottomCenter
+                                .heightIn(min = maxHeight)
+                                .verticalScroll(menuScrollState),
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
+                            Column(
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                IconButton(onClick = { isExpanded = false }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = stringResource(R.string.menu_close)
+                                    )
+                                }
+                                MenuItem(
+                                    text = stringResource(R.string.settings),
+                                    onClick = {
+                                        isExpanded = false
+                                        onOpenSettings()
+                                    }
+                                )
+                                MenuItem(
+                                    text = stringResource(R.string.help),
+                                    onClick = {
+                                        isExpanded = false
+                                        onOpenHelp()
+                                    }
+                                )
+                                MenuItem(
+                                    text = stringResource(R.string.about_switchwerk),
+                                    onClick = {
+                                        isExpanded = false
+                                        onOpenAbout()
+                                    }
+                                )
+                            }
+
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
                                 horizontalAlignment = Alignment.End
                             ) {
-                                Text(
-                                    text = stringResource(R.string.version_value, versionName),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.End,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = stringResource(R.string.release_date),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.End,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Image(
-                                    painter = painterResource(R.drawable.ic_launcher_foreground),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(988f / 1050f),
-                                    contentScale = ContentScale.Fit
-                                )
+                                MenuFooter(versionName = versionName)
                             }
                         }
                     }
@@ -153,6 +148,36 @@ fun AppOverflowMenu(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Filled.Menu,
             contentDescription = stringResource(R.string.menu_open)
+        )
+    }
+}
+
+@Composable
+private fun MenuFooter(versionName: String) {
+    Text(
+        text = stringResource(R.string.version_value, versionName),
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.End,
+        style = MaterialTheme.typography.labelSmall
+    )
+    Text(
+        text = stringResource(R.string.release_date),
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.End,
+        style = MaterialTheme.typography.labelSmall
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_launcher_foreground),
+            contentDescription = null,
+            modifier = Modifier
+                .width(minOf(maxWidth, MenuFooterIconMaxWidth))
+                .aspectRatio(988f / 1050f),
+            contentScale = ContentScale.Fit
         )
     }
 }

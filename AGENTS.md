@@ -248,6 +248,8 @@ Beispiel nach Merge:
 
 Der Assistent gibt für alle vom Benutzer lokal auszuführenden Schritte immer die
 vollständigen Copy-&-Paste-Befehle aus.
+Lokale Befehle werden ohne führende Leerzeichen und ohne Shell-Variablen
+ausgegeben, damit sie direkt fehlerfrei kopiert und eingefügt werden können.
 
 ## AI-Handoff
 

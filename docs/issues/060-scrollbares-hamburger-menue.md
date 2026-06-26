@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / UI / UX
 - Bereich: Navigation / Hamburger-Menü / Compose UI
@@ -30,6 +30,10 @@ Dieses Problem kann nicht nur im Landscape-Format auftreten, sondern grundsätzl
 - Verhalten sowohl im Landscape- als auch im Portrait-Format sicherstellen.
 - Hamburger-Icon und Menüeinträge weiterhin korrekt darstellen.
 - Alle Menüeinträge müssen jederzeit erreichbar bleiben.
+- Das Icon im unteren Info-/Über-Bereich darf im Landscape-Modus höchstens so
+  breit dargestellt werden wie im Portrait-Modus.
+- Das Icon auf der Über-SwitchWerk-Ansicht darf beim Wechsel von Portrait zu
+  Landscape nicht breiter werden.
 - Bestehendes Layout und Design möglichst unverändert beibehalten.
 - Keine funktionalen Änderungen an den Menüeinträgen vornehmen.
 
@@ -52,10 +56,14 @@ Dieses Problem kann nicht nur im Landscape-Format auftreten, sondern grundsätzl
 
 ## Akzeptanzkriterien
 
-- [ ] Im Landscape-Modus sind alle Menüeinträge erreichbar.
-- [ ] Im Portrait-Modus sind alle Menüeinträge erreichbar.
-- [ ] Bei Platzmangel kann der Menüinhalt vertikal gescrollt werden.
-- [ ] Bei ausreichend Platz bleibt das bestehende Layout unverändert.
-- [ ] Hamburger-Icon und Menüeinträge werden nicht abgeschnitten.
-- [ ] Die Lösung funktioniert auch bei großer Android-Schriftgröße.
-- [ ] Es gibt keine Regressionen im bestehenden Drawer-Verhalten.
+- [x] Im Landscape-Modus sind alle Menüeinträge erreichbar.
+- [x] Im Portrait-Modus sind alle Menüeinträge erreichbar.
+- [x] Bei Platzmangel kann der Menüinhalt vertikal gescrollt werden.
+- [x] Bei ausreichend Platz bleibt das bestehende Layout unverändert.
+- [x] Hamburger-Icon und Menüeinträge werden nicht abgeschnitten.
+- [x] Das Icon im unteren Info-/Über-Bereich wird im Landscape-Modus nicht
+      breiter als im Portrait-Modus dargestellt.
+- [x] Das Icon auf der Über-SwitchWerk-Ansicht wird beim Wechsel von Portrait
+      zu Landscape nicht breiter dargestellt.
+- [x] Die Lösung funktioniert auch bei großer Android-Schriftgröße.
+- [x] Es gibt keine Regressionen im bestehenden Drawer-Verhalten.
