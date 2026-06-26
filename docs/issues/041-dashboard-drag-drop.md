@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Verworfen
 - Priorität: P2
 - Typ: GUI / Dashboard / Bedienung
 
@@ -76,3 +76,9 @@ Falls Issue 025 noch nicht umgesetzt ist, beschränkt sich die erste Umsetzung a
 - Geräteaktion nach Umsortierung ausführen
 - Portrait-Modus testen
 - Landscape-Modus testen
+
+## Entscheidung
+
+Status: Verworfen.
+
+Die Umsetzung wird bewusst nicht weiterverfolgt, weil Geräte voraussichtlich selten umsortiert werden und die bestehende Hoch-/Runter-Sortierung den Bedarf robust erfüllt. Drag & Drop hätte nur geringen Bedienmehrwert, erhöht aber das Risiko versehentlicher Sortieränderungen und bringt zusätzlichen Implementierungs- und Testaufwand für Listen- und Widget-Ansicht.

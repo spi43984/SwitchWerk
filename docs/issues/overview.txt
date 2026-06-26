@@ -13,6 +13,8 @@ Die nächste Umsetzung wird nach folgender Reihenfolge bestimmt:
 
 Abgeschlossene Issues bleiben zur Dokumentation erhalten und werden nicht für die nächste Umsetzung berücksichtigt.
 
+Verworfene Issues wurden bewusst nicht umgesetzt und werden ebenfalls nicht für die nächste Umsetzung berücksichtigt.
+
 Backlog-Issues werden erst berücksichtigt, wenn sie ausdrücklich wieder aktiviert werden.
 
 Die Priorität bleibt eine globale Einordnung. Für zusammenhängende
@@ -62,7 +64,7 @@ es verändert die Priorisierungslogik nicht.
 | 038 | P0 | abgeschlossen | Dialog Keyboard Handling |
 | 039 | P0 | abgeschlossen | Unified List Interactions |
 | 040 | P1 | abgeschlossen | Import/Export Password Handling |
-| 041 | P2 | offen | Dashboard Drag And Drop |
+| 041 | -- | verworfen | Dashboard Drag And Drop |
 | 042 | P1 | abgeschlossen | Action Cancellation And Fast-Fail WiFi |
 | 043 | P0 | abgeschlossen | Verify Issue 036 Lint And Codex Session |
 | 044 | P0 | abgeschlossen | GitHub Actions Resource Optimization |
@@ -89,11 +91,10 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 041 Dashboard Drag And Drop
-2. 024 Authenticated Import Sources Backlog
-3. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-4. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-5. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-6. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-7. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
-8. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
+1. 024 Authenticated Import Sources Backlog
+2. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+3. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+4. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+5. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+6. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+7. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
