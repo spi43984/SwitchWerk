@@ -4,48 +4,66 @@ Stand: 26. Juni 2026
 
 ## Aktueller Stand
 
-Zuletzt abgeschlossen:
+Abschluss vorbereitet:
 
-- Issue 061 „Import Replace Preserves Wizard State“
-- Branch: `import-replace-preserve-wizard-state`
-- GitHub-Issue: #138
-- Duplikat: #139 geschlossen
-- Pull Request: #140
-- Merge-Commit: `92a9b17`
-- Beim Import mit „Alles ersetzen“ bleibt der bestehende Zustand des
-  Einrichtungs-Assistenten unverändert.
-- `showSetupWizardOnStart=false` bleibt nach Replace-Import `false`;
-  `showSetupWizardOnStart=true` bleibt `true`; Merge-Import verändert den
-  Wizard-State ebenfalls nicht.
-- Die Workflow-Dokumentation schreibt jetzt ausdrücklich vor, dass vor jedem
-  `gh issue create` GitHub lesend auf ein passendes bestehendes Issue geprüft
-  werden muss, auch wenn ein Startbefehl `gh issue create` enthält.
-- Container-Prüfungen erfolgreich:
-  - `./gradlew lintDebug`
-  - `./gradlew testDebugUnitTest`
-- Host-Build, Installation und Tests wurden vom Benutzer
-  bestätigt:
-  - `./gradlew clean assembleDebug`
-  - `./gradlew installDebug`
-- `docs/issues/061-import-replace-preserve-wizard-state.md` und
-  `docs/issues/overview.txt` sind lokal auf `abgeschlossen` gesetzt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 032
-  „Room Schema And Migration Test Coverage“.
+- Issue 032 „Room Schema And Migration Test Coverage“
+- GitHub-Issue: #142
+- Branch: `room-schema-migration-tests`
+- Kein Commit, kein Push, kein Pull Request.
+- Lokale Issue-Datei ist auf `Abgeschlossen` gesetzt.
+- `docs/issues/overview.txt` ist auf `abgeschlossen` gesetzt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`:
+  Issue 037 „GitHub Release Update Support“.
 
+Umgesetzt:
+
+- `app/build.gradle.kts` konfiguriert den Room-Schema-Export über KSP:
+  `room.schemaLocation = app/schemas`.
+- Aktuelle Room-Schema-Datei für Datenbankversion 8 liegt unter:
+  `app/schemas/de.piecha.switchwerk.data.local.AppDatabase/8.json`.
+- Neuer Android-Instrumentation-Test:
+  `app/src/androidTest/java/de/piecha/switchwerk/data/local/AppDatabaseMigrationTest.kt`.
+- Abgedeckt sind:
+  - Migration 2 -> 3 mit erhaltenen WLAN-Profilen, Namen aus SSID,
+    eindeutigen Namen bei gleicher SSID und Fallback für leere SSID.
+  - Migration 3 -> 4 mit erhaltenen WLAN-Profilen beim Tabellenumbau.
+  - Migration 4 -> 5 mit Default für `securityTypeVerifiedLocally`.
+  - Migration 5 -> 6 mit Default für `connectionMode`.
+  - Migration 6 -> 7 mit Default für `apiProtocol`.
+  - Migration 7 -> 8 mit Defaults für `apiRequestBody` und
+    `apiContentType`.
+  - End-to-End-Migration von Version 2 bis zur aktuellen Version 8.
+
+## Prüfungen
+
+Container erfolgreich:
+
+- `./gradlew :app:kspDebugKotlin`
+- `./gradlew :app:compileDebugAndroidTestKotlin`
+- `./gradlew :app:testDebugUnitTest`
+- `./gradlew :app:lintDebug`
+- `./gradlew :app:assembleDebug`
+- `git diff --check`
+
+Host erfolgreich:
+
+- `./gradlew clean assembleDebug`
+- `./gradlew installDebug`
+- `./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=de.piecha.switchwerk.data.local.AppDatabaseMigrationTest`
+
+Host eingeschränkt:
+
+- Der vollständige Lauf `./gradlew connectedDebugAndroidTest` scheitert in
+  bestehenden UI-Tests außerhalb dieses Issues:
+  `DeviceWifiProximityIndicatorTest` schlägt auf `Pixel 10 Pro XL - 16` mit
+  `NoSuchMethodException: android.hardware.input.InputManager.getInstance`
+  aus Espresso/Compose-Testinfrastruktur fehl.
 
 ## Start für nächste Codex-Session
 
 1. `AGENTS.md` lesen.
 2. `AI_HANDOFF.md` lesen.
-3. `AI_SESSION_PROMPT.md` als wiederverwendbare Startvorlage beachten.
-4. Für Issue-Arbeit die konkrete Datei unter `docs/issues` lesen.
-5. Bei Reihenfolge/Status `docs/issues/overview.txt` lesen.
-
-## Workflow-Erinnerung
-
-- `docs/issues/overview.txt` ist führend für Issue-Status, Priorität und Reihenfolge.
-- Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen, GitHub-Issue schließen oder Branch löschen.
-- Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen.
-- Host-Build und Installation werden durch den Benutzer bestätigt:
-  - `./gradlew clean assembleDebug`
-  - `./gradlew installDebug`
+3. Für Issue-Arbeit die konkrete Datei unter `docs/issues` lesen.
+4. Aktuellen Status mit `git status --short --branch` prüfen.
+5. Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
+   GitHub-Issue schließen oder Branch löschen.
