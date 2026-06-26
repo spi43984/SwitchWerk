@@ -14,6 +14,9 @@
 - Business-Logik ins ViewModel.
 - UI-State als Data Class.
 - Events klar benennen.
+- Sicherheitskritische One-Shot-Schalter nicht dauerhaft aktiv halten: Nach
+  Abschluss, Abbruch oder Fehler der Aktion immer auf den sicheren Default
+  zurücksetzen.
 
 Beispiel:
 

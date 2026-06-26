@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / Security / UX
 - Bereich: Import/Export / Einstellungen / Projektdokumentation
@@ -69,12 +69,25 @@ Dabei ist als dauerhafte Projektregel festzuhalten:
 
 ## Akzeptanzkriterien
 
-- [ ] Nach erfolgreichem Export ist **Passwörter einschließen** deaktiviert.
-- [ ] Nach Abbruch des Exportvorgangs ist **Passwörter einschließen** deaktiviert.
-- [ ] Nach einem Fehler während des Exports ist **Passwörter einschließen** deaktiviert.
-- [ ] Ein erneuter Export beginnt immer mit deaktiviertem Schalter.
-- [ ] Weitere vorhandene sicherheitskritische One-Shot-Schieberegler wurden geprüft.
-- [ ] Falls weitere betroffene Schieberegler vorhanden sind, werden sie ebenfalls nach Abschluss oder Abbruch ihrer Aktion zurückgesetzt.
-- [ ] Das Verhalten ist als wiederverwendbares Muster nachvollziehbar umgesetzt.
-- [ ] `CODE_STYLE.md` wurde um die Regel für sicherheitskritische Schieberegler ergänzt.
-- [ ] `SECURITY.md` wurde um das One-Shot-Prinzip für sicherheitskritische Optionen ergänzt.
+- [x] Nach erfolgreichem Export ist **Passwörter einschließen** deaktiviert.
+- [x] Nach Abbruch des Exportvorgangs ist **Passwörter einschließen** deaktiviert.
+- [x] Nach einem Fehler während des Exports ist **Passwörter einschließen** deaktiviert.
+- [x] Ein erneuter Export beginnt immer mit deaktiviertem Schalter.
+- [x] Weitere vorhandene sicherheitskritische One-Shot-Schieberegler wurden geprüft.
+- [x] Falls weitere betroffene Schieberegler vorhanden sind, werden sie ebenfalls nach Abschluss oder Abbruch ihrer Aktion zurückgesetzt.
+- [x] Das Verhalten ist als wiederverwendbares Muster nachvollziehbar umgesetzt.
+- [x] `CODE_STYLE.md` wurde um die Regel für sicherheitskritische Schieberegler ergänzt.
+- [x] `SECURITY.md` wurde um das One-Shot-Prinzip für sicherheitskritische Optionen ergänzt.
+
+## Abschlussnotizen
+
+- GitHub-Issue: #134
+- Der Export-Schalter **Passwörter einschließen** wird nur noch als One-Shot-Option verwendet und nach Start, Abbruch oder Fehlerpfad auf `false` zurückgesetzt.
+- Der ebenfalls sicherheitskritische Import-Schalter **Passwörter importieren** wurde geprüft und analog nach Import oder Abbruch zurückgesetzt.
+- Hilfe- und Info-Texte wurden aktualisiert.
+- Container-Prüfungen erfolgreich:
+  - `./gradlew lintDebug`
+  - `./gradlew testDebugUnitTest`
+- Host-Prüfungen vom Benutzer bestätigt:
+  - `./gradlew clean assembleDebug`
+  - `./gradlew installDebug`

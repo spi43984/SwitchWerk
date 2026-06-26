@@ -121,7 +121,8 @@ fun SettingsScreen(
     var importSource by remember { mutableStateOf(initialUiState.importSource) }
     var importPasswords by remember { mutableStateOf(false) }
     var showPasswordExportWarning by remember { mutableStateOf(initialUiState.showPasswordExportWarning) }
-    var exportIncludesPasswords by remember { mutableStateOf(initialUiState.exportIncludesPasswords) }
+    var exportIncludesPasswords by remember { mutableStateOf(false) }
+    var pendingExportIncludesPasswords by remember { mutableStateOf(false) }
     var openSwipeItemId by remember { mutableStateOf(initialUiState.openSwipeItemId) }
     var pendingImportConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
 
@@ -144,7 +145,10 @@ fun SettingsScreen(
     val exportConfigurationLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
-        uri?.let { viewModel.exportConfiguration(it, includePasswords = exportIncludesPasswords) }
+        val includePasswords = pendingExportIncludesPasswords
+        pendingExportIncludesPasswords = false
+        exportIncludesPasswords = false
+        uri?.let { viewModel.exportConfiguration(it, includePasswords = includePasswords) }
     }
     val importFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -216,6 +220,11 @@ fun SettingsScreen(
         } else {
             action()
         }
+    }
+    fun launchConfigurationExport(includePasswords: Boolean) {
+        pendingExportIncludesPasswords = includePasswords
+        exportIncludesPasswords = false
+        exportConfigurationLauncher.launch(EXPORT_FILE_NAME)
     }
 
     BackHandler(enabled = uiState.isEditingWifiProfile) {
@@ -379,7 +388,7 @@ fun SettingsScreen(
                                 if (exportIncludesPasswords) {
                                     showPasswordExportWarning = true
                                 } else {
-                                    exportConfigurationLauncher.launch(EXPORT_FILE_NAME)
+                                    launchConfigurationExport(includePasswords = false)
                                 }
                             }
                         },
@@ -399,10 +408,11 @@ fun SettingsScreen(
         PasswordExportWarningDialog(
             onExport = {
                 showPasswordExportWarning = false
-                exportConfigurationLauncher.launch(EXPORT_FILE_NAME)
+                launchConfigurationExport(includePasswords = true)
             },
             onCancel = {
                 showPasswordExportWarning = false
+                exportIncludesPasswords = false
             }
         )
     }
@@ -499,14 +509,17 @@ fun SettingsScreen(
             },
             onImportPasswordsChange = { importPasswords = it },
             onImport = { summary ->
+                val includePasswords = importPasswords
+                importPasswords = false
                 showImportConfigurationDialog = false
                 confirmImportWithOptionalScanPermission(
                     importsWifiProfiles =
                         summary.wifiProfilesNew + summary.wifiProfilesOverwritten > 0,
-                    confirmImport = { viewModel.confirmImport(importPasswords) }
+                    confirmImport = { viewModel.confirmImport(includePasswords) }
                 )
             },
             onCancel = {
+                importPasswords = false
                 showImportConfigurationDialog = false
                 viewModel.cancelPendingImport()
             }
