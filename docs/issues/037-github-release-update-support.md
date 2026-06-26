@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-* Status: Offen
+* Status: Abgeschlossen
 * Priorität: P2
 * Typ: Feature
 * Bereich: Release / Updates
@@ -138,27 +138,27 @@ Der konkrete Repository-Pfad und Asset-Name sollen im Rahmen der Implementierung
 
 ## Akzeptanzkriterien
 
-* [ ] Die installierte App-Version wird angezeigt.
-* [ ] Die neueste GitHub Release-Version kann abgerufen werden.
-* [ ] Pre-Releases werden nicht als reguläres Update angezeigt.
-* [ ] Der Versionsvergleich funktioniert zuverlässig.
-* [ ] Verfügbare Updates werden angezeigt.
-* [ ] Die Release Notes können angezeigt werden.
-* [ ] Eine manuelle Update-Prüfung ist möglich.
-* [ ] Eine automatische Update-Prüfung findet maximal einmal pro Kalendertag statt.
-* [ ] Mehrfache App-Starts am selben Tag verwenden das zwischengespeicherte Ergebnis.
-* [ ] Die manuelle Update-Prüfung ignoriert die tägliche Begrenzung.
-* [ ] Das passende APK-Asset kann erkannt werden.
-* [ ] Die APK kann heruntergeladen werden.
-* [ ] Der Download-Fortschritt wird angezeigt.
-* [ ] Die APK wird lokal Android-konform gespeichert.
-* [ ] Der Android Installationsdialog kann gestartet werden.
-* [ ] Netzwerkfehler werden sauber behandelt.
-* [ ] Fehlerhafte Release-Daten führen nicht zu App-Abstürzen.
-* [ ] Bestehende Schaltfunktionen bleiben unabhängig von der Update-Funktion nutzbar.
-* [ ] Es werden keine sensiblen App-, WLAN- oder Gerätedaten übertragen.
-* [ ] Relevante Unit- und UI-Tests sind ergänzt.
-* [ ] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
+* [x] Die installierte App-Version wird angezeigt.
+* [x] Die neueste GitHub Release-Version kann abgerufen werden.
+* [x] Pre-Releases werden nicht als reguläres Update angezeigt.
+* [x] Der Versionsvergleich funktioniert zuverlässig.
+* [x] Verfügbare Updates werden angezeigt.
+* [x] Die Release Notes können angezeigt werden.
+* [x] Eine manuelle Update-Prüfung ist möglich.
+* [x] Eine automatische Update-Prüfung findet maximal einmal pro Kalendertag statt.
+* [x] Mehrfache App-Starts am selben Tag verwenden das zwischengespeicherte Ergebnis.
+* [x] Die manuelle Update-Prüfung ignoriert die tägliche Begrenzung.
+* [x] Das passende APK-Asset kann erkannt werden.
+* [x] Die APK kann heruntergeladen werden.
+* [x] Der Download-Fortschritt wird angezeigt.
+* [x] Die APK wird lokal Android-konform gespeichert.
+* [x] Der Android Installationsdialog kann gestartet werden.
+* [x] Netzwerkfehler werden sauber behandelt.
+* [x] Fehlerhafte Release-Daten führen nicht zu App-Abstürzen.
+* [x] Bestehende Schaltfunktionen bleiben unabhängig von der Update-Funktion nutzbar.
+* [x] Es werden keine sensiblen App-, WLAN- oder Gerätedaten übertragen.
+* [x] Relevante Unit- und UI-Tests sind ergänzt.
+* [x] Build und Installation wurden auf dem Ubuntu-Host erfolgreich geprüft.
 
 ## Testhinweise
 
@@ -177,4 +177,3 @@ Der konkrete Repository-Pfad und Asset-Name sollen im Rahmen der Implementierung
 * App-Start mit gecachtem Update-Ergebnis.
 * Mehrere App-Starts am selben Kalendertag.
 * Manuelle Prüfung über Einstellungen.
-

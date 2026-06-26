@@ -58,7 +58,7 @@ es verändert die Priorisierungslogik nicht.
 | 034 | P1 | abgeschlossen | Collapsible Action Details Panel |
 | 035 | P0 | abgeschlossen | App Identity, Help And Release Packaging |
 | 036 | P0 | abgeschlossen | Device WiFi Proximity Indicator |
-| 037 | P2 | offen | GitHub Release Update Support |
+| 037 | P2 | abgeschlossen | GitHub Release Update Support |
 | 038 | P0 | abgeschlossen | Dialog Keyboard Handling |
 | 039 | P0 | abgeschlossen | Unified List Interactions |
 | 040 | P1 | abgeschlossen | Import/Export Password Handling |
@@ -86,11 +86,10 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 037 GitHub Release Update Support
-2. 041 Dashboard Drag And Drop
-3. 024 Authenticated Import Sources Backlog
-4. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-5. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-6. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-7. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-8. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+1. 041 Dashboard Drag And Drop
+2. 024 Authenticated Import Sources Backlog
+3. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+4. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+5. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+6. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+7. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)

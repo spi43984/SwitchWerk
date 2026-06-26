@@ -4,15 +4,15 @@ Stand: 26. Juni 2026
 
 ## Aktueller Stand
 
-In Arbeit:
+Abschluss durchgeführt:
 
 - Issue 037 „GitHub Release Update Support“
 - GitHub-Issue: #144
-- Branch: `github-release-update-support`
-- Kein Commit, kein Push, kein Pull Request.
-- Lokale Issue-Datei und `docs/issues/overview.txt` sind nicht abgeschlossen.
+- Pull Request: #145
+- Feature-Branch: `github-release-update-support`
+- Merge-Commit auf `main`: `489476c1064c02217cd2a122b2097b563797c0d7`
 
-Umgesetzt:
+Umgesetzt und gemergt:
 
 - Update-Logik außerhalb Compose unter `data/update`.
 - GitHub Releases API für `spi43984/SwitchWerk`.
@@ -24,66 +24,44 @@ Umgesetzt:
 - Debug-Builds werden nicht als updatefähige Release-Version behandelt.
 - Download-Service speichert APK über app-eigenen Download-Bereich und FileProvider.
 - Android Package Installer wird nur per Benutzer-Intent geöffnet.
-- Einstellungen zeigen installierte Version, verfügbare Version, Release Notes, letzte Prüfung, Fehlerstatus und Downloadfortschritt.
+- Einstellungen zeigen installierte Version, verfügbare Version, Release Notes,
+  letzte Prüfung, Fehlerstatus und Downloadfortschritt.
 - Dashboard zeigt einen kompakten Hinweis, wenn ein Update verfügbar ist.
-- Hamburger-Menü enthält einen Eintrag `Updates`, der direkt zu
-  `Einstellungen -> System` führt. Wenn ein Update verfügbar ist, lautet der
-  Menüeintrag `Update verfügbar`.
+- Hamburger-Menü enthält `Updates` bzw. bei verfügbarem Update `Update verfügbar`
+  und führt direkt zu `Einstellungen -> System`.
 - Hilfe- und Info-Texte wurden für Deutsch und Englisch um Updates ergänzt.
-- Update-Check- und Downloadfehler werden nur im Update-Bereich angezeigt,
-  nicht zusätzlich oben im allgemeinen Einstellungs-Fehlerbereich.
-- Release-Dokumentation enthält ein korrigiertes Veröffentlichungsskript mit Asset-Name `SwitchWerk-${VERSION}.apk`.
-- Neues versioniertes Release-Skript:
-  `scripts/release-github.sh`.
-  Es fragt die Version interaktiv ab oder akzeptiert sie als Argument,
-  validiert `MAJOR.MINOR.PATCH`, prüft vorhandene Tags und GitHub-Releases,
-  prüft `keystore.properties`, verifiziert die APK mit `apksigner` und lädt das
-  Asset als `SwitchWerk-<version>.apk` hoch.
-- Unit-Tests für Versionsvergleich, Release-Auswertung, Asset-Auswahl und Cache-Logik ergänzt.
+- Release-Skript `scripts/release-github.sh` erzwingt das Asset-Format
+  `SwitchWerk-<version>.apk`.
+- Unit-Tests für Versionsvergleich, Release-Auswertung, Asset-Auswahl und
+  Cache-Logik ergänzt.
 
-## Prüfungen im Container
+## Prüfungen
 
-Erfolgreich:
+Container erfolgreich:
 
 - `./gradlew lintDebug`
 - `./gradlew testDebugUnitTest`
 - `./gradlew clean assembleDebug`
-- Nach Menü-/Hilfetext-Ergänzung zusätzlich: `./gradlew assembleDebug`
-- Nach Entfernen des doppelten Update-Fehlerhinweises zusätzlich:
-  `./gradlew testDebugUnitTest`, `./gradlew assembleDebug`
-- `git diff --check`
+- `./gradlew assembleDebug`
 - `bash -n scripts/release-github.sh`
+- `git diff --check`
 
-Keystore-Prüfung:
+Host erfolgreich laut Benutzer:
 
-- `keystore.properties` existiert.
-- Erwartete Schlüssel sind vorhanden: `storeFile`, `storePassword`,
-  `keyAlias`, `keyPassword`.
-- `keystore.properties` und Keystore-Dateiendungen werden von `.gitignore`
-  ignoriert.
-- Die in `keystore.properties` referenzierte Keystore-Datei war im Container
-  nicht erreichbar. Auf dem Ubuntu-Host muss geprüft werden, ob der Pfad dort
-  existiert.
+- `./gradlew clean assembleDebug`
+- `./gradlew installDebug`
 
-Hinweise:
+Manuell erfolgreich laut Benutzer:
 
-- `assembleDebug` meldet bestehende Deprecation-Warnungen zu
-  `EncryptedSharedPreferences` / `MasterKey`, `WindowInsetsControllerCompat`
-  und `LocalLifecycleOwner`.
-- Die maßgebliche Bestätigung für Host-Build, Installation und manuelle Tests
-  steht noch aus.
+- Release-Build-Test ohne neues GitHub-Release.
+- Hamburger-Menü `Updates` öffnet `Einstellungen -> System`.
+- Update-Fehler wird nur noch im Update-Bereich angezeigt.
 
-## Nächste Schritte
+## Nächste Session
 
-1. Auf dem Ubuntu-Host prüfen:
-   `./gradlew clean assembleDebug`
-2. Auf dem Ubuntu-Host installieren:
-   `./gradlew installDebug`
-3. Manuell prüfen:
-   - Einstellungen öffnen.
-   - System → Updates prüfen.
-   - Debug-Hinweis kontrollieren.
-   - Release-Build später mit GitHub-Release-Asset `SwitchWerk-<version>.apk`
-     gegen eine ältere installierte Version testen.
-4. Erst nach Host-Prüfung und ausdrücklicher Freigabe committen, pushen oder PR
-   erstellen.
+Nächstes offenes Issue nach `docs/issues/overview.txt`:
+
+1. Issue 041 „Dashboard Drag And Drop“
+
+Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
+GitHub-Issue schließen oder Branch löschen.
