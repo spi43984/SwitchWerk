@@ -73,7 +73,7 @@ Oder mit Versionsargument:
 Das Skript prüft `keystore.properties`, die darin referenzierte Keystore-Datei,
 das offizielle Repository `spi43984/SwitchWerk`, einen sauberen Worktree,
 vorhandene Tags und GitHub-Releases, aktualisiert `versionCode` und
-`versionName`, führt `lintRelease`, `testReleaseUnitTest` und
+`versionName`, führt `lintRelease`, `testDebugUnitTest` und
 `clean assembleRelease` aus, verifiziert die APK mit `apksigner` und lädt sie als
 `SwitchWerk-<version>.apk` hoch.
 

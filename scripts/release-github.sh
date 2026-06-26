@@ -122,7 +122,7 @@ perl -0pi -e "s/versionName = \"[^\"]+\"/versionName = \"${VERSION}\"/" app/buil
 git diff -- app/build.gradle.kts
 
 ./gradlew lintRelease
-./gradlew testReleaseUnitTest
+./gradlew testDebugUnitTest
 ./gradlew clean assembleRelease
 
 test -f "${APK_SOURCE}"
