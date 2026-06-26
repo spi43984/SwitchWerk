@@ -6,27 +6,29 @@ Stand: 26. Juni 2026
 
 Zuletzt lokal abgeschlossen:
 
-- Issue 059 „Export Config Reset Sensitive Toggles“
-- Branch: `export-config-reset-sensitive-toggles`
-- GitHub-Issue: #134
-- Der Export-Schalter **Passwörter einschließen** wird als One-Shot-Option
-  behandelt und nach Exportstart, Dateiauswahl-Abbruch, Warndialog-Abbruch oder
-  Fehlerpfad wieder deaktiviert.
-- Der Import-Schalter **Passwörter importieren** wurde als weiterer
-  sicherheitskritischer One-Shot-Schalter geprüft und nach Import oder Abbruch
-  ebenfalls zurückgesetzt.
-- Hilfe- und Info-Texte sowie `CODE_STYLE.md` und `SECURITY.md` dokumentieren
-  das One-Shot-Prinzip.
+- Issue 060 „Scrollbares Hamburger-Menü bei Platzmangel“
+- Branch: `scrollbares-hamburger-menue`
+- GitHub-Issue: #136
+- Der Inhalt des Hamburger-/Overflow-Menüs ist bei Platzmangel vertikal
+  scrollbar, ohne Menüeinträge, Texte, Icons, Navigation oder Zielseiten
+  funktional zu ändern.
+- Close-Button, Einstellungen, Hilfe, Über SwitchWerk, Version, Release-Datum
+  und Icon bleiben auch in Landscape, Portrait, auf kleinen Displays und bei
+  großer Android-Schriftgröße erreichbar.
+- Das Icon im unteren Menü-Info-Bereich und das Icon auf der Über-SwitchWerk-
+  Ansicht werden im Landscape-Modus nicht breiter als die jeweilige
+  Portrait-Basis dargestellt.
 - Container-Prüfungen erfolgreich:
   - `./gradlew lintDebug`
   - `./gradlew testDebugUnitTest`
-- Host-Build und Installation wurden vom Benutzer bestätigt:
+- Host-Build, Installation und manuelle UI-Prüfung wurden vom Benutzer
+  bestätigt:
   - `./gradlew clean assembleDebug`
   - `./gradlew installDebug`
-- `docs/issues/059-export-config-reset-sensitive-toggles.md` und
+- `docs/issues/060-scrollbares-hamburger-menue.md` und
   `docs/issues/overview.txt` sind lokal auf `abgeschlossen` gesetzt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 060
-  „Scrollbares Hamburger-Menü bei Platzmangel“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 061
+  „Import Replace Preserves Wizard State“.
 
 Zuletzt abgeschlossen:
 

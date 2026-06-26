@@ -1,11 +1,11 @@
 package de.piecha.switchwerk.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.foundation.Image
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
@@ -53,7 +54,11 @@ private fun HelpSection(titleResourceId: Int, textResourceId: Int) {
 }
 
 @Composable
-fun AboutContent(versionName: String, modifier: Modifier = Modifier) {
+fun AboutContent(
+    versionName: String,
+    modifier: Modifier = Modifier,
+    iconMaxWidth: Dp = 435.dp
+) {
     val uriHandler = LocalUriHandler.current
 
     Card(modifier = modifier.fillMaxWidth()) {
@@ -61,16 +66,17 @@ fun AboutContent(versionName: String, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
+                val iconWidth = minOf(maxWidth * 0.85f, iconMaxWidth)
+
                 Image(
                     painter = painterResource(R.drawable.ic_launcher_foreground),
                     contentDescription = stringResource(R.string.app_name),
                     modifier = Modifier
-                        .fillMaxWidth(0.85f)
-                        .widthIn(max = 435.dp)
+                        .width(iconWidth)
                         .aspectRatio(988f / 1050f),
                     contentScale = ContentScale.Fit
                 )
