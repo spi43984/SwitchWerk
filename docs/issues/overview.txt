@@ -85,7 +85,7 @@ es verändert die Priorisierungslogik nicht.
 | 061 | P0 | abgeschlossen | Import Replace Preserves Wizard State |
 | 062 | P1 | offen | Update Release Notes UI |
 | 063 | P1 | offen | Scroll-Hinweise für lange Dialogfelder |
-| 064 | P0 | offen | Input Validation For Technical Fields |
+| 064 | P0 | abgeschlossen | Input Validation For Technical Fields |
 
 ## Empfohlene Umsetzungsreihenfolge
 

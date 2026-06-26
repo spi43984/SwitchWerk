@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Security / Validation / UX
 - Bereich: Eingabeformulare / Geräte / WLAN-Profile / Import-Export
@@ -77,21 +77,21 @@ Die App soll keine beliebigen oder offensichtlich gefährlichen Eingaben ungepr�
 
 ## Akzeptanzkriterien
 
-- [ ] Ungültige IP-Adressen werden erkannt und nicht gespeichert.
-- [ ] Gültige Beispiel-IP-Adressen wie `192.0.2.10` werden akzeptiert.
-- [ ] Ungültige DNS-/Hostnamen werden erkannt und nicht gespeichert.
-- [ ] Gültige Beispiel-Hostnamen wie `device.local` und `server.domain.com` werden akzeptiert.
-- [ ] API-Pfade werden auf plausible und sichere Eingaben geprüft.
-- [ ] HTTP-Methoden werden auf erlaubte Werte begrenzt.
-- [ ] Content-Type-Werte werden auf plausible Werte geprüft.
-- [ ] Potenziell gefährliche oder unerwartete Eingaben werden nicht ungeprüft gespeichert oder ausgeführt.
-- [ ] Fehler werden direkt am betroffenen Eingabefeld verständlich angezeigt.
-- [ ] Fehlertexte sind auf Deutsch und Englisch vorhanden.
-- [ ] Bereits gespeicherte ungültige Altdaten führen nicht zu einem App-Absturz.
-- [ ] Importierte Konfigurationen umgehen die Validierung nicht.
-- [ ] Es werden keine sensiblen Daten geloggt.
-- [ ] Unit-Tests decken zentrale Validatoren ab.
-- [ ] Bestehende gültige Konfigurationen funktionieren weiterhin.
+- [x] Ungültige IP-Adressen werden erkannt und nicht gespeichert.
+- [x] Gültige Beispiel-IP-Adressen wie `192.0.2.10` werden akzeptiert.
+- [x] Ungültige DNS-/Hostnamen werden erkannt und nicht gespeichert.
+- [x] Gültige Beispiel-Hostnamen wie `device.local` und `server.domain.com` werden akzeptiert.
+- [x] API-Pfade werden auf plausible und sichere Eingaben geprüft.
+- [x] HTTP-Methoden werden auf erlaubte Werte begrenzt.
+- [x] Content-Type-Werte werden auf plausible Werte geprüft.
+- [x] Potenziell gefährliche oder unerwartete Eingaben werden nicht ungeprüft gespeichert oder ausgeführt.
+- [x] Fehler werden direkt am betroffenen Eingabefeld verständlich angezeigt.
+- [x] Fehlertexte sind auf Deutsch und Englisch vorhanden.
+- [x] Bereits gespeicherte ungültige Altdaten führen nicht zu einem App-Absturz.
+- [x] Importierte Konfigurationen umgehen die Validierung nicht.
+- [x] Es werden keine sensiblen Daten geloggt.
+- [x] Unit-Tests decken zentrale Validatoren ab.
+- [x] Bestehende gültige Konfigurationen funktionieren weiterhin.
 
 ## Testhinweise
 
