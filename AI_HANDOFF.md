@@ -18,9 +18,5 @@ Abgeschlossen:
 - Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
 - Host-Prüfungen: `./gradlew clean assembleDebug`, `./gradlew installDebug`
 
-Nächstes offenes Issue nach `docs/issues/overview.txt`:
-
-1. Issue 041 „Dashboard Drag And Drop“
-
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
 GitHub-Issue schließen oder Branch löschen.
