@@ -4,7 +4,7 @@ Stand: 26. Juni 2026
 
 ## Aktueller Stand
 
-Zuletzt lokal abgeschlossen:
+Zuletzt abgeschlossen:
 
 - Issue 061 „Import Replace Preserves Wizard State“
 - Branch: `import-replace-preserve-wizard-state`
@@ -32,12 +32,6 @@ Zuletzt lokal abgeschlossen:
 - Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 032
   „Room Schema And Migration Test Coverage“.
 
-Zuletzt abgeschlossen:
-
-- Issue 022 „Request Body And Content-Type Support“
-- GitHub-Issue: #127
-- Pull Request: #128
-- Merge-Commit: `173bfba`
 
 ## Start für nächste Codex-Session
 

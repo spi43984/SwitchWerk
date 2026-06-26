@@ -260,6 +260,11 @@ ausgegeben, damit sie direkt fehlerfrei kopiert und eingefügt werden können.
 
 ## AI-Handoff
 
+`AI_HANDOFF.md` enthält ausschließlich den aktuellen Übergabestand für die
+nächste Session. Frühere Übergabestände werden beim Aktualisieren ersetzt und
+nicht angehängt. Die Datei ist keine Historie und kein Changelog; historische
+Informationen verbleiben in Git, Pull Requests und den Issue-Dateien.
+
 Die Datei `AI_HANDOFF.md` wird immer direkt im Hauptverzeichnis des
 Repositories abgelegt und aktualisiert.
 

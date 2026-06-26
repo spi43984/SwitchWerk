@@ -87,6 +87,9 @@ Jeder aktualisierte AI_HANDOFF.md muss für die nächste Session ausdrücklich a
 AI_SESSION_PROMPT.md als wiederverwendbare Startvorlage verweisen. Der Verweis
 darf beim Ersetzen oder Kürzen des Handoffs nicht entfernt werden.
 
+AI_HANDOFF.md enthält nur den aktuellen Übergabestand. Frühere Übergabestände
+werden ersetzt und nicht als Historie oder Changelog angehängt.
+
 Nutze externe Repositories nur dann als funktionale Referenz, wenn der Auftrag
 oder AI_HANDOFF.md dies ausdrücklich verlangt. Übernimm keinen fremden Code.
 
