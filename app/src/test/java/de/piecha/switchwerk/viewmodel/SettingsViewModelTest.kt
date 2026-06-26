@@ -15,6 +15,7 @@ import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.DeviceProtocol
@@ -33,6 +34,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -163,6 +165,22 @@ class SettingsViewModelTest {
         viewModel.updateImportMode(ConfigurationImportMode.REPLACE)
 
         assertEquals(replaceSummary, viewModel.uiState.value.importSummary)
+    }
+
+    @Test
+    fun confirmedImportDoesNotChangeSetupWizardState() = runTest(dispatcher) {
+        assertSetupWizardStateAfterImport(
+            initialShowSetupWizardOnStart = false,
+            mode = ConfigurationImportMode.REPLACE
+        )
+        assertSetupWizardStateAfterImport(
+            initialShowSetupWizardOnStart = true,
+            mode = ConfigurationImportMode.REPLACE
+        )
+        assertSetupWizardStateAfterImport(
+            initialShowSetupWizardOnStart = false,
+            mode = ConfigurationImportMode.MERGE
+        )
     }
 
     @Test
@@ -503,6 +521,32 @@ class SettingsViewModelTest {
                 override fun disconnect() = Unit
             },
             stringProvider = FakeStringProvider
+        )
+    }
+
+    private suspend fun TestScope.assertSetupWizardStateAfterImport(
+        initialShowSetupWizardOnStart: Boolean,
+        mode: ConfigurationImportMode
+    ) {
+        val appSettingsRepository = FakeAppSettingsRepository(
+            initialSettings = AppSettings(
+                showSetupWizardOnStart = initialShowSetupWizardOnStart
+            )
+        )
+        val viewModel = settingsViewModel(
+            transferRepository = FakeConfigurationTransferRepository(),
+            appSettingsRepository = appSettingsRepository
+        )
+        runCurrent()
+
+        viewModel.prepareImportFromUrl("https://example.com/switchwerk.json", mode)
+        runCurrent()
+        viewModel.confirmImport(includePasswords = false)
+        runCurrent()
+
+        assertEquals(
+            initialShowSetupWizardOnStart,
+            appSettingsRepository.settings.value.showSetupWizardOnStart
         )
     }
 
