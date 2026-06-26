@@ -141,8 +141,43 @@ Für die allgemeine GitHub-Nutzung und manuelle Repository-Arbeit:
 - Diff prüfen
 - Tests ausführen
 - erst dann nach `main` mergen
+- nach dem Merge explizit prüfen, dass der PR wirklich gemergt wurde und der
+  Merge-Commit beziehungsweise Squash-Commit auf `main` angekommen ist
+- das zugehörige GitHub-Issue erst nach dieser Prüfung schließen
+
+Wenn ein Repository Merge-Commits nicht erlaubt, ist `gh pr merge --merge`
+nicht geeignet. In diesem Fall muss die im Repository erlaubte Strategie
+verwendet werden, zum Beispiel `--squash`. Ein geschlossener PR ohne
+`mergedAt` gilt nicht als abgeschlossen und darf kein Issue schließen.
 
 Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`, `ai-context.md` und `AI_SESSION_PROMPT.md`: PRs und Merge nur nach ausdrücklicher Freigabe. Status, Priorisierung und Reihenfolge der Issues stehen ausschließlich in `docs/issues/overview.txt`.
+
+## Lokale Befehlsausgaben
+
+Wenn der Assistent Befehle ausgibt, die der Benutzer lokal kopieren und
+einfügen soll, gelten diese Regeln:
+
+- keine führenden Leerzeichen vor Befehlen
+- keine Shell-Variablen in Copy-&-Paste-Befehlen
+- lange Befehle mit `\` am Zeilenende umbrechen
+- nach kritischen GitHub-Aktionen immer Prüfkommandos mit ausgeben
+
+Beispiel:
+
+```bash
+gh pr merge 123 \
+--squash \
+--delete-branch \
+--subject "Kurzer Merge-Titel" \
+--body "Kurze Merge-Beschreibung."
+gh pr view 123 \
+--json state,mergedAt,mergeCommit
+git switch main
+git pull
+git log \
+--oneline \
+-1
+```
 
 ## GitHub Actions
 
@@ -190,17 +225,34 @@ ohne bei jedem Push erneut erzeugt zu werden.
 14. Feature-Branch pushen.
 15. Pull Request erstellen.
 16. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
-17. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
-18. Lokale Issue-Datei unter `docs/issues` abhaken.
-19. `docs/issues/overview.txt` aktualisieren.
-20. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
-21. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
-22. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
-23. Dokumentationsänderungen committen und pushen.
-24. Zugehöriges GitHub-Issue erst danach schließen.
-25. Branch lokal löschen.
-26. Branch remote löschen.
-27. Remote-Referenzen bereinigen.
+17. Unmittelbar nach dem Merge prüfen, dass der PR wirklich gemergt wurde:
+
+       gh pr view <PR-NUMMER> \
+       --json state,mergedAt,mergeCommit
+
+   `state` muss `MERGED` sein und `mergedAt` darf nicht leer sein.
+18. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+19. Prüfen, dass `main` den Merge- oder Squash-Commit enthält:
+
+       git log \
+       --oneline \
+       -1
+
+20. Lokale Issue-Datei unter `docs/issues` abhaken.
+21. `docs/issues/overview.txt` aktualisieren.
+22. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
+23. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
+24. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
+25. Dokumentationsänderungen committen und pushen.
+26. Nach dem Dokumentations-Push erneut `main` prüfen:
+
+       git status \
+       -sb
+
+27. Zugehöriges GitHub-Issue erst danach schließen.
+28. Branch lokal löschen.
+29. Branch remote löschen.
+30. Remote-Referenzen bereinigen.
 
 ## Verbindliche Issue-Abschluss-Checkliste
 
@@ -213,6 +265,8 @@ Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wu
 * [ ] `AI_HANDOFF.md` aktualisiert, falls aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss
 * [ ] nächstes offenes Issue in `docs/issues/overview.txt` festgelegt
 * [ ] Status von Issue-Datei und `docs/issues/overview.txt` ist konsistent
+* [ ] Pull Request ist wirklich gemergt (`state=MERGED`, `mergedAt` gesetzt)
+* [ ] `main` enthält den Merge- oder Squash-Commit
 * [ ] GitHub-Issue geschlossen
 * [ ] Feature-Branch lokal gelöscht
 * [ ] Feature-Branch remote gelöscht
