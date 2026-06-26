@@ -24,7 +24,7 @@
     <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen und Hilfe</string>
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung, Updates und Aktionsdetails\n• Backup: Konfiguration sichern oder importieren</string>
     <string name="system_info_title">System</string>
-    <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und Release Notes anzeigen\n• Aktionsdetails ein- oder ausblenden</string>
+    <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden</string>
     <string name="backup_info">• Export speichert die lokale Konfiguration\n• Passwörter nur bewusst exportieren oder importieren\n• Passwort-Schalter gelten nur für die nächste Aktion\n• Import nur aus vertrauenswürdigen Quellen</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
@@ -55,7 +55,7 @@
     <string name="help_privacy_title">Datenschutz</string>
     <string name="help_privacy_text">• ausschließlich lokal\n• keine Konten, Cloud oder Tracking\n• WLAN- und Standortrechte nur für WLAN-Funktionen</string>
     <string name="help_updates_title">Updates</string>
-    <string name="help_updates_text">• Release-Updates werden über das offizielle GitHub-Projekt geprüft\n• automatische Prüfung höchstens einmal pro Tag\n• APK-Download und Installation starten nur nach Benutzeraktion</string>
+    <string name="help_updates_text">• Release-Updates werden über das offizielle GitHub-Projekt geprüft\n• GitHub Release Notes öffnen die Release-Seite im Browser\n• automatische Prüfung höchstens einmal pro Tag\n• APK-Download und Installation starten nur nach Benutzeraktion</string>
     <string name="setup_wizard_title">Setup Wizard</string>
     <string name="setup_wizard_return_hint">When you open a linked page from this wizard, Back returns here until you close the wizard with one of the buttons at the bottom.</string>
     <string name="setup_wizard_intro_title">Introduction</string>
@@ -83,7 +83,7 @@
     <string name="update_debug_build_hint">Debug-Builds werden nicht als updatefähige Release-Version behandelt.</string>
     <string name="update_available_hint">Eine neue Version ist verfügbar.</string>
     <string name="update_current_hint">Die installierte Version ist aktuell.</string>
-    <string name="release_notes">Release Notes</string>
+    <string name="open_github_release">GitHub Release Notes öffnen</string>
     <string name="check_for_updates">Auf Updates prüfen</string>
     <string name="update_checking">Prüft…</string>
     <string name="update_check_completed">Update-Prüfung abgeschlossen</string>
@@ -103,6 +103,7 @@
     <string name="update_error_github">GitHub konnte die Release-Daten nicht bereitstellen.</string>
     <string name="update_error_download">APK-Download fehlgeschlagen.</string>
     <string name="update_error_install">Der Android-Installationsdialog konnte nicht geöffnet werden.</string>
+    <string name="update_error_open_release">Die GitHub-Release-Seite konnte nicht geöffnet werden.</string>
     <string name="update_error_unknown">Update-Aktion fehlgeschlagen.</string>
 
     <string name="settings_tab_wifi_profiles">WLAN-Profile</string>

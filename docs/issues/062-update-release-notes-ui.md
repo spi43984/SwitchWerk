@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-* Status: Offen
+* Status: Abgeschlossen
 * Priorität: P1
 * Typ: UX / Feature
 * Bereich: Release / Updates
@@ -12,6 +12,8 @@
 Der Update-Bereich in den Einstellungen soll Release Notes platzsparender und bedienbarer darstellen.
 
 Anwender sollen die GitHub-Release-Seite über einen klaren Button öffnen können, statt einen Link aus den Release Notes kopieren oder erkennen zu müssen. Lange Release Notes sollen einklappbar sein, damit der Update-Bereich nach Download oder Installation nicht dauerhaft viel Platz belegt.
+
+Abschlussentscheidung: Release Notes werden nicht mehr direkt im Update-Bereich angezeigt. Stattdessen öffnet ein eigener Button die GitHub-Release-Seite im Browser. Dadurch entfällt der einklappbare In-App-Release-Notes-Abschnitt.
 
 ## Hintergrund
 
@@ -23,23 +25,21 @@ Ein dedizierter Button und einklappbare Release Notes verbessern die Bedienbarke
 
 ### GitHub-Release-Button
 
-* Im Update-Bereich wird ein Button `GitHub Release öffnen` angezeigt, wenn eine verfügbare Release-URL vorhanden ist.
+* Im Update-Bereich wird ein Button `GitHub Release Notes öffnen` angezeigt, wenn eine verfügbare Release-URL vorhanden ist.
 * Der Button öffnet die GitHub-Release-Seite der angezeigten verfügbaren Version.
 * Der Button verwendet die bereits vorhandene Release-URL aus dem Update-Status.
 * Es wird keine Markdown-Link-Erkennung und kein Parsing von Release-Notes-Text eingeführt.
 
-### Einklappbare Release Notes
+### Release Notes
 
-* Release Notes können ein- und ausgeklappt werden.
-* Lange Release Notes verschwenden im eingeklappten Zustand keinen Platz.
-* Der eingeklappte Zustand muss klar erkennbar und wieder umkehrbar sein.
-* Die Bedienung bleibt auch mit langen Release Notes flüssig und scrollbar.
+* Release Notes werden nicht mehr direkt im Update-Bereich angezeigt.
+* Lange Release Notes belegen in den Einstellungen keinen zusätzlichen Platz.
+* Vollständige Release Notes sind über den GitHub-Release-Button erreichbar.
 
 ### Zustand nach Download / Installation
 
-* Nach erfolgreichem Download oder nach Start des Android-Installationsdialogs werden Release Notes automatisch eingeklappt.
-* Wenn die installierte Version aktuell ist, sollen Release Notes standardmäßig platzsparend eingeklappt bleiben.
-* Eine manuelle erneute Update-Prüfung darf die Release Notes wieder sinnvoll anzeigen, wenn ein Update verfügbar ist.
+* Download- und Installationsbuttons bleiben sichtbar und werden je nach Zustand deaktiviert.
+* Wenn die installierte Version aktuell ist, bleibt der Installationsbutton sichtbar, aber deaktiviert.
 
 ### UI-Texte
 
@@ -59,29 +59,24 @@ Ein dedizierter Button und einklappbare Release Notes verbessern die Bedienbarke
 
 ## Akzeptanzkriterien
 
-* [ ] Der Update-Bereich zeigt bei vorhandener Release-URL einen Button `GitHub Release öffnen`.
-* [ ] Der Button öffnet die GitHub-Release-Seite im Browser.
-* [ ] Release Notes sind ein- und ausklappbar.
-* [ ] Eingeklappte Release Notes belegen nur wenig Platz.
-* [ ] Nach erfolgreichem Download werden Release Notes eingeklappt.
-* [ ] Nach Start des Installationsdialogs werden Release Notes eingeklappt.
-* [ ] Bei aktueller installierter Version bleiben Release Notes standardmäßig eingeklappt.
-* [ ] Lange Release Notes blockieren die Bedienung nicht.
-* [ ] Es wird kein Markdown-Link-Parser eingeführt.
-* [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
-* [ ] Deutsch und Englisch sind konsistent gepflegt.
-* [ ] Bestehende Update-Funktionen aus Issue 037 bleiben unverändert nutzbar.
+* [x] Der Update-Bereich zeigt bei vorhandener Release-URL einen Button `GitHub Release Notes öffnen`.
+* [x] Der Button öffnet die GitHub-Release-Seite im Browser.
+* [x] Release Notes werden nicht mehr redundant direkt im Update-Bereich angezeigt.
+* [x] Lange Release Notes belegen in den Einstellungen keinen zusätzlichen Platz.
+* [x] Download- und Installationsbuttons bleiben sichtbar und werden je nach Zustand deaktiviert.
+* [x] Bei aktueller installierter Version ist `Installation öffnen` deaktiviert.
+* [x] Es wird kein Markdown-Link-Parser eingeführt.
+* [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+* [x] Deutsch und Englisch sind konsistent gepflegt.
+* [x] Bestehende Update-Funktionen aus Issue 037 bleiben unverändert nutzbar.
 
 ## Testhinweise
 
 * Update verfügbar mit kurzen Release Notes.
 * Update verfügbar mit langen Release Notes.
-* Release Notes ein- und ausklappen.
-* GitHub-Release-Button öffnet die Release-Seite.
+* GitHub-Release-Notes-Button öffnet die Release-Seite.
 * Download erfolgreich.
-* Nach Download sind Release Notes eingeklappt.
 * Installation öffnen.
-* Nach Start des Installationsdialogs sind Release Notes eingeklappt.
+* Download- und Installationsbuttons sind sichtbar und je nach Zustand deaktiviert.
 * App-Version ist aktuell.
-* Manuelle Update-Prüfung nach eingeklapptem Zustand.
 * Deutsch und Englisch prüfen.
