@@ -38,11 +38,6 @@ Zuletzt abgeschlossen:
 - Pull Request: #128
 - Merge-Commit: `173bfba`
 
-## Wichtige offene Hinweise
-
-- Issue 057 „Encrypted Storage Restore Start Crash“ war laut älterem Handoff lokal abgeschlossen und vom Benutzer bestätigt, aber möglicherweise noch nicht veröffentlicht. Status bei Bedarf in GitHub und `docs/issues/overview.txt` prüfen.
-- Issue 019 „Configurable WiFi List Sorting“ war laut älterem Handoff lokal implementiert und bestätigt, aber möglicherweise noch nicht veröffentlicht. Status bei Bedarf in GitHub und `docs/issues/overview.txt` prüfen.
-
 ## Start für nächste Codex-Session
 
 1. `AGENTS.md` lesen.
