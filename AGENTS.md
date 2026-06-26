@@ -163,7 +163,8 @@ Für jede Implementierung eines bestehenden fachlichen Issues gilt zunächst:
    Startbefehl mit `gh issue create` vorgibt.
 5. Prüfen, ob bereits ein passender Feature-Branch existiert.
 6. Nur falls nach der GitHub-Prüfung noch kein passendes GitHub-Issue
-   existiert, dieses aus der lokalen Issue-Datei erzeugen.
+   existiert, wird genau ein GitHub-Issue aus der lokalen Issue-Datei erzeugt.
+   Dieser schreibende GitHub-Zugriff ist im Rahmen der Implementierung erlaubt.
 7. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
    vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
 8. Ausschließlich den vereinbarten Issue-Scope implementieren.
@@ -173,6 +174,20 @@ Für jede Implementierung eines bestehenden fachlichen Issues gilt zunächst:
 11. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
 12. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
     auf dem Host ausgeben.
+
+Erlaubter GitHub-Schreibzugriff in Phase 1:
+
+- genau ein `gh issue create`, wenn nach der vorherigen GitHub-Prüfung kein
+  passendes GitHub-Issue existiert
+
+Nicht erlaubt ohne ausdrückliche Freigabe:
+
+- Commit
+- Push
+- Pull Request
+- Merge
+- GitHub-Issue schließen
+- Branch löschen
 
 Mindestens auf dem Host zu prüfen:
 

@@ -70,18 +70,31 @@ Bei der Implementierung eines neuen fachlichen Issues:
 2. Wechsle auf main.
 3. Hole den aktuellen Stand mit git pull.
 4. Bestimme das nächste offene Issue aus docs/issues/overview.txt.
-5. Prüfe GitHub lesend, ob das zugehörige GitHub-Issue bereits existiert.
+5. Lies die passende lokale Issue-Datei unter docs/issues/...
+6. Prüfe GitHub lesend, ob das zugehörige GitHub-Issue bereits existiert.
    Diese Prüfung ist vor jedem `gh issue create` Pflicht, auch wenn der
    Benutzer einen Startbefehl mit `gh issue create` vorgibt.
-6. Prüfe, ob der Feature-Branch bereits existiert.
-7. Erzeuge nur dann ein GitHub-Issue aus der lokalen Issue-Datei, wenn noch keines existiert.
-8. Lege danach einen eigenen fachlichen Branch an oder verwende den vorhandenen Branch.
-9. Zeige den vereinbarten Issue-Scope an.
-10. Analysiere nur die betroffenen Architektur-, Package- und Pattern-Dateien.
-11. Implementiere ausschließlich den vereinbarten Issue-Scope.
-12. Prüfe Änderungen und Diff.
-13. Führe nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung aus.
-14. Aktualisiere AI_HANDOFF.md im Hauptverzeichnis.
+7. Prüfe, ob der Feature-Branch bereits existiert.
+8. Wenn kein passendes GitHub-Issue existiert, erzeuge genau ein GitHub-Issue
+   aus der lokalen Issue-Datei. Dieser eine schreibende GitHub-Zugriff ist für
+   den Implementierungsstart erlaubt.
+9. Lege danach einen eigenen fachlichen Branch an oder verwende den vorhandenen Branch.
+10. Zeige den vereinbarten Issue-Scope an.
+11. Analysiere nur die betroffenen Architektur-, Package- und Pattern-Dateien.
+12. Implementiere ausschließlich den vereinbarten Issue-Scope.
+13. Prüfe Änderungen und Diff.
+14. Führe nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung aus.
+15. Aktualisiere AI_HANDOFF.md im Hauptverzeichnis.
+
+Ohne ausdrückliche Anforderung des Benutzers bleiben weiterhin verboten:
+
+* committen
+* pushen
+* Pull Request erstellen
+* mergen
+* GitHub-Issue schließen
+* Branch löschen
+* die lokale Issue-Datei abhaken
 
 Jeder aktualisierte AI_HANDOFF.md muss für die nächste Session ausdrücklich auf
 AI_SESSION_PROMPT.md als wiederverwendbare Startvorlage verweisen. Der Verweis
