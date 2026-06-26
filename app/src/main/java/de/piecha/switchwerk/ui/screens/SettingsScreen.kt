@@ -457,6 +457,7 @@ fun SettingsScreen(
             fileReference = fileImportReference,
             isPreparing = uiState.isTransferInProgress,
             summary = uiState.importSummary,
+            errorMessage = uiState.importErrorMessage,
             mode = uiState.importMode ?: importMode,
             importPasswords = importPasswords,
             onSelectUrl = {
@@ -1310,6 +1311,7 @@ private fun ImportConfigurationDialog(
     fileReference: String,
     isPreparing: Boolean,
     summary: ConfigurationImportSummary?,
+    errorMessage: UiText?,
     mode: ConfigurationImportMode,
     importPasswords: Boolean,
     onSelectUrl: () -> Unit,
@@ -1345,7 +1347,7 @@ private fun ImportConfigurationDialog(
         onDismissRequest = onCancel,
         actionText = stringResource(R.string.import_action),
         onAction = { summary?.let(onImport) },
-        actionEnabled = summary != null && !isPreparing,
+        actionEnabled = summary != null && errorMessage == null && !isPreparing,
         scrollToBottom = summary != null
     ) {
         Text(stringResource(R.string.import_step_source), style = MaterialTheme.typography.titleSmall)
@@ -1463,6 +1465,12 @@ private fun ImportConfigurationDialog(
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 Text(stringResource(R.string.configuration_processing))
             }
+        } else if (errorMessage != null) {
+            Text(
+                text = errorMessage.asString(),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         } else if (summary == null) {
             Text(stringResource(R.string.import_select_source_hint))
         } else {

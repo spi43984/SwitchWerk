@@ -47,15 +47,21 @@ Geräte müssen mindestens folgende Informationen abbilden können:
 - Button-Beschriftung / Aktionstitel
 - HTTP-Methode
 - API-Pfad oder Ziel-URL gemäß bestehendem Gerätemodell
-- zugewiesene WLAN-Profile
+- zugewiesene WLAN-Profile über deren interne Profil-ID
 - Reihenfolge der zugewiesenen WLAN-Profile
 
 WLAN-Profile müssen mindestens folgende Informationen abbilden können:
 
+- interne Profil-ID
 - Profilname
 - SSID
 - Sicherheits-/Konfigurationsdaten gemäß bestehendem WLAN-Profilmodell
 - optional Passwort, nur wenn der Export mit Passwörtern ausdrücklich gewählt wurde
+
+Beim Merge-Import gilt eine gleiche WLAN-Profil-ID als Identität und
+überschreibt beziehungsweise aktualisiert das vorhandene lokale Profil, auch
+wenn der Profilname abweicht. Ein gleicher Profilname mit anderer Profil-ID wird
+abgelehnt.
 
 ## Nicht Bestandteil
 
