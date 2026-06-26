@@ -126,6 +126,9 @@ class DefaultConfigurationTransferRepository(
                 applyImportedPasswords(document)
             }
             applyImportedAppSettings(document)
+            if (mode == ConfigurationImportMode.REPLACE) {
+                appSettingsRepository.setShowSetupWizardOnStart(true)
+            }
         }
     }
 

@@ -29,6 +29,8 @@ interface AppSettingsRepository {
         criterion: WifiProfileSortCriterion,
         direction: WifiProfileSortDirection
     )
+
+    fun setShowSetupWizardOnStart(showSetupWizardOnStart: Boolean)
 }
 
 class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepository {
@@ -87,6 +89,15 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         )
     }
 
+    override fun setShowSetupWizardOnStart(showSetupWizardOnStart: Boolean) {
+        preferences.edit()
+            .putBoolean(KEY_SHOW_SETUP_WIZARD_ON_START, showSetupWizardOnStart)
+            .apply()
+        mutableSettings.value = mutableSettings.value.copy(
+            showSetupWizardOnStart = showSetupWizardOnStart
+        )
+    }
+
     private fun loadSettings(): AppSettings {
         return AppSettings(
             themeMode = preferences.getEnum(KEY_THEME_MODE, AppThemeMode.SYSTEM),
@@ -111,6 +122,10 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
             wifiProfileSortDirection = preferences.getEnum(
                 KEY_WIFI_PROFILE_SORT_DIRECTION,
                 WifiProfileSortDirection.ASCENDING
+            ),
+            showSetupWizardOnStart = preferences.getBoolean(
+                KEY_SHOW_SETUP_WIZARD_ON_START,
+                true
             )
         )
     }
@@ -133,5 +148,6 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         const val KEY_DASHBOARD_LAYOUT_MODE = "dashboard_layout_mode"
         const val KEY_WIFI_PROFILE_SORT_CRITERION = "wifi_profile_sort_criterion"
         const val KEY_WIFI_PROFILE_SORT_DIRECTION = "wifi_profile_sort_direction"
+        const val KEY_SHOW_SETUP_WIZARD_ON_START = "show_setup_wizard_on_start"
     }
 }
