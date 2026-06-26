@@ -84,6 +84,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun StartScreen(
     onNavigateToSettings: () -> Unit,
+    onNavigateToUpdates: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit,
     viewModel: MainViewModel = koinViewModel()
@@ -144,8 +145,10 @@ fun StartScreen(
 
     AppMenuLayout(
         onOpenSettings = onNavigateToSettings,
+        onOpenUpdates = onNavigateToUpdates,
         onOpenHelp = onNavigateToHelp,
         onOpenAbout = onNavigateToAbout,
+        isUpdateAvailable = uiState.updateSnapshot?.isUpdateAvailable == true,
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
@@ -168,6 +171,14 @@ fun StartScreen(
                     text = message.asString(),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            uiState.updateSnapshot?.takeIf { it.isUpdateAvailable }?.availableRelease?.let { release ->
+                UpdateAvailableBanner(
+                    version = release.version,
+                    onOpenSettings = onNavigateToUpdates,
+                    modifier = Modifier.padding(top = 12.dp)
                 )
             }
 
@@ -230,6 +241,34 @@ fun StartScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UpdateAvailableBanner(
+    version: String,
+    onOpenSettings: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard_update_available, version),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Button(onClick = onOpenSettings) {
+                Text(stringResource(R.string.open_settings))
             }
         }
     }

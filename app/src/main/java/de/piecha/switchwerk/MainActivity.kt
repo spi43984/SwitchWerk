@@ -265,6 +265,10 @@ private fun SwitchWerkAppContent(
             onNavigateToSettings = {
                 currentScreen = AppScreen.Settings
             },
+            onNavigateToUpdates = {
+                selectedSettingsSection = SettingsSection.SYSTEM
+                currentScreen = AppScreen.Settings
+            },
             onNavigateToHelp = {
                 helpReturnScreen = AppScreen.Dashboard
                 currentScreen = AppScreen.Help

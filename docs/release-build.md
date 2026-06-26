@@ -51,12 +51,31 @@ Die signierte APK liegt anschließend unter
 
 ## GitHub Release
 
-1. Die signierte APK auf einem Testgerät installieren und prüfen.
-2. Einen Versions-Tag aus dem freigegebenen Commit erstellen und pushen.
-3. Auf GitHub unter **Releases** einen Release zum Tag erstellen und
-   `app-release.apk` als Asset hochladen.
-4. In den Release-Notes Versionsnummer, Änderungen und den Hinweis auf die
-   Installation aus unbekannten Quellen nennen.
+Das Release-APK muss als Asset mit dem Namen `SwitchWerk-<version>.apk`
+veröffentlicht werden, zum Beispiel `SwitchWerk-0.7.0.apk`. Die Update-Funktion
+der App erkennt ausschließlich diesen Namen.
+
+Vor dem Ausführen muss der freigegebene Stand auf `main` gemergt und lokal
+prüfbar sein. Das Skript erstellt keinen Pull Request.
+
+Interaktiv:
+
+```bash
+./scripts/release-github.sh
+```
+
+Oder mit Versionsargument:
+
+```bash
+./scripts/release-github.sh 0.7.0
+```
+
+Das Skript prüft `keystore.properties`, die darin referenzierte Keystore-Datei,
+das offizielle Repository `spi43984/SwitchWerk`, einen sauberen Worktree,
+vorhandene Tags und GitHub-Releases, aktualisiert `versionCode` und
+`versionName`, führt `lintRelease`, `testReleaseUnitTest` und
+`clean assembleRelease` aus, verifiziert die APK mit `apksigner` und lädt sie als
+`SwitchWerk-<version>.apk` hoch.
 
 GitHub Release ist der vorgesehene erste Verteilungsweg. Ein Play-Store-Upload
 ist nicht Teil dieses Prozesses.

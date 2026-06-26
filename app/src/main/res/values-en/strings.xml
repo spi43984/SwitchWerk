@@ -3,6 +3,7 @@
     <string name="menu_open">Open menu</string>
     <string name="menu_close">Close menu</string>
     <string name="settings">Settings</string>
+    <string name="open_settings">Open settings</string>
     <string name="help">Help</string>
     <string name="back">Back</string>
     <string name="back_to_dashboard">Back to dashboard</string>
@@ -21,9 +22,9 @@
     <string name="show_information">Show information</string>
     <string name="dashboard_info_title">Dashboard</string>
     <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view\n• Arrows change the order\n• The X at the bottom right cancels a running action\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings and help</string>
-    <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance and action details\n• Backup: save or import configuration</string>
+    <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance, updates, and action details\n• Backup: save or import configuration</string>
     <string name="system_info_title">System</string>
-    <string name="system_info">• Choose appearance and language\n• Show or hide action details</string>
+    <string name="system_info">• Choose appearance and language\n• Check for updates and view release notes\n• Show or hide action details</string>
     <string name="backup_info">• Export saves the local configuration\n• Export or import passwords only deliberately\n• Password switches apply only to the next action\n• Import only from trusted sources</string>
     <string name="password_storage_info">Wi-Fi passwords are stored encrypted on this device. They are not sent to a cloud service and are not shown in action details.</string>
     <string name="hostname_ip_info">Enter the device\'s local address in its assigned Wi-Fi network, for example 192.168.33.1 or a hostname resolved on the local network. No internet connection is required.</string>
@@ -51,6 +52,8 @@
     <string name="help_connection_text">• The status point confirms a Wi-Fi connection, not physical Wi-Fi proximity\n• Green: Wi-Fi connection confirmed\n• Red: Android could not establish the specific Wi-Fi request\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID alone does not confirm a connection\n• The X at the bottom right cancels a running action and its Wi-Fi request\n• Android\'s system dialog cannot be closed by SwitchWerk\n• A device access point may interrupt internet access\n• HTTP errors come from the device</string>
     <string name="help_import_title">Import and export</string>
     <string name="help_import_text">• Import configurations from trusted sources only\n• Wi-Fi profiles, devices and settings can be transferred\n• Password import and export must be enabled deliberately\n• Password switches apply only to the next action and are disabled afterwards</string>
+    <string name="help_updates_title">Updates</string>
+    <string name="help_updates_text">• Release updates are checked through the official GitHub project\n• Automatic checks run at most once per day\n• APK download and installation start only after user action</string>
     <string name="help_privacy_title">Permissions and privacy</string>
     <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
 
@@ -77,6 +80,36 @@
     <string name="action_details_sort_order">Action details order</string>
     <string name="newest_first">Newest first</string>
     <string name="newest_last">Newest last</string>
+    <string name="updates">Updates</string>
+    <string name="update_available_menu">Update available</string>
+    <string name="installed_version_value">Installed version: %1$s</string>
+    <string name="available_version_value">Available version: %1$s</string>
+    <string name="available_version_none">Available version: not known yet</string>
+    <string name="update_last_checked_value">Last checked: %1$s</string>
+    <string name="update_debug_build_hint">Debug builds are not treated as updateable release versions.</string>
+    <string name="update_available_hint">A new version is available.</string>
+    <string name="update_current_hint">The installed version is current.</string>
+    <string name="release_notes">Release notes</string>
+    <string name="check_for_updates">Check for updates</string>
+    <string name="update_checking">Checking…</string>
+    <string name="update_check_completed">Update check completed</string>
+    <string name="download_update">Download APK</string>
+    <string name="install_update">Open installation</string>
+    <string name="update_download_started">Download started</string>
+    <string name="update_download_progress">Download: %1$d %%</string>
+    <string name="update_download_completed">Download completed</string>
+    <string name="update_download_failed">Download failed</string>
+    <string name="dashboard_update_available">Update %1$s available</string>
+    <string name="update_error_debug_build">Debug builds do not check for release updates.</string>
+    <string name="update_error_no_regular_release">No regular GitHub release found.</string>
+    <string name="update_error_missing_apk">The matching APK asset is missing.</string>
+    <string name="update_error_ambiguous_apk">The release contains multiple matching APK assets.</string>
+    <string name="update_error_invalid_release">The release data is invalid.</string>
+    <string name="update_error_network">Update check failed because of a network error.</string>
+    <string name="update_error_github">GitHub could not provide the release data.</string>
+    <string name="update_error_download">APK download failed.</string>
+    <string name="update_error_install">The Android installation dialog could not be opened.</string>
+    <string name="update_error_unknown">Update action failed.</string>
 
     <plurals name="devices_found">
         <item quantity="one">%1$d device found</item>

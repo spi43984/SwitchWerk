@@ -4,66 +4,86 @@ Stand: 26. Juni 2026
 
 ## Aktueller Stand
 
-Abschluss vorbereitet:
+In Arbeit:
 
-- Issue 032 „Room Schema And Migration Test Coverage“
-- GitHub-Issue: #142
-- Branch: `room-schema-migration-tests`
+- Issue 037 „GitHub Release Update Support“
+- GitHub-Issue: #144
+- Branch: `github-release-update-support`
 - Kein Commit, kein Push, kein Pull Request.
-- Lokale Issue-Datei ist auf `Abgeschlossen` gesetzt.
-- `docs/issues/overview.txt` ist auf `abgeschlossen` gesetzt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`:
-  Issue 037 „GitHub Release Update Support“.
+- Lokale Issue-Datei und `docs/issues/overview.txt` sind nicht abgeschlossen.
 
 Umgesetzt:
 
-- `app/build.gradle.kts` konfiguriert den Room-Schema-Export über KSP:
-  `room.schemaLocation = app/schemas`.
-- Aktuelle Room-Schema-Datei für Datenbankversion 8 liegt unter:
-  `app/schemas/de.piecha.switchwerk.data.local.AppDatabase/8.json`.
-- Neuer Android-Instrumentation-Test:
-  `app/src/androidTest/java/de/piecha/switchwerk/data/local/AppDatabaseMigrationTest.kt`.
-- Abgedeckt sind:
-  - Migration 2 -> 3 mit erhaltenen WLAN-Profilen, Namen aus SSID,
-    eindeutigen Namen bei gleicher SSID und Fallback für leere SSID.
-  - Migration 3 -> 4 mit erhaltenen WLAN-Profilen beim Tabellenumbau.
-  - Migration 4 -> 5 mit Default für `securityTypeVerifiedLocally`.
-  - Migration 5 -> 6 mit Default für `connectionMode`.
-  - Migration 6 -> 7 mit Default für `apiProtocol`.
-  - Migration 7 -> 8 mit Defaults für `apiRequestBody` und
-    `apiContentType`.
-  - End-to-End-Migration von Version 2 bis zur aktuellen Version 8.
+- Update-Logik außerhalb Compose unter `data/update`.
+- GitHub Releases API für `spi43984/SwitchWerk`.
+- Pre-Releases und Drafts werden ignoriert.
+- APK-Asset wird verbindlich über `SwitchWerk-<version>.apk` erkannt.
+- Versionsvergleich für semantische Versionen.
+- SharedPreferences-Cache mit letzter Prüfung und Tagesbegrenzung für automatische Checks.
+- Manuelle Prüfung in den Einstellungen umgeht die Tagesbegrenzung.
+- Debug-Builds werden nicht als updatefähige Release-Version behandelt.
+- Download-Service speichert APK über app-eigenen Download-Bereich und FileProvider.
+- Android Package Installer wird nur per Benutzer-Intent geöffnet.
+- Einstellungen zeigen installierte Version, verfügbare Version, Release Notes, letzte Prüfung, Fehlerstatus und Downloadfortschritt.
+- Dashboard zeigt einen kompakten Hinweis, wenn ein Update verfügbar ist.
+- Hamburger-Menü enthält einen Eintrag `Updates`, der direkt zu
+  `Einstellungen -> System` führt. Wenn ein Update verfügbar ist, lautet der
+  Menüeintrag `Update verfügbar`.
+- Hilfe- und Info-Texte wurden für Deutsch und Englisch um Updates ergänzt.
+- Update-Check- und Downloadfehler werden nur im Update-Bereich angezeigt,
+  nicht zusätzlich oben im allgemeinen Einstellungs-Fehlerbereich.
+- Release-Dokumentation enthält ein korrigiertes Veröffentlichungsskript mit Asset-Name `SwitchWerk-${VERSION}.apk`.
+- Neues versioniertes Release-Skript:
+  `scripts/release-github.sh`.
+  Es fragt die Version interaktiv ab oder akzeptiert sie als Argument,
+  validiert `MAJOR.MINOR.PATCH`, prüft vorhandene Tags und GitHub-Releases,
+  prüft `keystore.properties`, verifiziert die APK mit `apksigner` und lädt das
+  Asset als `SwitchWerk-<version>.apk` hoch.
+- Unit-Tests für Versionsvergleich, Release-Auswertung, Asset-Auswahl und Cache-Logik ergänzt.
 
-## Prüfungen
+## Prüfungen im Container
 
-Container erfolgreich:
+Erfolgreich:
 
-- `./gradlew :app:kspDebugKotlin`
-- `./gradlew :app:compileDebugAndroidTestKotlin`
-- `./gradlew :app:testDebugUnitTest`
-- `./gradlew :app:lintDebug`
-- `./gradlew :app:assembleDebug`
-- `git diff --check`
-
-Host erfolgreich:
-
+- `./gradlew lintDebug`
+- `./gradlew testDebugUnitTest`
 - `./gradlew clean assembleDebug`
-- `./gradlew installDebug`
-- `./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=de.piecha.switchwerk.data.local.AppDatabaseMigrationTest`
+- Nach Menü-/Hilfetext-Ergänzung zusätzlich: `./gradlew assembleDebug`
+- Nach Entfernen des doppelten Update-Fehlerhinweises zusätzlich:
+  `./gradlew testDebugUnitTest`, `./gradlew assembleDebug`
+- `git diff --check`
+- `bash -n scripts/release-github.sh`
 
-Host eingeschränkt:
+Keystore-Prüfung:
 
-- Der vollständige Lauf `./gradlew connectedDebugAndroidTest` scheitert in
-  bestehenden UI-Tests außerhalb dieses Issues:
-  `DeviceWifiProximityIndicatorTest` schlägt auf `Pixel 10 Pro XL - 16` mit
-  `NoSuchMethodException: android.hardware.input.InputManager.getInstance`
-  aus Espresso/Compose-Testinfrastruktur fehl.
+- `keystore.properties` existiert.
+- Erwartete Schlüssel sind vorhanden: `storeFile`, `storePassword`,
+  `keyAlias`, `keyPassword`.
+- `keystore.properties` und Keystore-Dateiendungen werden von `.gitignore`
+  ignoriert.
+- Die in `keystore.properties` referenzierte Keystore-Datei war im Container
+  nicht erreichbar. Auf dem Ubuntu-Host muss geprüft werden, ob der Pfad dort
+  existiert.
 
-## Start für nächste Codex-Session
+Hinweise:
 
-1. `AGENTS.md` lesen.
-2. `AI_HANDOFF.md` lesen.
-3. Für Issue-Arbeit die konkrete Datei unter `docs/issues` lesen.
-4. Aktuellen Status mit `git status --short --branch` prüfen.
-5. Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
-   GitHub-Issue schließen oder Branch löschen.
+- `assembleDebug` meldet bestehende Deprecation-Warnungen zu
+  `EncryptedSharedPreferences` / `MasterKey`, `WindowInsetsControllerCompat`
+  und `LocalLifecycleOwner`.
+- Die maßgebliche Bestätigung für Host-Build, Installation und manuelle Tests
+  steht noch aus.
+
+## Nächste Schritte
+
+1. Auf dem Ubuntu-Host prüfen:
+   `./gradlew clean assembleDebug`
+2. Auf dem Ubuntu-Host installieren:
+   `./gradlew installDebug`
+3. Manuell prüfen:
+   - Einstellungen öffnen.
+   - System → Updates prüfen.
+   - Debug-Hinweis kontrollieren.
+   - Release-Build später mit GitHub-Release-Asset `SwitchWerk-<version>.apk`
+     gegen eine ältere installierte Version testen.
+4. Erst nach Host-Prüfung und ausdrücklicher Freigabe committen, pushen oder PR
+   erstellen.

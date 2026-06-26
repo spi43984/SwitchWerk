@@ -10,6 +10,8 @@ import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
 import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiConnectionService
+import de.piecha.switchwerk.data.update.AppUpdateInstallService
+import de.piecha.switchwerk.data.update.FakeAppUpdateRepository
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
@@ -520,7 +522,13 @@ class SettingsViewModelTest {
 
                 override fun disconnect() = Unit
             },
-            stringProvider = FakeStringProvider
+            stringProvider = FakeStringProvider,
+            appUpdateRepository = FakeAppUpdateRepository(),
+            appUpdateInstallService = object : AppUpdateInstallService {
+                override fun installIntent(apkUri: Uri): Result<android.content.Intent> {
+                    return Result.failure(IllegalStateException())
+                }
+            }
         )
     }
 

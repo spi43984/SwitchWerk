@@ -10,6 +10,7 @@ import de.piecha.switchwerk.data.repository.FakeWifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiProximityIssue
 import de.piecha.switchwerk.data.network.WifiProximityService
 import de.piecha.switchwerk.data.network.WifiProximitySnapshot
+import de.piecha.switchwerk.data.update.FakeAppUpdateRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
@@ -58,7 +59,8 @@ class MainViewModelTest {
             deviceActionService = actionService,
             appSettingsRepository = FakeAppSettingsRepository(),
             wifiProfileRepository = FakeWifiProfileRepository(),
-            wifiProximityService = FixedWifiProximityService()
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
 
@@ -109,7 +111,8 @@ class MainViewModelTest {
             deviceActionService = actionService,
             appSettingsRepository = FakeAppSettingsRepository(),
             wifiProfileRepository = FakeWifiProfileRepository(),
-            wifiProximityService = FixedWifiProximityService()
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
 
@@ -144,7 +147,8 @@ class MainViewModelTest {
             deviceActionService = WaitingDeviceActionService(),
             appSettingsRepository = FakeAppSettingsRepository(),
             wifiProfileRepository = FakeWifiProfileRepository(),
-            wifiProximityService = FixedWifiProximityService()
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
 
@@ -161,7 +165,8 @@ class MainViewModelTest {
             deviceActionService = WaitingDeviceActionService(),
             appSettingsRepository = FakeAppSettingsRepository(),
             wifiProfileRepository = FakeWifiProfileRepository(),
-            wifiProximityService = FixedWifiProximityService()
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
 
@@ -287,7 +292,8 @@ class MainViewModelTest {
             wifiProfileRepository = FakeWifiProfileRepository(),
             wifiProximityService = FixedWifiProximityService(
                 WifiProximitySnapshot(visibleSsids = setOf("Shelly-Garage"))
-            )
+            ),
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
 
@@ -318,7 +324,8 @@ class MainViewModelTest {
             wifiProfileRepository = FakeWifiProfileRepository(),
             wifiProximityService = FixedWifiProximityService(
                 WifiProximitySnapshot(visibleSsids = setOf("Home-WLAN"))
-            )
+            ),
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
         viewModel.refreshWifiProximity()
@@ -354,7 +361,8 @@ class MainViewModelTest {
             deviceActionService = WaitingDeviceActionService(),
             appSettingsRepository = FakeAppSettingsRepository(),
             wifiProfileRepository = FakeWifiProfileRepository(),
-            wifiProximityService = proximityService
+            wifiProximityService = proximityService,
+            appUpdateRepository = FakeAppUpdateRepository()
         )
         runCurrent()
 

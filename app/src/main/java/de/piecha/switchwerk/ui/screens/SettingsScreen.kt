@@ -44,6 +44,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedTextField
@@ -87,6 +88,9 @@ import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.AppUpdateDownloadState
+import de.piecha.switchwerk.domain.model.AppUpdateError
+import de.piecha.switchwerk.domain.model.AppUpdateSnapshot
 import de.piecha.switchwerk.ui.components.SettingsSectionTabs
 import de.piecha.switchwerk.ui.components.InfoHint
 import de.piecha.switchwerk.ui.components.StandardActionButton
@@ -96,6 +100,8 @@ import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.asString
+import java.text.DateFormat
+import java.util.Date
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -125,6 +131,13 @@ fun SettingsScreen(
     var pendingExportIncludesPasswords by remember { mutableStateOf(false) }
     var openSwipeItemId by remember { mutableStateOf(initialUiState.openSwipeItemId) }
     var pendingImportConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    LaunchedEffect(viewModel) {
+        viewModel.installEvents.collect { intent ->
+            runCatching { context.startActivity(intent) }
+                .onFailure { viewModel.reportUpdateInstallFailed() }
+        }
+    }
 
     SideEffect {
         onUiStateChanged(
@@ -356,6 +369,15 @@ fun SettingsScreen(
                         showInfoHint = true
                     )
                     HorizontalDivider()
+                    UpdateSettingsSection(
+                        snapshot = uiState.updateSnapshot,
+                        downloadState = uiState.updateDownloadState,
+                        isChecking = uiState.isUpdateCheckInProgress,
+                        onCheckClick = viewModel::checkForUpdatesManually,
+                        onDownloadClick = viewModel::downloadUpdate,
+                        onInstallClick = viewModel::installDownloadedUpdate
+                    )
+                    HorizontalDivider()
                     ActionDetailsSettingsSection(
                         showActionDetails = uiState.appSettings.showActionDetails,
                         detailPanelHeight = uiState.appSettings.detailPanelHeight,
@@ -540,6 +562,122 @@ private fun SystemSetupWizardSection(onShowSetupWizard: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+@Composable
+private fun UpdateSettingsSection(
+    snapshot: AppUpdateSnapshot?,
+    downloadState: AppUpdateDownloadState,
+    isChecking: Boolean,
+    onCheckClick: () -> Unit,
+    onDownloadClick: () -> Unit,
+    onInstallClick: () -> Unit
+) {
+    val release = snapshot?.availableRelease
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(stringResource(R.string.updates), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.installed_version_value, snapshot?.installedVersion.orEmpty()))
+        Text(
+            text = if (release == null) {
+                stringResource(R.string.available_version_none)
+            } else {
+                stringResource(R.string.available_version_value, release.version)
+            }
+        )
+        snapshot?.lastCheckedAtMillis?.let {
+            Text(
+                stringResource(
+                    R.string.update_last_checked_value,
+                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                        .format(Date(it))
+                )
+            )
+        }
+        when {
+            snapshot?.isDebugBuild == true -> Text(stringResource(R.string.update_debug_build_hint))
+            snapshot?.isUpdateAvailable == true -> Text(stringResource(R.string.update_available_hint))
+            release != null -> Text(stringResource(R.string.update_current_hint))
+        }
+        snapshot?.error?.let { error ->
+            Text(
+                text = stringResource(error.messageResourceId()),
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        if (!release?.notes.isNullOrBlank()) {
+            Text(stringResource(R.string.release_notes), style = MaterialTheme.typography.titleSmall)
+            Text(release?.notes.orEmpty(), style = MaterialTheme.typography.bodyMedium)
+        }
+        when (downloadState) {
+            AppUpdateDownloadState.Idle -> Unit
+            AppUpdateDownloadState.Started -> {
+                Text(stringResource(R.string.update_download_started))
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            is AppUpdateDownloadState.Progress -> {
+                Text(stringResource(R.string.update_download_progress, downloadState.percent))
+                LinearProgressIndicator(
+                    progress = { downloadState.percent / 100f },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            is AppUpdateDownloadState.Completed -> {
+                Text(stringResource(R.string.update_download_completed))
+            }
+            is AppUpdateDownloadState.Failed -> {
+                Text(
+                    text = stringResource(R.string.update_download_failed),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            StandardActionButton(
+                text = if (isChecking) {
+                    stringResource(R.string.update_checking)
+                } else {
+                    stringResource(R.string.check_for_updates)
+                },
+                onClick = onCheckClick,
+                enabled = !isChecking,
+                modifier = Modifier.weight(1f)
+            )
+            if (snapshot?.isUpdateAvailable == true) {
+                StandardActionButton(
+                    text = stringResource(R.string.download_update),
+                    onClick = onDownloadClick,
+                    enabled = downloadState !is AppUpdateDownloadState.Started &&
+                        downloadState !is AppUpdateDownloadState.Progress,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        if (downloadState is AppUpdateDownloadState.Completed || snapshot?.downloadedApkUri != null) {
+            StandardActionButton(
+                text = stringResource(R.string.install_update),
+                onClick = onInstallClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+private fun AppUpdateError.messageResourceId(): Int = when (this) {
+    AppUpdateError.DebugBuild -> R.string.update_error_debug_build
+    AppUpdateError.NoRegularRelease -> R.string.update_error_no_regular_release
+    AppUpdateError.MissingApkAsset -> R.string.update_error_missing_apk
+    AppUpdateError.AmbiguousApkAsset -> R.string.update_error_ambiguous_apk
+    AppUpdateError.InvalidReleaseData -> R.string.update_error_invalid_release
+    AppUpdateError.Network -> R.string.update_error_network
+    AppUpdateError.GitHub -> R.string.update_error_github
+    AppUpdateError.Download -> R.string.update_error_download
+    AppUpdateError.Install -> R.string.update_error_install
 }
 
 data class SettingsScreenUiState(

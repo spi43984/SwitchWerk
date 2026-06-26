@@ -27,6 +27,18 @@ import de.piecha.switchwerk.data.security.EncryptedWifiCredentialStore
 import de.piecha.switchwerk.data.security.WifiCredentialStore
 import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
 import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
+import de.piecha.switchwerk.data.update.AndroidAppUpdateDownloadService
+import de.piecha.switchwerk.data.update.AndroidAppUpdateInstallService
+import de.piecha.switchwerk.data.update.AppUpdateCacheRepository
+import de.piecha.switchwerk.data.update.AppUpdateDownloadService
+import de.piecha.switchwerk.data.update.AppUpdateInstallService
+import de.piecha.switchwerk.data.update.AppUpdateRepository
+import de.piecha.switchwerk.data.update.DefaultAppUpdateRepository
+import de.piecha.switchwerk.data.update.GitHubReleaseEvaluator
+import de.piecha.switchwerk.data.update.GitHubReleaseService
+import de.piecha.switchwerk.data.update.OkHttpGitHubReleaseService
+import de.piecha.switchwerk.data.update.SharedPreferencesAppUpdateCacheRepository
+import de.piecha.switchwerk.BuildConfig
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import de.piecha.switchwerk.ui.AndroidStringProvider
@@ -106,6 +118,38 @@ val appModule = module {
         )
     }
 
+    single<GitHubReleaseService> {
+        OkHttpGitHubReleaseService(client = get())
+    }
+
+    single { GitHubReleaseEvaluator() }
+
+    single<AppUpdateCacheRepository> {
+        SharedPreferencesAppUpdateCacheRepository(androidContext())
+    }
+
+    single<AppUpdateDownloadService> {
+        AndroidAppUpdateDownloadService(
+            context = androidContext(),
+            client = get()
+        )
+    }
+
+    single<AppUpdateInstallService> {
+        AndroidAppUpdateInstallService(androidContext())
+    }
+
+    single<AppUpdateRepository> {
+        DefaultAppUpdateRepository(
+            releaseService = get(),
+            releaseEvaluator = get(),
+            cacheRepository = get(),
+            downloadService = get(),
+            installedVersion = BuildConfig.VERSION_NAME,
+            isDebugBuild = BuildConfig.DEBUG
+        )
+    }
+
     single<DeviceRepository> {
         RoomDeviceRepository(
             deviceDao = get(),
@@ -156,7 +200,8 @@ val appModule = module {
             deviceActionService = get(),
             appSettingsRepository = get(),
             wifiProfileRepository = get(),
-            wifiProximityService = get()
+            wifiProximityService = get(),
+            appUpdateRepository = get()
         )
     }
 
@@ -167,7 +212,9 @@ val appModule = module {
             configurationTransferRepository = get(),
             appSettingsRepository = get(),
             wifiConnectionService = get(),
-            stringProvider = get()
+            stringProvider = get(),
+            appUpdateRepository = get(),
+            appUpdateInstallService = get()
         )
     }
 }
