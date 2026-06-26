@@ -85,6 +85,40 @@ require_official_repository() {
   fi
 }
 
+prepare_release_notes() {
+  local previous_tag="$1"
+  local target_tag="$2"
+  local notes_file
+  local editor_command
+  local editor_args
+
+  notes_file="$(mktemp "/tmp/switchwerk-release-${VERSION}.XXXXXX.md")"
+  RELEASE_NOTES_FILE="${notes_file}"
+
+  cat > "${notes_file}" <<EOF
+## Änderungen
+
+- ...
+
+**Vollständiges Changelog:** https://github.com/${OFFICIAL_REPOSITORY}/compare/${previous_tag}...${target_tag}
+EOF
+
+  editor_command="${VISUAL:-${EDITOR:-vi}}"
+  read -r -a editor_args <<< "${editor_command}"
+  "${editor_args[@]}" "${notes_file}"
+
+  if grep -Fxq -- "- ..." "${notes_file}"; then
+    echo "Fehler: Release Notes enthalten noch den Platzhalter '- ...'."
+    echo "Datei: ${notes_file}"
+    exit 1
+  fi
+
+  if [[ ! -s "${notes_file}" ]]; then
+    echo "Fehler: Release Notes sind leer."
+    exit 1
+  fi
+}
+
 require_command git
 require_command gh
 require_command perl
@@ -99,6 +133,7 @@ TAG="v${VERSION}"
 APK_SOURCE="app/build/outputs/apk/release/app-release.apk"
 APK_NAME="SwitchWerk-${VERSION}.apk"
 APK_UPLOAD_PATH="app/build/outputs/apk/release/${APK_NAME}"
+RELEASE_NOTES_FILE=""
 
 git status
 git switch main
@@ -114,6 +149,21 @@ fi
 
 if gh release view "${TAG}" --repo "${OFFICIAL_REPOSITORY}" >/dev/null 2>&1; then
   echo "Fehler: Release ${TAG} existiert bereits."
+  exit 1
+fi
+
+PREVIOUS_TAG="$(
+  gh release list \
+    --repo "${OFFICIAL_REPOSITORY}" \
+    --exclude-drafts \
+    --exclude-pre-releases \
+    --limit 1 \
+    --json tagName \
+    --jq '.[0].tagName'
+)"
+
+if [[ -z "${PREVIOUS_TAG}" ]]; then
+  echo "Fehler: Es wurde kein vorheriges reguläres Release gefunden."
   exit 1
 fi
 
@@ -142,6 +192,7 @@ else
 fi
 
 require_clean_worktree
+prepare_release_notes "${PREVIOUS_TAG}" "${TAG}"
 
 git tag -a "${TAG}" -m "Release ${VERSION}"
 git push origin "${TAG}"
@@ -150,6 +201,6 @@ gh release create "${TAG}" \
   "${APK_UPLOAD_PATH}" \
   --repo "${OFFICIAL_REPOSITORY}" \
   --title "SwitchWerk ${VERSION}" \
-  --generate-notes
+  --notes-file "${RELEASE_NOTES_FILE}"
 
 gh release view "${TAG}" --repo "${OFFICIAL_REPOSITORY}" --web
