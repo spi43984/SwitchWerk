@@ -7,6 +7,8 @@ local.properties
 keystore.properties
 *.jks
 *.keystore
+*.p12
+*.pfx
 
 # Log/OS Files
 *.log
