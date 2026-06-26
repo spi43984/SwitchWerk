@@ -50,8 +50,10 @@ private val MenuFooterIconMaxWidth = 188.dp
 @Composable
 fun AppMenuLayout(
     onOpenSettings: () -> Unit,
+    onOpenUpdates: () -> Unit,
     onOpenHelp: () -> Unit,
     onOpenAbout: () -> Unit,
+    isUpdateAvailable: Boolean = false,
     modifier: Modifier = Modifier,
     rightEdgeExtension: Dp = 0.dp,
     content: @Composable (openMenu: () -> Unit) -> Unit
@@ -108,6 +110,17 @@ fun AppMenuLayout(
                                     onClick = {
                                         isExpanded = false
                                         onOpenSettings()
+                                    }
+                                )
+                                MenuItem(
+                                    text = if (isUpdateAvailable) {
+                                        stringResource(R.string.update_available_menu)
+                                    } else {
+                                        stringResource(R.string.updates)
+                                    },
+                                    onClick = {
+                                        isExpanded = false
+                                        onOpenUpdates()
                                     }
                                 )
                                 MenuItem(

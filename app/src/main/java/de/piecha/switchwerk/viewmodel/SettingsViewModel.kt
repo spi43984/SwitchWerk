@@ -1,5 +1,6 @@
 package de.piecha.switchwerk.viewmodel
 
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,10 +14,16 @@ import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiConnectionService
+import de.piecha.switchwerk.data.update.AppUpdateInstallService
+import de.piecha.switchwerk.data.update.AppUpdateRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.AppUpdateCheckResult
+import de.piecha.switchwerk.domain.model.AppUpdateDownloadState
+import de.piecha.switchwerk.domain.model.AppUpdateError
+import de.piecha.switchwerk.domain.model.AppUpdateSnapshot
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.Device
@@ -32,8 +39,11 @@ import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
 import java.net.URI
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -86,7 +96,10 @@ data class SettingsUiState(
     val isTransferInProgress: Boolean = false,
     val importSummary: ConfigurationImportSummary? = null,
     val importMode: ConfigurationImportMode? = null,
-    val appSettings: AppSettings = AppSettings()
+    val appSettings: AppSettings = AppSettings(),
+    val updateSnapshot: AppUpdateSnapshot? = null,
+    val updateDownloadState: AppUpdateDownloadState = AppUpdateDownloadState.Idle,
+    val isUpdateCheckInProgress: Boolean = false
 )
 
 class SettingsViewModel(
@@ -95,19 +108,24 @@ class SettingsViewModel(
     private val configurationTransferRepository: ConfigurationTransferRepository,
     private val appSettingsRepository: AppSettingsRepository,
     private val wifiConnectionService: WifiConnectionService,
-    private val stringProvider: StringProvider
+    private val stringProvider: StringProvider,
+    private val appUpdateRepository: AppUpdateRepository,
+    private val appUpdateInstallService: AppUpdateInstallService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         SettingsUiState(appSettings = appSettingsRepository.settings.value)
     )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private val _installEvents = MutableSharedFlow<Intent>()
+    val installEvents: SharedFlow<Intent> = _installEvents.asSharedFlow()
     private var pendingImport: PreparedConfigurationImport? = null
 
     init {
         observeWifiProfiles()
         observeDevices()
         observeAppSettings()
+        loadCachedUpdateState()
     }
 
     fun setThemeMode(themeMode: AppThemeMode) {
@@ -139,6 +157,86 @@ class SettingsViewModel(
 
     fun showSetupWizardAgain() {
         appSettingsRepository.setShowSetupWizardOnStart(true)
+    }
+
+    fun checkForUpdatesManually() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isUpdateCheckInProgress = true,
+                errorMessage = null,
+                statusMessage = null
+            )
+            when (val result = appUpdateRepository.checkForUpdates(force = true)) {
+                is AppUpdateCheckResult.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        updateSnapshot = result.snapshot,
+                        isUpdateCheckInProgress = false,
+                        statusMessage = uiText(R.string.update_check_completed)
+                    )
+                }
+                is AppUpdateCheckResult.Error -> {
+                    _uiState.value = _uiState.value.copy(
+                        updateSnapshot = result.snapshot,
+                        isUpdateCheckInProgress = false,
+                        errorMessage = null
+                    )
+                }
+            }
+        }
+    }
+
+    fun downloadUpdate() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                updateDownloadState = AppUpdateDownloadState.Started,
+                errorMessage = null,
+                statusMessage = uiText(R.string.update_download_started)
+            )
+            val result = appUpdateRepository.downloadUpdate { progress ->
+                _uiState.value = _uiState.value.copy(updateDownloadState = progress)
+            }
+            _uiState.value = when (result) {
+                is AppUpdateDownloadState.Completed -> _uiState.value.copy(
+                    updateSnapshot = appUpdateRepository.cachedUpdate(),
+                    updateDownloadState = result,
+                    statusMessage = uiText(R.string.update_download_completed),
+                    errorMessage = null
+                )
+                is AppUpdateDownloadState.Failed -> _uiState.value.copy(
+                    updateSnapshot = appUpdateRepository.cachedUpdate(),
+                    updateDownloadState = result,
+                    statusMessage = null,
+                    errorMessage = null
+                )
+                else -> _uiState.value.copy(updateDownloadState = result)
+            }
+        }
+    }
+
+    fun installDownloadedUpdate() {
+        val uri = when (val state = _uiState.value.updateDownloadState) {
+            is AppUpdateDownloadState.Completed -> state.apkUri
+            else -> _uiState.value.updateSnapshot?.downloadedApkUri
+        } ?: run {
+            _uiState.value = _uiState.value.copy(errorMessage = AppUpdateError.Install.toUpdateUiText())
+            return
+        }
+
+        viewModelScope.launch {
+            appUpdateInstallService.installIntent(uri)
+                .onSuccess { intent -> _installEvents.emit(intent) }
+                .onFailure {
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = AppUpdateError.Install.toUpdateUiText()
+                    )
+                }
+        }
+    }
+
+    fun reportUpdateInstallFailed() {
+        _uiState.value = _uiState.value.copy(
+            errorMessage = AppUpdateError.Install.toUpdateUiText()
+        )
     }
 
     fun startNewWifiProfile() {
@@ -898,6 +996,25 @@ class SettingsViewModel(
                 )
             }
         }
+    }
+
+    private fun loadCachedUpdateState() {
+        _uiState.value = _uiState.value.copy(
+            updateSnapshot = appUpdateRepository.cachedUpdate()
+        )
+    }
+
+    private fun AppUpdateError?.toUpdateUiText(): UiText = when (this) {
+        AppUpdateError.DebugBuild -> uiText(R.string.update_error_debug_build)
+        AppUpdateError.NoRegularRelease -> uiText(R.string.update_error_no_regular_release)
+        AppUpdateError.MissingApkAsset -> uiText(R.string.update_error_missing_apk)
+        AppUpdateError.AmbiguousApkAsset -> uiText(R.string.update_error_ambiguous_apk)
+        AppUpdateError.InvalidReleaseData -> uiText(R.string.update_error_invalid_release)
+        AppUpdateError.Network -> uiText(R.string.update_error_network)
+        AppUpdateError.GitHub -> uiText(R.string.update_error_github)
+        AppUpdateError.Download -> uiText(R.string.update_error_download)
+        AppUpdateError.Install -> uiText(R.string.update_error_install)
+        null -> uiText(R.string.update_error_unknown)
     }
 
     private fun sortWifiProfiles(

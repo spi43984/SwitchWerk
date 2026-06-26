@@ -14,8 +14,11 @@ import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiProximityIssue
 import de.piecha.switchwerk.data.network.WifiProximityService
 import de.piecha.switchwerk.data.network.WifiProximitySnapshot
+import de.piecha.switchwerk.data.update.AppUpdateRepository
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
+import de.piecha.switchwerk.domain.model.AppUpdateCheckResult
+import de.piecha.switchwerk.domain.model.AppUpdateSnapshot
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
@@ -73,7 +76,8 @@ data class MainUiState(
     val deviceActionStates: Map<String, DeviceActionUiState> = emptyMap(),
     val wifiProximityStatuses: Map<String, DeviceWifiProximityStatus> = emptyMap(),
     val appSettings: AppSettings = AppSettings(),
-    val diagnosticItems: List<DiagnosticListItem> = emptyList()
+    val diagnosticItems: List<DiagnosticListItem> = emptyList(),
+    val updateSnapshot: AppUpdateSnapshot? = null
 )
 
 class MainViewModel(
@@ -81,7 +85,8 @@ class MainViewModel(
     private val deviceActionService: DeviceActionService,
     private val appSettingsRepository: AppSettingsRepository,
     private val wifiProfileRepository: WifiProfileRepository,
-    private val wifiProximityService: WifiProximityService
+    private val wifiProximityService: WifiProximityService,
+    private val appUpdateRepository: AppUpdateRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -105,6 +110,7 @@ class MainViewModel(
         observeDevices()
         observeAppSettings()
         observeWifiProfiles()
+        checkForUpdatesAutomatically()
     }
 
     private fun observeDevices() {
@@ -329,6 +335,20 @@ class MainViewModel(
             wifiProfileRepository.observeWifiProfiles().collect { profiles ->
                 wifiProfiles = profiles
                 updateWifiProximityState()
+            }
+        }
+    }
+
+    private fun checkForUpdatesAutomatically() {
+        _uiState.value = _uiState.value.copy(updateSnapshot = appUpdateRepository.cachedUpdate())
+        viewModelScope.launch {
+            when (val result = appUpdateRepository.checkForUpdates(force = false)) {
+                is AppUpdateCheckResult.Success -> {
+                    _uiState.value = _uiState.value.copy(updateSnapshot = result.snapshot)
+                }
+                is AppUpdateCheckResult.Error -> {
+                    _uiState.value = _uiState.value.copy(updateSnapshot = result.snapshot)
+                }
             }
         }
     }
