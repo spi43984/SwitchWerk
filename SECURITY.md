@@ -12,6 +12,10 @@ Die App steuert lokale Geräte im Heimnetz. Deshalb muss sie verhindern, dass ve
 - Keine unnötigen Berechtigungen.
 - Keine sensiblen Daten im Log.
 - Keine Passwörter oder Tokens im Quellcode.
+- Sicherheitskritische One-Shot-Optionen, z. B. Schalter zum Einschließen oder
+  Übernehmen von Passwörtern, gelten nur für die unmittelbar folgende Aktion und
+  werden nach Abschluss, Abbruch oder Fehler automatisch auf den sicheren
+  Default zurückgesetzt.
 
 ## Netzwerk
 

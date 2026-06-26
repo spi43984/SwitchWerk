@@ -80,19 +80,18 @@ es verändert die Priorisierungslogik nicht.
 | 056 | P0 | abgeschlossen | Keyboard Options For Technical Device Inputs |
 | 057 | P0 | abgeschlossen | Encrypted Storage Restore Start Crash |
 | 058 | P0 | abgeschlossen | Setup Wizard / Einrichtungs-Assistent |
-| 059 | P0 | offen | Export Config Reset Sensitive Toggles |
+| 059 | P0 | abgeschlossen | Export Config Reset Sensitive Toggles |
 | 060 | P0 | offen | Scrollbares Hamburger-Menü bei Platzmangel |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 059 Export Config Reset Sensitive Toggles
-2. 060 Scrollbares Hamburger-Menü bei Platzmangel
-3. 032 Room Schema And Migration Test Coverage
-4. 037 GitHub Release Update Support
-5. 041 Dashboard Drag And Drop
-6. 024 Authenticated Import Sources Backlog
-7. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-8. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-9. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-10. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-11. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+1. 060 Scrollbares Hamburger-Menü bei Platzmangel
+2. 032 Room Schema And Migration Test Coverage
+3. 037 GitHub Release Update Support
+4. 041 Dashboard Drag And Drop
+5. 024 Authenticated Import Sources Backlog
+6. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+7. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+8. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+9. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+10. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)

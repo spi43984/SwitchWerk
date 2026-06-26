@@ -24,7 +24,7 @@
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung und Aktionsdetails\n• Backup: Konfiguration sichern oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Aktionsdetails ein- oder ausblenden</string>
-    <string name="backup_info">• Export speichert die lokale Konfiguration\n• Passwörter nur bewusst exportieren\n• Import nur aus vertrauenswürdigen Quellen</string>
+    <string name="backup_info">• Export speichert die lokale Konfiguration\n• Passwörter nur bewusst exportieren oder importieren\n• Passwort-Schalter gelten nur für die nächste Aktion\n• Import nur aus vertrauenswürdigen Quellen</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
     <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /relay/0?turn=on</string>
@@ -49,8 +49,8 @@
     <string name="help_getting_started_text">• WLAN-Profil anlegen\n• Gerät mit Adresse und API-Aufruf hinzufügen\n• Aktion starten</string>
     <string name="help_connection_title">Verbindung</string>
     <string name="help_connection_text">• Der Statuspunkt bestätigt eine WLAN-Verbindung, nicht die physische WLAN-Nähe\n• Grün: WLAN-Verbindung bestätigt\n• Rot: Android konnte die konkrete WLAN-Anfrage nicht verbinden\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID allein bestätigt keine Verbindung\n• X rechts unten bricht eine laufende Aktion und ihre WLAN-Anfrage ab\n• Androids Systemdialog kann nicht durch SwitchWerk beendet werden\n• Geräte-AP kann Internetzugang unterbrechen\n• HTTP-Fehler kommen vom Gerät</string>
-    <string name="help_import_title">Import</string>
-    <string name="help_import_text">• Import prepared configurations from trusted sources only\n• Wi-Fi profiles, devices and settings can be transferred\n• Password import must be enabled explicitly</string>
+    <string name="help_import_title">Import und Export</string>
+    <string name="help_import_text">• Konfigurationen nur aus vertrauenswürdigen Quellen importieren\n• WLAN-Profile, Geräte und Einstellungen können übernommen werden\n• Passwortimport und Passwortexport müssen bewusst aktiviert werden\n• Passwort-Schalter gelten nur für die nächste Aktion und werden danach deaktiviert</string>
     <string name="help_privacy_title">Datenschutz</string>
     <string name="help_privacy_text">• ausschließlich lokal\n• keine Konten, Cloud oder Tracking\n• WLAN- und Standortrechte nur für WLAN-Funktionen</string>
     <string name="setup_wizard_title">Setup Wizard</string>

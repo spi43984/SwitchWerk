@@ -6,30 +6,27 @@ Stand: 26. Juni 2026
 
 Zuletzt lokal abgeschlossen:
 
-- Issue 058 „Setup Wizard / Einrichtungs-Assistent“
-- Branch: `setup-wizard`
-- GitHub-Issue: #131
-- Setup-Wizard wird beim ersten Start angezeigt und über `AppSettings` /
-  `AppSettingsRepository` persistent gesteuert.
-- **Überspringen** schließt den Wizard nur für die laufende Sitzung.
-- **Nicht mehr anzeigen** deaktiviert die automatische Anzeige dauerhaft.
-- Replace-Import einer Konfiguration aktiviert die Wizard-Anzeige erneut.
-- Verlinkte Wizard-Ziele öffnen Backup, WLAN-Profile, Geräte oder Dashboard;
-  Zurück führt wieder zum Wizard, bis er über die unteren Buttons geschlossen wird.
-- Die Wizard-Scrollposition wird beim Öffnen verlinkter Seiten wiederhergestellt.
-- **Einrichtungs-Assistent erneut anzeigen** ist unter
-  **Einstellungen → System** und in **Hilfe** verfügbar.
-- Hilfe ist scrollbar.
+- Issue 059 „Export Config Reset Sensitive Toggles“
+- Branch: `export-config-reset-sensitive-toggles`
+- GitHub-Issue: #134
+- Der Export-Schalter **Passwörter einschließen** wird als One-Shot-Option
+  behandelt und nach Exportstart, Dateiauswahl-Abbruch, Warndialog-Abbruch oder
+  Fehlerpfad wieder deaktiviert.
+- Der Import-Schalter **Passwörter importieren** wurde als weiterer
+  sicherheitskritischer One-Shot-Schalter geprüft und nach Import oder Abbruch
+  ebenfalls zurückgesetzt.
+- Hilfe- und Info-Texte sowie `CODE_STYLE.md` und `SECURITY.md` dokumentieren
+  das One-Shot-Prinzip.
 - Container-Prüfungen erfolgreich:
   - `./gradlew lintDebug`
   - `./gradlew testDebugUnitTest`
-- Host-Build und Installation müssen noch vom Benutzer bestätigt werden:
+- Host-Build und Installation wurden vom Benutzer bestätigt:
   - `./gradlew clean assembleDebug`
   - `./gradlew installDebug`
-- `docs/issues/058-setup-wizard.md` und `docs/issues/overview.txt` sind lokal
-  auf `abgeschlossen` gesetzt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 059
-  „Export Config Reset Sensitive Toggles“.
+- `docs/issues/059-export-config-reset-sensitive-toggles.md` und
+  `docs/issues/overview.txt` sind lokal auf `abgeschlossen` gesetzt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 060
+  „Scrollbares Hamburger-Menü bei Platzmangel“.
 
 Zuletzt abgeschlossen:
 
