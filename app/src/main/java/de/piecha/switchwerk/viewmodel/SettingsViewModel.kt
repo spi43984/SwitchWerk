@@ -137,6 +137,10 @@ class SettingsViewModel(
         appSettingsRepository.setWifiProfileSorting(criterion, direction)
     }
 
+    fun showSetupWizardAgain() {
+        appSettingsRepository.setShowSetupWizardOnStart(true)
+    }
+
     fun startNewWifiProfile() {
         _uiState.value = _uiState.value.copy(
             form = WifiProfileFormState(isPasswordChanged = true),

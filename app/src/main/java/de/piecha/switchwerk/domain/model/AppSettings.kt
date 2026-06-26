@@ -41,5 +41,6 @@ data class AppSettings(
     val diagnosticsNewestFirst: Boolean = true,
     val dashboardLayoutMode: DashboardLayoutMode = DashboardLayoutMode.LIST,
     val wifiProfileSortCriterion: WifiProfileSortCriterion = WifiProfileSortCriterion.PROFILE_NAME,
-    val wifiProfileSortDirection: WifiProfileSortDirection = WifiProfileSortDirection.ASCENDING
+    val wifiProfileSortDirection: WifiProfileSortDirection = WifiProfileSortDirection.ASCENDING,
+    val showSetupWizardOnStart: Boolean = true
 )
