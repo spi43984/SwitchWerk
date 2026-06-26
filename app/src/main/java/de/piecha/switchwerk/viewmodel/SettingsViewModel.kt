@@ -119,6 +119,8 @@ class SettingsViewModel(
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
     private val _installEvents = MutableSharedFlow<Intent>()
     val installEvents: SharedFlow<Intent> = _installEvents.asSharedFlow()
+    private val _releasePageEvents = MutableSharedFlow<Intent>()
+    val releasePageEvents: SharedFlow<Intent> = _releasePageEvents.asSharedFlow()
     private var pendingImport: PreparedConfigurationImport? = null
 
     init {
@@ -233,9 +235,29 @@ class SettingsViewModel(
         }
     }
 
+    fun openAvailableReleasePage() {
+        val htmlUrl = _uiState.value.updateSnapshot
+            ?.availableRelease
+            ?.htmlUrl
+            ?.takeIf { it.isNotBlank() } ?: return
+
+        viewModelScope.launch {
+            _releasePageEvents.emit(
+                Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl))
+                    .addCategory(Intent.CATEGORY_BROWSABLE)
+            )
+        }
+    }
+
     fun reportUpdateInstallFailed() {
         _uiState.value = _uiState.value.copy(
             errorMessage = AppUpdateError.Install.toUpdateUiText()
+        )
+    }
+
+    fun reportReleasePageOpenFailed() {
+        _uiState.value = _uiState.value.copy(
+            errorMessage = uiText(R.string.update_error_open_release)
         )
     }
 

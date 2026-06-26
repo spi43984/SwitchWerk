@@ -139,6 +139,13 @@ fun SettingsScreen(
         }
     }
 
+    LaunchedEffect(viewModel) {
+        viewModel.releasePageEvents.collect { intent ->
+            runCatching { context.startActivity(intent) }
+                .onFailure { viewModel.reportReleasePageOpenFailed() }
+        }
+    }
+
     SideEffect {
         onUiStateChanged(
             SettingsScreenUiState(
@@ -375,7 +382,8 @@ fun SettingsScreen(
                         isChecking = uiState.isUpdateCheckInProgress,
                         onCheckClick = viewModel::checkForUpdatesManually,
                         onDownloadClick = viewModel::downloadUpdate,
-                        onInstallClick = viewModel::installDownloadedUpdate
+                        onInstallClick = viewModel::installDownloadedUpdate,
+                        onOpenReleasePageClick = viewModel::openAvailableReleasePage
                     )
                     HorizontalDivider()
                     ActionDetailsSettingsSection(
@@ -571,7 +579,8 @@ private fun UpdateSettingsSection(
     isChecking: Boolean,
     onCheckClick: () -> Unit,
     onDownloadClick: () -> Unit,
-    onInstallClick: () -> Unit
+    onInstallClick: () -> Unit,
+    onOpenReleasePageClick: () -> Unit
 ) {
     val release = snapshot?.availableRelease
     Column(
@@ -607,10 +616,6 @@ private fun UpdateSettingsSection(
                 color = MaterialTheme.colorScheme.error
             )
         }
-        if (!release?.notes.isNullOrBlank()) {
-            Text(stringResource(R.string.release_notes), style = MaterialTheme.typography.titleSmall)
-            Text(release?.notes.orEmpty(), style = MaterialTheme.typography.bodyMedium)
-        }
         when (downloadState) {
             AppUpdateDownloadState.Idle -> Unit
             AppUpdateDownloadState.Started -> {
@@ -634,35 +639,41 @@ private fun UpdateSettingsSection(
                 )
             }
         }
+        StandardActionButton(
+            text = if (isChecking) {
+                stringResource(R.string.update_checking)
+            } else {
+                stringResource(R.string.check_for_updates)
+            },
+            onClick = onCheckClick,
+            enabled = !isChecking,
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (!release?.htmlUrl.isNullOrBlank()) {
+            StandardActionButton(
+                text = stringResource(R.string.open_github_release),
+                onClick = onOpenReleasePageClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             StandardActionButton(
-                text = if (isChecking) {
-                    stringResource(R.string.update_checking)
-                } else {
-                    stringResource(R.string.check_for_updates)
-                },
-                onClick = onCheckClick,
-                enabled = !isChecking,
+                text = stringResource(R.string.download_update),
+                onClick = onDownloadClick,
+                enabled = snapshot?.isUpdateAvailable == true &&
+                    downloadState !is AppUpdateDownloadState.Started &&
+                    downloadState !is AppUpdateDownloadState.Progress,
                 modifier = Modifier.weight(1f)
             )
-            if (snapshot?.isUpdateAvailable == true) {
-                StandardActionButton(
-                    text = stringResource(R.string.download_update),
-                    onClick = onDownloadClick,
-                    enabled = downloadState !is AppUpdateDownloadState.Started &&
-                        downloadState !is AppUpdateDownloadState.Progress,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-        if (downloadState is AppUpdateDownloadState.Completed || snapshot?.downloadedApkUri != null) {
             StandardActionButton(
                 text = stringResource(R.string.install_update),
                 onClick = onInstallClick,
-                modifier = Modifier.fillMaxWidth()
+                enabled = snapshot?.isUpdateAvailable == true &&
+                    (downloadState is AppUpdateDownloadState.Completed || snapshot.downloadedApkUri != null),
+                modifier = Modifier.weight(1f)
             )
         }
     }

@@ -83,19 +83,18 @@ es verändert die Priorisierungslogik nicht.
 | 059 | P0 | abgeschlossen | Export Config Reset Sensitive Toggles |
 | 060 | P0 | abgeschlossen | Scrollbares Hamburger-Menü bei Platzmangel |
 | 061 | P0 | abgeschlossen | Import Replace Preserves Wizard State |
-| 062 | P1 | offen | Update Release Notes UI |
+| 062 | P1 | abgeschlossen | Update Release Notes UI |
 | 063 | P1 | offen | Scroll-Hinweise für lange Dialogfelder |
 | 064 | P0 | abgeschlossen | Input Validation For Technical Fields |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 062 Update Release Notes UI
-2. 063 Scroll-Hinweise für lange Dialogfelder
-3. 041 Dashboard Drag And Drop
-4. 024 Authenticated Import Sources Backlog
-5. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-6. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-7. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-8. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-9. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
-10. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
+1. 063 Scroll-Hinweise für lange Dialogfelder
+2. 041 Dashboard Drag And Drop
+3. 024 Authenticated Import Sources Backlog
+4. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+5. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+6. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+7. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+8. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+9. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
