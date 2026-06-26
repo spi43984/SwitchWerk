@@ -157,18 +157,21 @@ Für jede Implementierung eines bestehenden fachlichen Issues gilt zunächst:
 1. Nächstes Issue nach `docs/issues/overview.txt` bestimmen: zuerst Status `offen`, dann Priorität `P0` bis `P4`, danach Issue-ID aufsteigend.
 2. Auf `main` wechseln.
 3. Aktuellen Stand holen.
-4. Prüfen, ob zur passenden Datei unter `docs/issues/*.md` bereits ein
-   GitHub-Issue oder Feature-Branch existiert.
-5. Nur falls noch kein GitHub-Issue existiert, dieses aus der lokalen
-   Issue-Datei erzeugen.
-6. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
+4. Vor jedem `gh issue create` zwingend GitHub lesend prüfen, ob zur
+   passenden Datei unter `docs/issues/*.md` bereits ein passendes GitHub-Issue
+   existiert. Diese Prüfung gilt auch dann, wenn der Benutzer einen
+   Startbefehl mit `gh issue create` vorgibt.
+5. Prüfen, ob bereits ein passender Feature-Branch existiert.
+6. Nur falls nach der GitHub-Prüfung noch kein passendes GitHub-Issue
+   existiert, dieses aus der lokalen Issue-Datei erzeugen.
+7. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
    vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
-7. Ausschließlich den vereinbarten Issue-Scope implementieren.
-8. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
+8. Ausschließlich den vereinbarten Issue-Scope implementieren.
+9. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
    und aktualisieren, damit die UI-Erklärung zum tatsächlichen Verhalten passt.
-9. Änderungen und Diff prüfen.
-10. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
-11. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
+10. Änderungen und Diff prüfen.
+11. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
+12. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
     auf dem Host ausgeben.
 
 Mindestens auf dem Host zu prüfen:
@@ -234,8 +237,12 @@ Beispiel für Implementierungsstart:
 
     git switch main
     git pull
+    gh issue list --state all --search "WiFi Connection Service"
     gh issue create --title "WiFi Connection Service" --body-file docs/issues/009-wifi-connection-service.md
     git switch -c wifi-connection-service
+
+`gh issue create` im Beispiel darf nur ausgeführt werden, wenn die vorherige
+GitHub-Prüfung kein passendes bestehendes Issue ergeben hat.
 
 Beispiel nach Merge:
 
