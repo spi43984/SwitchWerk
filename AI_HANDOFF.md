@@ -6,22 +6,30 @@ Stand: 26. Juni 2026
 
 Zuletzt lokal abgeschlossen:
 
-- Issue 031 „Import Enforces Unique WiFi Profile Names“
-- Branch: `import-unique-wifi-profile-names`
-- Import-Fehler beim Laden einer Konfiguration werden im Importdialog angezeigt
-  statt global unter dem Dialog.
-- Hilfe-, Info- und Projektdokumentation erklären jetzt, dass
-  Geräte-WLAN-Zuordnungen über WLAN-Profil-IDs erfolgen, gleiche IDs beim
-  Merge-Import überschrieben werden und gleiche Profilnamen mit anderer ID
-  abgelehnt werden.
-- Container-Prüfung `./gradlew clean assembleDebug` erfolgreich. Benutzer meldete
-  auf dem Host: `assembleDebug` erfolgreich, `installDebug` scheiterte danach
-  mit fehlenden `R.string.help_import_title`/`help_import_text`, vermutlich
-  wegen nicht synchroner String-Ressourcen oder inkrementellem Gradle-Zustand.
-- `docs/issues/031-import-enforces-unique-wifi-profile-names.md` und
-  `docs/issues/overview.txt` sind lokal auf `abgeschlossen` gesetzt.
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 032
-  „Room Schema And Migration Test Coverage“.
+- Issue 058 „Setup Wizard / Einrichtungs-Assistent“
+- Branch: `setup-wizard`
+- GitHub-Issue: #131
+- Setup-Wizard wird beim ersten Start angezeigt und über `AppSettings` /
+  `AppSettingsRepository` persistent gesteuert.
+- **Überspringen** schließt den Wizard nur für die laufende Sitzung.
+- **Nicht mehr anzeigen** deaktiviert die automatische Anzeige dauerhaft.
+- Replace-Import einer Konfiguration aktiviert die Wizard-Anzeige erneut.
+- Verlinkte Wizard-Ziele öffnen Backup, WLAN-Profile, Geräte oder Dashboard;
+  Zurück führt wieder zum Wizard, bis er über die unteren Buttons geschlossen wird.
+- Die Wizard-Scrollposition wird beim Öffnen verlinkter Seiten wiederhergestellt.
+- **Einrichtungs-Assistent erneut anzeigen** ist unter
+  **Einstellungen → System** und in **Hilfe** verfügbar.
+- Hilfe ist scrollbar.
+- Container-Prüfungen erfolgreich:
+  - `./gradlew lintDebug`
+  - `./gradlew testDebugUnitTest`
+- Host-Build und Installation müssen noch vom Benutzer bestätigt werden:
+  - `./gradlew clean assembleDebug`
+  - `./gradlew installDebug`
+- `docs/issues/058-setup-wizard.md` und `docs/issues/overview.txt` sind lokal
+  auf `abgeschlossen` gesetzt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 059
+  „Export Config Reset Sensitive Toggles“.
 
 Zuletzt abgeschlossen:
 

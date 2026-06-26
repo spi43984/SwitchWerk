@@ -2,10 +2,26 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / Onboarding
 - Bereich: App-Start / Einstellungen / Hilfe
+
+## Ergebnis
+
+- Setup-Wizard wird beim ersten Start automatisch angezeigt.
+- Wizard-State wird in `AppSettings` über `AppSettingsRepository` gespeichert.
+- **Überspringen** schließt den Wizard nur für die laufende App-Sitzung.
+- **Nicht mehr anzeigen** deaktiviert die automatische Anzeige dauerhaft.
+- Replace-Import einer Konfiguration aktiviert die Wizard-Anzeige erneut.
+- Der Wizard ist nahezu vollbildlich, scrollt intern und enthält drei getrennte Blöcke.
+- Block 1 erklärt zusätzlich die farbigen LED-Anzeigen und weist auf mögliche Einschränkungen durch Androids WLAN-Policies hin.
+- Links aus dem Wizard öffnen Backup, WLAN-Profile, Geräte oder Dashboard.
+- Zurück führt von verlinkten Seiten zurück in den Wizard, solange dieser nicht über die unteren Buttons geschlossen wurde.
+- Die Wizard-Scrollposition wird beim Öffnen verlinkter Seiten wiederhergestellt.
+- Der Eintrag **Einrichtungs-Assistent erneut anzeigen** ist unter **Einstellungen → System** und in **Hilfe** vorhanden.
+- Hilfe ist scrollbar, damit der Eintrag erreichbar bleibt.
+- Alle neuen sichtbaren Texte liegen in deutschen und englischen String-Ressourcen.
 
 ## Ziel
 
@@ -145,20 +161,20 @@ Während der Wizard geöffnet ist:
 
 ## Akzeptanzkriterien
 
-- [ ] Wizard erscheint beim ersten Start automatisch.
-- [ ] Wizard erscheint nach **Konfiguration zurücksetzen**.
-- [ ] Wizard nutzt Vollbild- bzw. nahezu Vollbild-Darstellung.
-- [ ] Drei klar getrennte, scrollbare Informationsblöcke sind vorhanden.
-- [ ] Block 1 erklärt Zweck und grundsätzliche Funktionsweise der App.
-- [ ] Block 1 enthält keine Links.
-- [ ] Block 1 verwendet die Bezeichnungen **Einstellungen → WLAN-Profile**, **Einstellungen → Geräte** und **Hauptseite der App (Dashboard)**.
-- [ ] Block 2 erklärt den Import einer Konfiguration.
-- [ ] Block 2 enthält einen Link zum Bereich **Backup**.
-- [ ] Block 3 erklärt die manuelle Einrichtung.
-- [ ] Jeder Schritt in Block 3 besitzt einen Link zur passenden Seite.
-- [ ] Rückkehr von einer geöffneten Seite führt wieder in den Wizard.
-- [ ] Button **Überspringen** schließt den Wizard ohne dauerhafte Deaktivierung.
-- [ ] Button **Nicht mehr anzeigen** deaktiviert den Wizard dauerhaft.
-- [ ] Unter **Einstellungen → System** existiert der Eintrag **Einrichtungs-Assistent erneut anzeigen**.
-- [ ] Derselbe Eintrag ist zusätzlich im Bereich **Hilfe** vorhanden.
-- [ ] Alle Texte sind internationalisierbar Deutsch/Englisch.
+- [x] Wizard erscheint beim ersten Start automatisch.
+- [x] Wizard erscheint nach **Konfiguration zurücksetzen**.
+- [x] Wizard nutzt Vollbild- bzw. nahezu Vollbild-Darstellung.
+- [x] Drei klar getrennte, scrollbare Informationsblöcke sind vorhanden.
+- [x] Block 1 erklärt Zweck und grundsätzliche Funktionsweise der App.
+- [x] Block 1 enthält keine Links.
+- [x] Block 1 verwendet die Bezeichnungen **Einstellungen → WLAN-Profile**, **Einstellungen → Geräte** und **Hauptseite der App (Dashboard)**.
+- [x] Block 2 erklärt den Import einer Konfiguration.
+- [x] Block 2 enthält einen Link zum Bereich **Backup**.
+- [x] Block 3 erklärt die manuelle Einrichtung.
+- [x] Jeder Schritt in Block 3 besitzt einen Link zur passenden Seite.
+- [x] Rückkehr von einer geöffneten Seite führt wieder in den Wizard.
+- [x] Button **Überspringen** schließt den Wizard ohne dauerhafte Deaktivierung.
+- [x] Button **Nicht mehr anzeigen** deaktiviert den Wizard dauerhaft.
+- [x] Unter **Einstellungen → System** existiert der Eintrag **Einrichtungs-Assistent erneut anzeigen**.
+- [x] Derselbe Eintrag ist zusätzlich im Bereich **Hilfe** vorhanden.
+- [x] Alle Texte sind internationalisierbar Deutsch/Englisch.

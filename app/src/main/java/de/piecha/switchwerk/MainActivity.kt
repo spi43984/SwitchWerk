@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -18,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,7 @@ import de.piecha.switchwerk.ui.screens.ImportSource
 import de.piecha.switchwerk.ui.screens.StartScreen
 import de.piecha.switchwerk.ui.screens.HelpScreen
 import de.piecha.switchwerk.ui.screens.AboutScreen
+import de.piecha.switchwerk.ui.components.SetupWizard
 import de.piecha.switchwerk.ui.theme.SwitchWerkTheme
 import de.piecha.switchwerk.ui.AppLocaleController
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
@@ -215,18 +218,45 @@ private fun SwitchWerkAppContent(
         mutableStateOf(initialSettingsSection)
     }
     var pendingAndroidWifiSsid by remember { mutableStateOf<String?>(null) }
+    var setupWizardVisible by rememberSaveable { mutableStateOf(false) }
+    var setupWizardSkippedForSession by rememberSaveable { mutableStateOf(false) }
+    var setupWizardReturnPending by rememberSaveable { mutableStateOf(false) }
+    var setupWizardScrollPosition by rememberSaveable { mutableStateOf(0) }
     val context = LocalContext.current
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.appSettings.showSetupWizardOnStart) {
+        if (
+            uiState.appSettings.showSetupWizardOnStart &&
+            !setupWizardSkippedForSession
+        ) {
+            setupWizardVisible = true
+        }
+    }
 
     LaunchedEffect(mainViewModel) {
         mainViewModel.events.collect { event ->
-            if (event is MainUiEvent.ConfirmOpenAndroidWifiSettings) {
-                pendingAndroidWifiSsid = event.ssid
+            when (event) {
+                is MainUiEvent.ConfirmOpenAndroidWifiSettings -> {
+                    pendingAndroidWifiSsid = event.ssid
+                }
+
+                MainUiEvent.OpenSetupWizard -> {
+                    setupWizardSkippedForSession = false
+                    setupWizardReturnPending = false
+                    setupWizardVisible = true
+                }
             }
         }
     }
 
     SideEffect {
         onNavigationStateChanged(currentScreen, helpReturnScreen, selectedSettingsSection)
+    }
+
+    BackHandler(enabled = currentScreen == AppScreen.Dashboard && setupWizardReturnPending) {
+        setupWizardReturnPending = false
+        setupWizardVisible = true
     }
 
     when (currentScreen) {
@@ -250,14 +280,26 @@ private fun SwitchWerkAppContent(
             initialUiState = initialSettingsScreenUiState,
             onUiStateChanged = onSettingsScreenUiStateChanged,
             onNavigateBack = {
-                currentScreen = AppScreen.Dashboard
-            }
+                if (setupWizardReturnPending) {
+                    setupWizardReturnPending = false
+                    setupWizardVisible = true
+                } else {
+                    currentScreen = AppScreen.Dashboard
+                }
+            },
+            onShowSetupWizard = mainViewModel::showSetupWizardAgain
         )
 
         AppScreen.Help -> HelpScreen(
             onNavigateBack = {
-                currentScreen = helpReturnScreen
-            }
+                if (setupWizardReturnPending) {
+                    setupWizardReturnPending = false
+                    setupWizardVisible = true
+                } else {
+                    currentScreen = helpReturnScreen
+                }
+            },
+            onShowSetupWizard = mainViewModel::showSetupWizardAgain
         )
 
         AppScreen.About -> AboutScreen(
@@ -282,6 +324,50 @@ private fun SwitchWerkAppContent(
                 TextButton(onClick = { pendingAndroidWifiSsid = null }) {
                     Text(stringResource(R.string.cancel))
                 }
+            }
+        )
+    }
+
+    if (setupWizardVisible) {
+        SetupWizard(
+            initialScrollPosition = setupWizardScrollPosition,
+            onOpenBackup = { scrollPosition ->
+                setupWizardScrollPosition = scrollPosition
+                setupWizardVisible = false
+                setupWizardReturnPending = true
+                selectedSettingsSection = SettingsSection.BACKUP
+                currentScreen = AppScreen.Settings
+            },
+            onOpenWifiProfiles = { scrollPosition ->
+                setupWizardScrollPosition = scrollPosition
+                setupWizardVisible = false
+                setupWizardReturnPending = true
+                selectedSettingsSection = SettingsSection.WIFI_PROFILES
+                currentScreen = AppScreen.Settings
+            },
+            onOpenDevices = { scrollPosition ->
+                setupWizardScrollPosition = scrollPosition
+                setupWizardVisible = false
+                setupWizardReturnPending = true
+                selectedSettingsSection = SettingsSection.DEVICES
+                currentScreen = AppScreen.Settings
+            },
+            onOpenDashboard = { scrollPosition ->
+                setupWizardScrollPosition = scrollPosition
+                setupWizardVisible = false
+                setupWizardReturnPending = true
+                currentScreen = AppScreen.Dashboard
+            },
+            onSkip = {
+                setupWizardVisible = false
+                setupWizardSkippedForSession = true
+                setupWizardReturnPending = false
+            },
+            onDoNotShowAgain = {
+                setupWizardVisible = false
+                setupWizardSkippedForSession = true
+                setupWizardReturnPending = false
+                mainViewModel.hideSetupWizardOnStart()
             }
         )
     }
