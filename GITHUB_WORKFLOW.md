@@ -101,7 +101,7 @@ oder erweitert nicht die Werte `P0` bis `P4`.
 
 `ai-context.md` nur ändern, wenn dauerhafter Projektkontext, Projektentscheidungen oder langfristige Projektregeln betroffen sind.
 
-`AI_HANDOFF.md` nur ändern, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
+`AI_HANDOFF.md` nur ändern, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss. Die Datei enthält ausschließlich den aktuellen Übergabestand für die nächste Session; frühere Übergabestände werden ersetzt und nicht als Historie angehängt.
 
 ## Issue-Dateien, GitHub Issues und Branches
 
