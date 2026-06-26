@@ -54,4 +54,10 @@ class FakeAppSettingsRepository(
             wifiProfileSortDirection = direction
         )
     }
+
+    override fun setShowSetupWizardOnStart(showSetupWizardOnStart: Boolean) {
+        mutableSettings.value = mutableSettings.value.copy(
+            showSetupWizardOnStart = showSetupWizardOnStart
+        )
+    }
 }

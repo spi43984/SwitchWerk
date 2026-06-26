@@ -45,6 +45,8 @@ sealed interface DeviceActionUiState {
 
 sealed interface MainUiEvent {
     data class ConfirmOpenAndroidWifiSettings(val ssid: String) : MainUiEvent
+
+    data object OpenSetupWizard : MainUiEvent
 }
 
 sealed interface DiagnosticListItem {
@@ -252,6 +254,17 @@ class MainViewModel(
 
     fun clearDiagnosticMessages() {
         _uiState.value = _uiState.value.copy(diagnosticItems = emptyList())
+    }
+
+    fun hideSetupWizardOnStart() {
+        appSettingsRepository.setShowSetupWizardOnStart(false)
+    }
+
+    fun showSetupWizardAgain() {
+        appSettingsRepository.setShowSetupWizardOnStart(true)
+        viewModelScope.launch {
+            _events.emit(MainUiEvent.OpenSetupWizard)
+        }
     }
 
     private fun moveDevice(deviceId: String, offset: Int) {

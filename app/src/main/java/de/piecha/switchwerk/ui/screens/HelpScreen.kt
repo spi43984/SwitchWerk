@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -23,7 +25,10 @@ import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.components.HelpContent
 
 @Composable
-fun HelpScreen(onNavigateBack: () -> Unit) {
+fun HelpScreen(
+    onNavigateBack: () -> Unit,
+    onShowSetupWizard: () -> Unit
+) {
     BackHandler(onBack = onNavigateBack)
 
     Column(
@@ -45,6 +50,11 @@ fun HelpScreen(onNavigateBack: () -> Unit) {
             }
             Text(stringResource(R.string.help), style = MaterialTheme.typography.headlineLarge)
         }
-        HelpContent()
+        HelpContent(
+            onShowSetupWizard = onShowSetupWizard,
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        )
     }
 }

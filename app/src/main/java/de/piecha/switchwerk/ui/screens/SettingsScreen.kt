@@ -103,6 +103,7 @@ fun SettingsScreen(
     selectedSection: SettingsSection,
     onSectionSelected: (SettingsSection) -> Unit,
     onNavigateBack: () -> Unit,
+    onShowSetupWizard: () -> Unit,
     initialUiState: SettingsScreenUiState,
     onUiStateChanged: (SettingsScreenUiState) -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
@@ -354,6 +355,13 @@ fun SettingsScreen(
                         onDetailPanelHeightChange = viewModel::setDetailPanelHeight,
                         onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
                     )
+                    HorizontalDivider()
+                    SystemSetupWizardSection(
+                        onShowSetupWizard = {
+                            viewModel.showSetupWizardAgain()
+                            onShowSetupWizard()
+                        }
+                    )
                 }
 
                 SettingsSection.BACKUP -> Column(
@@ -457,7 +465,7 @@ fun SettingsScreen(
             fileReference = fileImportReference,
             isPreparing = uiState.isTransferInProgress,
             summary = uiState.importSummary,
-            errorMessage = uiState.importErrorMessage,
+            errorMessage = uiState.errorMessage,
             mode = uiState.importMode ?: importMode,
             importPasswords = importPasswords,
             onSelectUrl = {
@@ -502,6 +510,21 @@ fun SettingsScreen(
                 showImportConfigurationDialog = false
                 viewModel.cancelPendingImport()
             }
+        )
+    }
+}
+
+@Composable
+private fun SystemSetupWizardSection(onShowSetupWizard: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(stringResource(R.string.setup_wizard_system_title), style = MaterialTheme.typography.titleMedium)
+        StandardActionButton(
+            text = stringResource(R.string.setup_wizard_show_again),
+            onClick = onShowSetupWizard,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

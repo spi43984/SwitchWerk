@@ -22,7 +22,10 @@ import androidx.compose.ui.res.stringResource
 import de.piecha.switchwerk.R
 
 @Composable
-fun HelpContent(modifier: Modifier = Modifier) {
+fun HelpContent(
+    modifier: Modifier = Modifier,
+    onShowSetupWizard: () -> Unit = {}
+) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -32,6 +35,11 @@ fun HelpContent(modifier: Modifier = Modifier) {
             HelpSection(R.string.help_connection_title, R.string.help_connection_text)
             HelpSection(R.string.help_import_title, R.string.help_import_text)
             HelpSection(R.string.help_privacy_title, R.string.help_privacy_text)
+            StandardActionButton(
+                text = stringResource(R.string.setup_wizard_show_again),
+                onClick = onShowSetupWizard,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
