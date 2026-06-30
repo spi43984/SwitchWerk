@@ -88,6 +88,7 @@ es verändert die Priorisierungslogik nicht.
 | 062 | P1 | abgeschlossen | Update Release Notes UI |
 | 063 | P1 | abgeschlossen | Scroll-Hinweise für lange Dialogfelder |
 | 064 | P0 | abgeschlossen | Input Validation For Technical Fields |
+| 065 | P0 | offen | Adaptive Dashboard Widget Controls |
 
 ## Empfohlene Umsetzungsreihenfolge
 
