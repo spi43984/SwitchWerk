@@ -824,7 +824,7 @@ private fun DiagnosticPanel(
 
     LaunchedEffect(items.size, newestFirst) {
         if (displayedItems.isNotEmpty()) {
-            listState.scrollToItem(if (newestFirst) 0 else displayedItems.lastIndex)
+            listState.scrollToItem(if (newestFirst) 0 else displayedItems.size)
         }
     }
 
@@ -873,12 +873,6 @@ private fun DiagnosticPanel(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = layoutDiagnostics,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 state = listState,
@@ -886,12 +880,20 @@ private fun DiagnosticPanel(
             ) {
                 if (displayedItems.isEmpty()) {
                     item {
+                        LayoutDiagnosticsEntry(layoutDiagnostics)
+                    }
+                    item {
                         Text(
                             text = stringResource(R.string.no_device_action_yet),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                 } else {
+                    if (!newestFirst) {
+                        item {
+                            LayoutDiagnosticsEntry(layoutDiagnostics)
+                        }
+                    }
                     items(displayedItems) { item ->
                         when (item) {
                             is DiagnosticListItem.Message -> Text(
@@ -903,10 +905,24 @@ private fun DiagnosticPanel(
                             )
                         }
                     }
+                    if (newestFirst) {
+                        item {
+                            LayoutDiagnosticsEntry(layoutDiagnostics)
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun LayoutDiagnosticsEntry(layoutDiagnostics: String) {
+    Text(
+        text = layoutDiagnostics,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 @Composable
