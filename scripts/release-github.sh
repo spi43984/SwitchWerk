@@ -6,14 +6,6 @@ cd "${ROOT_DIR}"
 
 OFFICIAL_REPOSITORY="spi43984/SwitchWerk"
 VERSION="${1:-}"
-if [[ -z "${VERSION}" ]]; then
-  read -r -p "Release-Version (MAJOR.MINOR.PATCH): " VERSION
-fi
-
-if ! [[ "${VERSION}" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
-  echo "Fehler: VERSION muss dem Muster MAJOR.MINOR.PATCH entsprechen."
-  exit 1
-fi
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -85,6 +77,26 @@ require_official_repository() {
   fi
 }
 
+show_latest_release() {
+  local latest_release
+
+  latest_release="$(
+    gh release list \
+      --repo "${OFFICIAL_REPOSITORY}" \
+      --exclude-drafts \
+      --limit 1 \
+      --json tagName,name,publishedAt \
+      --jq '.[0] | "\(.tagName) - \(.name // "ohne Titel") (veröffentlicht: \(.publishedAt))"'
+  )"
+
+  if [[ -z "${latest_release}" ]]; then
+    echo "Fehler: Es wurde kein veröffentlichtes GitHub-Release gefunden."
+    exit 1
+  fi
+
+  echo "Letztes veröffentlichtes GitHub-Release: ${latest_release}"
+}
+
 prepare_release_notes() {
   local previous_tag="$1"
   local target_tag="$2"
@@ -121,10 +133,21 @@ EOF
 
 require_command git
 require_command gh
+require_official_repository
+show_latest_release
+
+if [[ -z "${VERSION}" ]]; then
+  read -r -p "Release-Version (MAJOR.MINOR.PATCH): " VERSION
+fi
+
+if ! [[ "${VERSION}" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+  echo "Fehler: VERSION muss dem Muster MAJOR.MINOR.PATCH entsprechen."
+  exit 1
+fi
+
 require_command perl
 require_keystore_properties
 require_apksigner
-require_official_repository
 
 IFS='.' read -r VERSION_MAJOR VERSION_MINOR VERSION_PATCH <<< "${VERSION}"
 VERSION_CODE=$(( VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH ))
