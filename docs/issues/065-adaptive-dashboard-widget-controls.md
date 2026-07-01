@@ -101,6 +101,9 @@ Wenn diese lesbare Darstellung nicht mehr möglich ist, soll als Fallback der Wi
 - GitHub-Issue: #154
 - Pull Request: #155
 - Merge-Commit: `83c5a2b`
+- Nachtrags-Pull-Request für scrollbare Layoutdiagnose: #156
+- Nachtrags-Merge-Commit: `5cfc761`
 - Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
 - Host-Prüfungen: `./gradlew clean assembleRelease`, `./gradlew installRelease`
 - Gerätetests erfolgreich auf Pixel 10 Pro XL mit größerer Schrift und Samsung S23 mit kleinster Schrift.
+- Host-Build, Installation und manueller Test der scrollbaren Layoutdiagnose erfolgreich.

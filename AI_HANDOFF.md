@@ -15,6 +15,10 @@ Abgeschlossen:
 - GitHub-Issue: #154
 - Pull Request: #155
 - Merge-Commit: `83c5a2b`
+- Nachtrags-Pull-Request: #156
+- Nachtrags-Merge-Commit: `5cfc761`
+- Layoutdiagnose ist der älteste scrollbare Eintrag der Aktionsdetails und
+  erscheint nach dem Löschen des Protokolls wieder zuerst.
 - Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
 - Host-Prüfungen: `./gradlew clean assembleRelease`, `./gradlew installRelease`
 - Gerätetests: Pixel 10 Pro XL mit größerer Schrift und Samsung S23 mit

@@ -142,6 +142,9 @@ weiter proportional berücksichtigt. Passen zwei Widgets nicht sauber
 nebeneinander, wird die Umschaltung zwischen Liste und Widgets ausgeblendet,
 ohne die persistierte Auswahl zu verändern. Gerätenamen dürfen in Widgets
 maximal zweizeilig sein, Aktionsbeschriftungen bleiben einzeilig.
+Die Layoutdiagnose ist als ältester, nicht persistierter Eintrag in den
+Aktionsdetails verfügbar. Sie scrollt mit den echten Ereignissen und erscheint
+nach dem Löschen des Aktionsprotokolls wieder zuerst.
 
 Die Einstellungen sind in die exklusiv sichtbaren Bereiche WLAN-Profile,
 Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und
