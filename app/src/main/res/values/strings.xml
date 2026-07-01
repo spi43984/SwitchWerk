@@ -21,7 +21,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
+    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen, wenn genug Platz für lesbare Widgets vorhanden ist\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung, Updates und Aktionsdetails\n• Backup: Konfiguration sichern oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden</string>
@@ -29,7 +29,7 @@
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
     <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /relay/0?turn=on</string>
-    <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
+    <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• zeigt Layoutwerte zur Dashboard-Breite und Widget-Umschaltung\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
     <string name="wifi_profiles_info_title">WLAN-Profile verwalten</string>
     <string name="devices_info_title">Geräte verwalten</string>
     <string name="list_interaction_info">• + legt einen neuen Eintrag an\n• Eintrag antippen zum Bearbeiten\n• Nach links oder rechts wischen zum Löschen\n• Löschen anschließend bestätigen</string>
@@ -129,6 +129,9 @@
     <string name="action_details_sort_order">Sortierung Aktionsdetails</string>
     <string name="newest_first">Neueste oben</string>
     <string name="newest_last">Neueste unten</string>
+    <string name="dashboard_layout_diagnostics">Layout: Bildschirm %1$d dp, Dashboard %2$d dp, Schrift %3$.2f, Widget min. %4$d dp, Umschaltung %5$s</string>
+    <string name="dashboard_layout_selector_visible">sichtbar</string>
+    <string name="dashboard_layout_selector_hidden">ausgeblendet</string>
 
     <plurals name="devices_found">
         <item quantity="one">%1$d Gerät gefunden</item>

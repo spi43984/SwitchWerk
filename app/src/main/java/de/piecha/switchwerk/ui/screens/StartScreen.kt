@@ -11,7 +11,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +34,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -57,10 +60,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
@@ -82,6 +87,8 @@ import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.asString
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 @Composable
 fun StartScreen(
@@ -157,90 +164,119 @@ fun StartScreen(
             .padding(screenPadding),
         rightEdgeExtension = screenPadding
     ) { openMenu ->
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            DashboardHeader(
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val density = LocalDensity.current
+            val configuration = LocalConfiguration.current
+            val textMeasurer = rememberTextMeasurer()
+            val switchingText = stringResource(R.string.switching)
+            val widgetMinWidth = requiredWidgetMinWidth(
+                devices = devices,
+                actionStates = uiState.deviceActionStates,
+                switchingText = switchingText,
+                actionStyle = MaterialTheme.typography.labelSmall,
+                textMeasurer = textMeasurer,
+                density = density
+            )
+            val canShowLayoutSelector = canShowDashboardLayoutSelector(
                 deviceCount = devices.size,
-                selectedMode = uiState.appSettings.dashboardLayoutMode,
-                isLandscape = isLandscape,
-                onModeSelected = viewModel::setDashboardLayoutMode,
-                onOpenMenu = openMenu
+                availableWidth = maxWidth,
+                widgetMinWidth = widgetMinWidth
+            )
+            val layoutDiagnostics = dashboardLayoutDiagnosticsText(
+                screenWidth = configuration.screenWidthDp.dp,
+                dashboardWidth = maxWidth,
+                fontScale = density.fontScale,
+                widgetMinWidth = widgetMinWidth,
+                selectorVisible = canShowLayoutSelector
             )
 
-            uiState.errorMessage?.let { message ->
-                Text(
-                    text = message.asString(),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 16.dp)
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DashboardHeader(
+                    deviceCount = devices.size,
+                    selectedMode = uiState.appSettings.dashboardLayoutMode,
+                    isLandscape = isLandscape,
+                    showLayoutSelector = canShowLayoutSelector,
+                    onModeSelected = viewModel::setDashboardLayoutMode,
+                    onOpenMenu = openMenu
                 )
-            }
 
-            uiState.updateSnapshot?.takeIf { it.isUpdateAvailable }?.availableRelease?.let { release ->
-                UpdateAvailableBanner(
-                    version = release.version,
-                    onOpenSettings = onNavigateToUpdates,
-                    modifier = Modifier.padding(top = 12.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(if (isLandscape) 6.dp else 12.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                val detailHeight = uiState.appSettings.detailPanelHeight.fraction
-                val deviceAreaWeight = if (showActionDetails && isActionDetailsExpanded) {
-                    1f - detailHeight
-                } else {
-                    1f
+                uiState.errorMessage?.let { message ->
+                    Text(
+                        text = message.asString(),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
                 }
 
-                if (devices.isEmpty()) {
-                    EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
-                } else {
-                    when (uiState.appSettings.dashboardLayoutMode) {
-                        DashboardLayoutMode.LIST -> DeviceList(
-                            devices = devices,
-                            actionStates = uiState.deviceActionStates,
-                            wifiProximityStatuses = uiState.wifiProximityStatuses,
-                            runningDeviceId = runningDeviceId,
-                            isActionDetailsExpanded = isActionDetailsExpanded,
-                            onDeviceActionClick = viewModel::executeDeviceAction,
-                            onCancelDeviceActionClick = viewModel::cancelDeviceAction,
-                            onMoveUpClick = viewModel::moveDeviceUp,
-                            onMoveDownClick = viewModel::moveDeviceDown,
-                            modifier = Modifier.weight(deviceAreaWeight)
-                        )
-
-                        DashboardLayoutMode.WIDGETS -> DeviceWidgetGrid(
-                            devices = devices,
-                            actionStates = uiState.deviceActionStates,
-                            wifiProximityStatuses = uiState.wifiProximityStatuses,
-                            runningDeviceId = runningDeviceId,
-                            isActionDetailsExpanded = isActionDetailsExpanded,
-                            onDeviceActionClick = viewModel::executeDeviceAction,
-                            onCancelDeviceActionClick = viewModel::cancelDeviceAction,
-                            onMoveUpClick = viewModel::moveDeviceUp,
-                            onMoveDownClick = viewModel::moveDeviceDown,
-                            modifier = Modifier.weight(deviceAreaWeight)
-                        )
-                    }
+                uiState.updateSnapshot?.takeIf { it.isUpdateAvailable }?.availableRelease?.let { release ->
+                    UpdateAvailableBanner(
+                        version = release.version,
+                        onOpenSettings = onNavigateToUpdates,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
                 }
 
-                if (showActionDetails) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    if (isActionDetailsExpanded) {
-                        DiagnosticPanel(
-                            items = uiState.diagnosticItems,
-                            newestFirst = uiState.appSettings.diagnosticsNewestFirst,
-                            onClear = viewModel::clearDiagnosticMessages,
-                            onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
-                            onMinimize = { isActionDetailsExpanded = false },
-                            modifier = Modifier.weight(detailHeight)
-                        )
+                Spacer(modifier = Modifier.height(if (isLandscape) 6.dp else 12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    val detailHeight = uiState.appSettings.detailPanelHeight.fraction
+                    val deviceAreaWeight = if (showActionDetails && isActionDetailsExpanded) {
+                        1f - detailHeight
                     } else {
-                        CollapsedActionDetailsPanel(
-                            onExpand = { isActionDetailsExpanded = true }
-                        )
+                        1f
+                    }
+
+                    if (devices.isEmpty()) {
+                        EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
+                    } else {
+                        when (uiState.appSettings.dashboardLayoutMode) {
+                            DashboardLayoutMode.LIST -> DeviceList(
+                                devices = devices,
+                                actionStates = uiState.deviceActionStates,
+                                wifiProximityStatuses = uiState.wifiProximityStatuses,
+                                runningDeviceId = runningDeviceId,
+                                isActionDetailsExpanded = isActionDetailsExpanded,
+                                onDeviceActionClick = viewModel::executeDeviceAction,
+                                onCancelDeviceActionClick = viewModel::cancelDeviceAction,
+                                onMoveUpClick = viewModel::moveDeviceUp,
+                                onMoveDownClick = viewModel::moveDeviceDown,
+                                modifier = Modifier.weight(deviceAreaWeight)
+                            )
+
+                            DashboardLayoutMode.WIDGETS -> DeviceWidgetGrid(
+                                devices = devices,
+                                actionStates = uiState.deviceActionStates,
+                                wifiProximityStatuses = uiState.wifiProximityStatuses,
+                                runningDeviceId = runningDeviceId,
+                                isActionDetailsExpanded = isActionDetailsExpanded,
+                                onDeviceActionClick = viewModel::executeDeviceAction,
+                                onCancelDeviceActionClick = viewModel::cancelDeviceAction,
+                                onMoveUpClick = viewModel::moveDeviceUp,
+                                onMoveDownClick = viewModel::moveDeviceDown,
+                                modifier = Modifier.weight(deviceAreaWeight)
+                            )
+                        }
+                    }
+
+                    if (showActionDetails) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        if (isActionDetailsExpanded) {
+                            DiagnosticPanel(
+                                items = uiState.diagnosticItems,
+                                layoutDiagnostics = layoutDiagnostics,
+                                newestFirst = uiState.appSettings.diagnosticsNewestFirst,
+                                onClear = viewModel::clearDiagnosticMessages,
+                                onToggleSortOrder = viewModel::toggleDiagnosticSortOrder,
+                                onMinimize = { isActionDetailsExpanded = false },
+                                modifier = Modifier.weight(detailHeight)
+                            )
+                        } else {
+                            CollapsedActionDetailsPanel(
+                                onExpand = { isActionDetailsExpanded = true }
+                            )
+                        }
                     }
                 }
             }
@@ -281,6 +317,7 @@ private fun DashboardHeader(
     deviceCount: Int,
     selectedMode: DashboardLayoutMode,
     isLandscape: Boolean,
+    showLayoutSelector: Boolean,
     onModeSelected: (DashboardLayoutMode) -> Unit,
     onOpenMenu: () -> Unit
 ) {
@@ -302,10 +339,12 @@ private fun DashboardHeader(
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1
             )
-            DashboardLayoutSelector(
-                selectedMode = selectedMode,
-                onModeSelected = onModeSelected
-            )
+            if (showLayoutSelector) {
+                DashboardLayoutSelector(
+                    selectedMode = selectedMode,
+                    onModeSelected = onModeSelected
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 InfoHint(R.string.dashboard_info_title, R.string.dashboard_info)
                 AppOverflowMenu(onClick = onOpenMenu)
@@ -338,10 +377,12 @@ private fun DashboardHeader(
                 text = pluralStringResource(R.plurals.devices_found, deviceCount, deviceCount),
                 style = MaterialTheme.typography.bodyLarge
             )
-            DashboardLayoutSelector(
-                selectedMode = selectedMode,
-                onModeSelected = onModeSelected
-            )
+            if (showLayoutSelector) {
+                DashboardLayoutSelector(
+                    selectedMode = selectedMode,
+                    onModeSelected = onModeSelected
+                )
+            }
         }
     }
 }
@@ -359,12 +400,24 @@ private fun DashboardLayoutSelector(
         FilterChip(
             selected = selectedMode == DashboardLayoutMode.LIST,
             onClick = { onModeSelected(DashboardLayoutMode.LIST) },
-            label = { Text(stringResource(R.string.layout_list)) }
+            label = {
+                Text(
+                    text = stringResource(R.string.layout_list),
+                    maxLines = 1,
+                    softWrap = false
+                )
+            }
         )
         FilterChip(
             selected = selectedMode == DashboardLayoutMode.WIDGETS,
             onClick = { onModeSelected(DashboardLayoutMode.WIDGETS) },
-            label = { Text(stringResource(R.string.layout_widgets)) }
+            label = {
+                Text(
+                    text = stringResource(R.string.layout_widgets),
+                    maxLines = 1,
+                    softWrap = false
+                )
+            }
         )
     }
 }
@@ -460,9 +513,21 @@ private fun DeviceWidgetGrid(
         }
     }
 
-    Box(modifier = modifier) {
+    BoxWithConstraints(modifier = modifier) {
+        val textMeasurer = rememberTextMeasurer()
+        val density = LocalDensity.current
+        val switchingText = stringResource(R.string.switching)
+        val adaptiveMinWidth = requiredWidgetMinWidth(
+            devices = devices,
+            actionStates = actionStates,
+            switchingText = switchingText,
+            actionStyle = MaterialTheme.typography.labelSmall,
+            textMeasurer = textMeasurer,
+            density = density
+        ).coerceAtMost(maxWidth)
+
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 140.dp),
+            columns = GridCells.Adaptive(minSize = adaptiveMinWidth),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(end = 8.dp),
@@ -510,9 +575,9 @@ private fun DeviceWidget(
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(
-                start = 12.dp,
+                start = 8.dp,
                 top = 10.dp,
-                end = 12.dp,
+                end = 8.dp,
                 bottom = 0.dp
             )
         ) {
@@ -521,7 +586,8 @@ private fun DeviceWidget(
                 wifiProximityStatus = wifiProximityStatus,
                 isActionRunning = actionState == DeviceActionUiState.Loading,
                 maxLines = 2,
-                modifier = Modifier.height(48.dp)
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.height(52.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -534,7 +600,8 @@ private fun DeviceWidget(
                 onActionClick = onActionClick,
                 onCancelActionClick = onCancelActionClick,
                 onMoveUpClick = onMoveUpClick,
-                onMoveDownClick = onMoveDownClick
+                onMoveDownClick = onMoveDownClick,
+                singleLineActionText = true
             )
         }
     }
@@ -624,7 +691,8 @@ private fun DeviceActionArea(
     onActionClick: () -> Unit,
     onCancelActionClick: () -> Unit,
     onMoveUpClick: () -> Unit,
-    onMoveDownClick: () -> Unit
+    onMoveDownClick: () -> Unit,
+    singleLineActionText: Boolean = false
 ) {
     if (actionState is DeviceActionUiState.Error) {
         Box(
@@ -655,11 +723,12 @@ private fun DeviceActionArea(
             }
         }
     } else {
-        Column(modifier = Modifier.height(84.dp)) {
+        Column(modifier = Modifier.height(78.dp)) {
             DeviceActionButton(
                 device = device,
                 actionState = actionState,
-                onActionClick = onActionClick
+                onActionClick = onActionClick,
+                singleLineText = singleLineActionText
             )
             Spacer(modifier = Modifier.height(4.dp))
             DeviceActionFooter(
@@ -678,7 +747,8 @@ private fun DeviceActionArea(
 private fun DeviceActionButton(
     device: Device,
     actionState: DeviceActionUiState?,
-    onActionClick: () -> Unit
+    onActionClick: () -> Unit,
+    singleLineText: Boolean = false
 ) {
     val label = when (actionState) {
         DeviceActionUiState.Loading -> stringResource(R.string.switching)
@@ -691,11 +761,22 @@ private fun DeviceActionButton(
         enabled = actionState !is DeviceActionUiState.Loading,
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(48.dp),
+        contentPadding = if (singleLineText) {
+            PaddingValues(horizontal = 6.dp)
+        } else {
+            ButtonDefaults.ContentPadding
+        }
     ) {
         Text(
             text = label,
-            maxLines = 2,
+            style = if (singleLineText) {
+                MaterialTheme.typography.labelSmall
+            } else {
+                MaterialTheme.typography.labelLarge
+            },
+            maxLines = if (singleLineText) 1 else 2,
+            softWrap = !singleLineText,
             overflow = TextOverflow.Ellipsis
         )
     }
@@ -731,6 +812,7 @@ private fun DeviceActionStatus(
 @Composable
 private fun DiagnosticPanel(
     items: List<DiagnosticListItem>,
+    layoutDiagnostics: String,
     newestFirst: Boolean,
     onClear: () -> Unit,
     onToggleSortOrder: () -> Unit,
@@ -790,6 +872,12 @@ private fun DiagnosticPanel(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = layoutDiagnostics,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -904,7 +992,9 @@ internal fun DeviceTitle(
     wifiProximityStatus: DeviceWifiProximityStatus,
     isActionRunning: Boolean,
     maxLines: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    softWrap: Boolean = true
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -915,7 +1005,8 @@ internal fun DeviceTitle(
             text = name,
             style = MaterialTheme.typography.titleMedium,
             maxLines = maxLines,
-            overflow = TextOverflow.Ellipsis,
+            softWrap = softWrap,
+            overflow = overflow,
             modifier = Modifier.weight(1f)
         )
         WifiProximityIndicator(
@@ -989,3 +1080,85 @@ private fun deviceWifiProximityText(status: DeviceWifiProximityStatus): String {
 private val WifiNearbyColor = Color(0xFF2E7D32)
 private val WifiNotNearbyColor = Color(0xFFC62828)
 private val WifiUnavailableColor = Color(0xFF757575)
+
+private val WidgetBaseMinWidth = 164.dp
+private const val WidgetCompactScale = 0.75f
+private val WidgetGridEndPadding = 8.dp
+private val WidgetGridHorizontalSpacing = 12.dp
+private val WidgetCardHorizontalPadding = 16.dp
+private val WidgetButtonHorizontalPadding = 12.dp
+
+private fun canShowDashboardLayoutSelector(
+    deviceCount: Int,
+    availableWidth: Dp,
+    widgetMinWidth: Dp
+): Boolean {
+    if (deviceCount < 2) {
+        return true
+    }
+    val widgetAreaWidth = availableWidth - WidgetGridEndPadding
+    val twoColumnWidth = widgetMinWidth + widgetMinWidth + WidgetGridHorizontalSpacing
+    return twoColumnWidth <= widgetAreaWidth
+}
+
+@Composable
+private fun dashboardLayoutDiagnosticsText(
+    screenWidth: Dp,
+    dashboardWidth: Dp,
+    fontScale: Float,
+    widgetMinWidth: Dp,
+    selectorVisible: Boolean
+): String {
+    val selectorState = stringResource(
+        if (selectorVisible) {
+            R.string.dashboard_layout_selector_visible
+        } else {
+            R.string.dashboard_layout_selector_hidden
+        }
+    )
+    return stringResource(
+        R.string.dashboard_layout_diagnostics,
+        screenWidth.value.roundToInt(),
+        dashboardWidth.value.roundToInt(),
+        fontScale,
+        widgetMinWidth.value.roundToInt(),
+        selectorState
+    )
+}
+
+private fun requiredWidgetMinWidth(
+    devices: List<Device>,
+    actionStates: Map<String, DeviceActionUiState>,
+    switchingText: String,
+    actionStyle: androidx.compose.ui.text.TextStyle,
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    density: androidx.compose.ui.unit.Density
+): Dp {
+    val actionTextWidth = devices.minOfOrNull { device ->
+        val actionText = if (actionStates[device.id] == DeviceActionUiState.Loading) {
+            switchingText
+        } else {
+            device.actionLabel
+        }
+        measureTextWidth(actionText, actionStyle, textMeasurer, density)
+    } ?: 0.dp
+    val measuredMinWidth = actionTextWidth + WidgetButtonHorizontalPadding + WidgetCardHorizontalPadding
+    val baseScale = if (density.fontScale < 1f) WidgetCompactScale else density.fontScale
+    val scaledBaseMinWidth = WidgetBaseMinWidth * baseScale
+    return maxOf(scaledBaseMinWidth, measuredMinWidth)
+}
+
+private fun measureTextWidth(
+    text: String,
+    style: androidx.compose.ui.text.TextStyle,
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    density: androidx.compose.ui.unit.Density
+): Dp {
+    val width = textMeasurer.measure(
+        text = text,
+        style = style,
+        maxLines = 1,
+        softWrap = false
+    ).size.width
+    return with(density) { ceil(width.toFloat()).toDp() }
+}

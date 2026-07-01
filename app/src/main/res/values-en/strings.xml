@@ -21,7 +21,7 @@
     <string name="ok">OK</string>
     <string name="show_information">Show information</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view\n• Arrows change the order\n• The X at the bottom right cancels a running action\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings and help</string>
+    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view when there is enough space for readable widgets\n• Arrows change the order\n• The X at the bottom right cancels a running action\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings, updates, help, and About SwitchWerk</string>
     <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance, updates, and action details\n• Backup: save or import configuration</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Choose appearance and language\n• Check for updates and open GitHub release notes\n• Show or hide action details</string>
@@ -29,7 +29,7 @@
     <string name="password_storage_info">Wi-Fi passwords are stored encrypted on this device. They are not sent to a cloud service and are not shown in action details.</string>
     <string name="hostname_ip_info">Enter the device\'s local address in its assigned Wi-Fi network, for example 192.168.33.1 or a hostname resolved on the local network. No internet connection is required.</string>
     <string name="api_call_info">The HTTP/RPC call is appended to the local device address. Use only a path supported by the device. POST can send an optional request body with a Content-Type, for example /relay/0?turn=on.</string>
-    <string name="action_details_info">• Shows Wi-Fi connection, timeout, and HTTP status\n• The X at the bottom right cancels the running action\n• Tap the compact bar to open it\n• Tap the Action details title in the open panel to minimize it\n• Local progress only\n• Passwords are not logged</string>
+    <string name="action_details_info">• Shows Wi-Fi connection, timeout, and HTTP status\n• Shows layout values for dashboard width and widget switching\n• The X at the bottom right cancels the running action\n• Tap the compact bar to open it\n• Tap the Action details title in the open panel to minimize it\n• Local progress only\n• Passwords are not logged</string>
     <string name="wifi_profiles_info_title">Manage Wi-Fi profiles</string>
     <string name="devices_info_title">Manage devices</string>
     <string name="list_interaction_info">• Use + to add an entry\n• Tap an entry to edit it\n• Swipe left or right to delete it\n• Confirm deletion afterwards</string>
@@ -80,6 +80,9 @@
     <string name="action_details_sort_order">Action details order</string>
     <string name="newest_first">Newest first</string>
     <string name="newest_last">Newest last</string>
+    <string name="dashboard_layout_diagnostics">Layout: screen %1$d dp, dashboard %2$d dp, font %3$.2f, widget min. %4$d dp, selector %5$s</string>
+    <string name="dashboard_layout_selector_visible">visible</string>
+    <string name="dashboard_layout_selector_hidden">hidden</string>
     <string name="updates">Updates</string>
     <string name="update_available_menu">Update available</string>
     <string name="installed_version_value">Installed version: %1$s</string>
