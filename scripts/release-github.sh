@@ -6,6 +6,7 @@ cd "${ROOT_DIR}"
 
 OFFICIAL_REPOSITORY="spi43984/SwitchWerk"
 VERSION="${1:-}"
+LATEST_RELEASE_VERSION=""
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -78,23 +79,54 @@ require_official_repository() {
 }
 
 show_latest_release() {
+  local -a release_data
+  local latest_release_tag
   local latest_release
 
-  latest_release="$(
+  mapfile -t release_data < <(
     gh release list \
       --repo "${OFFICIAL_REPOSITORY}" \
       --exclude-drafts \
       --limit 1 \
       --json tagName,name,publishedAt \
-      --jq '.[0] | "\(.tagName) - \(.name // "ohne Titel") (veröffentlicht: \(.publishedAt))"'
-  )"
+      --jq '.[0] | .tagName, "\(.tagName) - \(.name // "ohne Titel") (veröffentlicht: \(.publishedAt))"'
+  )
 
-  if [[ -z "${latest_release}" ]]; then
+  latest_release_tag="${release_data[0]:-}"
+  latest_release="${release_data[1]:-}"
+
+  if [[ -z "${latest_release_tag}" || -z "${latest_release}" ]]; then
     echo "Fehler: Es wurde kein veröffentlichtes GitHub-Release gefunden."
     exit 1
   fi
 
+  LATEST_RELEASE_VERSION="${latest_release_tag#v}"
+  if ! [[ "${LATEST_RELEASE_VERSION}" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+    echo "Fehler: Das letzte Release '${latest_release_tag}' hat kein unterstütztes Versionsformat."
+    exit 1
+  fi
+
   echo "Letztes veröffentlichtes GitHub-Release: ${latest_release}"
+}
+
+is_version_greater() {
+  local candidate="$1"
+  local current="$2"
+  local candidate_major candidate_minor candidate_patch
+  local current_major current_minor current_patch
+
+  IFS='.' read -r candidate_major candidate_minor candidate_patch <<< "${candidate}"
+  IFS='.' read -r current_major current_minor current_patch <<< "${current}"
+
+  if (( 10#${candidate_major} != 10#${current_major} )); then
+    (( 10#${candidate_major} > 10#${current_major} ))
+    return
+  fi
+  if (( 10#${candidate_minor} != 10#${current_minor} )); then
+    (( 10#${candidate_minor} > 10#${current_minor} ))
+    return
+  fi
+  (( 10#${candidate_patch} > 10#${current_patch} ))
 }
 
 prepare_release_notes() {
@@ -137,13 +169,41 @@ require_official_repository
 show_latest_release
 
 if [[ -z "${VERSION}" ]]; then
-  read -r -p "Release-Version (MAJOR.MINOR.PATCH): " VERSION
+  if ! read -r -p "Release-Version (MAJOR.MINOR.PATCH): " VERSION; then
+    echo "Fehler: Keine Release-Version eingegeben."
+    exit 1
+  fi
+fi
+
+if [[ -z "${VERSION}" ]]; then
+  echo "Fehler: Die Release-Version darf nicht leer sein."
+  exit 1
 fi
 
 if ! [[ "${VERSION}" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
   echo "Fehler: VERSION muss dem Muster MAJOR.MINOR.PATCH entsprechen."
   exit 1
 fi
+
+echo "Neue Release-Version: v${VERSION}"
+
+if ! is_version_greater "${VERSION}" "${LATEST_RELEASE_VERSION}"; then
+  echo "Fehler: Die neue Version muss größer als ${LATEST_RELEASE_VERSION} sein."
+  exit 1
+fi
+
+if ! read -r -p "Release v${VERSION} wirklich erstellen? [j/N]: " CONFIRM_RELEASE; then
+  echo "Release-Erstellung abgebrochen."
+  exit 1
+fi
+case "${CONFIRM_RELEASE}" in
+  j|J|ja|Ja|JA)
+    ;;
+  *)
+    echo "Release-Erstellung abgebrochen."
+    exit 1
+    ;;
+esac
 
 require_command perl
 require_keystore_properties
