@@ -1,6 +1,6 @@
 # AI Handoff
 
-Stand: 26. Juni 2026
+Stand: 1. Juli 2026
 
 ## Startvorlage
 
@@ -11,12 +11,16 @@ Für die nächste Session zuerst `AI_SESSION_PROMPT.md` verwenden und danach
 
 Abgeschlossen:
 
-- Issue 063 „Scroll-Hinweise für lange Dialogfelder“
-- GitHub-Issue: #151
-- Pull Request: #153
-- Feature-Branch: `scroll-hints-long-dialogs-merge`
+- Issue 065 „Adaptive Dashboard Widget Controls“
+- GitHub-Issue: #154
+- Pull Request: #155
+- Merge-Commit: `83c5a2b`
 - Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
-- Host-Prüfungen: `./gradlew clean assembleDebug`, `./gradlew installDebug`
+- Host-Prüfungen: `./gradlew clean assembleRelease`, `./gradlew installRelease`
+- Gerätetests: Pixel 10 Pro XL mit größerer Schrift und Samsung S23 mit
+  kleinster Schrift
+- Nächstes priorisiertes Thema: Issue 024 „Authenticated Import Sources
+  Backlog“; aktuell Status `Backlog`, daher keine aktive Implementierung.
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
 GitHub-Issue schließen oder Branch löschen.

@@ -135,6 +135,13 @@ der Dashboard-Kopf in einer Zeile dargestellt und ein aktivierter
 Aktionsdetailbereich nur visuell ausgeblendet, ohne die Benutzereinstellung zu
 verändern. Die Dashboard-Darstellung ist Teil des Konfigurationsexports; fehlt
 sie in älteren Importen, bleibt die aktuelle Benutzereinstellung erhalten.
+Die Widget-Mindestbreite wird zur Laufzeit aus verfügbarer Dashboardbreite,
+`fontScale` und Aktionsbeschriftungen bestimmt. Bei verkleinerter Systemschrift
+gilt eine kompakte Basisskalierung von `0,75`; normale und größere Schrift wird
+weiter proportional berücksichtigt. Passen zwei Widgets nicht sauber
+nebeneinander, wird die Umschaltung zwischen Liste und Widgets ausgeblendet,
+ohne die persistierte Auswahl zu verändern. Gerätenamen dürfen in Widgets
+maximal zweizeilig sein, Aktionsbeschriftungen bleiben einzeilig.
 
 Die Einstellungen sind in die exklusiv sichtbaren Bereiche WLAN-Profile,
 Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und

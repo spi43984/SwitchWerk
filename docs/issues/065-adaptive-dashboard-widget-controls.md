@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / UI
 - Bereich: Dashboard / Widget-Ansicht / Compose UI
@@ -11,13 +11,13 @@
 
 Die Dashboard-Widget-Ansicht soll auf schmalen Displays und bei großer Android-Schriftgröße stabil und lesbar bleiben.
 
-Widgets sollen weiterhin nebeneinander dargestellt werden. Wenn die Darstellung durch schmale Displays oder große Schrift nicht mehr ohne unlesbaren Text möglich ist, sollen die Umschalt-Buttons für Listen- und Widget-Ansicht automatisch ausgeblendet werden.
+Widgets sollen weiterhin nebeneinander dargestellt werden. Wenn die Darstellung durch schmale Displays oder große Schrift nicht mehr ausreichend lesbar möglich ist, sollen die Umschalt-Buttons für Listen- und Widget-Ansicht automatisch ausgeblendet werden.
 
 ## Hintergrund
 
 Auf Geräten mit schmalem Display oder größer eingestellter Systemschrift kann es passieren, dass Widgets nicht mehr nebeneinander, sondern untereinander dargestellt werden oder dass der verfügbare Platz für die Widget-Beschriftung nicht mehr ausreicht.
 
-Die Widget-Ansicht soll zunächst adaptiv schmäler werden, solange der Text weiterhin vollständig und einzeilig lesbar bleibt. Ein Umbruch der Widget-Texte ist nicht gewünscht.
+Die Widget-Ansicht soll zunächst adaptiv schmäler werden. Gerätenamen dürfen maximal zweizeilig dargestellt und danach mit Ellipsis gekürzt werden. Aktionsbeschriftungen bleiben einzeilig und dürfen bei Bedarf mit Ellipsis gekürzt werden.
 
 Wenn diese lesbare Darstellung nicht mehr möglich ist, soll als Fallback der Widget-Button ausgeblendet werden. In diesem Fall kann auch der Listen-Button entfallen, da beide Buttons nur zum Umschalten der Ansicht dienen und auf kleinen Displays zusätzlichen Platz verbrauchen.
 
@@ -26,14 +26,14 @@ Wenn diese lesbare Darstellung nicht mehr möglich ist, soll als Fallback der Wi
 ### Adaptive Widget-Darstellung
 
 - Widget-Karten sollen flexible Breiten verwenden.
-- Widgets sollen nebeneinander dargestellt bleiben, solange der Text vollständig lesbar ist.
-- Widget-Texte dürfen nicht umbrechen.
-- Widget-Texte sollen nicht abgeschnitten oder nur mit Ellipsis als „lesbar“ gelten.
+- Widgets sollen nebeneinander dargestellt bleiben, solange Gerätename, Status und Aktion sauber dargestellt werden.
+- Gerätenamen dürfen maximal zweizeilig umbrechen und werden danach mit Ellipsis gekürzt.
+- Aktionsbeschriftungen bleiben einzeilig und dürfen bei Bedarf mit Ellipsis gekürzt werden.
 - Die Darstellung soll Android-Schriftgrößen beziehungsweise `fontScale` berücksichtigen.
 
 ### Fallback bei Platzmangel
 
-- Wenn die Widget-Texte bei verfügbarer Breite und aktueller Schriftgröße nicht mehr vollständig einzeilig lesbar dargestellt werden können:
+- Wenn zwei Widgets bei verfügbarer Breite und aktueller Schriftgröße nicht mehr sauber nebeneinander dargestellt werden können:
   - Widget-Button ausblenden.
   - Listen-Button ebenfalls ausblenden.
   - Die dadurch frei werdende Breite vollständig für die Widget-Darstellung nutzen.
@@ -57,8 +57,7 @@ Wenn diese lesbare Darstellung nicht mehr möglich ist, soll als Fallback der Wi
 - Keine Änderung an Import oder Export der Dashboard-Einstellung.
 - Keine Homescreen-Widgets von Android.
 - Keine neue externe Abhängigkeit.
-- Kein automatischer Zeilenumbruch für Widget-Texte.
-- Kein GitHub-Issue, Branch, Pull Request oder Merge im Rahmen des lokalen Planungs-Issues.
+- Kein mehr als zweizeiliger Gerätename in Widgets.
 
 ## Architekturhinweise
 
@@ -70,19 +69,20 @@ Wenn diese lesbare Darstellung nicht mehr möglich ist, soll als Fallback der Wi
 
 ## Akzeptanzkriterien
 
-- [ ] Widgets verwenden adaptive Breiten.
-- [ ] Widgets bleiben nebeneinander, solange die Widget-Texte vollständig einzeilig lesbar sind.
-- [ ] Widget-Texte brechen nicht auf mehrere Zeilen um.
-- [ ] Widget-Texte werden nicht als akzeptabel betrachtet, wenn sie nur abgeschnitten oder mit Ellipsis sichtbar sind.
-- [ ] Bei zu wenig Breite wird der Widget-Button automatisch ausgeblendet.
-- [ ] Wenn der Widget-Button ausgeblendet wird, wird auch der Listen-Button ausgeblendet.
-- [ ] Die freigewordene Breite wird für die Widget-Darstellung genutzt.
-- [ ] Die gespeicherte Dashboard-Auswahl bleibt unverändert.
-- [ ] Die Lösung funktioniert im Portrait-Modus.
-- [ ] Die Lösung funktioniert im Landscape-Modus.
-- [ ] Die Lösung funktioniert bei großer Android-Schriftgröße.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
-- [ ] Deutsch und Englisch sind bei neuen Texten konsistent gepflegt.
+- [x] Widgets verwenden adaptive Breiten.
+- [x] Widgets bleiben nebeneinander, solange Gerätename, Status und Aktion sauber dargestellt werden.
+- [x] Gerätenamen werden maximal zweizeilig und danach mit Ellipsis dargestellt.
+- [x] Aktionsbeschriftungen bleiben einzeilig und werden bei Bedarf mit Ellipsis dargestellt.
+- [x] Bei zu wenig Breite wird der Widget-Button automatisch ausgeblendet.
+- [x] Wenn der Widget-Button ausgeblendet wird, wird auch der Listen-Button ausgeblendet.
+- [x] Die freigewordene Breite wird für die Widget-Darstellung genutzt.
+- [x] Die gespeicherte Dashboard-Auswahl bleibt unverändert.
+- [x] Die Lösung funktioniert im Portrait-Modus.
+- [x] Die Lösung berücksichtigt den Landscape-Modus.
+- [x] Die Lösung funktioniert bei großer Android-Schriftgröße.
+- [x] Verkleinerte Android-Schrift wird mit einer kompakten Mindestskalierung von `0,75` berücksichtigt.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und aktualisiert.
+- [x] Deutsch und Englisch sind bei neuen Texten konsistent gepflegt.
 
 ## Testhinweise
 
@@ -95,3 +95,12 @@ Wenn diese lesbare Darstellung nicht mehr möglich ist, soll als Fallback der Wi
 - Prüfen, dass Widget- und Listen-Button bei Platzmangel ausgeblendet werden.
 - Prüfen, dass die gespeicherte Dashboard-Ansicht nach App-Neustart unverändert bleibt.
 - Prüfen, dass Listenansicht und Widget-Ansicht weiterhin umschaltbar sind, wenn ausreichend Platz vorhanden ist.
+
+## Abschluss
+
+- GitHub-Issue: #154
+- Pull Request: #155
+- Merge-Commit: `83c5a2b`
+- Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
+- Host-Prüfungen: `./gradlew clean assembleRelease`, `./gradlew installRelease`
+- Gerätetests erfolgreich auf Pixel 10 Pro XL mit größerer Schrift und Samsung S23 mit kleinster Schrift.
