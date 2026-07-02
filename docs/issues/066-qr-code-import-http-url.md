@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / Import
 - Bereich: QR-Code-Import / Konfigurationsimport / URL-Validierung
@@ -61,15 +61,25 @@ Für lokale Geräte, Router, Shelly-APs, OpenWrt-Systeme oder einfache interne W
 
 ## Akzeptanzkriterien
 
-- [ ] QR-Code mit `https://server.domain.com/config.json` wird weiterhin akzeptiert.
-- [ ] QR-Code mit `http://server.domain.com/config.json` wird akzeptiert.
-- [ ] QR-Code mit neutraler lokaler Beispieladresse wie `http://192.0.2.10/config.json` wird akzeptiert.
-- [ ] QR-Code mit ungültigem Scheme wird abgelehnt.
-- [ ] Die Fehlermeldung nennt HTTP/HTTPS korrekt und nicht nur HTTPS.
-- [ ] Import über HTTP startet denselben Importablauf wie Import über HTTPS.
-- [ ] Fehler beim HTTP-Download werden sauber angezeigt.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+- [x] QR-Code mit `https://server.domain.com/config.json` wird weiterhin akzeptiert.
+- [x] QR-Code mit `http://server.domain.com/config.json` wird akzeptiert.
+- [x] QR-Code mit neutraler lokaler Beispieladresse wie `http://192.0.2.10/config.json` wird akzeptiert.
+- [x] QR-Code mit ungültigem Scheme wird abgelehnt.
+- [x] Die Fehlermeldung nennt HTTP/HTTPS korrekt und nicht nur HTTPS.
+- [x] Import über HTTP startet denselben Importablauf wie Import über HTTPS.
+- [x] Fehler beim HTTP-Download werden sauber angezeigt.
+- [x] Deutsche und englische Texte sind konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+
+## Abschluss
+
+- Implementiert in Branch `qr-code-import-http-url`.
+- QR-Code-Import und manueller URL-Import akzeptieren `http://` und `https://`.
+- Andere Schemes bleiben ungültig.
+- Direkte HTTP-Importe mit Portnummer werden akzeptiert.
+- HTTPS-Weiterleitungen auf HTTP bleiben blockiert.
+- Container-Prüfung: `./gradlew testDebugUnitTest` erfolgreich.
+- Host-Prüfungen laut Benutzerrückmeldung erfolgreich: `./gradlew clean assembleDebug`, `./gradlew installDebug`.
 
 ## Testhinweise
 

@@ -64,18 +64,52 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun validQrCodeUrlStartsUrlImport() = runTest(dispatcher) {
+    fun httpsQrCodeUrlStartsUrlImport() = runTest(dispatcher) {
         val transferRepository = FakeConfigurationTransferRepository()
         val viewModel = settingsViewModel(transferRepository)
         runCurrent()
 
         viewModel.prepareImportFromQrCode(
-            content = " https://example.com/switchwerk.json ",
+            content = " https://server.domain.com/switchwerk.json ",
             mode = ConfigurationImportMode.REPLACE
         )
         runCurrent()
 
-        assertEquals("https://example.com/switchwerk.json", transferRepository.lastUrl)
+        assertEquals("https://server.domain.com/switchwerk.json", transferRepository.lastUrl)
+        assertEquals(ConfigurationImportMode.REPLACE, transferRepository.lastMode)
+        assertTrue(viewModel.uiState.value.importSummary != null)
+    }
+
+    @Test
+    fun httpQrCodeUrlStartsUrlImport() = runTest(dispatcher) {
+        val transferRepository = FakeConfigurationTransferRepository()
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromQrCode(
+            content = " http://server.domain.com/switchwerk.json ",
+            mode = ConfigurationImportMode.REPLACE
+        )
+        runCurrent()
+
+        assertEquals("http://server.domain.com/switchwerk.json", transferRepository.lastUrl)
+        assertEquals(ConfigurationImportMode.REPLACE, transferRepository.lastMode)
+        assertTrue(viewModel.uiState.value.importSummary != null)
+    }
+
+    @Test
+    fun localExampleHttpQrCodeUrlStartsUrlImport() = runTest(dispatcher) {
+        val transferRepository = FakeConfigurationTransferRepository()
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromQrCode(
+            content = "http://192.0.2.10/switchwerk.json",
+            mode = ConfigurationImportMode.REPLACE
+        )
+        runCurrent()
+
+        assertEquals("http://192.0.2.10/switchwerk.json", transferRepository.lastUrl)
         assertEquals(ConfigurationImportMode.REPLACE, transferRepository.lastMode)
         assertTrue(viewModel.uiState.value.importSummary != null)
     }
@@ -88,6 +122,26 @@ class SettingsViewModelTest {
 
         viewModel.prepareImportFromQrCode(
             content = "not a url",
+            mode = ConfigurationImportMode.MERGE
+        )
+        runCurrent()
+
+        assertEquals(null, transferRepository.lastUrl)
+        assertFalse(viewModel.uiState.value.isTransferInProgress)
+        assertEquals(
+            R.string.error_invalid_qr_url,
+            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+        )
+    }
+
+    @Test
+    fun unsupportedQrCodeSchemeDoesNotStartImport() = runTest(dispatcher) {
+        val transferRepository = FakeConfigurationTransferRepository()
+        val viewModel = settingsViewModel(transferRepository)
+        runCurrent()
+
+        viewModel.prepareImportFromQrCode(
+            content = "ftp://server.domain.com/switchwerk.json",
             mode = ConfigurationImportMode.MERGE
         )
         runCurrent()

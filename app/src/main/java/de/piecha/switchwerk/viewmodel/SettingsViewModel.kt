@@ -1068,7 +1068,9 @@ class SettingsViewModel(
 
     private fun String.isValidImportUrl(): Boolean {
         val uri = runCatching { URI(this) }.getOrNull() ?: return false
-        return uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()
+        return (uri.scheme.equals("http", ignoreCase = true) ||
+            uri.scheme.equals("https", ignoreCase = true)) &&
+            !uri.host.isNullOrBlank()
     }
 
     private fun Throwable.toUiText(@StringRes fallbackResourceId: Int): UiText =
