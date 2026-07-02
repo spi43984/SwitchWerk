@@ -27,10 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.components.AboutContent
+import de.piecha.switchwerk.ui.components.StandardDialogButtons
 import de.piecha.switchwerk.ui.components.VerticalScrollIndicator
 
 private val AboutScreenPadding = 24.dp
@@ -42,6 +44,7 @@ private val AboutIconMaxWidth = 435.dp
 fun AboutScreen(onNavigateBack: () -> Unit) {
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     val versionName = context.packageManager
         .getPackageInfo(context.packageName, 0)
         .versionName
@@ -60,38 +63,52 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
     val scrollState = rememberScrollState()
     var viewportHeight by remember { mutableIntStateOf(0) }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .padding(AboutScreenPadding)
-            .onSizeChanged { viewportHeight = it.height }
+            .padding(AboutScreenPadding),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(end = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-                Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.headlineLarge)
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
             }
-            AboutContent(versionName, iconMaxWidth = aboutIconMaxWidth)
+            Text(stringResource(R.string.about_switchwerk), style = MaterialTheme.typography.headlineLarge)
         }
-        VerticalScrollIndicator(
-            scrollState = scrollState,
-            viewportHeight = viewportHeight,
-            modifier = Modifier.align(Alignment.CenterEnd)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .onSizeChanged { viewportHeight = it.height }
+        ) {
+            AboutContent(
+                versionName = versionName,
+                iconMaxWidth = aboutIconMaxWidth,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(end = 8.dp)
+            )
+            VerticalScrollIndicator(
+                scrollState = scrollState,
+                viewportHeight = viewportHeight,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
+        StandardDialogButtons(
+            actionText = stringResource(R.string.open_github_project),
+            onAction = { uriHandler.openUri(PROJECT_URL) },
+            cancelText = stringResource(R.string.close),
+            onCancel = onNavigateBack,
+            cancelUsesWeight = false
         )
     }
 }
+
+private const val PROJECT_URL = "https://github.com/spi43984/SwitchWerk"

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,8 +52,8 @@ import kotlin.math.max
 fun StandardConfigurationDialog(
     title: String,
     onDismissRequest: () -> Unit,
-    actionText: String,
-    onAction: () -> Unit,
+    actionText: String?,
+    onAction: (() -> Unit)?,
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
     scrollToBottom: Boolean = false,
@@ -239,11 +240,13 @@ private fun ScrollIndicator(
 
 @Composable
 fun StandardDialogButtons(
-    actionText: String,
-    onAction: () -> Unit,
+    actionText: String?,
+    onAction: (() -> Unit)?,
     cancelText: String,
     onCancel: () -> Unit,
-    actionEnabled: Boolean = true
+    actionEnabled: Boolean = true,
+    actionWeight: Float = 1f,
+    cancelUsesWeight: Boolean = true
 ) {
     Row(
         modifier = Modifier
@@ -252,20 +255,30 @@ fun StandardDialogButtons(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        StandardActionButton(
-            text = actionText,
-            onClick = onAction,
-            enabled = actionEnabled,
-            modifier = Modifier
+        if (actionText != null && onAction != null) {
+            StandardActionButton(
+                text = actionText,
+                onClick = onAction,
+                enabled = actionEnabled,
+                modifier = Modifier
+                    .weight(actionWeight)
+                    .fillMaxHeight()
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+        val hasAction = actionText != null && onAction != null
+        val cancelModifier = if (hasAction && cancelUsesWeight) {
+            Modifier
                 .weight(1f)
                 .fillMaxHeight()
-        )
+        } else {
+            Modifier.fillMaxHeight()
+        }
         StandardActionButton(
             text = cancelText,
             onClick = onCancel,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
+            modifier = cancelModifier
         )
     }
 }
@@ -284,8 +297,7 @@ fun StandardActionButton(
     ) {
         Text(
             text = text,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            textAlign = TextAlign.Center
         )
     }
 }

@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -24,8 +23,7 @@ import de.piecha.switchwerk.R
 
 @Composable
 fun HelpContent(
-    modifier: Modifier = Modifier,
-    onShowSetupWizard: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -37,11 +35,6 @@ fun HelpContent(
             HelpSection(R.string.help_import_title, R.string.help_import_text)
             HelpSection(R.string.help_updates_title, R.string.help_updates_text)
             HelpSection(R.string.help_privacy_title, R.string.help_privacy_text)
-            StandardActionButton(
-                text = stringResource(R.string.setup_wizard_show_again),
-                onClick = onShowSetupWizard,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }
@@ -60,8 +53,6 @@ fun AboutContent(
     modifier: Modifier = Modifier,
     iconMaxWidth: Dp = 435.dp
 ) {
-    val uriHandler = LocalUriHandler.current
-
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -87,13 +78,6 @@ fun AboutContent(
             Text(stringResource(R.string.release_date))
             Text(stringResource(R.string.about_author))
             Text(stringResource(R.string.about_license))
-            StandardActionButton(
-                text = stringResource(R.string.open_github_project),
-                onClick = { uriHandler.openUri(PROJECT_URL) },
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }
-
-private const val PROJECT_URL = "https://github.com/spi43984/SwitchWerk"

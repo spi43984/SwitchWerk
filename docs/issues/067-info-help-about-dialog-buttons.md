@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / UI
 - Bereich: Info-Texte / Hilfe / Über SwitchWerk / Compose UI
@@ -76,21 +76,21 @@ Zusätzlich sollen die Aktionsbereiche in `Über SwitchWerk` und `Hilfe` optisch
 
 ## Akzeptanzkriterien
 
-- [ ] Alle i-Texte zeigen unten rechts nur noch `Schließen`.
-- [ ] Reine Info-Texte zeigen nicht mehr gleichzeitig `OK` und `Abbrechen`.
-- [ ] `Über SwitchWerk` zeigt unten links `GitHub-Projekt öffnen`.
-- [ ] `Über SwitchWerk` zeigt rechts daneben `Schließen`.
-- [ ] Im `Über SwitchWerk`-Dialog sind beide Buttons gleich hoch.
-- [ ] Im `Über SwitchWerk`-Dialog ist der linke Button breiter und der rechte Button gerade ausreichend breit für `Schließen`.
-- [ ] `Hilfe` zeigt unten links `Einrichtungs-Assistent erneut zeigen`.
-- [ ] `Hilfe` zeigt rechts daneben `Schließen`.
-- [ ] Im Hilfe-Dialog sind beide Buttons gleich hoch.
-- [ ] Im Hilfe-Dialog ist der linke Button breiter und der rechte Button gerade ausreichend breit für `Schließen`.
-- [ ] Die Darstellung funktioniert im Portrait-Modus.
-- [ ] Die Darstellung funktioniert im Landscape-Modus.
-- [ ] Die Darstellung bleibt bei größerer Android-Schriftgröße bedienbar.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Bestehende Sicherheitsabfragen behalten die sichere Abbruchaktion rechts.
+- [x] Alle i-Texte zeigen unten rechts nur noch `Schließen`.
+- [x] Reine Info-Texte zeigen nicht mehr gleichzeitig `OK` und `Abbrechen`.
+- [x] `Über SwitchWerk` zeigt unten links `GitHub-Projekt öffnen`.
+- [x] `Über SwitchWerk` zeigt rechts daneben `Schließen`.
+- [x] Im `Über SwitchWerk`-Dialog sind beide Buttons gleich hoch.
+- [x] Im `Über SwitchWerk`-Dialog ist der linke Button breiter und der rechte Button gerade ausreichend breit für `Schließen`.
+- [x] `Hilfe` zeigt unten links `Einrichtungs-Assistent erneut zeigen`.
+- [x] `Hilfe` zeigt rechts daneben `Schließen`.
+- [x] Im Hilfe-Dialog sind beide Buttons gleich hoch.
+- [x] Im Hilfe-Dialog ist der linke Button breiter und der rechte Button gerade ausreichend breit für `Schließen`.
+- [x] Die Darstellung funktioniert im Portrait-Modus.
+- [x] Die Darstellung funktioniert im Landscape-Modus.
+- [x] Die Darstellung bleibt bei größerer Android-Schriftgröße bedienbar.
+- [x] Deutsche und englische Texte sind konsistent gepflegt.
+- [x] Bestehende Sicherheitsabfragen behalten die sichere Abbruchaktion rechts.
 
 ## Testhinweise
 

@@ -49,8 +49,9 @@ fun InfoHint(
         StandardConfigurationDialog(
             title = stringResource(titleResourceId),
             onDismissRequest = { isVisible = false },
-            actionText = stringResource(R.string.ok),
-            onAction = { isVisible = false }
+            actionText = null,
+            onAction = null,
+            cancelText = stringResource(R.string.close)
         ) {
             BulletListText(stringResource(messageResourceId))
         }

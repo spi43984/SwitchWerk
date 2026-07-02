@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.components.HelpContent
+import de.piecha.switchwerk.ui.components.StandardDialogButtons
 import de.piecha.switchwerk.ui.components.VerticalScrollIndicator
 
 @Composable
@@ -65,7 +66,6 @@ fun HelpScreen(
                 .onSizeChanged { viewportHeight = it.height }
         ) {
             HelpContent(
-                onShowSetupWizard = onShowSetupWizard,
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
@@ -77,5 +77,12 @@ fun HelpScreen(
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
+        StandardDialogButtons(
+            actionText = stringResource(R.string.setup_wizard_show_again),
+            onAction = onShowSetupWizard,
+            cancelText = stringResource(R.string.close),
+            onCancel = onNavigateBack,
+            cancelUsesWeight = false
+        )
     }
 }

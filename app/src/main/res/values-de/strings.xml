@@ -10,6 +10,7 @@
     <string name="delete">Löschen</string>
     <string name="save">Speichern</string>
     <string name="cancel">Abbrechen</string>
+    <string name="close">Schließen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="name">Name</string>
@@ -72,7 +73,7 @@
     <string name="setup_wizard_open_dashboard">3. Dashboard öffnen</string>
     <string name="setup_wizard_skip">Überspringen</string>
     <string name="setup_wizard_do_not_show_again">Nicht mehr anzeigen</string>
-    <string name="setup_wizard_show_again">Einrichtungs-Assistent erneut anzeigen</string>
+    <string name="setup_wizard_show_again">Einrichtungs-Assistent erneut zeigen</string>
     <string name="setup_wizard_system_title">Einrichtungs-Assistent</string>
     <string name="updates">Updates</string>
     <string name="update_available_menu">Update verfügbar</string>
