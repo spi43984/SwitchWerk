@@ -209,9 +209,9 @@
     <string name="export_passwords_action">Export passwords</string>
     <string name="export_passwords_warning">The export file contains Wi-Fi passwords in plain text. Only share it with people who are allowed to know these passwords.</string>
     <string name="choose_import_mode">Choose import mode</string>
-    <string name="import_from_https">Import from HTTPS URL</string>
+    <string name="import_from_https">Import from HTTP/HTTPS URL</string>
     <string name="check_import">Check import</string>
-    <string name="https_url">HTTPS URL</string>
+    <string name="https_url">HTTP/HTTPS URL</string>
     <string name="import_mode_merge">Add / overwrite</string>
     <string name="import_mode_merge_description">Existing entries are retained. Matching IDs are overwritten.</string>
     <string name="import_mode_replace">Replace everything</string>
@@ -240,7 +240,7 @@
     <string name="error_wifi_profile_save">Wi-Fi profile could not be saved</string>
     <string name="error_wifi_profile_delete">Wi-Fi profile could not be deleted</string>
     <string name="configuration_exported">Configuration was exported</string>
-    <string name="error_invalid_qr_url">QR code does not contain a valid HTTPS URL</string>
+    <string name="error_invalid_qr_url">QR code does not contain a valid HTTP/HTTPS URL</string>
     <string name="error_camera_permission">Camera permission is required to scan the QR code</string>
     <string name="default_action_label">Switch</string>
     <string name="unknown_wifi">Unknown Wi-Fi</string>

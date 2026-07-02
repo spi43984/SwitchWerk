@@ -224,9 +224,9 @@
     <string name="export_passwords_action">Passwörter exportieren</string>
     <string name="export_passwords_warning">Die Exportdatei enthält WLAN-Passwörter im Klartext. Teile sie nur mit Personen, die diese Passwörter kennen dürfen.</string>
     <string name="choose_import_mode">Importmodus wählen</string>
-    <string name="import_from_https">Aus HTTPS-URL importieren</string>
+    <string name="import_from_https">Aus HTTP/HTTPS-URL importieren</string>
     <string name="check_import">Import prüfen</string>
-    <string name="https_url">HTTPS-URL</string>
+    <string name="https_url">HTTP/HTTPS-URL</string>
     <string name="import_mode_merge">Ergänzen / überschreiben</string>
     <string name="import_mode_merge_description">Bestehende Einträge bleiben erhalten. Gleiche IDs werden überschrieben.</string>
     <string name="import_mode_replace">Alles ersetzen</string>
@@ -255,7 +255,7 @@
     <string name="error_wifi_profile_save">WLAN-Profil konnte nicht gespeichert werden</string>
     <string name="error_wifi_profile_delete">WLAN-Profil konnte nicht gelöscht werden</string>
     <string name="configuration_exported">Konfiguration wurde exportiert</string>
-    <string name="error_invalid_qr_url">QR-Code enthält keine gültige HTTPS-URL</string>
+    <string name="error_invalid_qr_url">QR-Code enthält keine gültige HTTP/HTTPS-URL</string>
     <string name="error_camera_permission">Kamera-Berechtigung wird zum Scannen des QR-Codes benötigt</string>
     <string name="default_action_label">Schalten</string>
     <string name="unknown_wifi">Unbekanntes WLAN</string>

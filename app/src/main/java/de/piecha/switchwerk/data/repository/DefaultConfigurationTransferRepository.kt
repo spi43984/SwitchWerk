@@ -30,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 
 class DefaultConfigurationTransferRepository(
@@ -76,16 +77,7 @@ class DefaultConfigurationTransferRepository(
         mode: ConfigurationImportMode
     ): PreparedConfigurationImport {
         return withContext(Dispatchers.IO) {
-            val uri = runCatching { Uri.parse(url.trim()) }
-                .getOrElse { throw IllegalArgumentException("URL ist ungültig") }
-            require(uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()) {
-                "Für den URL-Import ist eine gültige HTTPS-URL erforderlich"
-            }
-
-            val requestUrl = Request.Builder()
-                .url(uri.toString())
-                .build()
-                .url
+            val requestUrl = importHttpUrl(url)
             val json = fetchImportJson(
                 googleDriveDownloadUrl(requestUrl) ?: requestUrl
             )
@@ -388,7 +380,7 @@ class DefaultConfigurationTransferRepository(
     }
 
     private fun fetchImportJson(url: HttpUrl): String {
-        val firstResponse = executeHttpsGet(url)
+        val firstResponse = executeImportGet(url)
         firstResponse.use { response ->
             if (response.request.url.host == GOOGLE_ACCOUNTS_HOST) {
                 throw IllegalArgumentException(
@@ -415,7 +407,7 @@ class DefaultConfigurationTransferRepository(
             ?: throw IllegalArgumentException(
                 "Die URL liefert eine Webseite statt einer SwitchWerk-JSON-Datei"
             )
-        executeHttpsGet(downloadUrl).use { response ->
+        executeImportGet(downloadUrl).use { response ->
             if (!response.isSuccessful) {
                 throw IllegalArgumentException("Download-URL antwortet mit HTTP ${response.code}")
             }
@@ -428,13 +420,13 @@ class DefaultConfigurationTransferRepository(
         }
     }
 
-    private fun executeHttpsGet(url: HttpUrl) = httpClient.newCall(
+    private fun executeImportGet(url: HttpUrl) = httpClient.newCall(
         Request.Builder()
             .url(url)
             .get()
             .build()
     ).execute().also { response ->
-        if (!response.request.url.isHttps) {
+        if (url.isHttps && !response.request.url.isHttps) {
             response.close()
             throw IllegalArgumentException(
                 "Weiterleitung auf eine unsichere HTTP-URL wurde abgelehnt"
@@ -454,6 +446,14 @@ class DefaultConfigurationTransferRepository(
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
         const val GOOGLE_DRIVE_HOST = "google.com"
     }
+}
+
+internal fun importHttpUrl(url: String): HttpUrl {
+    val httpUrl = url.trim().toHttpUrlOrNull()
+    require(httpUrl != null && httpUrl.host.isNotBlank()) {
+        "Für den URL-Import ist eine gültige HTTP/HTTPS-URL erforderlich"
+    }
+    return httpUrl
 }
 
 internal fun ConfigurationDocument.normalizedForImport(): ConfigurationDocument {
