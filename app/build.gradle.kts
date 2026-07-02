@@ -28,8 +28,8 @@ android {
         applicationId = "de.piecha.switchwerk"
         minSdk = 26
         targetSdk = 36
-        versionCode = 803
-        versionName = "0.8.3"
+        versionCode = 804
+        versionName = "0.8.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
