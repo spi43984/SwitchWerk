@@ -90,13 +90,15 @@ es verändert die Priorisierungslogik nicht.
 | 064 | P0 | abgeschlossen | Input Validation For Technical Fields |
 | 065 | P0 | abgeschlossen | Adaptive Dashboard Widget Controls |
 | 066 | P0 | abgeschlossen | QR Code Import HTTP URL |
+| 067 | P0 | offen | Info, Hilfe und Über-Dialog Buttons |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 024 Authenticated Import Sources Backlog
-2. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-3. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-4. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-5. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-6. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
-7. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
+1. 067 Info, Hilfe und Über-Dialog Buttons
+2. 024 Authenticated Import Sources Backlog
+3. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+4. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+5. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+6. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+7. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+8. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
