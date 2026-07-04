@@ -16,7 +16,8 @@ data class ConfigurationImportSummary(
     val passwordsIncluded: Int,
     val passwordsDeleted: Int,
     val localWifiProfilesDeleted: Int,
-    val localDevicesDeleted: Int
+    val localDevicesDeleted: Int,
+    val externalIntentsEnabledChange: Boolean? = null
 )
 
 data class PreparedConfigurationImport(

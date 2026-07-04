@@ -80,11 +80,15 @@ Bei der Implementierung eines neuen fachlichen Issues:
    den Implementierungsstart erlaubt.
 9. Lege danach einen eigenen fachlichen Branch an oder verwende den vorhandenen Branch.
 10. Zeige den vereinbarten Issue-Scope an.
-11. Analysiere nur die betroffenen Architektur-, Package- und Pattern-Dateien.
-12. Implementiere ausschließlich den vereinbarten Issue-Scope.
-13. Prüfe Änderungen und Diff.
-14. Führe nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung aus.
-15. Aktualisiere AI_HANDOFF.md im Hauptverzeichnis.
+11. Prüfe bei jeder neuen Funktion und frage den Benutzer ausdrücklich, ob
+    zugehörige neue oder geänderte Einstellungen exportiert und importiert
+    werden sollen. Dokumentiere die Entscheidung im Issue-Scope und nimm weder
+    Übertragung noch ausschließlich lokale Speicherung stillschweigend an.
+12. Analysiere nur die betroffenen Architektur-, Package- und Pattern-Dateien.
+13. Implementiere ausschließlich den vereinbarten Issue-Scope.
+14. Prüfe Änderungen und Diff.
+15. Führe nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung aus.
+16. Aktualisiere AI_HANDOFF.md im Hauptverzeichnis.
 
 Ohne ausdrückliche Anforderung des Benutzers bleiben weiterhin verboten:
 

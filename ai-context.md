@@ -100,10 +100,14 @@ Kurzfassung:
 5. Nur vor Beginn dieser Implementierung und nur falls noch kein passendes GitHub-Issue existiert, ein GitHub-Issue aus der lokalen Issue-Datei erzeugen.
 6. Eigenen fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
 7. Scope eng halten.
-8. Änderungen prüfen.
-9. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
-10. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
-11. Nach erfolgreichem Merge immer `docs/issues/overview.txt` aktualisieren, bevor das GitHub-Issue geschlossen wird. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext oder geänderten Projektentscheidungen anpassen.
+8. Bei jeder neuen Funktion prüfen und den Benutzer ausdrücklich fragen, ob
+   zugehörige neue oder geänderte Einstellungen exportiert und importiert
+   werden sollen. Die Entscheidung im Issue-Scope dokumentieren und keine der
+   beiden Varianten stillschweigend voraussetzen.
+9. Änderungen prüfen.
+10. Build, Installation und Gerätetests auf dem Ubuntu-Host bestätigen lassen.
+11. Ohne ausdrückliche Freigabe nicht veröffentlichen, pushen, PR erstellen oder mergen.
+12. Nach erfolgreichem Merge immer `docs/issues/overview.txt` aktualisieren, bevor das GitHub-Issue geschlossen wird. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext oder geänderten Projektentscheidungen anpassen.
 
 ---
 

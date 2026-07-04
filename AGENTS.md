@@ -168,11 +168,16 @@ Für jede Implementierung eines bestehenden fachlichen Issues gilt zunächst:
 7. Danach einen eigenen Branch mit fachlichem Namen anlegen oder einen
    vorhandenen passenden Branch verwenden, z. B. `wifi-connection-service`.
 8. Ausschließlich den vereinbarten Issue-Scope implementieren.
-9. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
+9. Bei jeder neuen Funktion ausdrücklich prüfen und den Benutzer fragen, ob
+   zugehörige neue oder geänderte Einstellungen in den Konfigurationsexport
+   und -import aufgenommen werden sollen. Die Entscheidung im Issue-Scope
+   dokumentieren; weder Übertragung noch ausschließlich lokale Speicherung
+   stillschweigend annehmen.
+10. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
    und aktualisieren, damit die UI-Erklärung zum tatsächlichen Verhalten passt.
-10. Änderungen und Diff prüfen.
-11. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
-12. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
+11. Änderungen und Diff prüfen.
+12. Nur verfügbare und sinnvolle Prüfungen in der aktuellen Umgebung ausführen.
+13. Vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests
     auf dem Host ausgeben.
 
 Erlaubter GitHub-Schreibzugriff in Phase 1:

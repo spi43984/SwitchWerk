@@ -12,7 +12,11 @@ data class ConfigurationAppSettings(
     val showActionDetails: Boolean,
     val detailPanelHeight: String,
     val diagnosticsNewestFirst: Boolean,
-    val dashboardLayoutMode: String? = null
+    val dashboardLayoutMode: String? = null,
+    val language: String? = null,
+    val wifiProfileSortCriterion: String? = null,
+    val wifiProfileSortDirection: String? = null,
+    val externalIntentsEnabled: Boolean? = null
 )
 
 data class ConfigurationWifiProfile(
@@ -47,4 +51,4 @@ data class ConfigurationDeviceConnection(
     val host: String
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 5
+const val CONFIGURATION_SCHEMA_VERSION = 6

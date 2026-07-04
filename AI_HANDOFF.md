@@ -2,39 +2,48 @@
 
 Stand: 4. Juli 2026
 
-## Abgeschlossen
+## Aktive Arbeit
 
-- Issue 072 „SwitchWerk empfängt Intents“
-- GitHub-Issue: #168
-- Pull Request: #169
-- Squash-Merge auf `main`: `4844d4e feat: add external device action intents (#169)`
-- Nachkorrektur-Pull-Request: #170
-- Nachkorrektur-Squash-Merge auf `main`:
-  `7a1f188 fix: make intent errors transient (#170)`
-- Externe Geräteaktionen verwenden eine strikt validierte lokale Geräte-ID und
-  die bestehende MainViewModel-/DeviceActionService-Logik.
-- Die globale Freigabe ist standardmäßig deaktiviert. URLs, Befehle,
-  Request-Bodies und zusätzliche Extras werden nicht akzeptiert.
-- Deutsche und englische Hilfe-, Info- und Fehlertexte sowie die README sind
-  aktualisiert.
-- Container-Prüfungen und GitHub-Prüfungen waren erfolgreich. Der manuelle
-  ADB-Intent-Test wurde vom Benutzer bestätigt.
-- Die Anzeige von
-  Intent-Fehlern korrigiert: bekannte Geräte verwenden den zeitlich begrenzten
-  Widget-Fehler, nicht zuordenbare Fehler einen zeitlich begrenzten allgemeinen
-  Hinweis; alle Fälle bleiben in den Aktionsdetails erhalten.
-- Der Benutzer hat das korrigierte Verhalten auf dem Gerät bestätigt.
-- Die Hilfe enthält deutsch/englisch konsistente, per Textauswahl kopierbare
-  ADB-Beispiele für einen gültigen Intent und den Fehlertest ohne Geräte-ID.
-- Der Benutzer hat auch die kopierbaren Beispiele in der Hilfe erfolgreich
-  getestet.
+- Issue 077 „Import/Export fehlender App-Einstellungen“
+- GitHub-Issue: #171
+- Branch: `import-export-app-settings`
+- Implementierung abgeschlossen, aber noch nicht committed oder veröffentlicht.
+- Konfigurationsschema auf Version 6 erhöht.
+- Sprache, WLAN-Profil-Sortierung und globale Freigabe externer Intents werden
+  exportiert und importiert.
+- Ältere Konfigurationen ohne diese Felder behalten die lokalen Werte.
+- Ungültige Enum-Werte und unvollständige WLAN-Sortierangaben werden vor dem
+  Speichern abgelehnt.
+- Änderungen der Intent-Freigabe erscheinen vor der Importbestätigung in der
+  Zusammenfassung; die Übernahme erfolgt erst beim bestätigten Import.
+- `showSetupWizardOnStart` bleibt lokal und wird nicht übertragen.
+- Merge und Replace verwenden für die neuen App-Einstellungen dieselbe Logik.
+- Deutsche und englische Hilfe-, Info- und Zusammenfassungstexte wurden auf
+  Konsistenz geprüft und an den tatsächlichen Transferumfang angepasst.
+- Die englische Fallback-Ressource enthält für die relevanten Import-/Export-
+  Statusmeldungen keine deutschen Texte mehr.
 
-## Nächster Stand
+## Prüfstand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 077
-  „Import/Export fehlender App-Einstellungen“.
-- Weitere Reihenfolge und Status ausschließlich aus `docs/issues/overview.txt`
-  entnehmen.
+- Gezielte Unit-Tests: erfolgreich.
+- Gesamte Debug-Unit-Test-Suite im Container: erfolgreich.
+- `lintDebug` im Container: erfolgreich.
+- `git diff --check`: erfolgreich.
+- Der Benutzer hat den lokalen Host-/Gerätetest als erfolgreich bestätigt.
+
+## Nächster Schritt
+
+- Auf ausdrückliche Freigabe: Änderungen committen, pushen und Pull Request
+  erstellen.
+- Issue-Datei und `docs/issues/overview.txt` erst nach Merge gemäß
+  Abschluss-Workflow aktualisieren.
+- Dauerhafte neue Projektregel: Bei jeder neuen Funktion muss ausdrücklich
+  geprüft und der Benutzer gefragt werden, ob zugehörige Einstellungen
+  exportiert und importiert werden sollen. Die Regel steht in `AGENTS.md`,
+  `ai-context.md` und `AI_SESSION_PROMPT.md`.
+
+Für die nächste Session `AI_SESSION_PROMPT.md` als wiederverwendbare
+Startvorlage verwenden.
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
 GitHub-Issue schließen oder Branch löschen.

@@ -24,6 +24,16 @@ class ConfigurationJsonCodec {
                     settings.dashboardLayoutMode?.let { dashboardLayoutMode ->
                         writer.name("dashboardLayoutMode").value(dashboardLayoutMode)
                     }
+                    settings.language?.let { writer.name("language").value(it) }
+                    settings.wifiProfileSortCriterion?.let {
+                        writer.name("wifiProfileSortCriterion").value(it)
+                    }
+                    settings.wifiProfileSortDirection?.let {
+                        writer.name("wifiProfileSortDirection").value(it)
+                    }
+                    settings.externalIntentsEnabled?.let {
+                        writer.name("externalIntentsEnabled").value(it)
+                    }
                     writer.endObject()
                 }
                 writer.name("wifiProfiles")
@@ -113,6 +123,10 @@ class ConfigurationJsonCodec {
         var detailPanelHeight: String? = null
         var diagnosticsNewestFirst: Boolean? = null
         var dashboardLayoutMode: String? = null
+        var language: String? = null
+        var wifiProfileSortCriterion: String? = null
+        var wifiProfileSortDirection: String? = null
+        var externalIntentsEnabled: Boolean? = null
 
         beginObject()
         while (hasNext()) {
@@ -122,6 +136,10 @@ class ConfigurationJsonCodec {
                 "detailPanelHeight" -> detailPanelHeight = nextString()
                 "diagnosticsNewestFirst" -> diagnosticsNewestFirst = nextBoolean()
                 "dashboardLayoutMode" -> dashboardLayoutMode = nextString()
+                "language" -> language = nextString()
+                "wifiProfileSortCriterion" -> wifiProfileSortCriterion = nextString()
+                "wifiProfileSortDirection" -> wifiProfileSortDirection = nextString()
+                "externalIntentsEnabled" -> externalIntentsEnabled = nextBoolean()
                 else -> skipValue()
             }
         }
@@ -141,7 +159,11 @@ class ConfigurationJsonCodec {
                 diagnosticsNewestFirst,
                 "appSettings.diagnosticsNewestFirst"
             ),
-            dashboardLayoutMode = dashboardLayoutMode
+            dashboardLayoutMode = dashboardLayoutMode,
+            language = language,
+            wifiProfileSortCriterion = wifiProfileSortCriterion,
+            wifiProfileSortDirection = wifiProfileSortDirection,
+            externalIntentsEnabled = externalIntentsEnabled
         )
     }
 

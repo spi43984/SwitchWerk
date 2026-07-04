@@ -1647,6 +1647,18 @@ private fun ImportSummaryContent(
         ImportSummaryRow(stringResource(R.string.import_summary_wifi_profiles_label), wifiProfilesText)
         ImportSummaryRow(stringResource(R.string.import_summary_devices_label), devicesText)
         ImportSummaryRow(stringResource(R.string.import_summary_passwords_label), passwordsText)
+        summary.externalIntentsEnabledChange?.let { enabled ->
+            ImportSummaryRow(
+                stringResource(R.string.import_summary_external_intents_label),
+                stringResource(
+                    if (enabled) {
+                        R.string.import_summary_external_intents_enabled
+                    } else {
+                        R.string.import_summary_external_intents_disabled
+                    }
+                )
+            )
+        }
     }
 }
 
