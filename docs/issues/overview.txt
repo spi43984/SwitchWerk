@@ -94,13 +94,25 @@ es verändert die Priorisierungslogik nicht.
 | 068 | P0 | abgeschlossen | GUI-Navigation und Konfiguration vereinfachen |
 | 069 | P0 | abgeschlossen | Stable Latest APK Release Asset |
 | 070 | P0 | abgeschlossen | Dependabot Vulnerabilities prüfen |
+| 071 | P1 | offen | App Shortcuts |
+| 072 | P1 | offen | SwitchWerk empfängt Intents |
+| 073 | P2 | offen | Farbige Geräte |
+| 074 | P1 | offen | Gruppen |
+| 075 | P1 | offen | Schnellkacheln |
+| 076 | P2 | offen | Templates |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 024 Authenticated Import Sources Backlog
-2. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-3. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-4. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-5. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-6. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
-7. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
+1. 071 App Shortcuts
+2. 072 SwitchWerk empfängt Intents
+3. 074 Gruppen
+4. 075 Schnellkacheln
+5. 073 Farbige Geräte
+6. 076 Templates
+7. 024 Authenticated Import Sources Backlog
+8. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+9. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+10. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+11. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+12. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+13. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
