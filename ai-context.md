@@ -168,6 +168,15 @@ anderer Profil-ID wird beim Merge-Import abgelehnt. Importierte
 Geräte-Zuordnungen bleiben auf die in der Importdatei referenzierten
 Profil-IDs bezogen.
 
+Dynamische Android App Shortcuts werden pro Gerät über `shortcutEnabled`
+konfiguriert. Die Einstellung gehört zur lokalen Room-Konfiguration und zum
+Konfigurationsimport/-export; fehlt sie in älteren Importen, gilt der sichere
+Default `false`. Shortcuts werden zentral aus dem Geräte-Repository aktualisiert,
+folgen der Dashboard-Reihenfolge und sind auf höchstens vier beziehungsweise das
+niedrigere Android-Systemlimit begrenzt. Ein Shortcut enthält nur die opake
+Geräte-ID und führt die Aktion über dieselbe ViewModel-/DeviceActionService-Logik
+wie das Dashboard aus.
+
 ---
 
 ## Zielgeräte

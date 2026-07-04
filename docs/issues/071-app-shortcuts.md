@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: Feature / UX
 - Bereich: Android App Shortcuts / Dashboard / Geräteaktionen
@@ -61,15 +61,22 @@ Android App Shortcuts bieten dafür einen einfachen Einstieg, ohne Cloud, Accoun
 
 ## Akzeptanzkriterien
 
-- [ ] Für ausgewählte Geräteaktionen werden Android App Shortcuts angelegt.
-- [ ] Ein Shortcut startet die passende bestehende Geräteaktion.
-- [ ] Fortschritt, Erfolg und Fehler werden für Shortcut-Aktionen verständlich angezeigt.
-- [ ] Umbenannte Geräte aktualisieren ihre Shortcut-Beschriftung.
-- [ ] Gelöschte Geräte entfernen zugehörige Shortcuts.
-- [ ] Die Anzahl veröffentlichter Shortcuts bleibt Android-kompatibel begrenzt.
-- [ ] Keine sensiblen Daten werden in Shortcuts, Logs oder sichtbaren technischen Daten gespeichert.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+- [x] Für ausgewählte Geräteaktionen werden Android App Shortcuts angelegt.
+- [x] Ein Shortcut startet die passende bestehende Geräteaktion.
+- [x] Fortschritt, Erfolg und Fehler werden für Shortcut-Aktionen verständlich angezeigt.
+- [x] Umbenannte Geräte aktualisieren ihre Shortcut-Beschriftung.
+- [x] Gelöschte Geräte entfernen zugehörige Shortcuts.
+- [x] Die Anzahl veröffentlichter Shortcuts bleibt Android-kompatibel begrenzt.
+- [x] Keine sensiblen Daten werden in Shortcuts, Logs oder sichtbaren technischen Daten gespeichert.
+- [x] Deutsche und englische Texte sind konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+
+## Abschluss
+
+- Implementierung: Pull Request #167
+- GitHub-Issue: #166
+- Release-Build, Installation und Gerätetest wurden auf dem Ubuntu-Host bestätigt.
+- GitHub Android Quality Checks und Dependency Submission waren erfolgreich.
 
 ## Testhinweise
 
