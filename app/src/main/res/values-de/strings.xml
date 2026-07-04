@@ -23,9 +23,9 @@
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
     <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
-    <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung, Updates und Aktionsdetails\n• Konfigurationen: Konfiguration exportieren oder importieren</string>
+    <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung, Updates, Aktionsdetails und externe Intents\n• Konfigurationen: Konfiguration exportieren oder importieren</string>
     <string name="system_info_title">System</string>
-    <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden</string>
+    <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden\n• Externe Intents erlauben oder sperren</string>
     <string name="backup_info">• Export speichert die lokale Konfiguration\n• Import übernimmt eine Konfiguration aus einer vertrauenswürdigen Quelle\n• Passwörter nur bewusst ohne oder mit Passwortwerten auswählen\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
@@ -42,6 +42,15 @@
     <string name="app_shortcut_description">Geräteaktion beim langen Drücken auf das App-Symbol anbieten. Android zeigt höchstens vier ausgewählte Aktionen.</string>
     <string name="help_shortcuts_title">App-Shortcuts</string>
     <string name="help_shortcuts_text">• Im Geräte-Dialog pro Aktion aktivieren\n• App-Symbol lange drücken und die Aktion auswählen\n• Es werden höchstens vier aktivierte Aktionen gemäß Dashboard-Reihenfolge angeboten\n• Fortschritt und Ergebnis erscheinen im Dashboard</string>
+    <string name="help_external_intents_title">Externe Intents</string>
+    <string name="help_external_intents_text">• Externe Intents unter Einstellungen → System aktivieren\n• Die stabile lokale Geräte-ID steht in einer exportierten Konfiguration\n• Akzeptiert wird nur die lokale ID eines vorhandenen Geräts\n• URLs, Befehle, Request-Bodies und zusätzliche Extras werden abgelehnt\n• Der Intent öffnet SwitchWerk im Vordergrund\n• Fortschritt und Ergebnis erscheinen im Dashboard</string>
+    <string name="external_intents_title">Externe Intents</string>
+    <string name="external_intents_enable">Externe Intents erlauben</string>
+    <string name="external_intents_description">Standardmäßig deaktiviert. Andere Apps können konfigurierte Geräteaktionen ausschließlich über ihre lokale ID starten.</string>
+    <string name="external_intent_disabled_error">Externe Intents sind in den Einstellungen deaktiviert.</string>
+    <string name="external_intent_missing_device_id_error">Der externe Intent enthält keine Geräte-ID.</string>
+    <string name="external_intent_unknown_device_error">Der externe Intent verweist auf ein unbekanntes Gerät.</string>
+    <string name="external_intent_invalid_error">Der externe Intent ist ungültig und wurde abgelehnt.</string>
     <string name="wifi_assignment_dialog_info_title">WLAN-Zuordnung</string>
     <string name="wifi_assignment_dialog_info">• WLAN-Profil für das Gerät auswählen\n• lokale Geräteadresse eintragen\n• kein Internetzugang erforderlich</string>
     <string name="about_switchwerk">Über SwitchWerk</string>

@@ -433,6 +433,11 @@ fun SettingsScreen(
                                 onDiagnosticsNewestFirstChange = viewModel::setDiagnosticsNewestFirst
                             )
                             HorizontalDivider()
+                            ExternalIntentsSettingsSection(
+                                enabled = uiState.appSettings.externalIntentsEnabled,
+                                onEnabledChange = viewModel::setExternalIntentsEnabled
+                            )
+                            HorizontalDivider()
                             SystemSetupWizardSection(
                                 onShowSetupWizard = {
                                     viewModel.showSetupWizardAgain()
@@ -627,6 +632,36 @@ fun SettingsScreen(
                 viewModel.cancelPendingImport()
             }
         )
+    }
+}
+
+@Composable
+private fun ExternalIntentsSettingsSection(
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit
+) {
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                stringResource(R.string.external_intents_title),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(36.dp)
+                    .clickable { onEnabledChange(!enabled) },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.external_intents_enable))
+                Switch(checked = enabled, onCheckedChange = onEnabledChange)
+            }
+            Text(
+                stringResource(R.string.external_intents_description),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }
 

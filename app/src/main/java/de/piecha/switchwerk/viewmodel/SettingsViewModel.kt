@@ -151,6 +151,10 @@ class SettingsViewModel(
         appSettingsRepository.setDiagnosticsNewestFirst(diagnosticsNewestFirst)
     }
 
+    fun setExternalIntentsEnabled(enabled: Boolean) {
+        appSettingsRepository.setExternalIntentsEnabled(enabled)
+    }
+
     fun setWifiProfileSorting(
         criterion: WifiProfileSortCriterion,
         direction: WifiProfileSortDirection

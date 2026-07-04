@@ -24,6 +24,7 @@ import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
+import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -207,6 +208,39 @@ class MainViewModel(
 
     fun executeDeviceAction(deviceId: String) {
         _uiState.value.devices.firstOrNull { it.id == deviceId }?.let(::executeDeviceAction)
+    }
+
+    fun handleExternalDeviceAction(result: ExternalDeviceActionIntentResult) {
+        if (!_uiState.value.appSettings.externalIntentsEnabled) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = uiText(R.string.external_intent_disabled_error)
+            )
+            return
+        }
+        when (result) {
+            is ExternalDeviceActionIntentResult.Valid -> {
+                val device = _uiState.value.devices.firstOrNull { it.id == result.deviceId }
+                if (device == null) {
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = uiText(R.string.external_intent_unknown_device_error)
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(errorMessage = null)
+                    executeDeviceAction(device)
+                }
+            }
+            ExternalDeviceActionIntentResult.MissingDeviceId -> {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = uiText(R.string.external_intent_missing_device_id_error)
+                )
+            }
+            ExternalDeviceActionIntentResult.InvalidDeviceId,
+            ExternalDeviceActionIntentResult.UnexpectedExtras -> {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = uiText(R.string.external_intent_invalid_error)
+                )
+            }
+        }
     }
 
     fun cancelDeviceAction(deviceId: String) {

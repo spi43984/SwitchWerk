@@ -42,5 +42,6 @@ data class AppSettings(
     val dashboardLayoutMode: DashboardLayoutMode = DashboardLayoutMode.LIST,
     val wifiProfileSortCriterion: WifiProfileSortCriterion = WifiProfileSortCriterion.PROFILE_NAME,
     val wifiProfileSortDirection: WifiProfileSortDirection = WifiProfileSortDirection.ASCENDING,
-    val showSetupWizardOnStart: Boolean = true
+    val showSetupWizardOnStart: Boolean = true,
+    val externalIntentsEnabled: Boolean = false
 )
