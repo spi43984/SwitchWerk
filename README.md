@@ -29,6 +29,10 @@ akzeptiert.
 Die Geräte-ID steht beim jeweiligen Gerät im Feld `id` einer exportierten
 SwitchWerk-Konfiguration. Der Intent startet die `MainActivity`; SwitchWerk wird
 daher im Vordergrund geöffnet und zeigt dort Fortschritt und Ergebnis an.
+Fehler für eine bekannte Geräte-ID erscheinen vorübergehend am zugehörigen
+Gerät. Nicht zuordenbare Intent-Fehler werden vorübergehend oberhalb der
+Geräteliste angezeigt. Alle Intent-Fehler bleiben zusätzlich in den
+Aktionsdetails erhalten, bis das Protokoll gelöscht wird.
 
 ```bash
 adb shell am start -n de.piecha.switchwerk/.MainActivity \
@@ -39,6 +43,9 @@ adb shell am start -n de.piecha.switchwerk/.MainActivity \
 Action: `de.piecha.switchwerk.action.RUN_DEVICE_ACTION`
 
 Pflicht-Extra: `de.piecha.switchwerk.extra.DEVICE_ID` (String)
+
+Dieselben Befehle stehen in der App-Hilfe als auswählbare Textblöcke bereit und
+können dort durch langes Drücken kopiert werden.
 
 ## Entwicklung
 

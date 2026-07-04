@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import de.piecha.switchwerk.R
 
 @Composable
@@ -35,8 +37,26 @@ fun HelpContent(
             HelpSection(R.string.help_import_title, R.string.help_import_text)
             HelpSection(R.string.help_shortcuts_title, R.string.help_shortcuts_text)
             HelpSection(R.string.help_external_intents_title, R.string.help_external_intents_text)
+            SelectableHelpSection(
+                R.string.help_external_intents_examples_title,
+                R.string.help_external_intents_examples_text
+            )
             HelpSection(R.string.help_updates_title, R.string.help_updates_text)
             HelpSection(R.string.help_privacy_title, R.string.help_privacy_text)
+        }
+    }
+}
+
+@Composable
+private fun SelectableHelpSection(titleResourceId: Int, textResourceId: Int) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(titleResourceId), style = MaterialTheme.typography.titleSmall)
+        SelectionContainer {
+            Text(
+                text = stringResource(textResourceId),
+                fontFamily = FontFamily.Monospace,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }

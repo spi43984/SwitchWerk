@@ -43,10 +43,12 @@
     <string name="help_shortcuts_title">App shortcuts</string>
     <string name="help_shortcuts_text">• Enable an action in its device dialog\n• Long-press the app icon and select the action\n• At most four enabled actions are offered in dashboard order\n• Progress and results appear on the dashboard</string>
     <string name="help_external_intents_title">External intents</string>
-    <string name="help_external_intents_text">• Enable external intents in Settings → System\n• Find the stable local device ID in an exported configuration\n• Only an existing local device ID is accepted\n• URLs, commands, request bodies, and additional extras are rejected\n• The intent opens SwitchWerk in the foreground\n• Progress and results appear on the dashboard</string>
+    <string name="help_external_intents_text">• Enable external intents in Settings → System\n• Find the stable local device ID in an exported configuration\n• Only an existing local device ID is accepted\n• URLs, commands, request bodies, and additional extras are rejected\n• The intent opens SwitchWerk in the foreground\n• Progress and results appear on the dashboard\n• Error notices disappear automatically but remain in Action details until cleared</string>
+    <string name="help_external_intents_examples_title">Copyable ADB examples</string>
+    <string name="help_external_intents_examples_text">Valid device action (replace device-123 with the local device ID):\nadb shell am start -n de.piecha.switchwerk/.MainActivity -a de.piecha.switchwerk.action.RUN_DEVICE_ACTION --es de.piecha.switchwerk.extra.DEVICE_ID device-123\n\nMissing device ID (error test):\nadb shell am start -n de.piecha.switchwerk/.MainActivity -a de.piecha.switchwerk.action.RUN_DEVICE_ACTION</string>
     <string name="external_intents_title">External intents</string>
     <string name="external_intents_enable">Allow external intents</string>
-    <string name="external_intents_description">Disabled by default. Other apps can start configured device actions by local ID only.</string>
+    <string name="external_intents_description">Disabled by default. Other apps can start configured device actions by local ID only. Error notices disappear automatically and remain in Action details until cleared.</string>
     <string name="external_intent_disabled_error">External intents are disabled in Settings.</string>
     <string name="external_intent_missing_device_id_error">The external intent has no device ID.</string>
     <string name="external_intent_unknown_device_error">The external intent references an unknown device.</string>

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -71,11 +72,53 @@ class MainViewModelTest {
         runCurrent()
 
         assertEquals(0, actionService.callCount)
+        assertEquals(null, viewModel.uiState.value.errorMessage)
+        val actionError = viewModel.uiState.value.deviceActionStates["device-1"]
+            as DeviceActionUiState.Error
         assertEquals(
             R.string.external_intent_disabled_error,
-            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+            (actionError.message as UiText.Resource).resourceId
         )
+        assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+
+        advanceTimeBy(4_001L)
+        runCurrent()
+
+        assertEquals(null, viewModel.uiState.value.deviceActionStates["device-1"])
+        assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
     }
+
+    @Test
+    fun unassignedExternalIntentErrorIsTemporaryButRemainsInDiagnostics() =
+        runTest(dispatcher) {
+            val viewModel = MainViewModel(
+                repository = FakeDeviceRepository(emptyList()),
+                deviceActionService = WaitingDeviceActionService(),
+                appSettingsRepository = FakeAppSettingsRepository(
+                    AppSettings(externalIntentsEnabled = true)
+                ),
+                wifiProfileRepository = FakeWifiProfileRepository(),
+                wifiProximityService = FixedWifiProximityService(),
+                appUpdateRepository = FakeAppUpdateRepository()
+            )
+            runCurrent()
+
+            viewModel.handleExternalDeviceAction(
+                ExternalDeviceActionIntentResult.MissingDeviceId
+            )
+
+            assertEquals(
+                R.string.external_intent_missing_device_id_error,
+                (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+            )
+            assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+
+            advanceTimeBy(4_001L)
+            runCurrent()
+
+            assertEquals(null, viewModel.uiState.value.errorMessage)
+            assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+        }
 
     @Test
     fun enabledExternalActionUsesExistingActionService() = runTest(dispatcher) {

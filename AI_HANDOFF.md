@@ -19,6 +19,15 @@ Stand: 4. Juli 2026
 
 ## Nächster Stand
 
+- Auf dem lokalen Branch `fix-intent-error-display` ist die Anzeige von
+  Intent-Fehlern korrigiert: bekannte Geräte verwenden den zeitlich begrenzten
+  Widget-Fehler, nicht zuordenbare Fehler einen zeitlich begrenzten allgemeinen
+  Hinweis; alle Fälle bleiben in den Aktionsdetails erhalten.
+- Der Benutzer hat das korrigierte Verhalten auf dem Gerät bestätigt.
+- Die Hilfe enthält deutsch/englisch konsistente, per Textauswahl kopierbare
+  ADB-Beispiele für einen gültigen Intent und den Fehlertest ohne Geräte-ID.
+- Der Benutzer hat auch die kopierbaren Beispiele in der Hilfe erfolgreich
+  getestet.
 - Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 074 „Gruppen“.
 - Weitere Reihenfolge und Status ausschließlich aus `docs/issues/overview.txt`
   entnehmen.

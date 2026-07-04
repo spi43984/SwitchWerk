@@ -102,6 +102,7 @@ class MainViewModel(
     private val actionJobs = mutableMapOf<String, Job>()
     private val userCancelledActionIds = mutableSetOf<String>()
     private val actionStateResetJobs = mutableMapOf<String, Job>()
+    private var generalErrorResetJob: Job? = null
     private var wifiProfiles: List<WifiProfile> = emptyList()
     private var wifiProximitySnapshot = WifiProximitySnapshot()
     private var wifiRefreshJob: Job? = null
@@ -211,34 +212,62 @@ class MainViewModel(
     }
 
     fun handleExternalDeviceAction(result: ExternalDeviceActionIntentResult) {
+        val validDevice = (result as? ExternalDeviceActionIntentResult.Valid)?.let { request ->
+            _uiState.value.devices.firstOrNull { it.id == request.deviceId }
+        }
         if (!_uiState.value.appSettings.externalIntentsEnabled) {
-            _uiState.value = _uiState.value.copy(
-                errorMessage = uiText(R.string.external_intent_disabled_error)
+            reportExternalIntentError(
+                message = uiText(R.string.external_intent_disabled_error),
+                deviceId = validDevice?.id
             )
             return
         }
         when (result) {
             is ExternalDeviceActionIntentResult.Valid -> {
-                val device = _uiState.value.devices.firstOrNull { it.id == result.deviceId }
-                if (device == null) {
-                    _uiState.value = _uiState.value.copy(
-                        errorMessage = uiText(R.string.external_intent_unknown_device_error)
+                if (validDevice == null) {
+                    reportExternalIntentError(
+                        uiText(R.string.external_intent_unknown_device_error)
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(errorMessage = null)
-                    executeDeviceAction(device)
+                    executeDeviceAction(validDevice)
                 }
             }
             ExternalDeviceActionIntentResult.MissingDeviceId -> {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = uiText(R.string.external_intent_missing_device_id_error)
+                reportExternalIntentError(
+                    uiText(R.string.external_intent_missing_device_id_error)
                 )
             }
             ExternalDeviceActionIntentResult.InvalidDeviceId,
             ExternalDeviceActionIntentResult.UnexpectedExtras -> {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = uiText(R.string.external_intent_invalid_error)
+                reportExternalIntentError(
+                    uiText(R.string.external_intent_invalid_error)
                 )
+            }
+        }
+    }
+
+    private fun reportExternalIntentError(message: UiText, deviceId: String? = null) {
+        appendActionSeparator()
+        appendDiagnosticMessage(message, elapsedMillis = 0L)
+        if (deviceId != null) {
+            actionStateResetJobs.remove(deviceId)?.cancel()
+            val errorState = DeviceActionUiState.Error(message)
+            updateDeviceActionState(deviceId, errorState)
+            scheduleActionStateReset(
+                deviceId = deviceId,
+                state = errorState,
+                delayMillis = ACTION_ERROR_DISPLAY_MILLIS
+            )
+            return
+        }
+
+        generalErrorResetJob?.cancel()
+        _uiState.value = _uiState.value.copy(errorMessage = message)
+        generalErrorResetJob = viewModelScope.launch {
+            delay(ACTION_ERROR_DISPLAY_MILLIS)
+            if (_uiState.value.errorMessage == message) {
+                _uiState.value = _uiState.value.copy(errorMessage = null)
             }
         }
     }

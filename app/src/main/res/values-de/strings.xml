@@ -43,10 +43,12 @@
     <string name="help_shortcuts_title">App-Shortcuts</string>
     <string name="help_shortcuts_text">• Im Geräte-Dialog pro Aktion aktivieren\n• App-Symbol lange drücken und die Aktion auswählen\n• Es werden höchstens vier aktivierte Aktionen gemäß Dashboard-Reihenfolge angeboten\n• Fortschritt und Ergebnis erscheinen im Dashboard</string>
     <string name="help_external_intents_title">Externe Intents</string>
-    <string name="help_external_intents_text">• Externe Intents unter Einstellungen → System aktivieren\n• Die stabile lokale Geräte-ID steht in einer exportierten Konfiguration\n• Akzeptiert wird nur die lokale ID eines vorhandenen Geräts\n• URLs, Befehle, Request-Bodies und zusätzliche Extras werden abgelehnt\n• Der Intent öffnet SwitchWerk im Vordergrund\n• Fortschritt und Ergebnis erscheinen im Dashboard</string>
+    <string name="help_external_intents_text">• Externe Intents unter Einstellungen → System aktivieren\n• Die stabile lokale Geräte-ID steht in einer exportierten Konfiguration\n• Akzeptiert wird nur die lokale ID eines vorhandenen Geräts\n• URLs, Befehle, Request-Bodies und zusätzliche Extras werden abgelehnt\n• Der Intent öffnet SwitchWerk im Vordergrund\n• Fortschritt und Ergebnis erscheinen im Dashboard\n• Fehlerhinweise verschwinden automatisch, bleiben aber bis zum Löschen in den Aktionsdetails</string>
+    <string name="help_external_intents_examples_title">Kopierbare ADB-Beispiele</string>
+    <string name="help_external_intents_examples_text">Gültige Geräteaktion (device-123 durch die lokale Geräte-ID ersetzen):\nadb shell am start -n de.piecha.switchwerk/.MainActivity -a de.piecha.switchwerk.action.RUN_DEVICE_ACTION --es de.piecha.switchwerk.extra.DEVICE_ID device-123\n\nFehlende Geräte-ID (Fehlertest):\nadb shell am start -n de.piecha.switchwerk/.MainActivity -a de.piecha.switchwerk.action.RUN_DEVICE_ACTION</string>
     <string name="external_intents_title">Externe Intents</string>
     <string name="external_intents_enable">Externe Intents erlauben</string>
-    <string name="external_intents_description">Standardmäßig deaktiviert. Andere Apps können konfigurierte Geräteaktionen ausschließlich über ihre lokale ID starten.</string>
+    <string name="external_intents_description">Standardmäßig deaktiviert. Andere Apps können konfigurierte Geräteaktionen ausschließlich über ihre lokale ID starten. Fehlerhinweise verschwinden automatisch und bleiben bis zum Löschen in den Aktionsdetails.</string>
     <string name="external_intent_disabled_error">Externe Intents sind in den Einstellungen deaktiviert.</string>
     <string name="external_intent_missing_device_id_error">Der externe Intent enthält keine Geräte-ID.</string>
     <string name="external_intent_unknown_device_error">Der externe Intent verweist auf ein unbekanntes Gerät.</string>

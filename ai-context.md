@@ -185,7 +185,11 @@ akzeptiert ausschließlich die opake lokale Geräte-ID im String-Extra
 Request-Bodies werden abgelehnt. Die Activity bleibt dünn und delegiert nach
 der Validierung über das MainViewModel an dieselbe DeviceActionService-Logik
 wie Dashboard und App Shortcuts. Der Activity-basierte Aufruf öffnet die App im
-Vordergrund.
+Vordergrund. Intent-Fehler für eine bekannte Geräte-ID verwenden den normalen,
+zeitlich begrenzten Fehlerstatus des Geräte-Widgets. Nicht zuordenbare Fehler
+erscheinen zeitlich begrenzt oberhalb der Geräteliste. Beide Varianten bleiben
+bis zum manuellen Löschen in den Aktionsdetails erhalten. Die App-Hilfe bietet
+auswählbare ADB-Beispiele für gültige und fehlerhafte Aufrufe.
 
 ---
 
