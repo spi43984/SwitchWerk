@@ -31,7 +31,8 @@ Stand: 4. Juli 2026
 
 ## Nächster Stand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 074 „Gruppen“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 077
+  „Import/Export fehlender App-Einstellungen“.
 - Weitere Reihenfolge und Status ausschließlich aus `docs/issues/overview.txt`
   entnehmen.
 
