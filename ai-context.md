@@ -177,6 +177,16 @@ niedrigere Android-Systemlimit begrenzt. Ein Shortcut enthält nur die opake
 Geräte-ID und führt die Aktion über dieselbe ViewModel-/DeviceActionService-Logik
 wie das Dashboard aus.
 
+Externe Android-Intents für Geräteaktionen sind global in den
+Systemeinstellungen aktivierbar und verwenden den sicheren Default `false`.
+Die dokumentierte Action `de.piecha.switchwerk.action.RUN_DEVICE_ACTION`
+akzeptiert ausschließlich die opake lokale Geräte-ID im String-Extra
+`de.piecha.switchwerk.extra.DEVICE_ID`; zusätzliche Extras, URLs, Befehle und
+Request-Bodies werden abgelehnt. Die Activity bleibt dünn und delegiert nach
+der Validierung über das MainViewModel an dieselbe DeviceActionService-Logik
+wie Dashboard und App Shortcuts. Der Activity-basierte Aufruf öffnet die App im
+Vordergrund.
+
 ---
 
 ## Zielgeräte

@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: Feature / Integration
 - Bereich: Android Intents / Automatisierung / Geräteaktionen
@@ -61,15 +61,36 @@ SwitchWerk eignet sich für lokale, kurze Geräteaktionen. Andere Android-Apps w
 
 ## Akzeptanzkriterien
 
-- [ ] SwitchWerk kann einen expliziten Intent zum Starten einer bestehenden Geräteaktion empfangen.
-- [ ] Aktionen werden über stabile lokale IDs referenziert.
-- [ ] Ungültige, fehlende oder unbekannte Parameter werden sicher abgelehnt.
-- [ ] Es werden keine beliebigen URLs oder Befehle aus externen Intents ausgeführt.
-- [ ] Die bestehende Geräteaktionslogik wird wiederverwendet.
-- [ ] Fortschritt, Erfolg und Fehler werden verständlich angezeigt.
-- [ ] Sicherheitseinstellungen oder Freigaben sind geprüft und umgesetzt, falls erforderlich.
-- [ ] Intent-Nutzung ist dokumentiert.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt, sofern UI-Texte ergänzt werden.
+- [x] SwitchWerk kann einen expliziten Intent zum Starten einer bestehenden Geräteaktion empfangen.
+- [x] Aktionen werden über stabile lokale IDs referenziert.
+- [x] Ungültige, fehlende oder unbekannte Parameter werden sicher abgelehnt.
+- [x] Es werden keine beliebigen URLs oder Befehle aus externen Intents ausgeführt.
+- [x] Die bestehende Geräteaktionslogik wird wiederverwendet.
+- [x] Fortschritt, Erfolg und Fehler werden verständlich angezeigt.
+- [x] Sicherheitseinstellungen oder Freigaben sind geprüft und umgesetzt, falls erforderlich.
+- [x] Intent-Nutzung ist dokumentiert.
+- [x] Deutsche und englische Texte sind konsistent gepflegt, sofern UI-Texte ergänzt werden.
+
+## Umsetzung
+
+- GitHub-Issue: #168
+- Pull Request: #169
+- Externe Intents sind global aktivierbar und standardmäßig deaktiviert.
+- Die Action `de.piecha.switchwerk.action.RUN_DEVICE_ACTION` akzeptiert nur das
+  String-Extra `de.piecha.switchwerk.extra.DEVICE_ID`.
+- Die Activity validiert den Intent über einen kleinen Parser und delegiert die
+  lokale Geräte-ID an das MainViewModel. Netzwerk- und Geräteaktionslogik bleibt
+  im bestehenden DeviceActionService.
+- Hilfe-, Info- und Fehlertexte sind auf Deutsch und Englisch gepflegt; die
+  README dokumentiert den ADB-Aufruf und das Vordergrundverhalten.
+
+## Prüfergebnis
+
+- `./gradlew lintDebug`: erfolgreich
+- `./gradlew testDebugUnitTest`: erfolgreich
+- GitHub Android Quality Checks: erfolgreich
+- GitHub Dependency Submission: erfolgreich
+- Manueller ADB-Test mit einer konfigurierten Geräte-ID: erfolgreich
 
 ## Testhinweise
 

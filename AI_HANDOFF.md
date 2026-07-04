@@ -2,31 +2,26 @@
 
 Stand: 4. Juli 2026
 
-## Aktive Arbeit
+## Abgeschlossen
 
-- Issue 072 „SwitchWerk empfängt Intents“ ist auf dem lokalen Branch
-  `switchwerk-intents` implementiert, aber noch nicht auf dem Ubuntu-Host
-  bestätigt oder veröffentlicht.
-- Zugehöriges GitHub-Issue: #168.
-- Externe Intents sind standardmäßig deaktiviert und global unter
-  Einstellungen → System aktivierbar.
-- Die Action `de.piecha.switchwerk.action.RUN_DEVICE_ACTION` akzeptiert
-  ausschließlich das String-Extra `de.piecha.switchwerk.extra.DEVICE_ID`.
-- Der Parser lehnt fehlende, ungültige und zusätzliche Parameter ab. Das
-  MainViewModel löst nur bereits konfigurierte Geräte-IDs auf und verwendet die
-  bestehende DeviceActionService-Logik.
-- Start-Intents und `onNewIntent` werden verarbeitet; Fortschritt und Ergebnis
-  erscheinen im vorhandenen Dashboard-/Aktionsprotokoll.
-- Deutsche und englische UI-/Hilfetexte sowie die README-Nutzungsdokumentation
-  sind ergänzt.
+- Issue 072 „SwitchWerk empfängt Intents“
+- GitHub-Issue: #168
+- Pull Request: #169
+- Squash-Merge auf `main`: `4844d4e feat: add external device action intents (#169)`
+- Externe Geräteaktionen verwenden eine strikt validierte lokale Geräte-ID und
+  die bestehende MainViewModel-/DeviceActionService-Logik.
+- Die globale Freigabe ist standardmäßig deaktiviert. URLs, Befehle,
+  Request-Bodies und zusätzliche Extras werden nicht akzeptiert.
+- Deutsche und englische Hilfe-, Info- und Fehlertexte sowie die README sind
+  aktualisiert.
+- Container-Prüfungen und GitHub-Prüfungen waren erfolgreich. Der manuelle
+  ADB-Intent-Test wurde vom Benutzer bestätigt.
 
-## Prüfstand
+## Nächster Stand
 
-- Container: `./gradlew testDebugUnitTest` erfolgreich.
-- Container: `./gradlew lintDebug` erfolgreich.
-- Die Intent-Ausführung mit einer konfigurierten Geräte-ID wurde vom Benutzer
-  per ADB erfolgreich getestet.
-- Vollständige Host-Build-Prüfung und Installation sind noch nicht bestätigt.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 074 „Gruppen“.
+- Weitere Reihenfolge und Status ausschließlich aus `docs/issues/overview.txt`
+  entnehmen.
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
-GitHub-Issue schließen, lokale Issue-Dateien abhaken oder Branch löschen.
+GitHub-Issue schließen oder Branch löschen.
