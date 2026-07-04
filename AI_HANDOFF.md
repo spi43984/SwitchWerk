@@ -8,6 +8,9 @@ Stand: 4. Juli 2026
 - GitHub-Issue: #168
 - Pull Request: #169
 - Squash-Merge auf `main`: `4844d4e feat: add external device action intents (#169)`
+- Nachkorrektur-Pull-Request: #170
+- Nachkorrektur-Squash-Merge auf `main`:
+  `7a1f188 fix: make intent errors transient (#170)`
 - Externe Geräteaktionen verwenden eine strikt validierte lokale Geräte-ID und
   die bestehende MainViewModel-/DeviceActionService-Logik.
 - Die globale Freigabe ist standardmäßig deaktiviert. URLs, Befehle,
@@ -16,10 +19,7 @@ Stand: 4. Juli 2026
   aktualisiert.
 - Container-Prüfungen und GitHub-Prüfungen waren erfolgreich. Der manuelle
   ADB-Intent-Test wurde vom Benutzer bestätigt.
-
-## Nächster Stand
-
-- Auf dem lokalen Branch `fix-intent-error-display` ist die Anzeige von
+- Die Anzeige von
   Intent-Fehlern korrigiert: bekannte Geräte verwenden den zeitlich begrenzten
   Widget-Fehler, nicht zuordenbare Fehler einen zeitlich begrenzten allgemeinen
   Hinweis; alle Fälle bleiben in den Aktionsdetails erhalten.
@@ -28,6 +28,9 @@ Stand: 4. Juli 2026
   ADB-Beispiele für einen gültigen Intent und den Fehlertest ohne Geräte-ID.
 - Der Benutzer hat auch die kopierbaren Beispiele in der Hilfe erfolgreich
   getestet.
+
+## Nächster Stand
+
 - Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 074 „Gruppen“.
 - Weitere Reihenfolge und Status ausschließlich aus `docs/issues/overview.txt`
   entnehmen.

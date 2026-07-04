@@ -95,6 +95,7 @@ SwitchWerk eignet sich für lokale, kurze Geräteaktionen. Andere Android-Apps w
   andere Aktionsfehler vier Sekunden am Geräte-Widget. Nicht zuordenbare Fehler
   erscheinen vier Sekunden oberhalb der Geräteliste. Alle Intent-Fehler bleiben
   bis zum manuellen Löschen in den Aktionsdetails erhalten.
+- Nachkorrektur-Pull-Request: #170
 - Die App-Hilfe enthält deutsch/englisch konsistente, auswählbare ADB-Beispiele
   für einen gültigen Aufruf und einen Fehlertest ohne Geräte-ID.
 - Die Nachkorrektur und die kopierbaren Hilfebeispiele wurden vom Benutzer auf
