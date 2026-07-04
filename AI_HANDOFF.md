@@ -1,6 +1,6 @@
 # AI Handoff
 
-Stand: 2. Juli 2026
+Stand: 4. Juli 2026
 
 ## Startvorlage
 
@@ -11,25 +11,36 @@ Für die nächste Session zuerst `AI_SESSION_PROMPT.md` verwenden und danach
 
 Abgeschlossen:
 
-- Issue 067 „Info, Hilfe und Über-Dialog Buttons“
-- GitHub-Issue: #160
-- Branch: `info-help-about-dialog-buttons`
-- Info-Dialoge zeigen unten rechts nur noch `Schließen` beziehungsweise
-  `Close`.
-- `StandardDialogButtons` unterstützt optional eine fehlende linke Aktion und
-  einen kompakten rechten Button.
-- Hilfe zeigt unten links `Einrichtungs-Assistent erneut zeigen` und rechts
-  `Schließen`.
-- Über SwitchWerk zeigt unten links `GitHub-Projekt öffnen` und rechts
-  `Schließen`.
-- Hilfe-/Über-Fachaktionen wurden aus dem Inhaltsbereich in die untere
-  Aktionsleiste verschoben.
-- Deutsche und englische Strings für die betroffenen Buttons sind konsistent.
-- Container-Prüfungen: `./gradlew lintDebug`, `./gradlew testDebugUnitTest`
-- Host-Prüfungen laut Benutzerrückmeldung erfolgreich:
-  `./gradlew clean assembleDebug`, `./gradlew installDebug`
-- Nächstes priorisiertes Thema: Issue 024 „Authenticated Import Sources
-  Backlog“; aktuell Status `Backlog`, daher keine aktive Implementierung.
+- Issue 068 „GUI-Navigation und Konfiguration vereinfachen“
+- GitHub-Issue: #161
+- Pull Request: #162
+- Branch: `docs/issue-068-gui-navigation-konfiguration`
+- Einrichtungs-Assistent zeigt nur noch den kurzen Einstieg und direkte
+  Einstiegsaktionen für Hilfe, Konfigurationen, WLAN-Profile, Geräte und
+  Dashboard.
+- Sichtbare Bezeichnung `Backup` wurde zu `Konfigurationen` geändert.
+- Hilfe, Info-/i-Texte und Über SwitchWerk wurden auf die neue Navigation und
+  Terminologie angepasst.
+- Import und Export im Bereich `Konfigurationen` sind optisch getrennt.
+- Passwortauswahl für Export und Import ist eine Dreifachauswahl mit sicherer
+  Mittelposition; Aktionsbuttons bleiben dort deaktiviert.
+- Sicherheitskritische Passwortauswahlen werden nach Abschluss, Abbruch oder
+  Fehler zurückgesetzt.
+- Importdialog hebt die nächsten Schritte ruhig pulsierend hervor und scrollt
+  nach Passwortentscheidung zur Zusammenfassung, soweit die Bildschirmhöhe das
+  zulässt.
+- Deutsche, englische und Fallback-Strings wurden konsistent geprüft.
+- Über SwitchWerk und Menü-Footer zeigen nur noch `Version x.y.z`, kein hart
+  codiertes Veröffentlichungsdatum.
+- Container-Prüfungen: `./gradlew :app:compileDebugKotlin`,
+  `./gradlew :app:lintDebug`
+- GitHub Actions in PR #162 erfolgreich: `build`, `submit-gradle`
+- Host-Prüfungen laut Benutzerrückmeldung erfolgreich: Build und Tests.
+
+Nächstes priorisiertes Thema:
+
+- Issue 024 „Authenticated Import Sources Backlog“; aktuell Status `Backlog`,
+  daher keine aktive Implementierung ohne ausdrückliche Reaktivierung.
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
 GitHub-Issue schließen oder Branch löschen.

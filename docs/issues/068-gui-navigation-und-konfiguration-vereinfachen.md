@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / UI
 - Bereich: Einrichtungs-Assistent / Hilfe / Über SwitchWerk / Einstellungen / Backup / Import / Übersetzungen
@@ -147,36 +147,52 @@ Auch horizontale scrollbare Menüs werden teilweise übersehen. Sichtbare Scroll
 
 ## Akzeptanzkriterien
 
-- [ ] Der Einrichtungs-Assistent zeigt nur noch den ersten Satz der Einführung direkt an.
-- [ ] Der Einrichtungs-Assistent enthält einen Button `Hilfe anzeigen`.
-- [ ] `Hilfe anzeigen` öffnet die Hilfe.
-- [ ] Der Einrichtungs-Assistent enthält einen klar getrennten Abschnitt zum Import einer bestehenden Konfiguration.
-- [ ] Der Abschnitt zum Import enthält einen Button `Konfiguration importieren`.
-- [ ] `Konfiguration importieren` öffnet den Bereich `Konfigurationen`.
-- [ ] Der Einrichtungs-Assistent enthält einen klar getrennten Abschnitt zum selbstständigen Einrichten.
-- [ ] Die Buttons `1. Einrichtung WLAN-Profile`, `2. Einrichtung Geräte` und `3. Dashboard` öffnen die passenden Bereiche.
-- [ ] Der längere Einführungstext ist in `Über SwitchWerk` integriert.
-- [ ] Die bisherige Schritt-Aufzählung und der Hinweis `Die farbigen...` sind in die Hilfe integriert.
-- [ ] Die sichtbare Menübezeichnung `Backup` wurde zu `Konfigurationen` geändert.
-- [ ] Das horizontale Einstellungen-Menü zeigt links/rechts Scrollpfeile, wenn weitere Menüpunkte außerhalb des sichtbaren Bereichs liegen.
-- [ ] Die Scrollpfeile verschwinden, wenn in der jeweiligen Richtung kein weiterer Inhalt vorhanden ist.
-- [ ] Import und Export im Bereich `Konfigurationen` sind optisch klar getrennt.
-- [ ] `Passwörter exportieren` ist eindeutig dem Export zugeordnet.
-- [ ] `Passwörter importieren` ist eindeutig dem Import zugeordnet.
-- [ ] Die Passwort-Optionen für Import und Export sind als Dreifachschalter umgesetzt.
-- [ ] Die Mittelposition ist Default und deaktiviert den zugehörigen nächsten Aktionsbutton.
-- [ ] Linke Position bedeutet `ohne Passwörter`.
-- [ ] Rechte Position bedeutet `mit Passwörtern`.
-- [ ] Die Bedeutung der Schalterstellungen wird direkt sichtbar erklärt.
-- [ ] Nach Abschluss, Abbruch oder Fehler wird die jeweilige Passwort-Auswahl auf Default zurückgesetzt.
-- [ ] Im Dialog `Konfiguration importieren` wird der nächste erforderliche Schritt langsam und verständlich hervorgehoben.
-- [ ] Die Schritt-Hervorhebung führt durch Quelle, Laden, Importmodus, Passwortentscheidung und Abschlussbuttons.
-- [ ] Die Darstellung funktioniert im Portrait-Modus.
-- [ ] Die Darstellung funktioniert im Landscape-Modus.
-- [ ] Die Darstellung bleibt bei größerer Android-Schriftgröße bedienbar.
-- [ ] Hilfe-, Info- und i-Texte verwenden die neuen Bezeichnungen konsistent.
-- [ ] Deutsche und englische Übersetzungen sind vollständig und konsistent gepflegt.
-- [ ] Bestehende Sicherheitsregeln für Abbruchaktionen bleiben erhalten.
+- [x] Der Einrichtungs-Assistent zeigt nur noch den ersten Satz der Einführung direkt an.
+- [x] Der Einrichtungs-Assistent enthält einen Button `Hilfe anzeigen`.
+- [x] `Hilfe anzeigen` öffnet die Hilfe.
+- [x] Der Einrichtungs-Assistent enthält einen klar getrennten Abschnitt zum Import einer bestehenden Konfiguration.
+- [x] Der Abschnitt zum Import enthält einen Button `Konfiguration importieren`.
+- [x] `Konfiguration importieren` öffnet den Bereich `Konfigurationen`.
+- [x] Der Einrichtungs-Assistent enthält einen klar getrennten Abschnitt zum selbstständigen Einrichten.
+- [x] Die Buttons `1. Einrichtung WLAN-Profile`, `2. Einrichtung Geräte` und `3. Dashboard` öffnen die passenden Bereiche.
+- [x] Der längere Einführungstext ist in `Über SwitchWerk` integriert.
+- [x] Die bisherige Schritt-Aufzählung und der Hinweis `Die farbigen...` sind in die Hilfe integriert.
+- [x] Die sichtbare Menübezeichnung `Backup` wurde zu `Konfigurationen` geändert.
+- [x] Das horizontale Einstellungen-Menü zeigt links/rechts Scrollpfeile, wenn weitere Menüpunkte außerhalb des sichtbaren Bereichs liegen.
+- [x] Die Scrollpfeile verschwinden, wenn in der jeweiligen Richtung kein weiterer Inhalt vorhanden ist.
+- [x] Import und Export im Bereich `Konfigurationen` sind optisch klar getrennt.
+- [x] `Passwörter exportieren` ist eindeutig dem Export zugeordnet.
+- [x] `Passwörter importieren` ist eindeutig dem Import zugeordnet.
+- [x] Die Passwort-Optionen für Import und Export sind als Dreifachschalter umgesetzt.
+- [x] Die Mittelposition ist Default und deaktiviert den zugehörigen nächsten Aktionsbutton.
+- [x] Linke Position bedeutet `ohne Passwörter`.
+- [x] Rechte Position bedeutet `mit Passwörtern`.
+- [x] Die Bedeutung der Schalterstellungen wird direkt sichtbar erklärt.
+- [x] Nach Abschluss, Abbruch oder Fehler wird die jeweilige Passwort-Auswahl auf Default zurückgesetzt.
+- [x] Im Dialog `Konfiguration importieren` wird der nächste erforderliche Schritt langsam und verständlich hervorgehoben.
+- [x] Die Schritt-Hervorhebung führt durch Quelle, Laden, Importmodus, Passwortentscheidung und Abschlussbuttons.
+- [x] Die Darstellung funktioniert im Portrait-Modus.
+- [x] Die Darstellung funktioniert im Landscape-Modus.
+- [x] Die Darstellung bleibt bei größerer Android-Schriftgröße bedienbar.
+- [x] Hilfe-, Info- und i-Texte verwenden die neuen Bezeichnungen konsistent.
+- [x] Deutsche und englische Übersetzungen sind vollständig und konsistent gepflegt.
+- [x] Bestehende Sicherheitsregeln für Abbruchaktionen bleiben erhalten.
+
+## Abschluss
+
+- Implementiert in Branch `docs/issue-068-gui-navigation-konfiguration`.
+- Pull Request: #162 `GUI-Navigation und Konfiguration vereinfachen`.
+- GitHub-Issue: #161.
+- Einrichtungs-Assistent gekürzt und mit direkten Einstiegsaktionen für Hilfe, Konfigurationen, WLAN-Profile, Geräte und Dashboard versehen.
+- Sichtbare Bezeichnung `Backup` zu `Konfigurationen` geändert; interne technische Namen blieben unverändert.
+- Import und Export im Bereich `Konfigurationen` optisch getrennt.
+- Passwortauswahl für Export und Import als Dreifachauswahl umgesetzt; Mittelposition deaktiviert die jeweilige Aktion.
+- Passwortauswahl wird nach Abschluss, Abbruch oder Fehler auf den sicheren Default zurückgesetzt.
+- Importdialog führt mit ruhiger pulsierender Hervorhebung durch Quelle, Laden, Importmodus, Passwortentscheidung und Zusammenfassung.
+- Hilfe-, Info- und i-Texte sowie deutsche und englische Übersetzungen wurden geprüft und konsistent aktualisiert.
+- Container-Prüfungen: `./gradlew :app:compileDebugKotlin`, `./gradlew :app:lintDebug`.
+- GitHub Actions in PR #162 erfolgreich: `build`, `submit-gradle`.
+- Host-Prüfungen laut Benutzerrückmeldung erfolgreich: Build und Tests.
 
 ## Testhinweise
 
