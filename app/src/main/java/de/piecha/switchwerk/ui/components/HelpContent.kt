@@ -75,7 +75,6 @@ fun AboutContent(
             }
             Text(stringResource(R.string.about_description))
             Text(stringResource(R.string.version_value, versionName))
-            Text(stringResource(R.string.release_date))
             Text(stringResource(R.string.about_author))
             Text(stringResource(R.string.about_license))
         }

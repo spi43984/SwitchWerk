@@ -39,6 +39,7 @@ import de.piecha.switchwerk.R
 @Composable
 fun SetupWizard(
     initialScrollPosition: Int,
+    onOpenHelp: (Int) -> Unit,
     onOpenBackup: (Int) -> Unit,
     onOpenWifiProfiles: (Int) -> Unit,
     onOpenDevices: (Int) -> Unit,
@@ -101,8 +102,11 @@ fun SetupWizard(
                                 title = stringResource(R.string.setup_wizard_intro_title)
                             ) {
                                 Text(stringResource(R.string.setup_wizard_intro_text))
-                                Text(stringResource(R.string.setup_wizard_intro_steps))
-                                Text(stringResource(R.string.setup_wizard_status_lights_text))
+                                StandardActionButton(
+                                    text = stringResource(R.string.show_help),
+                                    onClick = { onOpenHelp(scrollState.value) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
 
                             WizardBlock(
