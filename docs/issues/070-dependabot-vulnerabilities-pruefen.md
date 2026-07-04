@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Security / Dependencies
 - Bereich: Abhängigkeiten / Dependabot / Gradle / Build
@@ -81,19 +81,61 @@ kontrolliert behandelt werden.
 
 ## Akzeptanzkriterien
 
-- [ ] GitHub Dependabot Security Alerts wurden geprüft.
-- [ ] Betroffene direkte und transitive Abhängigkeiten sind dokumentiert.
-- [ ] Kritikalität und Relevanz für SwitchWerk wurden bewertet.
-- [ ] Sichere Update-Pfade wurden geprüft.
-- [ ] Notwendige Dependency-Updates wurden umgesetzt oder begründet
+- [x] GitHub Dependabot Security Alerts wurden geprüft.
+- [x] Betroffene direkte und transitive Abhängigkeiten sind dokumentiert.
+- [x] Kritikalität und Relevanz für SwitchWerk wurden bewertet.
+- [x] Sichere Update-Pfade wurden geprüft.
+- [x] Notwendige Dependency-Updates wurden umgesetzt oder begründet
       zurückgestellt.
-- [ ] Keine unnötigen neuen Abhängigkeiten wurden eingeführt.
-- [ ] Keine Cloud-, Tracking-, Analytics-, Werbe- oder Account-Funktion wurde
+- [x] Keine unnötigen neuen Abhängigkeiten wurden eingeführt.
+- [x] Keine Cloud-, Tracking-, Analytics-, Werbe- oder Account-Funktion wurde
       eingeführt.
-- [ ] Build-, Lint- und Testauswirkungen wurden geprüft.
-- [ ] Verbleibende Risiken oder offene Dependabot-Warnungen sind dokumentiert.
-- [ ] Host-Build und Installation wurden durch den Benutzer bestätigt, falls
+- [x] Build-, Lint- und Testauswirkungen wurden geprüft.
+- [x] Verbleibende Risiken oder offene Dependabot-Warnungen sind dokumentiert.
+- [x] Host-Build und Installation wurden durch den Benutzer bestätigt, falls
       Code- oder Build-Dateien geändert wurden.
+
+## Ergebnis
+
+- PR #165 wurde als Commit `20caac2` nach `main` übernommen.
+- Der nicht benötigte Foojay-Toolchain-Resolver wurde entfernt.
+- Gepatchte Versionen von Bouncy Castle, jose4j, JDOM und Commons Lang werden
+  im Buildscript-Classpath erzwungen.
+- Die ausgelieferten App-Runtime-Abhängigkeiten enthalten keine der von
+  Dependabot gemeldeten Pakete. Die Warnungen betreffen transitive
+  Gradle-/Android-Build- und Dependency-Submission-Pfade.
+- Nach der Dependency-Submission auf `main` wurden die Alerts für `jose4j`
+  und `jdom2` automatisch geschlossen.
+
+## Verbleibende Warnungen
+
+Nach der Neubewertung auf `main` bleiben 33 Alerts offen: 1 kritisch, 12 hoch,
+18 mittel und 2 niedrig. Betroffen sind ältere, parallel im GitHub
+Dependency-Graph erfasste Tooling-Versionen von Netty, Bouncy Castle, Commons
+Lang und Apache HttpClient. Sichere Versionen derselben Bibliotheken sind zum
+Teil bereits zusätzlich im Graph enthalten; die älteren Versionen stammen aus
+weiteren Tooling-Konfigurationen und nicht aus dem App-Runtime-Classpath.
+
+Ein globales Erzwingen aktueller Netty-, Bouncy-Castle- und HttpClient-Versionen
+über sämtliche Gradle- und Plugin-Konfigurationen wurde zurückgestellt. Dies
+könnte interne Gradle-, Android-Gradle-Plugin-, gRPC- oder
+Dependency-Submission-Kompatibilität verändern und wäre ohne gezielte
+Toolchain-Aktualisierung und separate Prüfung zu riskant. Der sichere Folgepfad
+ist ein kompatibles Upgrade der verursachenden Build-Plugins bzw. Toolchains;
+bis dahin besteht kein bekannter Auslieferungs- oder Laufzeitpfad in der App.
+
+## Durchgeführte Prüfungen
+
+- Container: `./gradlew buildEnvironment`
+- Container: `./gradlew app:dependencies --configuration debugRuntimeClasspath`
+- Container: `./gradlew lintDebug`
+- Container: `./gradlew testDebugUnitTest`
+- Host: `./gradlew lintRelease`
+- Host: `./gradlew testDebugUnitTest`
+- Host: `./gradlew clean assembleRelease`
+- Host: `./gradlew installRelease`
+- Host: manueller App-Smoke-Test
+- GitHub: Android Quality Checks und Automatic Dependency Submission
 
 ## Testhinweise
 
