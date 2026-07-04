@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-* Status: Offen
+* Status: Abgeschlossen
 * Priorität: P0
 * Typ: Release / Packaging
 * Bereich: Release / Updates
@@ -66,13 +66,28 @@ Hinweis: Falls das Script aktuell `SwitchWerk-${VERSION}.apk` ohne führendes `v
 
 ## Akzeptanzkriterien
 
-* [ ] Nach Ausführung des Release-Scripts enthält die GitHub Release ein versioniertes APK-Asset.
-* [ ] Nach Ausführung des Release-Scripts enthält dieselbe GitHub Release zusätzlich `SwitchWerk.apk`.
-* [ ] `SwitchWerk.apk` ist bytegleich oder funktional identisch mit der versionierten Release-APK.
-* [ ] Der stabile Download-Link `/releases/latest/download/SwitchWerk.apk` funktioniert für die neueste Release.
-* [ ] Bestehende Release-Funktionalität bleibt unverändert nutzbar.
-* [ ] Das Script bricht weiterhin bei fehlender oder ungültiger APK sauber ab.
-* [ ] Die Änderung ist im Script klar nachvollziehbar benannt.
+* [x] Nach Ausführung des Release-Scripts enthält die GitHub Release ein versioniertes APK-Asset.
+* [x] Nach Ausführung des Release-Scripts enthält dieselbe GitHub Release zusätzlich `SwitchWerk.apk`.
+* [x] `SwitchWerk.apk` ist bytegleich oder funktional identisch mit der versionierten Release-APK.
+* [x] Der stabile Download-Link `/releases/latest/download/SwitchWerk.apk` funktioniert für die neueste Release.
+* [x] Bestehende Release-Funktionalität bleibt unverändert nutzbar.
+* [x] Das Script bricht weiterhin bei fehlender oder ungültiger APK sauber ab.
+* [x] Die Änderung ist im Script klar nachvollziehbar benannt.
+
+## Abschluss
+
+Umgesetzt in `scripts/release-github.sh`.
+
+Das Script behält das bestehende versionierte Asset `SwitchWerk-${VERSION}.apk`
+bei und erzeugt zusätzlich `SwitchWerk.apk` aus derselben geprüften
+Release-APK. `gh release create` erhält beide APK-Dateien als Assets.
+
+Geprüft:
+
+* `bash -n scripts/release-github.sh`
+
+Ein echter Release-Lauf und die Download-Prüfung der GitHub-Assets erfolgen beim
+nächsten Release auf dem Host.
 
 ## Testhinweise
 

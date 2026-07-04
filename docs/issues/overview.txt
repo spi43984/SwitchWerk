@@ -92,17 +92,16 @@ es verändert die Priorisierungslogik nicht.
 | 066 | P0 | abgeschlossen | QR Code Import HTTP URL |
 | 067 | P0 | abgeschlossen | Info, Hilfe und Über-Dialog Buttons |
 | 068 | P0 | abgeschlossen | GUI-Navigation und Konfiguration vereinfachen |
-| 069 | P0 | offen | Stable Latest APK Release Asset |
+| 069 | P0 | abgeschlossen | Stable Latest APK Release Asset |
 | 070 | P0 | offen | Dependabot Vulnerabilities prüfen |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 069 Stable Latest APK Release Asset
-2. 070 Dependabot Vulnerabilities prüfen
-3. 024 Authenticated Import Sources Backlog
-4. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-5. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-6. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-7. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-8. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
-9. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
+1. 070 Dependabot Vulnerabilities prüfen
+2. 024 Authenticated Import Sources Backlog
+3. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+4. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+5. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+6. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+7. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+8. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)

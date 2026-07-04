@@ -11,36 +11,29 @@ Für die nächste Session zuerst `AI_SESSION_PROMPT.md` verwenden und danach
 
 Abgeschlossen:
 
-- Issue 068 „GUI-Navigation und Konfiguration vereinfachen“
-- GitHub-Issue: #161
-- Pull Request: #162
-- Branch: `docs/issue-068-gui-navigation-konfiguration`
-- Einrichtungs-Assistent zeigt nur noch den kurzen Einstieg und direkte
-  Einstiegsaktionen für Hilfe, Konfigurationen, WLAN-Profile, Geräte und
-  Dashboard.
-- Sichtbare Bezeichnung `Backup` wurde zu `Konfigurationen` geändert.
-- Hilfe, Info-/i-Texte und Über SwitchWerk wurden auf die neue Navigation und
-  Terminologie angepasst.
-- Import und Export im Bereich `Konfigurationen` sind optisch getrennt.
-- Passwortauswahl für Export und Import ist eine Dreifachauswahl mit sicherer
-  Mittelposition; Aktionsbuttons bleiben dort deaktiviert.
-- Sicherheitskritische Passwortauswahlen werden nach Abschluss, Abbruch oder
-  Fehler zurückgesetzt.
-- Importdialog hebt die nächsten Schritte ruhig pulsierend hervor und scrollt
-  nach Passwortentscheidung zur Zusammenfassung, soweit die Bildschirmhöhe das
-  zulässt.
-- Deutsche, englische und Fallback-Strings wurden konsistent geprüft.
-- Über SwitchWerk und Menü-Footer zeigen nur noch `Version x.y.z`, kein hart
-  codiertes Veröffentlichungsdatum.
-- Container-Prüfungen: `./gradlew :app:compileDebugKotlin`,
-  `./gradlew :app:lintDebug`
-- GitHub Actions in PR #162 erfolgreich: `build`, `submit-gradle`
-- Host-Prüfungen laut Benutzerrückmeldung erfolgreich: Build und Tests.
+- Issue 069 „Stable Latest APK Release Asset“
+- GitHub-Issue: #163
+- Branch: `stable-latest-apk-release-asset`
+- Commit auf `main`: `14fbfb7 fix: add stable latest apk release asset`
+- `scripts/release-github.sh` erzeugt weiterhin das bestehende versionierte
+  Release-Asset `SwitchWerk-${VERSION}.apk`.
+- Zusätzlich erzeugt das Script `SwitchWerk.apk` aus derselben geprüften
+  Release-APK.
+- `gh release create` erhält beide APK-Dateien als Assets.
+- Der lokale Feature-Branch wurde gelöscht.
+- Es existierte kein Remote-Branch `stable-latest-apk-release-asset`.
+- Container-Prüfung: `bash -n scripts/release-github.sh`
+
+Noch durch den Benutzer beim nächsten echten Release zu prüfen:
+
+- Release-Script auf dem Host ausführen.
+- Beide GitHub-Release-Assets herunterladen.
+- Stable-Link `/releases/latest/download/SwitchWerk.apk` prüfen.
+- APK-Signatur der heruntergeladenen APK prüfen.
 
 Nächstes priorisiertes Thema:
 
-- Issue 024 „Authenticated Import Sources Backlog“; aktuell Status `Backlog`,
-  daher keine aktive Implementierung ohne ausdrückliche Reaktivierung.
+- Issue 070 „Dependabot Vulnerabilities prüfen“
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
 GitHub-Issue schließen oder Branch löschen.
