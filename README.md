@@ -22,12 +22,26 @@ sichere und cloudfreie Lösung für lokale Geräteaktionen.
 
 Die Entwicklung erfolgt auf Ubuntu Linux mit Android Studio.
 
-Build und Installation auf dem Host:
+Debug-Build und -Installation auf dem Host:
 
 ```bash
+./gradlew lintDebug
+./gradlew testDebugUnitTest
 ./gradlew clean assembleDebug
 ./gradlew installDebug
 ```
+
+Release-Build und -Installation bei konfigurierter Release-Signierung:
+
+```bash
+./gradlew lintRelease
+./gradlew testDebugUnitTest
+./gradlew clean assembleRelease
+./gradlew installRelease
+```
+
+Einen Task `testReleaseUnitTest` gibt es in diesem Projekt nicht. Die gewählte
+Installationsvariante muss zur Signatur der bereits installierten App passen.
 
 ADB, Gerätetests und Android Studio laufen auf dem Ubuntu-Host, nicht im
 Codex-Container.

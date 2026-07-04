@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.location.LocationManager
+import android.content.pm.ShortcutManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.action.DefaultDeviceActionService
 import de.piecha.switchwerk.data.action.DeviceActionService
@@ -43,6 +44,12 @@ import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.SettingsViewModel
 import de.piecha.switchwerk.ui.AndroidStringProvider
 import de.piecha.switchwerk.ui.StringProvider
+import de.piecha.switchwerk.shortcut.AndroidAppShortcutPublisher
+import de.piecha.switchwerk.shortcut.AppShortcutCoordinator
+import de.piecha.switchwerk.shortcut.AppShortcutPublisher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -62,6 +69,7 @@ val appModule = module {
             .addMigrations(AppDatabase.MIGRATION_5_6)
             .addMigrations(AppDatabase.MIGRATION_6_7)
             .addMigrations(AppDatabase.MIGRATION_7_8)
+            .addMigrations(AppDatabase.MIGRATION_8_9)
             .build()
     }
 
@@ -82,6 +90,13 @@ val appModule = module {
     }
 
     single { WifiProximityConfirmationStore() }
+
+    single { androidContext().getSystemService(ShortcutManager::class.java) }
+    single<AppShortcutPublisher> {
+        AndroidAppShortcutPublisher(androidContext(), get())
+    }
+    single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single { AppShortcutCoordinator(get(), get(), get()) }
 
     single<WifiConnectionService> {
         AndroidWifiConnectionService(

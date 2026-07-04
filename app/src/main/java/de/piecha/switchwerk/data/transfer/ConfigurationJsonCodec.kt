@@ -50,6 +50,7 @@ class ConfigurationJsonCodec {
                     writer.name("id").value(device.id)
                     writer.name("name").value(device.name)
                     writer.name("actionLabel").value(device.actionLabel)
+                    writer.name("shortcutEnabled").value(device.shortcutEnabled)
                     writer.name("action")
                     writer.beginObject()
                     writer.name("protocol").value(device.action.protocol)
@@ -208,6 +209,7 @@ class ConfigurationJsonCodec {
             var actionLabel: String? = null
             var action: ConfigurationDeviceAction? = null
             var connections: List<ConfigurationDeviceConnection>? = null
+            var shortcutEnabled = false
 
             beginObject()
             while (hasNext()) {
@@ -215,6 +217,7 @@ class ConfigurationJsonCodec {
                     "id" -> id = nextString()
                     "name" -> name = nextString()
                     "actionLabel" -> actionLabel = nextString()
+                    "shortcutEnabled" -> shortcutEnabled = nextBoolean()
                     "action" -> action = readAction()
                     "connections" -> connections = readConnections()
                     else -> skipValue()
@@ -227,7 +230,8 @@ class ConfigurationJsonCodec {
                 name = requireField(name, "devices.name"),
                 actionLabel = requireField(actionLabel, "devices.actionLabel"),
                 action = requireField(action, "devices.action"),
-                connections = requireField(connections, "devices.connections")
+                connections = requireField(connections, "devices.connections"),
+                shortcutEnabled = shortcutEnabled
             )
         }
         endArray()

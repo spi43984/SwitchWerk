@@ -13,5 +13,6 @@ data class DeviceEntity(
     val apiPath: String,
     val apiRequestBody: String,
     val apiContentType: String,
-    val sortOrder: Int
+    val sortOrder: Int,
+    val shortcutEnabled: Boolean = false
 )

@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -88,6 +89,7 @@ fun DeviceManagementSection(
     onDeleteClick: (String) -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
+    onShortcutEnabledChange: (Boolean) -> Unit,
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
@@ -110,6 +112,7 @@ fun DeviceManagementSection(
             onCloseSwipeItem = onCloseSwipeItem,
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
+            onShortcutEnabledChange = onShortcutEnabledChange,
             onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
@@ -172,6 +175,7 @@ private fun DeviceEditDialog(
     onCloseSwipeItem: () -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
+    onShortcutEnabledChange: (Boolean) -> Unit,
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
@@ -206,6 +210,7 @@ private fun DeviceEditDialog(
             onCloseSwipeItem = onCloseSwipeItem,
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
+            onShortcutEnabledChange = onShortcutEnabledChange,
             onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
@@ -373,6 +378,7 @@ private fun DeviceForm(
     onCloseSwipeItem: () -> Unit,
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
+    onShortcutEnabledChange: (Boolean) -> Unit,
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
@@ -418,6 +424,26 @@ private fun DeviceForm(
                 .fillMaxWidth()
                 .focusRequester(actionLabelFocusRequester)
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onShortcutEnabledChange(!form.shortcutEnabled) },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.app_shortcut))
+                Text(
+                    text = stringResource(R.string.app_shortcut_description),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Switch(
+                checked = form.shortcutEnabled,
+                onCheckedChange = onShortcutEnabledChange
+            )
+        }
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)

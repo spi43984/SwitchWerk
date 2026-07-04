@@ -87,7 +87,8 @@ class RoomDeviceRepository(
                 contentType = ApiContentType.valueOf(apiContentType)
             ),
             connections = connections.map { it.toDomain() },
-            sortOrder = sortOrder
+            sortOrder = sortOrder,
+            shortcutEnabled = shortcutEnabled
         )
     }
 
@@ -101,7 +102,8 @@ class RoomDeviceRepository(
             apiPath = apiCall.path,
             apiRequestBody = apiCall.requestBody,
             apiContentType = apiCall.contentType.name,
-            sortOrder = sortOrder
+            sortOrder = sortOrder,
+            shortcutEnabled = shortcutEnabled
         )
     }
 

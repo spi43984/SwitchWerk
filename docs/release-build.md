@@ -38,13 +38,29 @@ noch in Tickets, Logs oder Chat-Nachrichten geteilt werden.
 
 ## Befehle
 
+Debug-Build und Debug-Installation:
+
 ```bash
 ./gradlew lintDebug
 ./gradlew testDebugUnitTest
 ./gradlew clean assembleDebug
 ./gradlew installDebug
-./gradlew assembleRelease
 ```
+
+Release-Build und Release-Installation:
+
+```bash
+./gradlew lintRelease
+./gradlew testDebugUnitTest
+./gradlew clean assembleRelease
+./gradlew installRelease
+```
+
+Das Projekt stellt keinen Task `testReleaseUnitTest` bereit. Die Unit-Tests
+werden deshalb für beide Varianten mit `testDebugUnitTest` ausgeführt.
+`installRelease` benötigt die oben beschriebene Release-Signierung. Stimmt die
+Signatur nicht mit der bereits installierten App überein, muss diese vor dem
+Variantenwechsel deinstalliert werden; ihre lokalen App-Daten gehen dabei verloren.
 
 Die signierte APK liegt anschließend unter
 `app/build/outputs/apk/release/app-release.apk`.

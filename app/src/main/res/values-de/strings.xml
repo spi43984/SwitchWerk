@@ -37,7 +37,11 @@
     <string name="wifi_profile_dialog_info_title">WLAN-Profil</string>
     <string name="wifi_profile_dialog_info">• SSID des Ziel-WLANs eintragen\n• Name muss eindeutig sein\n• Passwort bleibt verschlüsselt auf dem Gerät</string>
     <string name="device_dialog_info_title">Gerät</string>
-    <string name="device_dialog_info">• Namen und Button-Beschriftung festlegen\n• HTTP oder HTTPS wählen\n• HTTP/RPC-Methode und -Pfad eintragen\n• Für POST optional Request-Body und Content-Type wählen\n• WLAN-Zuordnungen bestimmen die Verbindungsreihenfolge</string>
+    <string name="device_dialog_info">• Namen und Button-Beschriftung festlegen\n• Aktion optional als App-Shortcut anbieten\n• Android zeigt höchstens vier aktivierte Shortcuts gemäß Dashboard-Reihenfolge\n• HTTP oder HTTPS wählen\n• HTTP/RPC-Methode und -Pfad eintragen\n• Für POST optional Request-Body und Content-Type wählen\n• WLAN-Zuordnungen bestimmen die Verbindungsreihenfolge</string>
+    <string name="app_shortcut">App-Shortcut</string>
+    <string name="app_shortcut_description">Geräteaktion beim langen Drücken auf das App-Symbol anbieten. Android zeigt höchstens vier ausgewählte Aktionen.</string>
+    <string name="help_shortcuts_title">App-Shortcuts</string>
+    <string name="help_shortcuts_text">• Im Geräte-Dialog pro Aktion aktivieren\n• App-Symbol lange drücken und die Aktion auswählen\n• Es werden höchstens vier aktivierte Aktionen gemäß Dashboard-Reihenfolge angeboten\n• Fortschritt und Ergebnis erscheinen im Dashboard</string>
     <string name="wifi_assignment_dialog_info_title">WLAN-Zuordnung</string>
     <string name="wifi_assignment_dialog_info">• WLAN-Profil für das Gerät auswählen\n• lokale Geräteadresse eintragen\n• kein Internetzugang erforderlich</string>
     <string name="about_switchwerk">Über SwitchWerk</string>

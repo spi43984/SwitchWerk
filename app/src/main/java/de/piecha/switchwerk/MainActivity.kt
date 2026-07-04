@@ -18,6 +18,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -43,6 +44,8 @@ import de.piecha.switchwerk.ui.AppLocaleController
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.MainUiEvent
+import de.piecha.switchwerk.shortcut.APP_SHORTCUT_DEVICE_ID
+import de.piecha.switchwerk.shortcut.shortcutDeviceId
 import org.koin.android.ext.android.inject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -73,12 +76,19 @@ class MainActivity : ComponentActivity() {
     private var helpReturnScreenForRestoration = AppScreen.Dashboard
     private var selectedSettingsSectionForRestoration = SettingsSection.WIFI_PROFILES
     private var settingsScreenUiStateForRestoration = SettingsScreenUiState()
+    private var pendingShortcutDeviceId by mutableStateOf<String?>(null)
+    private var shortcutLaunchCount by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        pendingShortcutDeviceId = intent.shortcutDeviceId()
         currentScreenForRestoration = savedInstanceState.restoreAppScreen(
             STATE_CURRENT_SCREEN,
             AppScreen.Dashboard
         )
+        if (pendingShortcutDeviceId != null) {
+            currentScreenForRestoration = AppScreen.Dashboard
+            shortcutLaunchCount += 1
+        }
         helpReturnScreenForRestoration = savedInstanceState.restoreAppScreen(
             STATE_HELP_RETURN_SCREEN,
             AppScreen.Dashboard
@@ -106,6 +116,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             val mainViewModel: MainViewModel = koinViewModel()
             val uiState by mainViewModel.uiState.collectAsState()
+            LaunchedEffect(pendingShortcutDeviceId, uiState.devices) {
+                pendingShortcutDeviceId?.let { deviceId ->
+                    if (uiState.devices.any { it.id == deviceId }) {
+                        mainViewModel.executeDeviceAction(deviceId)
+                        pendingShortcutDeviceId = null
+                    } else if (!uiState.isLoading) {
+                        pendingShortcutDeviceId = null
+                    }
+                }
+            }
             LaunchedEffect(uiState.appSettings.language) {
                 val language = uiState.appSettings.language
                 if (language != initialLanguage && AppLocaleController.apply(this@MainActivity, language)) {
@@ -125,6 +145,7 @@ class MainActivity : ComponentActivity() {
                         initialHelpReturnScreen = helpReturnScreenForRestoration,
                         initialSettingsSection = selectedSettingsSectionForRestoration,
                         initialSettingsScreenUiState = settingsScreenUiStateForRestoration,
+                        shortcutLaunchCount = shortcutLaunchCount,
                         onNavigationStateChanged = { currentScreen, helpReturnScreen, settingsSection ->
                             currentScreenForRestoration = currentScreen
                             helpReturnScreenForRestoration = helpReturnScreen
@@ -137,6 +158,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        pendingShortcutDeviceId = intent.shortcutDeviceId()
+        if (pendingShortcutDeviceId != null) shortcutLaunchCount += 1
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -173,6 +201,11 @@ class MainActivity : ComponentActivity() {
         const val NEARBY_WIFI_PERMISSION_REQUEST = 1001
     }
 }
+
+private fun Intent?.shortcutDeviceId(): String? = shortcutDeviceId(
+    action = this?.action,
+    deviceId = this?.getStringExtra(APP_SHORTCUT_DEVICE_ID)
+)
 
 private fun Bundle?.restoreAppScreen(key: String, fallback: AppScreen): AppScreen {
     val name = this?.getString(key) ?: return fallback
@@ -219,6 +252,7 @@ private fun SwitchWerkAppContent(
     initialHelpReturnScreen: AppScreen,
     initialSettingsSection: SettingsSection,
     initialSettingsScreenUiState: SettingsScreenUiState,
+    shortcutLaunchCount: Int,
     onNavigationStateChanged: (AppScreen, AppScreen, SettingsSection) -> Unit,
     onSettingsScreenUiStateChanged: (SettingsScreenUiState) -> Unit
 ) {
@@ -235,8 +269,17 @@ private fun SwitchWerkAppContent(
     val context = LocalContext.current
     val uiState by mainViewModel.uiState.collectAsState()
 
+    LaunchedEffect(shortcutLaunchCount) {
+        if (shortcutLaunchCount > 0) {
+            currentScreen = AppScreen.Dashboard
+            setupWizardVisible = false
+            setupWizardReturnPending = false
+        }
+    }
+
     LaunchedEffect(uiState.appSettings.showSetupWizardOnStart) {
         if (
+            shortcutLaunchCount == 0 &&
             uiState.appSettings.showSetupWizardOnStart &&
             !setupWizardSkippedForSession
         ) {

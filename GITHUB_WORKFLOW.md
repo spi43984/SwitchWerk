@@ -215,10 +215,24 @@ ohne bei jedem Push erneut erzeugt zu werden.
 9. Implementieren.
 10. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
    und aktualisieren, damit die UI-Erklärung zum tatsächlichen Verhalten passt.
-11. Build und Installation auf dem Host testen:
+11. Build und Installation auf dem Host passend zur installierten Variante testen.
+    Debug:
 
+       ./gradlew lintDebug
+       ./gradlew testDebugUnitTest
        ./gradlew clean assembleDebug
        ./gradlew installDebug
+
+    Release bei konfigurierter Release-Signierung:
+
+       ./gradlew lintRelease
+       ./gradlew testDebugUnitTest
+       ./gradlew clean assembleRelease
+       ./gradlew installRelease
+
+    `testReleaseUnitTest` existiert nicht. Bei einem Variantenwechsel mit
+    abweichender Signatur muss die installierte App zuerst deinstalliert werden;
+    ihre lokalen Daten gehen dabei verloren.
 
 12. Ohne ausdrückliche Veröffentlichungsanforderung nicht committen, pushen oder einen Pull Request erstellen.
 13. Nach ausdrücklicher Veröffentlichungsanforderung auf dem Feature-Branch committen.
