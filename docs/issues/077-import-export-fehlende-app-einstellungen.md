@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bugfix / Konfiguration / Sicherheit
 - Bereich: Import/Export / AppSettings / Übersetzungen
@@ -100,23 +100,33 @@ dieses Issues.
 
 ## Akzeptanzkriterien
 
-- [ ] Sprache wird exportiert und importiert.
-- [ ] WLAN-Profil-Sortierkriterium wird exportiert und importiert.
-- [ ] WLAN-Profil-Sortierrichtung wird exportiert und importiert.
-- [ ] Freigabe externer Intents wird exportiert und importiert.
-- [ ] Die Import-Zusammenfassung weist auf eine Änderung der Intent-Freigabe
+- [x] Sprache wird exportiert und importiert.
+- [x] WLAN-Profil-Sortierkriterium wird exportiert und importiert.
+- [x] WLAN-Profil-Sortierrichtung wird exportiert und importiert.
+- [x] Freigabe externer Intents wird exportiert und importiert.
+- [x] Die Import-Zusammenfassung weist auf eine Änderung der Intent-Freigabe
       hin.
-- [ ] Externe Intents werden erst nach bestätigtem Import aktiviert.
-- [ ] Ungültige Einstellungswerte werden vor dem Speichern sicher abgelehnt.
-- [ ] Ältere Konfigurationen ohne die neuen Felder bleiben importierbar und
+- [x] Externe Intents werden erst nach bestätigtem Import aktiviert.
+- [x] Ungültige Einstellungswerte werden vor dem Speichern sicher abgelehnt.
+- [x] Ältere Konfigurationen ohne die neuen Felder bleiben importierbar und
       verändern die zugehörigen lokalen Einstellungen nicht.
-- [ ] Der Zustand des Einrichtungs-Assistenten bleibt unverändert lokal.
-- [ ] Merge- und Replace-Import verhalten sich für die neuen Einstellungen
+- [x] Der Zustand des Einrichtungs-Assistenten bleibt unverändert lokal.
+- [x] Merge- und Replace-Import verhalten sich für die neuen Einstellungen
       konsistent.
-- [ ] Deutsche und englische Hilfe-, Info- und Zusammenfassungstexte sind
+- [x] Deutsche und englische Hilfe-, Info- und Zusammenfassungstexte sind
       konsistent.
-- [ ] Unit-Tests decken Export, Import, Rückwärtskompatibilität, ungültige Werte
+- [x] Unit-Tests decken Export, Import, Rückwärtskompatibilität, ungültige Werte
       und die Intent-Sicherheitsanzeige ab.
+
+## Abschluss
+
+- GitHub-Issue: #171
+- Pull Request: #172
+- Squash-Merge auf `main`: `21512a5`
+- Container-Prüfungen `testDebugUnitTest`, `lintDebug` und `git diff --check`
+  erfolgreich.
+- GitHub-Prüfungen erfolgreich.
+- Host-/Gerätetest vom Benutzer als erfolgreich bestätigt.
 
 ## Testhinweise
 
