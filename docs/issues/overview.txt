@@ -92,6 +92,7 @@ es verändert die Priorisierungslogik nicht.
 | 066 | P0 | abgeschlossen | QR Code Import HTTP URL |
 | 067 | P0 | abgeschlossen | Info, Hilfe und Über-Dialog Buttons |
 | 068 | P0 | abgeschlossen | GUI-Navigation und Konfiguration vereinfachen |
+| 069 | P0 | offen | Stable Latest APK Release Asset |
 
 ## Empfohlene Umsetzungsreihenfolge
 
