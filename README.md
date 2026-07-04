@@ -18,6 +18,28 @@ sichere und cloudfreie Lösung für lokale Geräteaktionen.
 - Room für notwendige lokale Speicherung
 - GitHub Actions
 
+## Externe Geräteaktionen
+
+Externe Intents sind standardmäßig deaktiviert und müssen unter
+`Einstellungen → System → Externe Intents` freigegeben werden. Eine andere App
+kann danach eine bereits lokal konfigurierte Geräteaktion über deren stabile ID
+starten. URLs, RPC-Befehle, HTTP-Bodies und zusätzliche Extras werden nicht
+akzeptiert.
+
+Die Geräte-ID steht beim jeweiligen Gerät im Feld `id` einer exportierten
+SwitchWerk-Konfiguration. Der Intent startet die `MainActivity`; SwitchWerk wird
+daher im Vordergrund geöffnet und zeigt dort Fortschritt und Ergebnis an.
+
+```bash
+adb shell am start -n de.piecha.switchwerk/.MainActivity \
+  -a de.piecha.switchwerk.action.RUN_DEVICE_ACTION \
+  --es de.piecha.switchwerk.extra.DEVICE_ID device-123
+```
+
+Action: `de.piecha.switchwerk.action.RUN_DEVICE_ACTION`
+
+Pflicht-Extra: `de.piecha.switchwerk.extra.DEVICE_ID` (String)
+
 ## Entwicklung
 
 Die Entwicklung erfolgt auf Ubuntu Linux mit Android Studio.

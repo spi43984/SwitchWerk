@@ -23,9 +23,9 @@
     <string name="show_information">Show information</string>
     <string name="dashboard_info_title">Dashboard</string>
     <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view when there is enough space for readable widgets\n• Arrows change the order\n• The X at the bottom right cancels a running action\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings, updates, help, and About SwitchWerk</string>
-    <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance, updates, and action details\n• Configurations: export or import the configuration</string>
+    <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance, updates, action details, and external intents\n• Configurations: export or import the configuration</string>
     <string name="system_info_title">System</string>
-    <string name="system_info">• Choose appearance and language\n• Check for updates and open GitHub release notes\n• Show or hide action details</string>
+    <string name="system_info">• Choose appearance and language\n• Check for updates and open GitHub release notes\n• Show or hide action details\n• Allow or block external intents</string>
     <string name="backup_info">• Export saves the local configuration\n• Import loads a configuration from a trusted source\n• Choose password handling deliberately for each action\n• The password choice applies only to the next action and is reset afterwards</string>
     <string name="password_storage_info">Wi-Fi passwords are stored encrypted on this device. They are not sent to a cloud service and are not shown in action details.</string>
     <string name="hostname_ip_info">Enter the device\'s local address in its assigned Wi-Fi network, for example 192.168.33.1 or a hostname resolved on the local network. No internet connection is required.</string>
@@ -42,6 +42,15 @@
     <string name="app_shortcut_description">Offer this device action when the app icon is long-pressed. Android shows at most four selected actions.</string>
     <string name="help_shortcuts_title">App shortcuts</string>
     <string name="help_shortcuts_text">• Enable an action in its device dialog\n• Long-press the app icon and select the action\n• At most four enabled actions are offered in dashboard order\n• Progress and results appear on the dashboard</string>
+    <string name="help_external_intents_title">External intents</string>
+    <string name="help_external_intents_text">• Enable external intents in Settings → System\n• Find the stable local device ID in an exported configuration\n• Only an existing local device ID is accepted\n• URLs, commands, request bodies, and additional extras are rejected\n• The intent opens SwitchWerk in the foreground\n• Progress and results appear on the dashboard</string>
+    <string name="external_intents_title">External intents</string>
+    <string name="external_intents_enable">Allow external intents</string>
+    <string name="external_intents_description">Disabled by default. Other apps can start configured device actions by local ID only.</string>
+    <string name="external_intent_disabled_error">External intents are disabled in Settings.</string>
+    <string name="external_intent_missing_device_id_error">The external intent has no device ID.</string>
+    <string name="external_intent_unknown_device_error">The external intent references an unknown device.</string>
+    <string name="external_intent_invalid_error">The external intent is invalid and was rejected.</string>
     <string name="wifi_assignment_dialog_info_title">Wi-Fi assignment</string>
     <string name="wifi_assignment_dialog_info">• Select a Wi-Fi profile for the device\n• Enter the local device address\n• No internet access is required</string>
     <string name="about_switchwerk">About SwitchWerk</string>

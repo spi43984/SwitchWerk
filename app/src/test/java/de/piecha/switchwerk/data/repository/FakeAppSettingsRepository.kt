@@ -60,4 +60,8 @@ class FakeAppSettingsRepository(
             showSetupWizardOnStart = showSetupWizardOnStart
         )
     }
+
+    override fun setExternalIntentsEnabled(enabled: Boolean) {
+        mutableSettings.value = mutableSettings.value.copy(externalIntentsEnabled = enabled)
+    }
 }

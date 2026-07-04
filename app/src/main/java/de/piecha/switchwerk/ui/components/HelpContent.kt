@@ -34,6 +34,7 @@ fun HelpContent(
             HelpSection(R.string.help_connection_title, R.string.help_connection_text)
             HelpSection(R.string.help_import_title, R.string.help_import_text)
             HelpSection(R.string.help_shortcuts_title, R.string.help_shortcuts_text)
+            HelpSection(R.string.help_external_intents_title, R.string.help_external_intents_text)
             HelpSection(R.string.help_updates_title, R.string.help_updates_text)
             HelpSection(R.string.help_privacy_title, R.string.help_privacy_text)
         }

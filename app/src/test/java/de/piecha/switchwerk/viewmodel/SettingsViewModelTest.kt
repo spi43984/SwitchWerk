@@ -461,6 +461,7 @@ class SettingsViewModelTest {
         viewModel.setShowActionDetails(true)
         viewModel.setDetailPanelHeight(DetailPanelHeight.FORTY_PERCENT)
         viewModel.setDiagnosticsNewestFirst(false)
+        viewModel.setExternalIntentsEnabled(true)
         runCurrent()
 
         assertEquals(AppThemeMode.DARK, viewModel.uiState.value.appSettings.themeMode)
@@ -471,6 +472,7 @@ class SettingsViewModelTest {
             viewModel.uiState.value.appSettings.detailPanelHeight
         )
         assertFalse(viewModel.uiState.value.appSettings.diagnosticsNewestFirst)
+        assertTrue(viewModel.uiState.value.appSettings.externalIntentsEnabled)
     }
 
     @Test

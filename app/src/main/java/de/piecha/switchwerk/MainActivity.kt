@@ -46,6 +46,8 @@ import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.MainUiEvent
 import de.piecha.switchwerk.shortcut.APP_SHORTCUT_DEVICE_ID
 import de.piecha.switchwerk.shortcut.shortcutDeviceId
+import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
+import de.piecha.switchwerk.intent.externalDeviceActionRequest
 import org.koin.android.ext.android.inject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -77,15 +79,18 @@ class MainActivity : ComponentActivity() {
     private var selectedSettingsSectionForRestoration = SettingsSection.WIFI_PROFILES
     private var settingsScreenUiStateForRestoration = SettingsScreenUiState()
     private var pendingShortcutDeviceId by mutableStateOf<String?>(null)
+    private var pendingExternalDeviceAction by
+        mutableStateOf<ExternalDeviceActionIntentResult?>(null)
     private var shortcutLaunchCount by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         pendingShortcutDeviceId = intent.shortcutDeviceId()
+        pendingExternalDeviceAction = intent.externalDeviceActionRequest()
         currentScreenForRestoration = savedInstanceState.restoreAppScreen(
             STATE_CURRENT_SCREEN,
             AppScreen.Dashboard
         )
-        if (pendingShortcutDeviceId != null) {
+        if (pendingShortcutDeviceId != null || pendingExternalDeviceAction != null) {
             currentScreenForRestoration = AppScreen.Dashboard
             shortcutLaunchCount += 1
         }
@@ -126,6 +131,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            LaunchedEffect(pendingExternalDeviceAction, uiState.isLoading) {
+                val request = pendingExternalDeviceAction ?: return@LaunchedEffect
+                if (!uiState.isLoading) {
+                    pendingExternalDeviceAction = null
+                    mainViewModel.handleExternalDeviceAction(request)
+                }
+            }
             LaunchedEffect(uiState.appSettings.language) {
                 val language = uiState.appSettings.language
                 if (language != initialLanguage && AppLocaleController.apply(this@MainActivity, language)) {
@@ -164,7 +176,10 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingShortcutDeviceId = intent.shortcutDeviceId()
-        if (pendingShortcutDeviceId != null) shortcutLaunchCount += 1
+        pendingExternalDeviceAction = intent.externalDeviceActionRequest()
+        if (pendingShortcutDeviceId != null || pendingExternalDeviceAction != null) {
+            shortcutLaunchCount += 1
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -13,11 +13,13 @@ import de.piecha.switchwerk.data.network.WifiProximitySnapshot
 import de.piecha.switchwerk.data.update.FakeAppUpdateRepository
 import de.piecha.switchwerk.domain.model.ApiCall
 import de.piecha.switchwerk.domain.model.ApiMethod
+import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.UiText
+import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,6 +50,55 @@ class MainViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun externalActionIsRejectedWhenSettingIsDisabled() = runTest(dispatcher) {
+        val actionService = WaitingDeviceActionService()
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(listOf(device(id = "device-1", sortOrder = 0))),
+            deviceActionService = actionService,
+            appSettingsRepository = FakeAppSettingsRepository(),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
+        )
+        runCurrent()
+
+        viewModel.handleExternalDeviceAction(
+            ExternalDeviceActionIntentResult.Valid("device-1")
+        )
+        runCurrent()
+
+        assertEquals(0, actionService.callCount)
+        assertEquals(
+            R.string.external_intent_disabled_error,
+            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+        )
+    }
+
+    @Test
+    fun enabledExternalActionUsesExistingActionService() = runTest(dispatcher) {
+        val actionService = WaitingDeviceActionService()
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(listOf(device(id = "device-1", sortOrder = 0))),
+            deviceActionService = actionService,
+            appSettingsRepository = FakeAppSettingsRepository(
+                AppSettings(externalIntentsEnabled = true)
+            ),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
+        )
+        runCurrent()
+
+        viewModel.handleExternalDeviceAction(
+            ExternalDeviceActionIntentResult.Valid("device-1")
+        )
+        runCurrent()
+
+        assertEquals(1, actionService.callCount)
+        assertEquals(DeviceActionUiState.Loading, viewModel.uiState.value.deviceActionStates["device-1"])
     }
 
     @Test

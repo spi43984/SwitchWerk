@@ -2,30 +2,31 @@
 
 Stand: 4. Juli 2026
 
-## Abgeschlossen
+## Aktive Arbeit
 
-- Issue 071 „App Shortcuts“
-- GitHub-Issue: #166
-- Pull Request: #167
-- Squash-Merge auf `main`: `65bc40d feat: add dynamic app shortcuts (#167)`
-- Dynamische App-Shortcuts sind pro Gerät konfigurierbar, werden zentral aus
-  dem Geräte-Repository aktualisiert und führen Aktionen über die bestehende
-  MVVM-/DeviceActionService-Logik aus.
-- Room-Migration 8 → 9 und Konfigurationsschema 5 speichern
-  `shortcutEnabled`; ältere Importe verwenden sicher `false`.
-- Deutsche und englische Hilfe-, Info- und UI-Texte sind aktualisiert.
-- Debug- und Release-Prüfbefehle sind in den zentralen Entwicklungsdokumenten
-  getrennt dokumentiert; beide verwenden `testDebugUnitTest`.
-- Container-Prüfungen, GitHub Android Quality Checks und Dependency Submission
-  waren erfolgreich. Release-Build, Installation und Gerätetest wurden vom
-  Benutzer auf dem Ubuntu-Host bestätigt.
+- Issue 072 „SwitchWerk empfängt Intents“ ist auf dem lokalen Branch
+  `switchwerk-intents` implementiert, aber noch nicht auf dem Ubuntu-Host
+  bestätigt oder veröffentlicht.
+- Zugehöriges GitHub-Issue: #168.
+- Externe Intents sind standardmäßig deaktiviert und global unter
+  Einstellungen → System aktivierbar.
+- Die Action `de.piecha.switchwerk.action.RUN_DEVICE_ACTION` akzeptiert
+  ausschließlich das String-Extra `de.piecha.switchwerk.extra.DEVICE_ID`.
+- Der Parser lehnt fehlende, ungültige und zusätzliche Parameter ab. Das
+  MainViewModel löst nur bereits konfigurierte Geräte-IDs auf und verwendet die
+  bestehende DeviceActionService-Logik.
+- Start-Intents und `onNewIntent` werden verarbeitet; Fortschritt und Ergebnis
+  erscheinen im vorhandenen Dashboard-/Aktionsprotokoll.
+- Deutsche und englische UI-/Hilfetexte sowie die README-Nutzungsdokumentation
+  sind ergänzt.
 
-## Nächster Stand
+## Prüfstand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 072
-  „SwitchWerk empfängt Intents“.
-- Weitere Reihenfolge und Status ausschließlich aus `docs/issues/overview.txt`
-  entnehmen.
+- Container: `./gradlew testDebugUnitTest` erfolgreich.
+- Container: `./gradlew lintDebug` erfolgreich.
+- Die Intent-Ausführung mit einer konfigurierten Geräte-ID wurde vom Benutzer
+  per ADB erfolgreich getestet.
+- Vollständige Host-Build-Prüfung und Installation sind noch nicht bestätigt.
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
-GitHub-Issue schließen oder Branch löschen.
+GitHub-Issue schließen, lokale Issue-Dateien abhaken oder Branch löschen.

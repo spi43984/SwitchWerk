@@ -31,6 +31,8 @@ interface AppSettingsRepository {
     )
 
     fun setShowSetupWizardOnStart(showSetupWizardOnStart: Boolean)
+
+    fun setExternalIntentsEnabled(enabled: Boolean)
 }
 
 class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepository {
@@ -98,6 +100,11 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         )
     }
 
+    override fun setExternalIntentsEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_EXTERNAL_INTENTS_ENABLED, enabled).apply()
+        mutableSettings.value = mutableSettings.value.copy(externalIntentsEnabled = enabled)
+    }
+
     private fun loadSettings(): AppSettings {
         return AppSettings(
             themeMode = preferences.getEnum(KEY_THEME_MODE, AppThemeMode.SYSTEM),
@@ -126,7 +133,8 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
             showSetupWizardOnStart = preferences.getBoolean(
                 KEY_SHOW_SETUP_WIZARD_ON_START,
                 true
-            )
+            ),
+            externalIntentsEnabled = preferences.getBoolean(KEY_EXTERNAL_INTENTS_ENABLED, false)
         )
     }
 
@@ -149,5 +157,6 @@ class SharedPreferencesAppSettingsRepository(context: Context) : AppSettingsRepo
         const val KEY_WIFI_PROFILE_SORT_CRITERION = "wifi_profile_sort_criterion"
         const val KEY_WIFI_PROFILE_SORT_DIRECTION = "wifi_profile_sort_direction"
         const val KEY_SHOW_SETUP_WIZARD_ON_START = "show_setup_wizard_on_start"
+        const val KEY_EXTERNAL_INTENTS_ENABLED = "external_intents_enabled"
     }
 }
