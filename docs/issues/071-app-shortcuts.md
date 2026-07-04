@@ -73,6 +73,30 @@ Android App Shortcuts bieten dafür einen einfachen Einstieg, ohne Cloud, Accoun
 
 ## Testhinweise
 
+Die Host-Prüfung passend zur aktuell installierten App-Variante ausführen.
+
+Debug:
+
+```text
+./gradlew lintDebug
+./gradlew testDebugUnitTest
+./gradlew clean assembleDebug
+./gradlew installDebug
+```
+
+Release bei konfigurierter Release-Signierung:
+
+```text
+./gradlew lintRelease
+./gradlew testDebugUnitTest
+./gradlew clean assembleRelease
+./gradlew installRelease
+```
+
+`testReleaseUnitTest` existiert in diesem Projekt nicht. Bei abweichenden
+Signaturen erfordert der Variantenwechsel eine Deinstallation mit Verlust der
+lokalen App-Daten.
+
 - Gerät als Shortcut markieren.
 - App-Icon lange drücken und Shortcut prüfen.
 - Shortcut ausführen und Erfolg prüfen.

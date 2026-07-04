@@ -116,12 +116,26 @@ Nach der Implementierung ausgeben:
 * Bewertung aller Akzeptanzkriterien
 * vollständige Copy-&-Paste-Befehle für Build, Installation und manuelle Tests auf dem Host
 
-Build und Installation auf dem Host mindestens mit:
+Build und Installation auf dem Host passend zur aktuell auf dem Testgerät
+installierten Variante mindestens mit einem der folgenden Blöcke anbieten.
+
+Debug:
 
 ./gradlew lintDebug
 ./gradlew testDebugUnitTest
 ./gradlew clean assembleDebug
 ./gradlew installDebug
+
+Release:
+
+./gradlew lintRelease
+./gradlew testDebugUnitTest
+./gradlew clean assembleRelease
+./gradlew installRelease
+
+Keinen Befehl `testReleaseUnitTest` ausgeben; dieser Task existiert im Projekt
+nicht. Auf die erforderliche Release-Signierung und möglichen Datenverlust bei
+einem signaturbedingten Variantenwechsel hinweisen.
 
 Melde den Build erst als erfolgreich, nachdem der Benutzer ein erfolgreiches
 Ergebnis vom Host zurückgemeldet hat.

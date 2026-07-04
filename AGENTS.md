@@ -189,10 +189,27 @@ Nicht erlaubt ohne ausdrückliche Freigabe:
 - GitHub-Issue schließen
 - Branch löschen
 
-Mindestens auf dem Host zu prüfen:
+Mindestens auf dem Host zu prüfen. Codex bietet abhängig von der aktuell auf dem
+Testgerät installierten Variante den passenden vollständigen Block an.
 
+Debug:
+
+    ./gradlew lintDebug
+    ./gradlew testDebugUnitTest
     ./gradlew clean assembleDebug
     ./gradlew installDebug
+
+Release:
+
+    ./gradlew lintRelease
+    ./gradlew testDebugUnitTest
+    ./gradlew clean assembleRelease
+    ./gradlew installRelease
+
+Es gibt keinen Task `testReleaseUnitTest`; für beide Varianten gilt
+`testDebugUnitTest`. `installRelease` setzt eine konfigurierte Release-Signierung
+voraus. Bei abweichenden Signaturen muss die bereits installierte Variante vor
+dem Wechsel deinstalliert werden, wodurch lokale App-Daten verloren gehen.
 
 Codex meldet den Build nicht als erfolgreich, solange der Benutzer kein
 erfolgreiches Ergebnis vom Host zurückgemeldet hat.

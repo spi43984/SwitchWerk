@@ -17,7 +17,7 @@ import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
         WifiProfileEntity::class,
         DeviceConnectionEntity::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -176,6 +176,14 @@ abstract class AppDatabase : RoomDatabase() {
                     ALTER TABLE devices
                     ADD COLUMN apiContentType TEXT NOT NULL DEFAULT 'APPLICATION_JSON'
                     """.trimIndent()
+                )
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE devices ADD COLUMN shortcutEnabled INTEGER NOT NULL DEFAULT 0"
                 )
             }
         }

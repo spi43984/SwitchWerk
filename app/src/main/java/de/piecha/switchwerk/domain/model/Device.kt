@@ -7,5 +7,6 @@ data class Device(
     val protocol: DeviceProtocol = DeviceProtocol.HTTP,
     val apiCall: ApiCall,
     val connections: List<DeviceConnection>,
-    val sortOrder: Int
+    val sortOrder: Int,
+    val shortcutEnabled: Boolean = false
 )

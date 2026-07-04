@@ -30,7 +30,8 @@ data class ConfigurationDevice(
     val name: String,
     val actionLabel: String,
     val action: ConfigurationDeviceAction,
-    val connections: List<ConfigurationDeviceConnection>
+    val connections: List<ConfigurationDeviceConnection>,
+    val shortcutEnabled: Boolean = false
 )
 
 data class ConfigurationDeviceAction(
@@ -46,4 +47,4 @@ data class ConfigurationDeviceConnection(
     val host: String
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 4
+const val CONFIGURATION_SCHEMA_VERSION = 5

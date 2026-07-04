@@ -205,6 +205,10 @@ class MainViewModel(
         }
     }
 
+    fun executeDeviceAction(deviceId: String) {
+        _uiState.value.devices.firstOrNull { it.id == deviceId }?.let(::executeDeviceAction)
+    }
+
     fun cancelDeviceAction(deviceId: String) {
         actionJobs[deviceId]?.takeIf(Job::isActive)?.let { job ->
             userCancelledActionIds += deviceId

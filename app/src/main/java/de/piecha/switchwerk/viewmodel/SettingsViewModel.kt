@@ -75,7 +75,8 @@ data class DeviceFormState(
     val apiPath: String = "",
     val apiRequestBody: String = "",
     val apiContentType: String = ApiContentType.APPLICATION_JSON.name,
-    val connections: List<DeviceConnectionFormState> = emptyList()
+    val connections: List<DeviceConnectionFormState> = emptyList(),
+    val shortcutEnabled: Boolean = false
 )
 
 data class WifiProfileDeletionConfirmation(
@@ -598,6 +599,7 @@ class SettingsViewModel(
                 apiPath = device.apiCall.path,
                 apiRequestBody = device.apiCall.requestBody,
                 apiContentType = device.apiCall.contentType.name,
+                shortcutEnabled = device.shortcutEnabled,
                 connections = device.connections.map { connection ->
                     val profile = _uiState.value.wifiProfiles.firstOrNull {
                         it.id == connection.wifiProfileId
@@ -630,6 +632,10 @@ class SettingsViewModel(
 
     fun updateDeviceActionLabel(actionLabel: String) {
         updateDeviceForm { it.copy(actionLabel = actionLabel) }
+    }
+
+    fun updateDeviceShortcutEnabled(enabled: Boolean) {
+        updateDeviceForm { it.copy(shortcutEnabled = enabled) }
     }
 
     fun updateDeviceApiMethod(apiMethod: String) {
@@ -809,7 +815,8 @@ class SettingsViewModel(
                                 host = it.host.trim()
                             )
                         },
-                        sortOrder = sortOrder
+                        sortOrder = sortOrder,
+                        shortcutEnabled = form.shortcutEnabled
                     )
                 )
             }.onSuccess {

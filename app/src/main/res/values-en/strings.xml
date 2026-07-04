@@ -37,7 +37,11 @@
     <string name="wifi_profile_dialog_info_title">Wi-Fi profile</string>
     <string name="wifi_profile_dialog_info">• Enter the target Wi-Fi SSID\n• The name must be unique\n• The password remains encrypted on the device</string>
     <string name="device_dialog_info_title">Device</string>
-    <string name="device_dialog_info">• Set the name and button label\n• Choose HTTP or HTTPS\n• Enter the HTTP/RPC method and path\n• For POST, optionally choose request body and Content-Type\n• Wi-Fi assignments define the connection order</string>
+    <string name="device_dialog_info">• Set the name and button label\n• Optionally offer the action as an app shortcut\n• Android shows at most four enabled shortcuts in dashboard order\n• Choose HTTP or HTTPS\n• Enter the HTTP/RPC method and path\n• For POST, optionally choose request body and Content-Type\n• Wi-Fi assignments define the connection order</string>
+    <string name="app_shortcut">App shortcut</string>
+    <string name="app_shortcut_description">Offer this device action when the app icon is long-pressed. Android shows at most four selected actions.</string>
+    <string name="help_shortcuts_title">App shortcuts</string>
+    <string name="help_shortcuts_text">• Enable an action in its device dialog\n• Long-press the app icon and select the action\n• At most four enabled actions are offered in dashboard order\n• Progress and results appear on the dashboard</string>
     <string name="wifi_assignment_dialog_info_title">Wi-Fi assignment</string>
     <string name="wifi_assignment_dialog_info">• Select a Wi-Fi profile for the device\n• Enter the local device address\n• No internet access is required</string>
     <string name="about_switchwerk">About SwitchWerk</string>

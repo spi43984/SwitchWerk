@@ -157,6 +157,7 @@ class DefaultConfigurationTransferRepository(
                     id = device.id,
                     name = device.name,
                     actionLabel = device.actionLabel,
+                    shortcutEnabled = device.shortcutEnabled,
                     action = ConfigurationDeviceAction(
                         protocol = device.apiProtocol,
                         method = device.apiMethod,
@@ -334,7 +335,8 @@ class DefaultConfigurationTransferRepository(
             apiPath = action.path,
             apiRequestBody = action.requestBody.orEmpty(),
             apiContentType = action.contentType,
-            sortOrder = sortOrder
+            sortOrder = sortOrder,
+            shortcutEnabled = shortcutEnabled
         )
     }
 
