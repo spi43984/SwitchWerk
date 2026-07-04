@@ -213,9 +213,13 @@ ohne bei jedem Push erneut erzeugt zu werden.
 7. GitHub-Issue-Nummer notieren.
 8. Fachlichen Branch anlegen oder vorhandenen passenden Branch verwenden.
 9. Implementieren.
-10. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
+10. Bei jeder neuen Funktion ausdrücklich prüfen und den Benutzer fragen, ob
+    zugehörige neue oder geänderte Einstellungen exportiert und importiert
+    werden sollen. Die Entscheidung im Issue-Scope dokumentieren und keine
+    Variante stillschweigend voraussetzen.
+11. Bei neuen oder geänderten Funktionen Hilfe-, Info- und Tooltip-Texte prüfen
    und aktualisieren, damit die UI-Erklärung zum tatsächlichen Verhalten passt.
-11. Build und Installation auf dem Host passend zur installierten Variante testen.
+12. Build und Installation auf dem Host passend zur installierten Variante testen.
     Debug:
 
        ./gradlew lintDebug
@@ -234,39 +238,39 @@ ohne bei jedem Push erneut erzeugt zu werden.
     abweichender Signatur muss die installierte App zuerst deinstalliert werden;
     ihre lokalen Daten gehen dabei verloren.
 
-12. Ohne ausdrückliche Veröffentlichungsanforderung nicht committen, pushen oder einen Pull Request erstellen.
-13. Nach ausdrücklicher Veröffentlichungsanforderung auf dem Feature-Branch committen.
-14. Feature-Branch pushen.
-15. Pull Request erstellen.
-16. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
-17. Unmittelbar nach dem Merge prüfen, dass der PR wirklich gemergt wurde:
+13. Ohne ausdrückliche Veröffentlichungsanforderung nicht committen, pushen oder einen Pull Request erstellen.
+14. Nach ausdrücklicher Veröffentlichungsanforderung auf dem Feature-Branch committen.
+15. Feature-Branch pushen.
+16. Pull Request erstellen.
+17. Pull Request prüfen und erst nach separater ausdrücklicher Merge-Freigabe nach `main` mergen.
+18. Unmittelbar nach dem Merge prüfen, dass der PR wirklich gemergt wurde:
 
        gh pr view <PR-NUMMER> \
        --json state,mergedAt,mergeCommit
 
    `state` muss `MERGED` sein und `mergedAt` darf nicht leer sein.
-18. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
-19. Prüfen, dass `main` den Merge- oder Squash-Commit enthält:
+19. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+20. Prüfen, dass `main` den Merge- oder Squash-Commit enthält:
 
        git log \
        --oneline \
        -1
 
-20. Lokale Issue-Datei unter `docs/issues` abhaken.
-21. `docs/issues/overview.txt` aktualisieren.
-22. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
-23. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
-24. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
-25. Dokumentationsänderungen committen und pushen.
-26. Nach dem Dokumentations-Push erneut `main` prüfen:
+21. Lokale Issue-Datei unter `docs/issues` abhaken.
+22. `docs/issues/overview.txt` aktualisieren.
+23. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben Status zeigen.
+24. `ai-context.md` nur bei geändertem dauerhaftem Projektkontext, geänderten Projektentscheidungen oder langfristigen Projektregeln aktualisieren.
+25. `AI_HANDOFF.md` aktualisieren, wenn aktive Arbeit, Implementierungsstand oder abgeschlossene Arbeit dokumentiert werden muss.
+26. Dokumentationsänderungen committen und pushen.
+27. Nach dem Dokumentations-Push erneut `main` prüfen:
 
        git status \
        -sb
 
-27. Zugehöriges GitHub-Issue erst danach schließen.
-28. Branch lokal löschen.
-29. Branch remote löschen.
-30. Remote-Referenzen bereinigen.
+28. Zugehöriges GitHub-Issue erst danach schließen.
+29. Branch lokal löschen.
+30. Branch remote löschen.
+31. Remote-Referenzen bereinigen.
 
 ## Verbindliche Issue-Abschluss-Checkliste
 

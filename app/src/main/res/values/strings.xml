@@ -26,7 +26,7 @@
     <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance, updates, action details, and external intents\n• Configurations: export or import the configuration</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Choose appearance and language\n• Check for updates and open GitHub release notes\n• Show or hide action details\n• Allow or block external intents</string>
-    <string name="backup_info">• Export saves the local configuration\n• Import loads a configuration from a trusted source\n• Choose password handling deliberately for each action\n• The password choice applies only to the next action and is reset afterwards</string>
+    <string name="backup_info">• Export saves Wi-Fi profiles, devices, and transferable app settings\n• Language, display, Wi-Fi profile sorting, and external intent permission are transferred\n• Setup wizard state remains local\n• Changes to external intent permission are shown before import confirmation\n• Choose password handling deliberately for each action\n• The password choice applies only to the next action and is reset afterwards</string>
     <string name="password_storage_info">Wi-Fi passwords are stored encrypted on this device. They are not sent to a cloud service and are not shown in action details.</string>
     <string name="hostname_ip_info">Enter the device\'s local address in its assigned Wi-Fi network, for example 192.168.33.1 or a hostname resolved on the local network. No internet connection is required.</string>
     <string name="api_call_info">The HTTP/RPC call is appended to the local device address. Use only a path supported by the device. POST can send an optional request body with a Content-Type, for example /relay/0?turn=on.</string>
@@ -66,7 +66,7 @@
     <string name="help_connection_title">Connection and troubleshooting</string>
     <string name="help_connection_text">• The status point confirms a Wi-Fi connection, not physical Wi-Fi proximity\n• Green: Wi-Fi connection confirmed\n• Red: Android could not establish the specific Wi-Fi request\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID alone does not confirm a connection\n• The X at the bottom right cancels a running action and its Wi-Fi request\n• Android\'s system dialog cannot be closed by SwitchWerk\n• A device access point may interrupt internet access\n• HTTP errors come from the device</string>
     <string name="help_import_title">Save and load configurations</string>
-    <string name="help_import_text">• Import configurations only from trusted sources\n• Export and import are clearly separated in Configurations\n• Wi-Fi profiles, devices and settings can be transferred\n• Password import and export must be selected deliberately before each action: left without passwords, right with passwords\n• The related action stays disabled in the middle position\n• The password choice applies only to the next action and is reset afterwards</string>
+    <string name="help_import_text">• Import configurations only from trusted sources\n• Wi-Fi profiles, devices, language, display, Wi-Fi profile sorting, and external intent permission can be transferred\n• Setup wizard state remains local\n• Changes to external intent permission are shown before import confirmation\n• Password import and export must be selected deliberately before each action: left without passwords, right with passwords\n• The related action stays disabled in the middle position\n• The password choice applies only to the next action and is reset afterwards</string>
     <string name="help_privacy_title">Permissions and privacy</string>
     <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
     <string name="help_updates_title">Updates</string>
@@ -259,6 +259,9 @@
     <string name="import_summary_wifi_profiles_label">Wi-Fi profiles</string>
     <string name="import_summary_devices_label">Devices</string>
     <string name="import_summary_passwords_label">Passwords</string>
+    <string name="import_summary_external_intents_label">External intents</string>
+    <string name="import_summary_external_intents_enabled">Will be enabled by this import.</string>
+    <string name="import_summary_external_intents_disabled">Will be disabled by this import.</string>
     <string name="import_summary_merge_value">%1$d new, %2$d overwritten</string>
     <string name="import_summary_replace_value">%1$d new, %2$d existing entries will be replaced</string>
     <string name="password_choice_without">Without passwords</string>
@@ -280,7 +283,7 @@
     <string name="error_profile_name_duplicate">Profilname ist bereits vergeben</string>
     <string name="error_wifi_profile_save">WLAN-Profil konnte nicht gespeichert werden</string>
     <string name="error_wifi_profile_delete">WLAN-Profil konnte nicht gelöscht werden</string>
-    <string name="configuration_exported">Konfiguration wurde exportiert</string>
+    <string name="configuration_exported">Configuration was exported</string>
     <string name="error_invalid_qr_url">QR-Code enthält keine gültige HTTP/HTTPS-URL</string>
     <string name="error_camera_permission">Kamera-Berechtigung wird zum Scannen des QR-Codes benötigt</string>
     <string name="default_action_label">Schalten</string>
@@ -297,8 +300,8 @@
     <string name="error_device_delete">Gerät konnte nicht gelöscht werden</string>
     <string name="error_device_order">Gerätereihenfolge konnte nicht geändert werden</string>
     <string name="error_import_prepare">Import konnte nicht vorbereitet werden</string>
-    <string name="configuration_imported">Konfiguration wurde importiert</string>
-    <string name="error_configuration_import">Konfiguration konnte nicht importiert werden</string>
+    <string name="configuration_imported">Configuration was imported</string>
+    <string name="error_configuration_import">Configuration could not be imported</string>
     <string name="error_operation_failed">Vorgang ist fehlgeschlagen</string>
     <string name="error_devices_load">Geräte konnten nicht geladen werden</string>
 

@@ -3,10 +3,13 @@ package de.piecha.switchwerk.data.transfer
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 
 class ConfigurationImportValidator {
 
@@ -26,6 +29,27 @@ class ConfigurationImportValidator {
                 require(DashboardLayoutMode.entries.any { it.name == dashboardLayoutMode }) {
                     "Nicht unterstützte Dashboard-Darstellung: $dashboardLayoutMode"
                 }
+            }
+            settings.language?.let { language ->
+                require(AppLanguage.entries.any { it.name == language }) {
+                    "Nicht unterstützte Sprache: $language"
+                }
+            }
+            settings.wifiProfileSortCriterion?.let { criterion ->
+                require(WifiProfileSortCriterion.entries.any { it.name == criterion }) {
+                    "Nicht unterstütztes WLAN-Sortierkriterium: $criterion"
+                }
+            }
+            settings.wifiProfileSortDirection?.let { direction ->
+                require(WifiProfileSortDirection.entries.any { it.name == direction }) {
+                    "Nicht unterstützte WLAN-Sortierrichtung: $direction"
+                }
+            }
+            require(
+                (settings.wifiProfileSortCriterion == null) ==
+                    (settings.wifiProfileSortDirection == null)
+            ) {
+                "WLAN-Sortierkriterium und WLAN-Sortierrichtung müssen gemeinsam angegeben werden"
             }
         }
 

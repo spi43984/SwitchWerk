@@ -68,7 +68,11 @@ class ConfigurationImportValidatorTest {
                     showActionDetails = true,
                     detailPanelHeight = "FORTY_PERCENT",
                     diagnosticsNewestFirst = false,
-                    dashboardLayoutMode = "WIDGETS"
+                    dashboardLayoutMode = "WIDGETS",
+                    language = "ENGLISH",
+                    wifiProfileSortCriterion = "SSID",
+                    wifiProfileSortDirection = "DESCENDING",
+                    externalIntentsEnabled = true
                 )
             )
         )
@@ -116,6 +120,30 @@ class ConfigurationImportValidatorTest {
                         detailPanelHeight = "THIRTY_PERCENT",
                         diagnosticsNewestFirst = true
                     )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun unsupportedNewAppSettingEnumsAreRejected() {
+        listOf(
+            validAppSettings().copy(language = "KLINGON"),
+            validAppSettings().copy(wifiProfileSortCriterion = "CREATED_AT"),
+            validAppSettings().copy(wifiProfileSortDirection = "RANDOM")
+        ).forEach { settings ->
+            assertThrows(IllegalArgumentException::class.java) {
+                validator.validate(validDocument().copy(appSettings = settings))
+            }
+        }
+    }
+
+    @Test
+    fun incompleteWifiProfileSortingIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument().copy(
+                    appSettings = validAppSettings().copy(wifiProfileSortDirection = null)
                 )
             )
         }
@@ -312,6 +340,18 @@ class ConfigurationImportValidatorTest {
             devices = devices
         )
     }
+
+    private fun validAppSettings() = ConfigurationAppSettings(
+        themeMode = "SYSTEM",
+        showActionDetails = false,
+        detailPanelHeight = "THIRTY_PERCENT",
+        diagnosticsNewestFirst = true,
+        dashboardLayoutMode = "LIST",
+        language = "SYSTEM",
+        wifiProfileSortCriterion = "PROFILE_NAME",
+        wifiProfileSortDirection = "ASCENDING",
+        externalIntentsEnabled = false
+    )
 
     private fun wifiProfile(
         id: String = "wifi-1",

@@ -21,8 +21,12 @@ import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
 import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
 import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
 import de.piecha.switchwerk.domain.model.AppThemeMode
+import de.piecha.switchwerk.domain.model.AppLanguage
+import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
+import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
@@ -128,15 +132,7 @@ class DefaultConfigurationTransferRepository(
 
         return ConfigurationDocument(
             schemaVersion = CONFIGURATION_SCHEMA_VERSION,
-            appSettings = appSettingsRepository.settings.value.let { settings ->
-                ConfigurationAppSettings(
-                    themeMode = settings.themeMode.name,
-                    showActionDetails = settings.showActionDetails,
-                    detailPanelHeight = settings.detailPanelHeight.name,
-                    diagnosticsNewestFirst = settings.diagnosticsNewestFirst,
-                    dashboardLayoutMode = settings.dashboardLayoutMode.name
-                )
-            },
+            appSettings = appSettingsRepository.settings.value.toConfigurationAppSettings(),
             wifiProfiles = profiles.map { profile ->
                 ConfigurationWifiProfile(
                     id = profile.id,
@@ -229,6 +225,9 @@ class DefaultConfigurationTransferRepository(
     ): ConfigurationImportSummary {
         val importedWifiProfileIds = document.wifiProfiles.map { it.id }.toSet()
         val importedDeviceIds = document.devices.map { it.id }.toSet()
+        val externalIntentsEnabledChange = document.appSettings.externalIntentsChangeFrom(
+            appSettingsRepository.settings.value
+        )
 
         return when (mode) {
             ConfigurationImportMode.MERGE -> ConfigurationImportSummary(
@@ -239,7 +238,8 @@ class DefaultConfigurationTransferRepository(
                 passwordsIncluded = document.passwordCount(),
                 passwordsDeleted = document.passwordDeletionCount(),
                 localWifiProfilesDeleted = 0,
-                localDevicesDeleted = 0
+                localDevicesDeleted = 0,
+                externalIntentsEnabledChange = externalIntentsEnabledChange
             )
 
             ConfigurationImportMode.REPLACE -> ConfigurationImportSummary(
@@ -250,7 +250,8 @@ class DefaultConfigurationTransferRepository(
                 passwordsIncluded = document.passwordCount(),
                 passwordsDeleted = document.passwordDeletionCount(),
                 localWifiProfilesDeleted = existingWifiProfileIds.size,
-                localDevicesDeleted = existingDeviceIds.size
+                localDevicesDeleted = existingDeviceIds.size,
+                externalIntentsEnabledChange = externalIntentsEnabledChange
             )
         }
     }
@@ -300,18 +301,7 @@ class DefaultConfigurationTransferRepository(
     }
 
     private fun applyImportedAppSettings(document: ConfigurationDocument) {
-        val settings = document.appSettings ?: return
-        appSettingsRepository.setThemeMode(AppThemeMode.valueOf(settings.themeMode))
-        appSettingsRepository.setShowActionDetails(settings.showActionDetails)
-        appSettingsRepository.setDetailPanelHeight(
-            DetailPanelHeight.valueOf(settings.detailPanelHeight)
-        )
-        appSettingsRepository.setDiagnosticsNewestFirst(settings.diagnosticsNewestFirst)
-        settings.dashboardLayoutMode?.let { dashboardLayoutMode ->
-            appSettingsRepository.setDashboardLayoutMode(
-                DashboardLayoutMode.valueOf(dashboardLayoutMode)
-            )
-        }
+        document.appSettings?.applyTo(appSettingsRepository)
     }
 
     private fun ConfigurationWifiProfile.toEntity(): WifiProfileEntity {
@@ -448,6 +438,42 @@ class DefaultConfigurationTransferRepository(
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
         const val GOOGLE_DRIVE_HOST = "google.com"
     }
+}
+
+internal fun AppSettings.toConfigurationAppSettings(): ConfigurationAppSettings {
+    return ConfigurationAppSettings(
+        themeMode = themeMode.name,
+        showActionDetails = showActionDetails,
+        detailPanelHeight = detailPanelHeight.name,
+        diagnosticsNewestFirst = diagnosticsNewestFirst,
+        dashboardLayoutMode = dashboardLayoutMode.name,
+        language = language.name,
+        wifiProfileSortCriterion = wifiProfileSortCriterion.name,
+        wifiProfileSortDirection = wifiProfileSortDirection.name,
+        externalIntentsEnabled = externalIntentsEnabled
+    )
+}
+
+internal fun ConfigurationAppSettings.applyTo(repository: AppSettingsRepository) {
+    repository.setThemeMode(AppThemeMode.valueOf(themeMode))
+    repository.setShowActionDetails(showActionDetails)
+    repository.setDetailPanelHeight(DetailPanelHeight.valueOf(detailPanelHeight))
+    repository.setDiagnosticsNewestFirst(diagnosticsNewestFirst)
+    dashboardLayoutMode?.let { repository.setDashboardLayoutMode(DashboardLayoutMode.valueOf(it)) }
+    language?.let { repository.setLanguage(AppLanguage.valueOf(it)) }
+    if (wifiProfileSortCriterion != null && wifiProfileSortDirection != null) {
+        repository.setWifiProfileSorting(
+            WifiProfileSortCriterion.valueOf(wifiProfileSortCriterion),
+            WifiProfileSortDirection.valueOf(wifiProfileSortDirection)
+        )
+    }
+    externalIntentsEnabled?.let(repository::setExternalIntentsEnabled)
+}
+
+internal fun ConfigurationAppSettings?.externalIntentsChangeFrom(
+    currentSettings: AppSettings
+): Boolean? {
+    return this?.externalIntentsEnabled?.takeIf { it != currentSettings.externalIntentsEnabled }
 }
 
 internal fun importHttpUrl(url: String): HttpUrl {
