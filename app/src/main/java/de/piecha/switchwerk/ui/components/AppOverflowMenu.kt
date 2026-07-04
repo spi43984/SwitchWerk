@@ -202,12 +202,6 @@ private fun MenuFooter(versionName: String) {
         textAlign = TextAlign.End,
         style = MaterialTheme.typography.labelSmall
     )
-    Text(
-        text = stringResource(R.string.release_date),
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.End,
-        style = MaterialTheme.typography.labelSmall
-    )
     Spacer(modifier = Modifier.height(8.dp))
     BoxWithConstraints(
         modifier = Modifier.fillMaxWidth(),

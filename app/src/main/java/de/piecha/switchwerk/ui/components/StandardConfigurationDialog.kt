@@ -57,6 +57,7 @@ fun StandardConfigurationDialog(
     modifier: Modifier = Modifier,
     actionEnabled: Boolean = true,
     scrollToBottom: Boolean = false,
+    scrollToBottomSignal: Int = 0,
     cancelText: String? = null,
     @StringRes infoTitleResourceId: Int? = null,
     @StringRes infoMessageResourceId: Int? = null,
@@ -64,7 +65,7 @@ fun StandardConfigurationDialog(
 ) {
     val scrollState = rememberScrollState()
     var scrollViewportHeight by remember { mutableIntStateOf(0) }
-    LaunchedEffect(scrollToBottom) {
+    LaunchedEffect(scrollToBottom, scrollToBottomSignal) {
         if (scrollToBottom) {
             withFrameNanos { }
             withFrameNanos { }

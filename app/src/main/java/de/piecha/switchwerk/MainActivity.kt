@@ -62,7 +62,9 @@ private const val STATE_FILE_IMPORT_URI = "file_import_uri"
 private const val STATE_FILE_IMPORT_REFERENCE = "file_import_reference"
 private const val STATE_SHOW_IMPORT_CONFIGURATION_DIALOG = "show_import_configuration_dialog"
 private const val STATE_IMPORT_SOURCE = "import_source"
+private const val STATE_IMPORT_PASSWORD_CHOICE = "import_password_choice"
 private const val STATE_SHOW_PASSWORD_EXPORT_WARNING = "show_password_export_warning"
+private const val STATE_EXPORT_PASSWORD_CHOICE = "export_password_choice"
 private const val STATE_OPEN_SWIPE_ITEM_ID = "open_swipe_item_id"
 
 class MainActivity : ComponentActivity() {
@@ -147,7 +149,9 @@ class MainActivity : ComponentActivity() {
         outState.putString(STATE_FILE_IMPORT_REFERENCE, settingsScreenUiStateForRestoration.fileImportReference)
         outState.putBoolean(STATE_SHOW_IMPORT_CONFIGURATION_DIALOG, settingsScreenUiStateForRestoration.showImportConfigurationDialog)
         outState.putString(STATE_IMPORT_SOURCE, settingsScreenUiStateForRestoration.importSource?.name)
+        outState.putString(STATE_IMPORT_PASSWORD_CHOICE, settingsScreenUiStateForRestoration.importPasswordChoice.name)
         outState.putBoolean(STATE_SHOW_PASSWORD_EXPORT_WARNING, settingsScreenUiStateForRestoration.showPasswordExportWarning)
+        outState.putString(STATE_EXPORT_PASSWORD_CHOICE, settingsScreenUiStateForRestoration.exportPasswordChoice.name)
         outState.putString(STATE_OPEN_SWIPE_ITEM_ID, settingsScreenUiStateForRestoration.openSwipeItemId)
         super.onSaveInstanceState(outState)
     }
@@ -190,7 +194,13 @@ private fun Bundle?.restoreSettingsScreenUiState(): SettingsScreenUiState {
         importSource = this?.getString(STATE_IMPORT_SOURCE)?.let { name ->
             ImportSource.entries.firstOrNull { it.name == name }
         },
+        importPasswordChoice = this?.getString(STATE_IMPORT_PASSWORD_CHOICE)?.let { name ->
+            de.piecha.switchwerk.ui.screens.PasswordTransferChoice.entries.firstOrNull { it.name == name }
+        } ?: de.piecha.switchwerk.ui.screens.PasswordTransferChoice.UNDECIDED,
         showPasswordExportWarning = this?.getBoolean(STATE_SHOW_PASSWORD_EXPORT_WARNING) ?: false,
+        exportPasswordChoice = this?.getString(STATE_EXPORT_PASSWORD_CHOICE)?.let { name ->
+            de.piecha.switchwerk.ui.screens.PasswordTransferChoice.entries.firstOrNull { it.name == name }
+        } ?: de.piecha.switchwerk.ui.screens.PasswordTransferChoice.UNDECIDED,
         openSwipeItemId = this?.getString(STATE_OPEN_SWIPE_ITEM_ID)
     )
 }
@@ -335,6 +345,13 @@ private fun SwitchWerkAppContent(
     if (setupWizardVisible) {
         SetupWizard(
             initialScrollPosition = setupWizardScrollPosition,
+            onOpenHelp = { scrollPosition ->
+                setupWizardScrollPosition = scrollPosition
+                setupWizardVisible = false
+                setupWizardReturnPending = true
+                helpReturnScreen = currentScreen
+                currentScreen = AppScreen.Help
+            },
             onOpenBackup = { scrollPosition ->
                 setupWizardScrollPosition = scrollPosition
                 setupWizardVisible = false
