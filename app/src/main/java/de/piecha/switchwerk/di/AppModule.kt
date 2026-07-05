@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.di
 
 import android.content.Context
+import android.appwidget.AppWidgetManager
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.location.LocationManager
@@ -51,6 +52,11 @@ import de.piecha.switchwerk.ui.StringProvider
 import de.piecha.switchwerk.shortcut.AndroidAppShortcutPublisher
 import de.piecha.switchwerk.shortcut.AppShortcutCoordinator
 import de.piecha.switchwerk.shortcut.AppShortcutPublisher
+import de.piecha.switchwerk.widget.SharedPreferencesWidgetActionStore
+import de.piecha.switchwerk.widget.SwitchWerkWidgetRenderer
+import de.piecha.switchwerk.widget.WidgetActionStore
+import de.piecha.switchwerk.widget.WidgetConfigurationViewModel
+import de.piecha.switchwerk.widget.WidgetUpdateCoordinator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -101,11 +107,25 @@ val appModule = module {
     single { WifiProximityConfirmationStore() }
 
     single { androidContext().getSystemService(ShortcutManager::class.java) }
+    single { AppWidgetManager.getInstance(androidContext()) }
     single<AppShortcutPublisher> {
         AndroidAppShortcutPublisher(androidContext(), get())
     }
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single { AppShortcutCoordinator(get(), get(), get(), get()) }
+    single<WidgetActionStore> { SharedPreferencesWidgetActionStore(androidContext()) }
+    single {
+        SwitchWerkWidgetRenderer(
+            context = androidContext(),
+            appWidgetManager = get(),
+            store = get(),
+            deviceRepository = get(),
+            switchGroupRepository = get(),
+            wifiProfileRepository = get(),
+            wifiProximityService = get()
+        )
+    }
+    single { WidgetUpdateCoordinator(get(), get(), get(), get()) }
 
     single<WifiConnectionService> {
         AndroidWifiConnectionService(
@@ -258,6 +278,15 @@ val appModule = module {
             stringProvider = get(),
             appUpdateRepository = get(),
             appUpdateInstallService = get()
+        )
+    }
+
+    viewModel {
+        WidgetConfigurationViewModel(
+            deviceRepository = get(),
+            switchGroupRepository = get(),
+            store = get(),
+            renderer = get()
         )
     }
 }

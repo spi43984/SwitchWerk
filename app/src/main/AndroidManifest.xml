@@ -16,6 +16,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
@@ -44,6 +45,54 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/update_file_paths" />
         </provider>
+        <service
+            android:name=".widget.WidgetActionExecutionService"
+            android:foregroundServiceType="shortService"
+            android:exported="false" />
+        <receiver
+            android:name=".widget.SwitchWerkWidgetProvider1x1"
+            android:exported="true"
+            android:label="@string/widget_label_1x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/switchwerk_widget_1x1_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.SwitchWerkWidgetProvider1x2"
+            android:exported="true"
+            android:label="@string/widget_label_1x2">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/switchwerk_widget_1x2_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.SwitchWerkWidgetProvider2x1"
+            android:exported="true"
+            android:label="@string/widget_label_2x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/switchwerk_widget_2x1_info" />
+        </receiver>
+        <activity
+            android:name=".widget.WidgetConfigurationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.SwitchWerk.WidgetConfiguration">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"

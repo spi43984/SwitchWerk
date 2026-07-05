@@ -5,6 +5,7 @@ import de.piecha.switchwerk.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import de.piecha.switchwerk.shortcut.AppShortcutCoordinator
+import de.piecha.switchwerk.widget.WidgetUpdateCoordinator
 
 class SwitchWerkApp : Application() {
     override fun onCreate() {
@@ -15,5 +16,6 @@ class SwitchWerkApp : Application() {
             modules(appModule)
         }.koin
         koin.get<AppShortcutCoordinator>().start()
+        koin.get<WidgetUpdateCoordinator>().start()
     }
 }

@@ -81,24 +81,89 @@ Wichtig ist zu prüfen, ob eine Aktion zuverlässig ausgelöst werden kann, ohne
 - Import/Export ausdrücklich prüfen, wenn Widget-Zuordnungen lokal gespeichert werden.
 - Bestehende App-Shortcuts und externe Intents nicht duplizieren, sondern gemeinsame Aktionsmodelle oder klare Delegation nutzen.
 
+## Implementierungsnotiz
+
+- Architekturentscheidung: klassische Android AppWidget/RemoteViews mit einer
+  Compose-Konfigurations-Activity.
+- Widget-Klicks starten einen nicht exportierten lokalen Service, der nur
+  Widget-ID und Eintragsindex entgegennimmt und die Zielaktion anschließend aus
+  der lokalen Widget-Zuordnung auflöst.
+- Ausführung erfolgt ausschließlich über bestehende `DeviceActionService`- und
+  `SwitchGroupActionService`-Logik.
+- Widget-Zuordnungen werden in SharedPreferences gespeichert, nicht in Room.
+  Eine Room-Migration ist deshalb nicht nötig.
+- Widget-Zuordnungen werden nicht in Konfigurationsimport/-export aufgenommen,
+  weil Android-AppWidget-IDs launcher- und gerätelokal sind.
+- Leere Schaltgruppen werden in der Widget-Konfiguration nicht als ausführbare
+  Aktion angeboten und bei späterer Leerung im Widget als nicht verfügbar
+  dargestellt.
+- Die Widget-Auswahl stellt eigene Launcher-Varianten für `1x1`, `1x2` und
+  `2x1` mit passenden Android-Zellmaßen bereit. Kompatible Launcher öffnen die
+  Zuordnung später über ihre native Bearbeiten-Aktion nach langem Drücken.
+- Die Render-Kapazität nutzt die aktuelle AppWidget-Größe, damit nach einer
+  Vergrößerung zusätzlich ausgewählte Aktionen angezeigt werden.
+- Widgets können einen optionalen freien Titel speichern. Ein leeres Feld
+  blendet den Titel aus und gibt die Höhe den Aktionsbuttons; eine kompakte
+  Zurücksetzen-Schaltfläche stellt den Standardtitel `SwitchWerk` wieder her.
+  Bei der erstmaligen Einrichtung ist `SwitchWerk` vorausgefüllt.
+- Die Konfiguration bietet eine Layoutwahl zwischen automatisch, einer Spalte
+  und zwei Spalten. Damit können Aktionen in ausreichend hohen Widgets bewusst
+  als breite Buttons untereinander dargestellt werden.
+- Ausgewählte Aktionen zeigen statt eines Hakens ihre laufende Auswahlnummer;
+  diese Nummer entspricht der späteren Reihenfolge im Widget.
+- Das Widget ist als nativ neu konfigurierbar markiert. Kompatible Launcher
+  bieten die Bearbeitung nach langem Drücken im Widget-Kontextmenü an; ein
+  dauerhaftes Zahnrad im Widget ist nicht nötig. Speichern und Abbrechen
+  schließen immer den Android-Konfigurationsvertrag per Activity-Ergebnis ab.
+  Ein noch sichtbares Launcher-Kontextmenü kann SwitchWerk mangels Android-API
+  nicht zuverlässig selbst schließen. Die Konfigurations-Activity verwendet
+  keine eigene Task-Zuordnung oder abweichende Task-Flags, damit der Launcher
+  den Standard-Lebenszyklus vollständig kontrolliert.
+- In der physischen Größe `1x1` wird der nicht sinnvoll lesbare Widget-Titel
+  ausgeblendet, damit die einzelne Aktionsfläche den verfügbaren Platz nutzt.
+- Ab Android 12 verwenden Widget-Hintergrund und Aktionsbuttons die systemseitig
+  vorgegebenen äußeren und inneren Widget-Radien. Ältere Android-Versionen
+  behalten die kompatiblen festen Radien.
+- Die vertikalen Abstände der Aktionsbuttons sind oben und unten symmetrisch;
+  dadurch sitzt der Aktionsbereich insbesondere ohne Titel mittig im Rahmen.
+- Widget-Aktionsflächen übernehmen die Dashboard-nahe WLAN-Statusfarbe
+  grün/grau/rot. Erfolg oder Fehler einer Widget-Aktion wird für vier Sekunden
+  in einem helleren Grün beziehungsweise Rot hervorgehoben und danach wieder
+  auf den aktuellen Status gesetzt.
+- Widget-Aktionen werden als Foreground-Service gestartet, damit Android den
+  Start aus dem Homescreen-Widget zuverlässig als Nutzeraktion behandelt.
+
 ## Akzeptanzkriterien
 
-- [ ] SwitchWerk stellt Android-Homescreen-Widgets bereit.
-- [ ] Ein `1x1`-Widget kann eine Geräteaktion starten.
-- [ ] Ein `1x1`-Widget kann eine Gruppenaktion starten.
-- [ ] `2x1` oder `1x2` kann zwei Aktionen kombiniert darstellen.
-- [ ] Vergrößerte Widgets können mehrere Geräte- oder Gruppenaktionen anzeigen.
-- [ ] `1x...`-Widgets ordnen Einträge untereinander an.
-- [ ] `2x...`-Widgets ordnen Einträge zweispaltig mit Einträgen untereinander an.
-- [ ] Widget-Einträge können mit lokal konfigurierten Geräten und Gruppen verknüpft werden.
-- [ ] Widget-Klicks starten ausschließlich lokal konfigurierte Aktionen.
-- [ ] Es ist geprüft und dokumentiert, ob die Aktion ohne sichtbares Öffnen der App ausgeführt werden kann.
-- [ ] Fortschritt, Erfolg und Fehler werden nachvollziehbar behandelt.
-- [ ] Umbenannte oder gelöschte Geräte und Gruppen werden in Widgets sicher aktualisiert oder entfernt.
-- [ ] Leere oder nicht ausführbare Gruppen werden nicht als ausführbare Widget-Aktion angeboten.
-- [ ] Keine sensiblen Daten werden in Widget-Labels, PendingIntents, Extras, Logs oder Dokumentation gespeichert.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+- [x] SwitchWerk stellt Android-Homescreen-Widgets bereit.
+- [x] Ein `1x1`-Widget kann eine Geräteaktion starten.
+- [x] Ein `1x1`-Widget kann eine Gruppenaktion starten.
+- [x] `2x1` oder `1x2` kann zwei Aktionen kombiniert darstellen.
+- [x] Vergrößerte Widgets können mehrere Geräte- oder Gruppenaktionen anzeigen.
+- [x] `1x...`-Widgets ordnen Einträge untereinander an.
+- [x] `2x...`-Widgets ordnen Einträge zweispaltig mit Einträgen untereinander an.
+- [x] Widget-Einträge können mit lokal konfigurierten Geräten und Gruppen verknüpft werden.
+- [x] Widget-Klicks starten ausschließlich lokal konfigurierte Aktionen.
+- [x] Es ist geprüft und dokumentiert, ob die Aktion ohne sichtbares Öffnen der App ausgeführt werden kann.
+- [x] Fortschritt, Erfolg und Fehler werden nachvollziehbar behandelt.
+- [x] Umbenannte oder gelöschte Geräte und Gruppen werden in Widgets sicher aktualisiert oder entfernt.
+- [x] Leere oder nicht ausführbare Gruppen werden nicht als ausführbare Widget-Aktion angeboten.
+- [x] Keine sensiblen Daten werden in Widget-Labels, PendingIntents, Extras, Logs oder Dokumentation gespeichert.
+- [x] Deutsche und englische Texte sind konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+
+## Abschlussprüfung
+
+- Container: `./gradlew testDebugUnitTest` erfolgreich.
+- Container: `./gradlew lintDebug` erfolgreich.
+- Iterative Release-Installationen und manuelle Gerätetests für Größen,
+  Skalierung, Konfiguration, Ausführung, Statusfarben und Layout durchgeführt.
+- Bekannte Plattformgrenze: Ein nach der Neukonfiguration sichtbar bleibendes
+  Launcher-Kontextmenü kann SwitchWerk nicht über eine öffentliche Android-API
+  schließen.
+- Folge-Thema vorgemerkt: Widget-Aktionen schreiben derzeit nicht in die
+  Dashboard-Aktionsdetails. Eine gemeinsame Aktionshistorie für Dashboard,
+  Widgets, Shortcuts und Intents soll als separates Issue geplant werden.
 
 ## Testhinweise
 
