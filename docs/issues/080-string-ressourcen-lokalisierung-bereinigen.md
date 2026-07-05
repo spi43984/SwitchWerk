@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Wartung / Lokalisierung
 - Bereich: Android-Ressourcen / Deutsch / Englisch
@@ -98,23 +98,32 @@ Hilfe-, Info- und Tooltip-Texte bleiben unverändert.
 
 ## Akzeptanzkriterien
 
-- [ ] `values`, `values-en` und `values-de` besitzen denselben Satz
+- [x] `values`, `values-en` und `values-de` besitzen denselben Satz
       übersetzbarer String-Schlüssel.
-- [ ] Alle 18 Setup-Wizard-Schlüssel sind explizit in `values-en` vorhanden.
-- [ ] Die drei Dashboard-Layout-Diagnoseschlüssel sind explizit in `values-de`
+- [x] Alle 18 Setup-Wizard-Schlüssel sind explizit in `values-en` vorhanden.
+- [x] Die drei Dashboard-Layout-Diagnoseschlüssel sind explizit in `values-de`
       vorhanden.
-- [ ] `values/strings.xml` enthält für die betroffenen Ressourcen nur englische
+- [x] `values/strings.xml` enthält für die betroffenen Ressourcen nur englische
       Fallback-Texte.
-- [ ] Platzhalter und Formatangaben stimmen für jeden Schlüssel zwischen den
+- [x] Platzhalter und Formatangaben stimmen für jeden Schlüssel zwischen den
       Sprachvarianten überein.
-- [ ] Eine automatisierbare Prüfung erkennt zukünftig fehlende deutsche oder
+- [x] Eine automatisierbare Prüfung erkennt zukünftig fehlende deutsche oder
       englische String-Ressourcen.
-- [ ] `MissingTranslation` wird nicht mehr pauschal unterdrückt oder eine
+- [x] `MissingTranslation` wird nicht mehr pauschal unterdrückt oder eine
       verbleibende eng begrenzte Ausnahme ist dokumentiert.
-- [ ] Setup-Wizard und Dashboard-Diagnosetexte wurden auf Deutsch und Englisch
+- [x] Setup-Wizard und Dashboard-Diagnosetexte wurden auf Deutsch und Englisch
       manuell geprüft.
-- [ ] Es gibt keine funktionalen Änderungen an Setup-Wizard, Dashboard oder
+- [x] Es gibt keine funktionalen Änderungen an Setup-Wizard, Dashboard oder
       Sprachumschaltung.
+
+## Abschluss
+
+- Abgeschlossen am 5. Juli 2026.
+- Pull Request: #178.
+- GitHub-Qualitätsprüfungen und Host-Tests erfolgreich.
+- Import/Export bleibt unverändert.
+- Betroffene Hilfe-, Info- und sichtbare UI-Texte wurden geprüft; die
+  Verneinung in „Über SwitchWerk“ wurde korrigiert.
 
 ## Testhinweise
 

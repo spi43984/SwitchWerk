@@ -4,27 +4,20 @@ Stand: 5. Juli 2026
 
 ## Abgeschlossen
 
-- Issue 078 „Release Notes mit GitHub Models vorbefüllen“
-- GitHub-Issue: #176
-- Commit auf `main`: `e3f383d`
-- `scripts/release-github.sh` versucht vor dem verpflichtenden Editor-Schritt,
-  über GitHub Models deutschsprachige Release Notes zu erzeugen.
-- Der Vorschlag basiert auf Commit-Betreffs und `git diff --stat` seit dem
-  vorherigen Release.
-- Bei fehlendem `jq`, fehlendem `curl`, fehlendem `gh auth token`,
-  fehlender Models-Berechtigung oder API-/Parsing-Fehlern fällt das Skript auf
-  den manuellen Platzhalter zurück.
-- Tokens und vollständige API-Antworten werden nicht geloggt.
-- Changelog-Link und bestehende Platzhalterprüfung bleiben erhalten.
-- Lokale Prüfungen waren erfolgreich:
-  - `bash -n scripts/release-github.sh`
-  - `shellcheck scripts/release-github.sh`
+- Issue 080 „String-Ressourcen und Lokalisierung bereinigen“
+- GitHub-Issue: #177
+- Pull Request: #178
+- Merge-Commit auf `main`: `a39e2e5`
+- Deutsche, englische und Default-String-Ressourcen besitzen wieder denselben
+  Schlüsselsatz.
+- `values/strings.xml` ist durchgängig der englische Fallback.
+- Ein automatisierter Test prüft Schlüssel, Attribute und Formatplatzhalter.
+- Die fehlerhafte Verneinung in „Über SwitchWerk“ wurde korrigiert.
+- GitHub-Qualitätsprüfungen und Host-Tests waren erfolgreich.
 
 ## Aktueller Arbeitsbaum
 
-- `app/build.gradle.kts` enthält lokale Versionsänderungen auf `0.8.8`, die
-  wahrscheinlich aus einem Release-Test stammen und nicht Teil von Issue 078
-  sind.
+- Nach dem Dokumentationsabschluss soll `main` sauber sein.
 
 ## Nächster Stand
 
