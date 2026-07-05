@@ -129,6 +129,110 @@ is_version_greater() {
   (( 10#${candidate_patch} > 10#${current_patch} ))
 }
 
+write_manual_release_notes_template() {
+  local notes_file="$1"
+  local previous_tag="$2"
+  local target_tag="$3"
+
+  cat > "${notes_file}" <<EOF
+## Änderungen
+
+- ...
+
+**Vollständiges Changelog:** https://github.com/${OFFICIAL_REPOSITORY}/compare/${previous_tag}...${target_tag}
+EOF
+}
+
+generate_release_notes_suggestion() (
+  local previous_tag="$1"
+  local target_tag="$2"
+  local range_target="${target_tag}"
+  local commits_file
+  local diffstat_file
+  local github_token
+  local suggestion
+
+  if ! command -v jq >/dev/null 2>&1 || ! command -v curl >/dev/null 2>&1; then
+    return 1
+  fi
+
+  if ! github_token="$(gh auth token 2>/dev/null)" || [[ -z "${github_token}" ]]; then
+    return 1
+  fi
+
+  commits_file="$(mktemp "/tmp/switchwerk-release-commits.XXXXXX.txt")"
+  diffstat_file="$(mktemp "/tmp/switchwerk-release-diffstat.XXXXXX.txt")"
+  trap 'rm -f "${commits_file}" "${diffstat_file}"' EXIT
+
+  if ! git rev-parse --verify "${range_target}^{commit}" >/dev/null 2>&1; then
+    range_target="HEAD"
+  fi
+
+  if ! git log "${previous_tag}".."${range_target}" --pretty=format:'- %s' > "${commits_file}" 2>/dev/null; then
+    return 1
+  fi
+
+  if ! git diff --stat "${previous_tag}".."${range_target}" > "${diffstat_file}" 2>/dev/null; then
+    return 1
+  fi
+
+  if ! suggestion="$(
+    {
+      jq -n \
+        --rawfile commits "${commits_file}" \
+        --rawfile diffstat "${diffstat_file}" \
+        '{
+          model: "openai/gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: "Du bist der Release-Manager von SwitchWerk. Du schreibst kurze deutschsprachige Release Notes für Endanwender. Verwende ausschließlich die gelieferten Informationen. Erfinde keine Funktionen. Erfinde keine Performance- oder Stabilitätsverbesserungen. Keine Commit-Hashes, keine PR-Nummern, keine technischen Interna."
+            },
+            {
+              role: "user",
+              content: "Formuliere Release Notes im Stil von SwitchWerk 0.8.7.\n\nRegeln:\n- Maximal 8 Stichpunkte.\n- Kurze, verständliche Sätze.\n- Nur Änderungen nennen, die Anwender bemerken können.\n- Ähnliche Änderungen zusammenfassen.\n- Interne Refactorings, Build-, CI-, Test- und reine Dokumentationsänderungen weglassen.\n- Wenn zu wenig Anwender-relevante Änderungen erkennbar sind, schreibe nur die sicheren Punkte.\n\nCommits seit dem letzten Release:\n\($commits)\n\nGeänderte Dateien als Überblick:\n\($diffstat)"
+            }
+          ],
+          temperature: 0.2
+        }' |
+        curl -fsS \
+          -H "Authorization: Bearer ${github_token}" \
+          -H "Content-Type: application/json" \
+          https://models.github.ai/inference/chat/completions \
+          -d @- |
+        jq -er '.choices[0].message.content // empty'
+    } 2>/dev/null
+  )"; then
+    return 1
+  fi
+
+  if [[ -z "${suggestion}" || "${suggestion}" == *"- ..."* ]]; then
+    return 1
+  fi
+
+  printf '%s\n' "${suggestion}"
+)
+
+write_release_notes_template() {
+  local notes_file="$1"
+  local previous_tag="$2"
+  local target_tag="$3"
+  local suggestion
+
+  if suggestion="$(generate_release_notes_suggestion "${previous_tag}" "${target_tag}")"; then
+    cat > "${notes_file}" <<EOF
+## Änderungen
+
+${suggestion}
+
+**Vollständiges Changelog:** https://github.com/${OFFICIAL_REPOSITORY}/compare/${previous_tag}...${target_tag}
+EOF
+  else
+    echo "Hinweis: Kein GitHub-Models-Vorschlag verfügbar; verwende manuellen Platzhalter."
+    write_manual_release_notes_template "${notes_file}" "${previous_tag}" "${target_tag}"
+  fi
+}
+
 prepare_release_notes() {
   local previous_tag="$1"
   local target_tag="$2"
@@ -139,13 +243,7 @@ prepare_release_notes() {
   notes_file="$(mktemp "/tmp/switchwerk-release-${VERSION}.XXXXXX.md")"
   RELEASE_NOTES_FILE="${notes_file}"
 
-  cat > "${notes_file}" <<EOF
-## Änderungen
-
-- ...
-
-**Vollständiges Changelog:** https://github.com/${OFFICIAL_REPOSITORY}/compare/${previous_tag}...${target_tag}
-EOF
+  write_release_notes_template "${notes_file}" "${previous_tag}" "${target_tag}"
 
   editor_command="${VISUAL:-${EDITOR:-vi}}"
   read -r -a editor_args <<< "${editor_command}"
