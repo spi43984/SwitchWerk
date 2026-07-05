@@ -35,4 +35,36 @@ class ExternalDeviceActionIntentTest {
             parseExternalDeviceActionIntent("device-123", setOf(EXTRA_DEVICE_ID, "command"))
         )
     }
+
+    @Test
+    fun validGroupIdIsAccepted() {
+        assertEquals(
+            ExternalSwitchGroupActionIntentResult.Valid("group-123"),
+            parseExternalSwitchGroupActionIntent("group-123", setOf(EXTRA_GROUP_ID))
+        )
+    }
+
+    @Test
+    fun missingGroupIdIsRejected() {
+        assertEquals(
+            ExternalSwitchGroupActionIntentResult.MissingGroupId,
+            parseExternalSwitchGroupActionIntent(null, emptySet())
+        )
+    }
+
+    @Test
+    fun invalidGroupIdIsRejected() {
+        assertEquals(
+            ExternalSwitchGroupActionIntentResult.InvalidGroupId,
+            parseExternalSwitchGroupActionIntent("https://server.domain.com/group", setOf(EXTRA_GROUP_ID))
+        )
+    }
+
+    @Test
+    fun unexpectedGroupExtraIsRejected() {
+        assertEquals(
+            ExternalSwitchGroupActionIntentResult.UnexpectedExtras,
+            parseExternalSwitchGroupActionIntent("group-123", setOf(EXTRA_GROUP_ID, "command"))
+        )
+    }
 }

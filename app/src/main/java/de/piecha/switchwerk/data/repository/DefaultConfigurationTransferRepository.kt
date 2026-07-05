@@ -195,6 +195,7 @@ class DefaultConfigurationTransferRepository(
                     id = group.id,
                     name = group.name,
                     actionLabel = group.actionLabel,
+                    shortcutEnabled = group.shortcutEnabled,
                     errorStrategy = group.errorStrategy,
                     members = groupMembers
                         .filter { it.groupId == group.id }
@@ -415,6 +416,7 @@ class DefaultConfigurationTransferRepository(
             name = name,
             actionLabel = actionLabel,
             sortOrder = sortOrder,
+            shortcutEnabled = shortcutEnabled,
             errorStrategy = errorStrategy
         )
     }

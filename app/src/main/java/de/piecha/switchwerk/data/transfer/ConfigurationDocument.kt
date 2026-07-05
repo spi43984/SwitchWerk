@@ -56,6 +56,7 @@ data class ConfigurationSwitchGroup(
     val id: String,
     val name: String,
     val actionLabel: String,
+    val shortcutEnabled: Boolean = false,
     val errorStrategy: String = "ABORT_ON_ERROR",
     val members: List<ConfigurationSwitchGroupMember>
 )
@@ -66,4 +67,4 @@ data class ConfigurationSwitchGroupMember(
     val pauseAfterMillis: Long
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 9
+const val CONFIGURATION_SCHEMA_VERSION = 10

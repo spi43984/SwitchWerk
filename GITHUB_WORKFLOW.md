@@ -161,6 +161,22 @@ einfügen soll, gelten diese Regeln:
 - keine Shell-Variablen in Copy-&-Paste-Befehlen
 - lange Befehle mit `\` am Zeilenende umbrechen
 - nach kritischen GitHub-Aktionen immer Prüfkommandos mit ausgeben
+- Nach Implementierungen oder prüfpflichtigen Änderungen immer auch die
+  vollständigen Release-Befehle zum Kompilieren und Installieren ausgeben,
+  unabhängig davon, ob der konkrete Prompt nur allgemein nach Prüfungen oder
+  Befehlen fragt:
+
+```text
+./gradlew lintRelease
+./gradlew testDebugUnitTest
+./gradlew clean assembleRelease
+./gradlew installRelease
+```
+
+  `testReleaseUnitTest` existiert nicht. `installRelease` setzt konfigurierte
+  Release-Signierung voraus. Bei abweichender Signatur zur installierten App
+  muss die vorhandene App vorher deinstalliert werden; dabei gehen lokale
+  App-Daten verloren.
 
 Beispiel:
 

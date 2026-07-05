@@ -23,7 +23,7 @@ import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
         SwitchGroupEntity::class,
         SwitchGroupMemberEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -232,6 +232,17 @@ abstract class AppDatabase : RoomDatabase() {
                     """
                     ALTER TABLE switch_groups
                     ADD COLUMN errorStrategy TEXT NOT NULL DEFAULT 'ABORT_ON_ERROR'
+                    """.trimIndent()
+                )
+            }
+        }
+
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    ALTER TABLE switch_groups
+                    ADD COLUMN shortcutEnabled INTEGER NOT NULL DEFAULT 0
                     """.trimIndent()
                 )
             }
