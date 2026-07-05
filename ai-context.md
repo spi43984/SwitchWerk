@@ -181,6 +181,15 @@ niedrigere Android-Systemlimit begrenzt. Ein Shortcut enthält nur die opake
 Geräte-ID und führt die Aktion über dieselbe ViewModel-/DeviceActionService-Logik
 wie das Dashboard aus.
 
+Android-Homescreen-Widgets verwenden klassische AppWidget/RemoteViews mit einer
+Compose-Konfigurations-Activity. Geräte- und nicht leere Schaltgruppenaktionen
+werden ausschließlich über die bestehenden `DeviceActionService`- und
+`SwitchGroupActionService`-Implementierungen ausgeführt. Widget-Zuordnungen und
+optionale Titel liegen in SharedPreferences und bleiben bewusst launcher- und
+gerätelokal; sie sind kein Bestandteil von Konfigurationsimport/-export, weil
+Android-AppWidget-IDs nicht übertragbar sind. PendingIntents enthalten nur die
+Widget-ID und den Eintragsindex, keine Ziel-IDs oder sensiblen Konfigurationsdaten.
+
 Externe Android-Intents für Geräteaktionen sind global in den
 Systemeinstellungen aktivierbar und verwenden den sicheren Default `false`.
 Die dokumentierte Action `de.piecha.switchwerk.action.RUN_DEVICE_ACTION`

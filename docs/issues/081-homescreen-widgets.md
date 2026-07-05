@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: Feature / Android Integration / UX
 - Bereich: Android Homescreen Widgets / Geräteaktionen / Schaltgruppen
