@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: Feature
 - Bereich: Schaltgruppen / Dashboard / Geräteaktionen / Einstellungen / Konfiguration
@@ -131,28 +131,38 @@ Konfigurierbare Pausen zwischen Geräten sind wichtig, weil manche Geräte oder 
 
 ## Akzeptanzkriterien
 
-- [ ] Unter Einstellungen gibt es einen eigenen Reiter `Gruppen` zwischen `Geräte` und `System`.
-- [ ] Schaltgruppen können angelegt, umbenannt und gelöscht werden.
-- [ ] Geräte können einer Schaltgruppe hinzugefügt und daraus entfernt werden.
-- [ ] Eine Schaltgruppe kann mehrere Geräte enthalten.
-- [ ] Dasselbe Gerät kann mehrfach in derselben Schaltgruppe eingetragen werden.
-- [ ] Geräte können innerhalb einer Schaltgruppe per Hoch-/Runter-Pfeilen sortiert werden.
-- [ ] Pro Gruppenmitglied kann eine Pause nach der Geräteaktion konfiguriert werden.
-- [ ] Benutzerdefinierte Pausen sind bis maximal 1 Stunde erlaubt und werden
+- [x] Unter Einstellungen gibt es einen eigenen Reiter `Gruppen` zwischen `Geräte` und `System`.
+- [x] Schaltgruppen können angelegt, umbenannt und gelöscht werden.
+- [x] Geräte können einer Schaltgruppe hinzugefügt und daraus entfernt werden.
+- [x] Eine Schaltgruppe kann mehrere Geräte enthalten.
+- [x] Dasselbe Gerät kann mehrfach in derselben Schaltgruppe eingetragen werden.
+- [x] Geräte können innerhalb einer Schaltgruppe per Hoch-/Runter-Pfeilen sortiert werden.
+- [x] Pro Gruppenmitglied kann eine Pause nach der Geräteaktion konfiguriert werden.
+- [x] Benutzerdefinierte Pausen sind bis maximal 1 Stunde erlaubt und werden
       lesbar formatiert angezeigt.
-- [ ] Schaltgruppen werden auf dem Dashboard wie normale ausführbare Geräte angezeigt.
-- [ ] Eine Schaltgruppe wird beim Antippen sequenziell in der konfigurierten Reihenfolge ausgeführt.
-- [ ] Die konfigurierten Pausen zwischen den Geräteaktionen werden eingehalten.
-- [ ] Eine laufende Schaltgruppe kann nicht versehentlich mehrfach parallel gestartet werden.
-- [ ] Fehler in einer enthaltenen Geräteaktion werden verständlich angezeigt.
-- [ ] Bei Fehler einer enthaltenen Geräteaktion wird die Schaltgruppe standardmäßig abgebrochen.
-- [ ] Optional kann eine Schaltgruppe nach Fehlern weiter ausgeführt werden.
-- [ ] Leere Schaltgruppen werden verständlich dargestellt und nicht ausgeführt.
-- [ ] Bestehende Einzelgeräteaktionen funktionieren unverändert.
-- [ ] Schaltgruppen, Mitglieder, Reihenfolge und Pausen werden exportiert und importiert.
-- [ ] Ältere Konfigurationen ohne Schaltgruppen bleiben importierbar.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+- [x] Schaltgruppen werden auf dem Dashboard wie normale ausführbare Geräte angezeigt.
+- [x] Eine Schaltgruppe wird beim Antippen sequenziell in der konfigurierten Reihenfolge ausgeführt.
+- [x] Die konfigurierten Pausen zwischen den Geräteaktionen werden eingehalten.
+- [x] Eine laufende Schaltgruppe kann nicht versehentlich mehrfach parallel gestartet werden.
+- [x] Fehler in einer enthaltenen Geräteaktion werden verständlich angezeigt.
+- [x] Bei Fehler einer enthaltenen Geräteaktion wird die Schaltgruppe standardmäßig abgebrochen.
+- [x] Optional kann eine Schaltgruppe nach Fehlern weiter ausgeführt werden.
+- [x] Leere Schaltgruppen werden verständlich dargestellt und nicht ausgeführt.
+- [x] Bestehende Einzelgeräteaktionen funktionieren unverändert.
+- [x] Schaltgruppen, Mitglieder, Reihenfolge und Pausen werden exportiert und importiert.
+- [x] Ältere Konfigurationen ohne Schaltgruppen bleiben importierbar.
+- [x] Deutsche und englische Texte sind konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+
+## Abschluss
+
+- Implementierung: Pull Request #175
+- GitHub-Issue: #173
+- Squash-Merge auf `main`: `5bd4e1e`
+- Lokale Prüfungen im Container: `./gradlew testDebugUnitTest`, `./gradlew lintDebug`
+- GitHub Android Quality Checks und Dependency Submission waren erfolgreich.
+- Host-Test wurde vom Benutzer bestätigt.
+- Folgeissue für Gruppen-App-Shortcuts: Issue 079.
 
 ## Testhinweise
 

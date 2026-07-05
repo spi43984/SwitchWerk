@@ -1,32 +1,32 @@
 # AI Handoff
 
-Stand: 4. Juli 2026
+Stand: 5. Juli 2026
 
 ## Abgeschlossen
 
-- Issue 077 „Import/Export fehlender App-Einstellungen“
-- GitHub-Issue: #171
-- Pull Request: #172
-- Squash-Merge auf `main`: `21512a5`
-- Sprache, WLAN-Profil-Sortierung und globale Freigabe externer Intents sind
-  Bestandteil des Konfigurationsexports und -imports.
-- Ältere Konfigurationen ohne diese Felder behalten die lokalen Werte;
-  `showSetupWizardOnStart` bleibt ausschließlich lokal.
-- Ungültige Enum-Werte und unvollständige WLAN-Sortierangaben werden vor dem
-  Speichern abgelehnt.
-- Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt.
-- Deutsche und englische Hilfe-, Info- und Zusammenfassungstexte sind
-  konsistent aktualisiert.
-- Unit-Tests, `lintDebug`, GitHub-Prüfungen und der vom Benutzer bestätigte
-  Host-/Gerätetest waren erfolgreich.
-- Dauerhafte Projektregel ergänzt: Bei jeder neuen Funktion muss der Benutzer
-  ausdrücklich gefragt werden, ob zugehörige Einstellungen exportiert und
-  importiert werden sollen. Die Entscheidung ist im Issue-Scope zu
-  dokumentieren.
+- Issue 074 „Schaltgruppen“
+- GitHub-Issue: #173
+- Pull Request: #175
+- Squash-Merge auf `main`: `5bd4e1e`
+- Schaltgruppen sind eigene lokale Modelle/Room-Entities und werden nicht als
+  normale Geräte gespeichert.
+- Dashboard zeigt Geräte und Schaltgruppen über ein gemeinsames UI-Modell.
+- Schaltgruppen werden sequenziell über einen eigenen Service ausgeführt, der
+  intern `DeviceActionService` nutzt.
+- Dasselbe Gerät kann mehrfach in derselben Schaltgruppe vorkommen.
+- Pausen pro Gruppenmitglied sind exportierbar/importierbar; eigene Pausen sind
+  bis 1 Stunde erlaubt und werden als `HH:MM:SS.mmm` angezeigt.
+- Fehlerbehandlung ist konfigurierbar: beim ersten Fehler abbrechen oder nach
+  Fehlern weiter ausführen.
+- Leere Gruppen bleiben sichtbar, sind aber nicht ausführbar.
+- Folgeissue 079 „Schaltgruppen App Shortcuts“ wurde als P1 angelegt.
+- Lokale Prüfungen, GitHub-Prüfungen und der vom Benutzer bestätigte Host-Test
+  waren erfolgreich.
 
 ## Nächster Stand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 074 „Gruppen“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 078 „Release
+  Notes mit GitHub Models vorbefüllen“.
 - Weitere Reihenfolge und Status ausschließlich aus
   `docs/issues/overview.txt` entnehmen.
 
