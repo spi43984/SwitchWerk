@@ -91,6 +91,7 @@ class ConfigurationJsonCodec {
                     writer.name("id").value(group.id)
                     writer.name("name").value(group.name)
                     writer.name("actionLabel").value(group.actionLabel)
+                    writer.name("shortcutEnabled").value(group.shortcutEnabled)
                     writer.name("errorStrategy").value(group.errorStrategy)
                     writer.name("members")
                     writer.beginArray()
@@ -354,6 +355,7 @@ class ConfigurationJsonCodec {
             var id: String? = null
             var name: String? = null
             var actionLabel: String? = null
+            var shortcutEnabled = false
             var errorStrategy: String? = null
             var members: List<ConfigurationSwitchGroupMember>? = null
 
@@ -363,6 +365,7 @@ class ConfigurationJsonCodec {
                     "id" -> id = nextString()
                     "name" -> name = nextString()
                     "actionLabel" -> actionLabel = nextString()
+                    "shortcutEnabled" -> shortcutEnabled = nextBoolean()
                     "errorStrategy" -> errorStrategy = nextString()
                     "members" -> members = readSwitchGroupMembers()
                     else -> skipValue()
@@ -374,6 +377,7 @@ class ConfigurationJsonCodec {
                 id = requireField(id, "switchGroups.id"),
                 name = requireField(name, "switchGroups.name"),
                 actionLabel = requireField(actionLabel, "switchGroups.actionLabel"),
+                shortcutEnabled = shortcutEnabled,
                 errorStrategy = errorStrategy ?: "ABORT_ON_ERROR",
                 members = requireField(members, "switchGroups.members")
             )

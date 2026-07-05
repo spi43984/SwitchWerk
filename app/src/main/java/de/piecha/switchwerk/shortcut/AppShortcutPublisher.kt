@@ -8,9 +8,10 @@ import android.graphics.drawable.Icon
 import de.piecha.switchwerk.MainActivity
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.SwitchGroup
 
 interface AppShortcutPublisher {
-    fun publish(devices: List<Device>)
+    fun publish(devices: List<Device>, switchGroups: List<SwitchGroup>)
 }
 
 class AndroidAppShortcutPublisher(
@@ -18,23 +19,29 @@ class AndroidAppShortcutPublisher(
     private val shortcutManager: ShortcutManager
 ) : AppShortcutPublisher {
 
-    override fun publish(devices: List<Device>) {
+    override fun publish(devices: List<Device>, switchGroups: List<SwitchGroup>) {
         val shortcuts = selectAppShortcuts(
             devices = devices,
+            switchGroups = switchGroups,
             maximumCount = minOf(shortcutManager.maxShortcutCountPerActivity, RECOMMENDED_MAXIMUM)
         ).map { shortcut ->
-            ShortcutInfo.Builder(context, "device:${shortcut.deviceId}")
+            ShortcutInfo.Builder(context, shortcut.shortcutId)
                 .setShortLabel(shortcut.shortLabel)
                 .setLongLabel(shortcut.longLabel)
                 .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher))
-                .setIntent(
-                    Intent(context, MainActivity::class.java)
-                        .setAction(APP_SHORTCUT_ACTION)
-                        .putExtra(APP_SHORTCUT_DEVICE_ID, shortcut.deviceId)
-                )
+                .setIntent(shortcut.toIntent())
                 .build()
         }
         shortcutManager.dynamicShortcuts = shortcuts
+    }
+
+    private fun AppShortcut.toIntent(): Intent {
+        val intent = Intent(context, MainActivity::class.java)
+            .setAction(APP_SHORTCUT_ACTION)
+        return when (this) {
+            is DeviceAppShortcut -> intent.putExtra(APP_SHORTCUT_DEVICE_ID, deviceId)
+            is SwitchGroupAppShortcut -> intent.putExtra(APP_SHORTCUT_GROUP_ID, groupId)
+        }
     }
 
     private companion object {

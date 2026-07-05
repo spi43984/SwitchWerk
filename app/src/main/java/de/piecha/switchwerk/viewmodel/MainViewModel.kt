@@ -30,6 +30,7 @@ import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
 import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
+import de.piecha.switchwerk.intent.ExternalSwitchGroupActionIntentResult
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -365,7 +366,7 @@ class MainViewModel(
         if (!_uiState.value.appSettings.externalIntentsEnabled) {
             reportExternalIntentError(
                 message = uiText(R.string.external_intent_disabled_error),
-                deviceId = validDevice?.id
+                actionKey = validDevice?.id?.let(DashboardItem::actionKey)
             )
             return
         }
@@ -394,11 +395,55 @@ class MainViewModel(
         }
     }
 
-    private fun reportExternalIntentError(message: UiText, deviceId: String? = null) {
+    fun handleExternalSwitchGroupAction(result: ExternalSwitchGroupActionIntentResult) {
+        val validGroup = (result as? ExternalSwitchGroupActionIntentResult.Valid)?.let { request ->
+            _uiState.value.switchGroups.firstOrNull { it.id == request.groupId }
+        }
+        if (!_uiState.value.appSettings.externalIntentsEnabled) {
+            reportExternalIntentError(
+                message = uiText(R.string.external_intent_disabled_error),
+                actionKey = validGroup?.id?.let(DashboardItem::groupKey)
+            )
+            return
+        }
+        when (result) {
+            is ExternalSwitchGroupActionIntentResult.Valid -> {
+                when {
+                    validGroup == null -> {
+                        reportExternalIntentError(
+                            uiText(R.string.external_intent_unknown_group_error)
+                        )
+                    }
+                    validGroup.members.isEmpty() -> {
+                        reportExternalIntentError(
+                            message = uiText(R.string.external_intent_empty_group_error),
+                            actionKey = DashboardItem.groupKey(validGroup.id)
+                        )
+                    }
+                    else -> {
+                        _uiState.value = _uiState.value.copy(errorMessage = null)
+                        executeSwitchGroupAction(validGroup)
+                    }
+                }
+            }
+            ExternalSwitchGroupActionIntentResult.MissingGroupId -> {
+                reportExternalIntentError(
+                    uiText(R.string.external_intent_missing_group_id_error)
+                )
+            }
+            ExternalSwitchGroupActionIntentResult.InvalidGroupId,
+            ExternalSwitchGroupActionIntentResult.UnexpectedExtras -> {
+                reportExternalIntentError(
+                    uiText(R.string.external_intent_invalid_error)
+                )
+            }
+        }
+    }
+
+    private fun reportExternalIntentError(message: UiText, actionKey: String? = null) {
         appendActionSeparator()
         appendDiagnosticMessage(message, elapsedMillis = 0L)
-        if (deviceId != null) {
-            val actionKey = DashboardItem.actionKey(deviceId)
+        if (actionKey != null) {
             actionStateResetJobs.remove(actionKey)?.cancel()
             val errorState = DeviceActionUiState.Error(message)
             updateDeviceActionState(actionKey, errorState)

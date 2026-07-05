@@ -412,6 +412,7 @@ fun SettingsScreen(
                     onNameChange = viewModel::updateSwitchGroupName,
                     onActionLabelChange = viewModel::updateSwitchGroupActionLabel,
                     onErrorStrategyChange = viewModel::updateSwitchGroupErrorStrategy,
+                    onShortcutEnabledChange = viewModel::updateSwitchGroupShortcutEnabled,
                     onAddMember = viewModel::addSwitchGroupMember,
                     onDeleteMember = viewModel::deleteSwitchGroupMember,
                     onMoveMember = viewModel::moveSwitchGroupMember,

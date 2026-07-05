@@ -76,6 +76,7 @@ class RoomSwitchGroupRepository(
             name = name,
             actionLabel = actionLabel,
             sortOrder = sortOrder,
+            shortcutEnabled = shortcutEnabled,
             errorStrategy = SwitchGroupErrorStrategy.valueOf(errorStrategy),
             members = members.map { it.toDomain() }
         )
@@ -87,6 +88,7 @@ class RoomSwitchGroupRepository(
             name = name,
             actionLabel = actionLabel,
             sortOrder = sortOrder,
+            shortcutEnabled = shortcutEnabled,
             errorStrategy = errorStrategy.name
         )
     }

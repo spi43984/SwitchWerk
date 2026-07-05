@@ -45,9 +45,13 @@ import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.viewmodel.MainUiEvent
 import de.piecha.switchwerk.shortcut.APP_SHORTCUT_DEVICE_ID
+import de.piecha.switchwerk.shortcut.APP_SHORTCUT_GROUP_ID
 import de.piecha.switchwerk.shortcut.shortcutDeviceId
+import de.piecha.switchwerk.shortcut.shortcutGroupId
 import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
+import de.piecha.switchwerk.intent.ExternalSwitchGroupActionIntentResult
 import de.piecha.switchwerk.intent.externalDeviceActionRequest
+import de.piecha.switchwerk.intent.externalSwitchGroupActionRequest
 import org.koin.android.ext.android.inject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -79,18 +83,28 @@ class MainActivity : ComponentActivity() {
     private var selectedSettingsSectionForRestoration = SettingsSection.WIFI_PROFILES
     private var settingsScreenUiStateForRestoration = SettingsScreenUiState()
     private var pendingShortcutDeviceId by mutableStateOf<String?>(null)
+    private var pendingShortcutGroupId by mutableStateOf<String?>(null)
     private var pendingExternalDeviceAction by
         mutableStateOf<ExternalDeviceActionIntentResult?>(null)
+    private var pendingExternalSwitchGroupAction by
+        mutableStateOf<ExternalSwitchGroupActionIntentResult?>(null)
     private var shortcutLaunchCount by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         pendingShortcutDeviceId = intent.shortcutDeviceId()
+        pendingShortcutGroupId = intent.shortcutGroupId()
         pendingExternalDeviceAction = intent.externalDeviceActionRequest()
+        pendingExternalSwitchGroupAction = intent.externalSwitchGroupActionRequest()
         currentScreenForRestoration = savedInstanceState.restoreAppScreen(
             STATE_CURRENT_SCREEN,
             AppScreen.Dashboard
         )
-        if (pendingShortcutDeviceId != null || pendingExternalDeviceAction != null) {
+        if (
+            pendingShortcutDeviceId != null ||
+            pendingShortcutGroupId != null ||
+            pendingExternalDeviceAction != null ||
+            pendingExternalSwitchGroupAction != null
+        ) {
             currentScreenForRestoration = AppScreen.Dashboard
             shortcutLaunchCount += 1
         }
@@ -131,11 +145,29 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            LaunchedEffect(pendingShortcutGroupId, uiState.switchGroups) {
+                pendingShortcutGroupId?.let { groupId ->
+                    val group = uiState.switchGroups.firstOrNull { it.id == groupId }
+                    if (group != null && group.members.isNotEmpty()) {
+                        mainViewModel.executeSwitchGroupAction(group)
+                        pendingShortcutGroupId = null
+                    } else if (!uiState.isLoading) {
+                        pendingShortcutGroupId = null
+                    }
+                }
+            }
             LaunchedEffect(pendingExternalDeviceAction, uiState.isLoading) {
                 val request = pendingExternalDeviceAction ?: return@LaunchedEffect
                 if (!uiState.isLoading) {
                     pendingExternalDeviceAction = null
                     mainViewModel.handleExternalDeviceAction(request)
+                }
+            }
+            LaunchedEffect(pendingExternalSwitchGroupAction, uiState.isLoading) {
+                val request = pendingExternalSwitchGroupAction ?: return@LaunchedEffect
+                if (!uiState.isLoading) {
+                    pendingExternalSwitchGroupAction = null
+                    mainViewModel.handleExternalSwitchGroupAction(request)
                 }
             }
             LaunchedEffect(uiState.appSettings.language) {
@@ -176,8 +208,15 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingShortcutDeviceId = intent.shortcutDeviceId()
+        pendingShortcutGroupId = intent.shortcutGroupId()
         pendingExternalDeviceAction = intent.externalDeviceActionRequest()
-        if (pendingShortcutDeviceId != null || pendingExternalDeviceAction != null) {
+        pendingExternalSwitchGroupAction = intent.externalSwitchGroupActionRequest()
+        if (
+            pendingShortcutDeviceId != null ||
+            pendingShortcutGroupId != null ||
+            pendingExternalDeviceAction != null ||
+            pendingExternalSwitchGroupAction != null
+        ) {
             shortcutLaunchCount += 1
         }
     }
@@ -220,6 +259,11 @@ class MainActivity : ComponentActivity() {
 private fun Intent?.shortcutDeviceId(): String? = shortcutDeviceId(
     action = this?.action,
     deviceId = this?.getStringExtra(APP_SHORTCUT_DEVICE_ID)
+)
+
+private fun Intent?.shortcutGroupId(): String? = shortcutGroupId(
+    action = this?.action,
+    groupId = this?.getStringExtra(APP_SHORTCUT_GROUP_ID)
 )
 
 private fun Bundle?.restoreAppScreen(key: String, fallback: AppScreen): AppScreen {

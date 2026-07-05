@@ -17,4 +17,16 @@ class ConfigurationJsonCodecShortcutTest {
 
         assertFalse(device.shortcutEnabled)
     }
+
+    @Test
+    fun configurationSwitchGroupWithoutShortcutFieldUsesSafeDefault() {
+        val group = ConfigurationSwitchGroup(
+            id = "group-1",
+            name = "Example Group",
+            actionLabel = "Run",
+            members = emptyList()
+        )
+
+        assertFalse(group.shortcutEnabled)
+    }
 }

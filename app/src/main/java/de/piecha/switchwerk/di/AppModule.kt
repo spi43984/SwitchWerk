@@ -76,6 +76,7 @@ val appModule = module {
             .addMigrations(AppDatabase.MIGRATION_8_9)
             .addMigrations(AppDatabase.MIGRATION_9_10)
             .addMigrations(AppDatabase.MIGRATION_10_11)
+            .addMigrations(AppDatabase.MIGRATION_11_12)
             .build()
     }
 
@@ -104,7 +105,7 @@ val appModule = module {
         AndroidAppShortcutPublisher(androidContext(), get())
     }
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
-    single { AppShortcutCoordinator(get(), get(), get()) }
+    single { AppShortcutCoordinator(get(), get(), get(), get()) }
 
     single<WifiConnectionService> {
         AndroidWifiConnectionService(

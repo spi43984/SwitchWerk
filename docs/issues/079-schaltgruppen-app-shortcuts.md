@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: Feature / UX
 - Bereich: Android App Shortcuts / Schaltgruppen / Dashboard
@@ -11,7 +11,9 @@
 
 SwitchWerk soll ausgewählte Schaltgruppen als Android App Shortcuts anbieten,
 damit häufig genutzte Gruppenaktionen direkt über langes Drücken auf das
-App-Icon gestartet werden können.
+App-Icon gestartet werden können. Zusätzlich sollen Schaltgruppen über die
+bestehende externe Intent-Freigabe per lokaler Gruppen-ID gestartet werden
+können.
 
 ## Hintergrund
 
@@ -43,10 +45,22 @@ in die bestehende Shortcut-Logik integriert werden.
 - Shortcuts müssen bei Umbenennung oder Löschung von Schaltgruppen aktualisiert
   beziehungsweise entfernt werden.
 - Leere Schaltgruppen dürfen nicht als ausführbarer Shortcut angeboten werden.
+- Leere Schaltgruppen dürfen auch per externem Gruppen-Intent nicht gestartet
+  werden.
 - Shortcuts dürfen keine technischen Geräte-URLs, Zugangsdaten, privaten
   Hostnamen oder sonstigen sensiblen Daten enthalten.
-- Shortcuts dürfen keine neue Netzwerk-, HTTP-, RPC- oder WLAN-Logik
-  implementieren.
+- Shortcuts und Gruppen-Intents dürfen keine neue Netzwerk-, HTTP-, RPC- oder
+  WLAN-Logik implementieren.
+
+### Externe Intents
+
+- Bei aktivierter externer Intent-Freigabe sollen Schaltgruppen per eigener
+  Action und lokaler Gruppen-ID gestartet werden können.
+- Der Gruppen-Intent akzeptiert ausschließlich die lokale Gruppen-ID.
+- Fehlende, ungültige, unbekannte oder leere Gruppen werden sauber abgelehnt.
+- Zusätzliche Extras, URLs, Befehle, Request-Bodies, Hostnamen und sonstige
+  Steuerdaten werden abgelehnt.
+- Die Ausführung nutzt ausschließlich die bestehende Schaltgruppen-Ausführung.
 
 ### Texte
 
@@ -57,10 +71,9 @@ in die bestehende Shortcut-Logik integriert werden.
 
 - Keine Quick Settings Tiles.
 - Keine Homescreen-Widgets.
-- Keine externen Automatisierungs-Integrationen.
 - Keine verschachtelten Gruppen.
-- Keine neuen Intent-Funktionen für externe Apps außerhalb der internen
-  App-Shortcut-Ausführung.
+- Keine externen Automatisierungs-Integrationen über die lokale Gruppen-ID
+  hinaus.
 - Keine Cloud- oder Account-Funktion.
 
 ## Architekturhinweise
@@ -75,24 +88,29 @@ in die bestehende Shortcut-Logik integriert werden.
   einführen.
 - Shortcut-IDs müssen Geräte und Gruppen eindeutig unterscheiden, z. B. durch
   unterschiedliche Präfixe.
+- Externe Intent-Actions und Extras müssen Geräte und Gruppen eindeutig trennen.
 - Import/Export prüfen, wenn eine neue Shortcut-Auswahl an Schaltgruppen
   gespeichert wird.
 
 ## Akzeptanzkriterien
 
-- [ ] Für ausgewählte Schaltgruppen werden Android App Shortcuts angelegt.
-- [ ] Ein Gruppen-Shortcut startet die passende bestehende Schaltgruppe.
-- [ ] Fortschritt, Erfolg, Abbruch und Fehler werden verständlich im Dashboard
+- [x] Für ausgewählte Schaltgruppen werden Android App Shortcuts angelegt.
+- [x] Ein Gruppen-Shortcut startet die passende bestehende Schaltgruppe.
+- [x] Fortschritt, Erfolg, Abbruch und Fehler werden verständlich im Dashboard
       angezeigt.
-- [ ] Umbenannte Schaltgruppen aktualisieren ihre Shortcut-Beschriftung.
-- [ ] Gelöschte Schaltgruppen entfernen zugehörige Shortcuts.
-- [ ] Leere Schaltgruppen werden nicht als ausführbare Shortcuts veröffentlicht.
-- [ ] Geräte- und Gruppen-Shortcuts teilen sich die Android-kompatible
+- [x] Umbenannte Schaltgruppen aktualisieren ihre Shortcut-Beschriftung.
+- [x] Gelöschte Schaltgruppen entfernen zugehörige Shortcuts.
+- [x] Leere Schaltgruppen werden nicht als ausführbare Shortcuts veröffentlicht.
+- [x] Bei aktivierter externer Intent-Freigabe startet ein gültiger
+      Gruppen-Intent die passende bestehende Schaltgruppe.
+- [x] Externe Gruppen-Intents mit fehlender, ungültiger, unbekannter oder leerer
+      Gruppe werden sauber abgelehnt.
+- [x] Geräte- und Gruppen-Shortcuts teilen sich die Android-kompatible
       Shortcut-Begrenzung.
-- [ ] Keine sensiblen Daten werden in Shortcut-Labels, Intent-Extras, Logs oder
+- [x] Keine sensiblen Daten werden in Shortcut-Labels, Intent-Extras, Logs oder
       Dokumentation gespeichert.
-- [ ] Deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
+- [x] Deutsche und englische Texte sind konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte wurden geprüft und bei Bedarf aktualisiert.
 
 ## Testhinweise
 
@@ -128,3 +146,9 @@ lokalen App-Daten.
 - Schaltgruppe leeren und prüfen, dass kein ausführbarer Shortcut veröffentlicht
   wird.
 - Schaltgruppe löschen und prüfen, dass der Shortcut entfernt wird.
+- Externen Gruppen-Intent mit gültiger Gruppen-ID ausführen.
+- Externen Gruppen-Intent ohne Gruppen-ID ausführen und Fehlermeldung prüfen.
+- Externen Gruppen-Intent mit unbekannter Gruppen-ID ausführen und Fehlermeldung
+  prüfen.
+- Externen Gruppen-Intent mit leerer Schaltgruppe ausführen und Fehlermeldung
+  prüfen.

@@ -96,6 +96,7 @@ data class SwitchGroupFormState(
     val name: String = "",
     val actionLabel: String = "",
     val sortOrder: Int = 0,
+    val shortcutEnabled: Boolean = false,
     val errorStrategy: SwitchGroupErrorStrategy = SwitchGroupErrorStrategy.ABORT_ON_ERROR,
     val members: List<SwitchGroupMemberFormState> = emptyList()
 )
@@ -684,6 +685,7 @@ class SettingsViewModel(
                 name = group.name,
                 actionLabel = group.actionLabel,
                 sortOrder = group.sortOrder,
+                shortcutEnabled = group.shortcutEnabled,
                 errorStrategy = group.errorStrategy,
                 members = group.members.mapNotNull { member ->
                     val device = _uiState.value.devices.firstOrNull { it.id == member.deviceId }
@@ -722,6 +724,10 @@ class SettingsViewModel(
 
     fun updateSwitchGroupErrorStrategy(errorStrategy: SwitchGroupErrorStrategy) {
         updateSwitchGroupForm { it.copy(errorStrategy = errorStrategy) }
+    }
+
+    fun updateSwitchGroupShortcutEnabled(enabled: Boolean) {
+        updateSwitchGroupForm { it.copy(shortcutEnabled = enabled) }
     }
 
     fun addSwitchGroupMember(deviceId: String) {
@@ -797,6 +803,7 @@ class SettingsViewModel(
                         name = trimmedName,
                         actionLabel = trimmedActionLabel,
                         sortOrder = form.sortOrder,
+                        shortcutEnabled = form.shortcutEnabled,
                         errorStrategy = form.errorStrategy,
                         members = form.members.mapIndexed { index, member ->
                             SwitchGroupMember(

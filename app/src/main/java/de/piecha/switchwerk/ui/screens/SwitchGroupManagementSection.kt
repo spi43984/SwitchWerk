@@ -68,6 +68,7 @@ fun SwitchGroupManagementSection(
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onErrorStrategyChange: (SwitchGroupErrorStrategy) -> Unit,
+    onShortcutEnabledChange: (Boolean) -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
@@ -83,6 +84,7 @@ fun SwitchGroupManagementSection(
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
             onErrorStrategyChange = onErrorStrategyChange,
+            onShortcutEnabledChange = onShortcutEnabledChange,
             onAddMember = onAddMember,
             onDeleteMember = onDeleteMember,
             onMoveMember = onMoveMember,
@@ -137,6 +139,7 @@ private fun SwitchGroupEditDialog(
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onErrorStrategyChange: (SwitchGroupErrorStrategy) -> Unit,
+    onShortcutEnabledChange: (Boolean) -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
@@ -158,6 +161,7 @@ private fun SwitchGroupEditDialog(
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
             onErrorStrategyChange = onErrorStrategyChange,
+            onShortcutEnabledChange = onShortcutEnabledChange,
             onAddMember = onAddMember,
             onDeleteMember = onDeleteMember,
             onMoveMember = onMoveMember,
@@ -273,6 +277,7 @@ private fun SwitchGroupForm(
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onErrorStrategyChange: (SwitchGroupErrorStrategy) -> Unit,
+    onShortcutEnabledChange: (Boolean) -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
@@ -302,6 +307,11 @@ private fun SwitchGroupForm(
         SwitchGroupErrorStrategySwitch(
             errorStrategy = form.errorStrategy,
             onErrorStrategyChange = onErrorStrategyChange
+        )
+
+        SwitchGroupShortcutSwitch(
+            enabled = form.shortcutEnabled,
+            onEnabledChange = onShortcutEnabledChange
         )
 
         SwitchGroupMemberList(
@@ -361,6 +371,35 @@ private fun SwitchGroupErrorStrategySwitch(
                     }
                 )
             }
+        )
+    }
+}
+
+@Composable
+private fun SwitchGroupShortcutSwitch(
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEnabledChange(!enabled) },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.app_shortcut),
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = stringResource(R.string.group_app_shortcut_description),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+        Switch(
+            checked = enabled,
+            onCheckedChange = onEnabledChange
         )
     }
 }

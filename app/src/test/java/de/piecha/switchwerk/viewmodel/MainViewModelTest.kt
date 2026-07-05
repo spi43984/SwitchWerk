@@ -4,9 +4,13 @@ import de.piecha.switchwerk.R
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
+import de.piecha.switchwerk.data.action.SwitchGroupActionResult
+import de.piecha.switchwerk.data.action.SwitchGroupActionService
+import de.piecha.switchwerk.data.action.SwitchGroupDiagnosticEvent
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.FakeAppSettingsRepository
 import de.piecha.switchwerk.data.repository.FakeWifiProfileRepository
+import de.piecha.switchwerk.data.repository.SwitchGroupRepository
 import de.piecha.switchwerk.data.network.WifiProximityIssue
 import de.piecha.switchwerk.data.network.WifiProximityService
 import de.piecha.switchwerk.data.network.WifiProximitySnapshot
@@ -17,9 +21,12 @@ import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.SwitchGroup
+import de.piecha.switchwerk.domain.model.SwitchGroupMember
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
+import de.piecha.switchwerk.intent.ExternalSwitchGroupActionIntentResult
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -142,6 +149,92 @@ class MainViewModelTest {
 
         assertEquals(1, actionService.callCount)
         assertEquals(DeviceActionUiState.Loading, viewModel.uiState.value.deviceActionStates["device-1"])
+    }
+
+    @Test
+    fun enabledExternalGroupActionUsesExistingGroupActionService() = runTest(dispatcher) {
+        val groupActionService = WaitingSwitchGroupActionService()
+        val group = switchGroup(id = "group-1", memberCount = 1)
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(listOf(device(id = "device-1", sortOrder = 0))),
+            switchGroupRepository = FakeSwitchGroupRepository(listOf(group)),
+            deviceActionService = WaitingDeviceActionService(),
+            switchGroupActionService = groupActionService,
+            appSettingsRepository = FakeAppSettingsRepository(
+                AppSettings(externalIntentsEnabled = true)
+            ),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
+        )
+        runCurrent()
+
+        viewModel.handleExternalSwitchGroupAction(
+            ExternalSwitchGroupActionIntentResult.Valid("group-1")
+        )
+        runCurrent()
+
+        assertEquals(1, groupActionService.callCount)
+        assertEquals(
+            DeviceActionUiState.Loading,
+            viewModel.uiState.value.deviceActionStates[DashboardItem.groupKey("group-1")]
+        )
+    }
+
+    @Test
+    fun externalGroupActionRejectsEmptyGroup() = runTest(dispatcher) {
+        val group = switchGroup(id = "group-1", memberCount = 0)
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(emptyList()),
+            switchGroupRepository = FakeSwitchGroupRepository(listOf(group)),
+            deviceActionService = WaitingDeviceActionService(),
+            switchGroupActionService = WaitingSwitchGroupActionService(),
+            appSettingsRepository = FakeAppSettingsRepository(
+                AppSettings(externalIntentsEnabled = true)
+            ),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
+        )
+        runCurrent()
+
+        viewModel.handleExternalSwitchGroupAction(
+            ExternalSwitchGroupActionIntentResult.Valid("group-1")
+        )
+        runCurrent()
+
+        val actionError = viewModel.uiState.value
+            .deviceActionStates[DashboardItem.groupKey("group-1")] as DeviceActionUiState.Error
+        assertEquals(
+            R.string.external_intent_empty_group_error,
+            (actionError.message as UiText.Resource).resourceId
+        )
+    }
+
+    @Test
+    fun externalGroupActionRejectsUnknownGroup() = runTest(dispatcher) {
+        val viewModel = MainViewModel(
+            repository = FakeDeviceRepository(emptyList()),
+            switchGroupRepository = FakeSwitchGroupRepository(emptyList()),
+            deviceActionService = WaitingDeviceActionService(),
+            switchGroupActionService = WaitingSwitchGroupActionService(),
+            appSettingsRepository = FakeAppSettingsRepository(
+                AppSettings(externalIntentsEnabled = true)
+            ),
+            wifiProfileRepository = FakeWifiProfileRepository(),
+            wifiProximityService = FixedWifiProximityService(),
+            appUpdateRepository = FakeAppUpdateRepository()
+        )
+        runCurrent()
+
+        viewModel.handleExternalSwitchGroupAction(
+            ExternalSwitchGroupActionIntentResult.Valid("group-1")
+        )
+
+        assertEquals(
+            R.string.external_intent_unknown_group_error,
+            (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
+        )
     }
 
     @Test
@@ -493,6 +586,23 @@ class MainViewModelTest {
         )
     }
 
+    private fun switchGroup(id: String, memberCount: Int): SwitchGroup {
+        return SwitchGroup(
+            id = id,
+            name = "Group",
+            actionLabel = "Run",
+            sortOrder = 0,
+            members = List(memberCount) { index ->
+                SwitchGroupMember(
+                    id = "member-$index",
+                    deviceId = "device-1",
+                    pauseAfterMillis = 0L,
+                    sortOrder = index
+                )
+            }
+        )
+    }
+
     private class WaitingDeviceActionService : DeviceActionService {
         val result = CompletableDeferred<DeviceActionResult>()
         var callCount = 0
@@ -514,6 +624,21 @@ class MainViewModelTest {
             }
             onDiagnosticEvent(DeviceActionDiagnosticEvent.ActionCompleted)
             return actionResult
+        }
+    }
+
+    private class WaitingSwitchGroupActionService : SwitchGroupActionService {
+        val result = CompletableDeferred<SwitchGroupActionResult>()
+        var callCount = 0
+
+        override suspend fun execute(
+            group: SwitchGroup,
+            devices: List<Device>,
+            onDiagnosticEvent: (SwitchGroupDiagnosticEvent) -> Unit
+        ): SwitchGroupActionResult {
+            callCount += 1
+            onDiagnosticEvent(SwitchGroupDiagnosticEvent.GroupStarted)
+            return result.await()
         }
     }
 
@@ -567,5 +692,23 @@ class MainViewModelTest {
         fun setDevices(devices: List<Device>) {
             devicesFlow.value = devices
         }
+    }
+
+    private class FakeSwitchGroupRepository(
+        groups: List<SwitchGroup>
+    ) : SwitchGroupRepository {
+        private val groupsFlow = MutableStateFlow(groups)
+
+        override fun observeSwitchGroups(): Flow<List<SwitchGroup>> = groupsFlow
+
+        override suspend fun getSwitchGroups(): List<SwitchGroup> = groupsFlow.value
+
+        override suspend fun saveSwitchGroup(group: SwitchGroup) = Unit
+
+        override suspend fun updateSwitchGroupOrder(groupIds: List<String>) = Unit
+
+        override suspend fun updateSwitchGroupSortOrders(sortOrders: Map<String, Int>) = Unit
+
+        override suspend fun deleteSwitchGroup(groupId: String) = Unit
     }
 }

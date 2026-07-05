@@ -4,30 +4,34 @@ Stand: 5. Juli 2026
 
 ## Abgeschlossen
 
-- Issue 080 „String-Ressourcen und Lokalisierung bereinigen“
-- GitHub-Issue: #177
-- Pull Request: #178
-- Merge-Commit auf `main`: `a39e2e5`
-- Deutsche, englische und Default-String-Ressourcen besitzen wieder denselben
-  Schlüsselsatz.
-- `values/strings.xml` ist durchgängig der englische Fallback.
-- Ein automatisierter Test prüft Schlüssel, Attribute und Formatplatzhalter.
-- Die fehlerhafte Verneinung in „Über SwitchWerk“ wurde korrigiert.
-- GitHub-Qualitätsprüfungen und Host-Tests waren erfolgreich.
+- Issue 079 "Schaltgruppen App Shortcuts"
+- GitHub-Issue: #180
+- Branch: `schaltgruppen-app-shortcuts`
+- Schaltgruppen können als Android App Shortcuts veröffentlicht werden.
+- Geräte- und Gruppen-Shortcuts teilen sich das Android-Limit und folgen der
+  gemeinsamen Dashboard-Reihenfolge.
+- Schaltgruppen können bei aktivierter externer Intent-Freigabe per lokaler
+  Gruppen-ID gestartet werden.
+- Leere Schaltgruppen werden weder als Shortcut veröffentlicht noch per
+  externem Gruppen-Intent ausgeführt.
+- Import/Export überträgt die Gruppenshortcut-Auswahl; ältere Importe bleiben
+  mit Default `false` kompatibel.
+- Deutsche, englische und Default-String-Ressourcen wurden konsistent gepflegt.
+- `GITHUB_WORKFLOW.md` dokumentiert, dass Release-Befehle zum Kompilieren und
+  Installieren künftig immer ausgegeben werden.
 
-## Aktueller Arbeitsbaum
+## Prüfungen
 
-- Nach dem Dokumentationsabschluss soll `main` sauber sein.
+- `./gradlew testDebugUnitTest`
+- `./gradlew lintDebug`
+- Host-Test wurde vom Benutzer als erfolgreich gemeldet.
 
 ## Nächster Stand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 079
-  „Schaltgruppen App Shortcuts“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 073
+  "Farbige Geräte".
 - Weitere Reihenfolge und Status ausschließlich aus
   `docs/issues/overview.txt` entnehmen.
-
-Für die nächste Session `AI_SESSION_PROMPT.md` als wiederverwendbare
-Startvorlage verwenden.
 
 Ohne ausdrückliche Anweisung nicht committen, pushen, PR erstellen, mergen,
 GitHub-Issue schließen oder Branch löschen.
