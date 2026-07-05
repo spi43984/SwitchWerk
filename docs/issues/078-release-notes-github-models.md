@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Tooling / Release / Automatisierung
 - Bereich: scripts/release-github.sh / GitHub Models / Release Notes
@@ -95,18 +95,29 @@ jq -n \
 
 ## Akzeptanzkriterien
 
-- [ ] Das Skript erzeugt vor dem Editor-Aufruf einen deutschsprachigen Vorschlag
+- [x] Das Skript erzeugt vor dem Editor-Aufruf einen deutschsprachigen Vorschlag
       für Release Notes.
-- [ ] Der Vorschlag basiert auf Commits und Diff-Statistik seit dem letzten
+- [x] Der Vorschlag basiert auf Commits und Diff-Statistik seit dem letzten
       Release.
-- [ ] Der Vorschlag enthält keine Commit-Hashes, PR-Nummern oder technischen
+- [x] Der Vorschlag enthält keine Commit-Hashes, PR-Nummern oder technischen
       Interna.
-- [ ] Der Anwender kann den Vorschlag vor dem Release im Editor bearbeiten.
-- [ ] Bei nicht verfügbarer GitHub-Models-API fällt das Skript auf einen
+- [x] Der Anwender kann den Vorschlag vor dem Release im Editor bearbeiten.
+- [x] Bei nicht verfügbarer GitHub-Models-API fällt das Skript auf einen
       manuellen Platzhalter zurück.
-- [ ] Tokens und API-Antworten mit sensiblen Daten werden nicht geloggt.
-- [ ] `scripts/release-github.sh` bleibt mit `set -euo pipefail` robust.
-- [ ] Bestehende Release-Schritte bleiben unverändert erhalten.
+- [x] Tokens und API-Antworten mit sensiblen Daten werden nicht geloggt.
+- [x] `scripts/release-github.sh` bleibt mit `set -euo pipefail` robust.
+- [x] Bestehende Release-Schritte bleiben unverändert erhalten.
+
+## Abschluss
+
+- Implementiert in `scripts/release-github.sh`.
+- GitHub-Issue: #176
+- Commit auf `main`: `e3f383d`
+- Lokale Prüfungen:
+  - `bash -n scripts/release-github.sh`
+  - `shellcheck scripts/release-github.sh`
+- Hilfe-, Info- und Tooltip-Texte: nicht betroffen, da reine Release-Tooling-Änderung.
+- Konfigurationsexport/-import: nicht betroffen, da keine App-Einstellung geändert wurde.
 
 ## Testhinweise
 
