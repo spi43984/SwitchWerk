@@ -21,8 +21,8 @@ Stand: 5. Juli 2026
 
 ## Nächster Stand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 075
-  „Schnellkacheln“.
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 079
+  „Schaltgruppen App Shortcuts“.
 - Weitere Reihenfolge und Status ausschließlich aus
   `docs/issues/overview.txt` entnehmen.
 

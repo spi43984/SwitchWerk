@@ -98,7 +98,7 @@ es verändert die Priorisierungslogik nicht.
 | 072 | P1 | abgeschlossen | SwitchWerk empfängt Intents |
 | 073 | P2 | offen | Farbige Geräte |
 | 074 | P1 | abgeschlossen | Gruppen |
-| 075 | P1 | offen | Schnellkacheln |
+| 075 | P2 | Backlog | Schnellkacheln |
 | 076 | P2 | offen | Templates |
 | 077 | P0 | abgeschlossen | Import/Export fehlender App-Einstellungen |
 | 078 | P0 | abgeschlossen | Release Notes mit GitHub Models vorbefüllen |
@@ -107,10 +107,10 @@ es verändert die Priorisierungslogik nicht.
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 075 Schnellkacheln
-2. 079 Schaltgruppen App Shortcuts
-3. 073 Farbige Geräte
-4. 076 Templates
+1. 079 Schaltgruppen App Shortcuts
+2. 073 Farbige Geräte
+3. 076 Templates
+4. 075 Schnellkacheln (Backlog)
 5. 024 Authenticated Import Sources Backlog
 6. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
 7. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)

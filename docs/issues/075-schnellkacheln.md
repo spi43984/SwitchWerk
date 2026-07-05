@@ -2,8 +2,8 @@
 
 ## Metadaten
 
-- Status: Offen
-- Priorität: P1
+- Status: Backlog
+- Priorität: P2
 - Typ: Feature / Android Integration
 - Bereich: Quick Settings Tile / Geräteaktionen
 
