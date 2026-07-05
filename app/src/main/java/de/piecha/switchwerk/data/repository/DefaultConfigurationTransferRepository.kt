@@ -6,9 +6,13 @@ import androidx.room.withTransaction
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.local.dao.DeviceConnectionDao
 import de.piecha.switchwerk.data.local.dao.DeviceDao
+import de.piecha.switchwerk.data.local.dao.SwitchGroupDao
+import de.piecha.switchwerk.data.local.dao.SwitchGroupMemberDao
 import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.DeviceConnectionEntity
 import de.piecha.switchwerk.data.local.entity.DeviceEntity
+import de.piecha.switchwerk.data.local.entity.SwitchGroupEntity
+import de.piecha.switchwerk.data.local.entity.SwitchGroupMemberEntity
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 import de.piecha.switchwerk.data.security.WifiCredentialStore
 import de.piecha.switchwerk.data.transfer.CONFIGURATION_SCHEMA_VERSION
@@ -19,6 +23,8 @@ import de.piecha.switchwerk.data.transfer.ConfigurationDeviceConnection
 import de.piecha.switchwerk.data.transfer.ConfigurationDocument
 import de.piecha.switchwerk.data.transfer.ConfigurationImportValidator
 import de.piecha.switchwerk.data.transfer.ConfigurationJsonCodec
+import de.piecha.switchwerk.data.transfer.ConfigurationSwitchGroup
+import de.piecha.switchwerk.data.transfer.ConfigurationSwitchGroupMember
 import de.piecha.switchwerk.data.transfer.ConfigurationWifiProfile
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
@@ -42,6 +48,8 @@ class DefaultConfigurationTransferRepository(
     private val database: AppDatabase,
     private val deviceDao: DeviceDao,
     private val deviceConnectionDao: DeviceConnectionDao,
+    private val switchGroupDao: SwitchGroupDao,
+    private val switchGroupMemberDao: SwitchGroupMemberDao,
     private val wifiProfileDao: WifiProfileDao,
     private val credentialStore: WifiCredentialStore,
     private val httpClient: OkHttpClient,
@@ -99,7 +107,15 @@ class DefaultConfigurationTransferRepository(
     ) {
         withContext(Dispatchers.IO) {
             val document = preparedImport.document.normalizedForImport()
-            validator.validate(document)
+            val existingDeviceIds = deviceDao.getAll().map { it.id }.toSet()
+            validator.validate(
+                document = document,
+                additionalDeviceIds = if (mode == ConfigurationImportMode.MERGE) {
+                    existingDeviceIds
+                } else {
+                    emptySet()
+                }
+            )
             if (mode == ConfigurationImportMode.MERGE) {
                 validator.validateMerge(
                     document = document,
@@ -129,6 +145,8 @@ class DefaultConfigurationTransferRepository(
         val profiles = wifiProfileDao.getAll()
         val devices = deviceDao.getAll()
         val connections = deviceConnectionDao.getAll()
+        val groups = switchGroupDao.getAll()
+        val groupMembers = switchGroupMemberDao.getAll()
 
         return ConfigurationDocument(
             schemaVersion = CONFIGURATION_SCHEMA_VERSION,
@@ -171,6 +189,24 @@ class DefaultConfigurationTransferRepository(
                             )
                         }
                 )
+            },
+            switchGroups = groups.map { group ->
+                ConfigurationSwitchGroup(
+                    id = group.id,
+                    name = group.name,
+                    actionLabel = group.actionLabel,
+                    errorStrategy = group.errorStrategy,
+                    members = groupMembers
+                        .filter { it.groupId == group.id }
+                        .sortedBy { it.sortOrder }
+                        .map { member ->
+                            ConfigurationSwitchGroupMember(
+                                id = member.id,
+                                deviceId = member.deviceId,
+                                pauseAfterMillis = member.pauseAfterMillis
+                            )
+                        }
+                )
             }
         )
     }
@@ -189,9 +225,16 @@ class DefaultConfigurationTransferRepository(
                     error
                 )
             }.normalizedForImport()
-        validator.validate(document)
-
         val existingWifiProfiles = wifiProfileDao.getAll()
+        val existingDeviceIds = deviceDao.getAll().map { it.id }.toSet()
+        validator.validate(
+            document = document,
+            additionalDeviceIds = if (mode == ConfigurationImportMode.MERGE) {
+                existingDeviceIds
+            } else {
+                emptySet()
+            }
+        )
         if (mode == ConfigurationImportMode.MERGE) {
             validator.validateMerge(
                 document = document,
@@ -199,7 +242,6 @@ class DefaultConfigurationTransferRepository(
             )
         }
         val existingWifiProfileIds = existingWifiProfiles.map { it.id }.toSet()
-        val existingDeviceIds = deviceDao.getAll().map { it.id }.toSet()
 
         val summariesByMode = ConfigurationImportMode.entries.associateWith { importMode ->
             createImportSummary(
@@ -257,6 +299,8 @@ class DefaultConfigurationTransferRepository(
     }
 
     private suspend fun replaceConfiguration(document: ConfigurationDocument) {
+        switchGroupMemberDao.deleteAll()
+        switchGroupDao.deleteAll()
         deviceConnectionDao.deleteAll()
         deviceDao.deleteAll()
         wifiProfileDao.deleteAll()
@@ -267,12 +311,23 @@ class DefaultConfigurationTransferRepository(
             }
         )
         deviceConnectionDao.upsertAll(document.toConnectionEntities())
+        switchGroupDao.upsertAll(
+            document.switchGroups.mapIndexed { index, group ->
+                group.toEntity(sortOrder = document.devices.size + index)
+            }
+        )
+        switchGroupMemberDao.upsertAll(document.toSwitchGroupMemberEntities())
     }
 
     private suspend fun mergeConfiguration(document: ConfigurationDocument) {
         val existingDevices = deviceDao.getAll()
         val existingSortOrders = existingDevices.associate { it.id to it.sortOrder }
-        var nextSortOrder = (existingDevices.maxOfOrNull { it.sortOrder } ?: -1) + 1
+        val existingGroups = switchGroupDao.getAll()
+        val existingGroupSortOrders = existingGroups.associate { it.id to it.sortOrder }
+        var nextSortOrder = (
+            (existingDevices.map { it.sortOrder } + existingGroups.map { it.sortOrder })
+                .maxOrNull() ?: -1
+        ) + 1
 
         wifiProfileDao.upsertAll(document.wifiProfiles.map { it.toEntity() })
         deviceDao.upsertAll(
@@ -285,6 +340,16 @@ class DefaultConfigurationTransferRepository(
             deviceConnectionDao.deleteForDevice(device.id)
         }
         deviceConnectionDao.upsertAll(document.toConnectionEntities())
+        switchGroupDao.upsertAll(
+            document.switchGroups.map { group ->
+                val sortOrder = existingGroupSortOrders[group.id] ?: nextSortOrder++
+                group.toEntity(sortOrder)
+            }
+        )
+        document.switchGroups.forEach { group ->
+            switchGroupMemberDao.deleteForGroup(group.id)
+        }
+        switchGroupMemberDao.upsertAll(document.toSwitchGroupMemberEntities())
     }
 
     private suspend fun applyImportedPasswords(document: ConfigurationDocument) {
@@ -339,6 +404,30 @@ class DefaultConfigurationTransferRepository(
                     wifiProfileId = connection.wifiProfileId,
                     host = connection.host,
                     priority = index
+                )
+            }
+        }
+    }
+
+    private fun ConfigurationSwitchGroup.toEntity(sortOrder: Int): SwitchGroupEntity {
+        return SwitchGroupEntity(
+            id = id,
+            name = name,
+            actionLabel = actionLabel,
+            sortOrder = sortOrder,
+            errorStrategy = errorStrategy
+        )
+    }
+
+    private fun ConfigurationDocument.toSwitchGroupMemberEntities(): List<SwitchGroupMemberEntity> {
+        return switchGroups.flatMap { group ->
+            group.members.mapIndexed { index, member ->
+                SwitchGroupMemberEntity(
+                    id = member.id,
+                    groupId = group.id,
+                    deviceId = member.deviceId,
+                    sortOrder = index,
+                    pauseAfterMillis = member.pauseAfterMillis
                 )
             }
         }
@@ -490,6 +579,12 @@ internal fun ConfigurationDocument.normalizedForImport(): ConfigurationDocument 
             profile.copy(
                 name = profile.name.trim(),
                 ssid = profile.ssid.trim()
+            )
+        },
+        switchGroups = switchGroups.map { group ->
+            group.copy(
+                name = group.name.trim(),
+                actionLabel = group.actionLabel.trim()
             )
         }
     )

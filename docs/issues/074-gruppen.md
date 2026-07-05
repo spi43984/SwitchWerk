@@ -46,17 +46,20 @@ Konfigurierbare Pausen zwischen Geräten sind wichtig, weil manche Geräte oder 
 - Bereits konfigurierte Geräte zu einer Schaltgruppe hinzufügen.
 - Geräte aus einer Schaltgruppe entfernen.
 - Eine Schaltgruppe kann zwei oder mehr Geräte enthalten.
+- Dasselbe Gerät darf mehrfach in derselben Schaltgruppe vorkommen, damit
+  zeitversetzte Wiederholungen derselben Geräteaktion möglich sind.
 - Die Reihenfolge der Geräte innerhalb einer Schaltgruppe muss mit Hoch-/Runter-Pfeilen festgelegt werden können.
 - Die Bedienung soll bewusst robust über Pfeile erfolgen und kein Drag-and-Drop einführen.
 - Pro Gruppenmitglied soll eine Pause nach der Geräteaktion konfigurierbar sein.
 - Für Pausen sinnvolle feste Werte anbieten, z. B.:
   - 0 ms
-  - 250 ms
   - 500 ms
   - 1 s
   - 2 s
-  - 5 s
 - Eine benutzerdefinierte Pause kann zusätzlich vorgesehen werden, wenn sie ohne große Zusatzkomplexität sauber validierbar ist.
+- Benutzerdefinierte Pausen sollen bis maximal 1 Stunde erlaubt sein und in der
+  UI in einer lesbaren Zeiteinheit dargestellt werden, nicht nur als langer
+  Millisekundenwert.
 
 ### Dashboard
 
@@ -78,9 +81,10 @@ Konfigurierbare Pausen zwischen Geräten sind wichtig, weil manche Geräte oder 
 - Während eine Schaltgruppe läuft, soll sie nicht mehrfach parallel gestartet werden können.
 - Wenn möglich, soll eine laufende Schaltgruppe abgebrochen werden können.
 - Das Fehlerverhalten soll für den ersten Schritt einfach und nachvollziehbar sein:
-  - Bei Fehler einer Geräteaktion wird die Schaltgruppe abgebrochen.
+  - Standardmäßig wird die Schaltgruppe bei Fehler einer Geräteaktion abgebrochen.
+  - Optional kann eingestellt werden, dass die Schaltgruppe nach Fehlern weiterläuft.
   - Der fehlerhafte Schritt und die betroffene Geräteaktion werden verständlich angezeigt.
-- Erweiterte Fehlerstrategien wie `immer weiter`, `bei Fehler abbrechen` oder `nur warnen` sind nicht Bestandteil dieses Issues und können später ergänzt werden.
+- Komplexere Fehlerstrategien wie `nur warnen`, Bedingungen oder automatische Wiederholungen sind nicht Bestandteil dieses Issues.
 
 ### Import und Export
 
@@ -101,7 +105,7 @@ Konfigurierbare Pausen zwischen Geräten sind wichtig, weil manche Geräte oder 
 - Keine parallele Gruppenausführung.
 - Keine komplexen Szenen mit Bedingungen.
 - Keine zeitgesteuerten Automationen.
-- Keine erweiterten Fehlerstrategien.
+- Keine komplexen Fehlerstrategien über `beim ersten Fehler abbrechen` und `nach Fehlern weiter ausführen` hinaus.
 - Keine Cloud-Synchronisation.
 - Keine Rollen- oder Benutzerverwaltung.
 - Keine Änderung der WLAN-Verbindungslogik.
@@ -131,14 +135,18 @@ Konfigurierbare Pausen zwischen Geräten sind wichtig, weil manche Geräte oder 
 - [ ] Schaltgruppen können angelegt, umbenannt und gelöscht werden.
 - [ ] Geräte können einer Schaltgruppe hinzugefügt und daraus entfernt werden.
 - [ ] Eine Schaltgruppe kann mehrere Geräte enthalten.
+- [ ] Dasselbe Gerät kann mehrfach in derselben Schaltgruppe eingetragen werden.
 - [ ] Geräte können innerhalb einer Schaltgruppe per Hoch-/Runter-Pfeilen sortiert werden.
 - [ ] Pro Gruppenmitglied kann eine Pause nach der Geräteaktion konfiguriert werden.
+- [ ] Benutzerdefinierte Pausen sind bis maximal 1 Stunde erlaubt und werden
+      lesbar formatiert angezeigt.
 - [ ] Schaltgruppen werden auf dem Dashboard wie normale ausführbare Geräte angezeigt.
 - [ ] Eine Schaltgruppe wird beim Antippen sequenziell in der konfigurierten Reihenfolge ausgeführt.
 - [ ] Die konfigurierten Pausen zwischen den Geräteaktionen werden eingehalten.
 - [ ] Eine laufende Schaltgruppe kann nicht versehentlich mehrfach parallel gestartet werden.
 - [ ] Fehler in einer enthaltenen Geräteaktion werden verständlich angezeigt.
-- [ ] Bei Fehler einer enthaltenen Geräteaktion wird die Schaltgruppe abgebrochen.
+- [ ] Bei Fehler einer enthaltenen Geräteaktion wird die Schaltgruppe standardmäßig abgebrochen.
+- [ ] Optional kann eine Schaltgruppe nach Fehlern weiter ausgeführt werden.
 - [ ] Leere Schaltgruppen werden verständlich dargestellt und nicht ausgeführt.
 - [ ] Bestehende Einzelgeräteaktionen funktionieren unverändert.
 - [ ] Schaltgruppen, Mitglieder, Reihenfolge und Pausen werden exportiert und importiert.

@@ -7,7 +7,9 @@ import android.location.LocationManager
 import android.content.pm.ShortcutManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.action.DefaultDeviceActionService
+import de.piecha.switchwerk.data.action.DefaultSwitchGroupActionService
 import de.piecha.switchwerk.data.action.DeviceActionService
+import de.piecha.switchwerk.data.action.SwitchGroupActionService
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
 import de.piecha.switchwerk.data.network.AndroidWifiProximityService
@@ -21,8 +23,10 @@ import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.DefaultConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.RoomDeviceRepository
+import de.piecha.switchwerk.data.repository.RoomSwitchGroupRepository
 import de.piecha.switchwerk.data.repository.RoomWifiProfileRepository
 import de.piecha.switchwerk.data.repository.SharedPreferencesAppSettingsRepository
+import de.piecha.switchwerk.data.repository.SwitchGroupRepository
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.security.EncryptedWifiCredentialStore
 import de.piecha.switchwerk.data.security.WifiCredentialStore
@@ -70,12 +74,16 @@ val appModule = module {
             .addMigrations(AppDatabase.MIGRATION_6_7)
             .addMigrations(AppDatabase.MIGRATION_7_8)
             .addMigrations(AppDatabase.MIGRATION_8_9)
+            .addMigrations(AppDatabase.MIGRATION_9_10)
+            .addMigrations(AppDatabase.MIGRATION_10_11)
             .build()
     }
 
     single { get<AppDatabase>().deviceDao() }
     single { get<AppDatabase>().deviceConnectionDao() }
     single { get<AppDatabase>().wifiProfileDao() }
+    single { get<AppDatabase>().switchGroupDao() }
+    single { get<AppDatabase>().switchGroupMemberDao() }
 
     single {
         androidContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -168,7 +176,15 @@ val appModule = module {
     single<DeviceRepository> {
         RoomDeviceRepository(
             deviceDao = get(),
-            deviceConnectionDao = get()
+            deviceConnectionDao = get(),
+            switchGroupMemberDao = get()
+        )
+    }
+
+    single<SwitchGroupRepository> {
+        RoomSwitchGroupRepository(
+            switchGroupDao = get(),
+            switchGroupMemberDao = get()
         )
     }
 
@@ -192,6 +208,8 @@ val appModule = module {
             database = get(),
             deviceDao = get(),
             deviceConnectionDao = get(),
+            switchGroupDao = get(),
+            switchGroupMemberDao = get(),
             wifiProfileDao = get(),
             credentialStore = get(),
             httpClient = get(),
@@ -209,10 +227,18 @@ val appModule = module {
         )
     }
 
+    single<SwitchGroupActionService> {
+        DefaultSwitchGroupActionService(
+            deviceActionService = get()
+        )
+    }
+
     viewModel {
         MainViewModel(
             repository = get(),
+            switchGroupRepository = get(),
             deviceActionService = get(),
+            switchGroupActionService = get(),
             appSettingsRepository = get(),
             wifiProfileRepository = get(),
             wifiProximityService = get(),
@@ -224,6 +250,7 @@ val appModule = module {
         SettingsViewModel(
             wifiProfileRepository = get(),
             deviceRepository = get(),
+            switchGroupRepository = get(),
             configurationTransferRepository = get(),
             appSettingsRepository = get(),
             wifiConnectionService = get(),

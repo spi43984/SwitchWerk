@@ -6,18 +6,24 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.piecha.switchwerk.data.local.dao.DeviceConnectionDao
 import de.piecha.switchwerk.data.local.dao.DeviceDao
+import de.piecha.switchwerk.data.local.dao.SwitchGroupDao
+import de.piecha.switchwerk.data.local.dao.SwitchGroupMemberDao
 import de.piecha.switchwerk.data.local.dao.WifiProfileDao
 import de.piecha.switchwerk.data.local.entity.DeviceConnectionEntity
 import de.piecha.switchwerk.data.local.entity.DeviceEntity
+import de.piecha.switchwerk.data.local.entity.SwitchGroupEntity
+import de.piecha.switchwerk.data.local.entity.SwitchGroupMemberEntity
 import de.piecha.switchwerk.data.local.entity.WifiProfileEntity
 
 @Database(
     entities = [
         DeviceEntity::class,
         WifiProfileEntity::class,
-        DeviceConnectionEntity::class
+        DeviceConnectionEntity::class,
+        SwitchGroupEntity::class,
+        SwitchGroupMemberEntity::class
     ],
-    version = 9,
+    version = 11,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -27,6 +33,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun wifiProfileDao(): WifiProfileDao
 
     abstract fun deviceConnectionDao(): DeviceConnectionDao
+
+    abstract fun switchGroupDao(): SwitchGroupDao
+
+    abstract fun switchGroupMemberDao(): SwitchGroupMemberDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -184,6 +194,45 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     "ALTER TABLE devices ADD COLUMN shortcutEnabled INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS switch_groups (
+                        id TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        actionLabel TEXT NOT NULL,
+                        sortOrder INTEGER NOT NULL,
+                        PRIMARY KEY(id)
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS switch_group_members (
+                        id TEXT NOT NULL,
+                        groupId TEXT NOT NULL,
+                        deviceId TEXT NOT NULL,
+                        sortOrder INTEGER NOT NULL,
+                        pauseAfterMillis INTEGER NOT NULL,
+                        PRIMARY KEY(id)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    ALTER TABLE switch_groups
+                    ADD COLUMN errorStrategy TEXT NOT NULL DEFAULT 'ABORT_ON_ERROR'
+                    """.trimIndent()
                 )
             }
         }

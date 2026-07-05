@@ -22,22 +22,26 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Tap a device action to run it\n• Choose list or widget view when there is enough space for readable widgets\n• Arrows change the order\n• The X at the bottom right cancels a running action\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings, updates, help, and About SwitchWerk</string>
-    <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• System: appearance, updates, action details, and external intents\n• Configurations: export or import the configuration</string>
+    <string name="dashboard_info">• Tap a device action or switch group to run it\n• Choose list or widget view when there is enough space for readable widgets\n• Arrows change the dashboard order\n• The X at the bottom right cancels a running action\n• Empty switch groups are shown but cannot be run\n• Action details: tap the compact bar to open it, or its title to minimize it\n• Green: Wi-Fi connection confirmed\n• Red: a specific Wi-Fi connection attempt failed\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID does not confirm a connection\n• The menu opens settings, updates, help, and About SwitchWerk</string>
+    <string name="settings_info">• Wi-Fi profiles: manage credentials\n• Devices: define actions and Wi-Fi assignments\n• Groups: run multiple existing device actions in sequence\n• System: appearance, updates, action details, and external intents\n• Configurations: export or import the configuration</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Choose appearance and language\n• Check for updates and open GitHub release notes\n• Show or hide action details\n• Allow or block external intents</string>
-    <string name="backup_info">• Export saves Wi-Fi profiles, devices, and transferable app settings\n• Language, display, Wi-Fi profile sorting, and external intent permission are transferred\n• Setup wizard state remains local\n• Changes to external intent permission are shown before import confirmation\n• Choose password handling deliberately for each action\n• The password choice applies only to the next action and is reset afterwards</string>
+    <string name="backup_info">• Export saves Wi-Fi profiles, devices, switch groups, and transferable app settings\n• Switch group members, order, and pauses are transferred\n• Language, display, Wi-Fi profile sorting, and external intent permission are transferred\n• Setup wizard state remains local\n• Changes to external intent permission are shown before import confirmation\n• Choose password handling deliberately for each action\n• The password choice applies only to the next action and is reset afterwards</string>
     <string name="password_storage_info">Wi-Fi passwords are stored encrypted on this device. They are not sent to a cloud service and are not shown in action details.</string>
     <string name="hostname_ip_info">Enter the device\'s local address in its assigned Wi-Fi network, for example 192.168.33.1 or a hostname resolved on the local network. No internet connection is required.</string>
     <string name="api_call_info">The HTTP/RPC call is appended to the local device address. Use only a path supported by the device. POST can send an optional request body with a Content-Type, for example /relay/0?turn=on.</string>
     <string name="action_details_info">• Shows Wi-Fi connection, timeout, and HTTP status\n• Layout values remain available as the oldest scrollable log entry\n• The X at the bottom right cancels the running action\n• Tap the compact bar to open it\n• Tap the Action details title in the open panel to minimize it\n• Local progress only\n• Passwords are not logged</string>
     <string name="wifi_profiles_info_title">Manage Wi-Fi profiles</string>
     <string name="devices_info_title">Manage devices</string>
+    <string name="groups_info_title">Manage switch groups</string>
+    <string name="groups_info">• Groups run existing device actions in sequence\n• The same device can be added more than once\n• Empty groups are visible on the dashboard but cannot be run\n• Use arrows to set member order\n• The pause applies after that member action</string>
     <string name="list_interaction_info">• Use + to add an entry\n• Tap an entry to edit it\n• Swipe left or right to delete it\n• Confirm deletion afterwards</string>
     <string name="wifi_profile_dialog_info_title">Wi-Fi profile</string>
     <string name="wifi_profile_dialog_info">• Enter the target Wi-Fi SSID\n• The name must be unique\n• The password remains encrypted on the device</string>
     <string name="device_dialog_info_title">Device</string>
     <string name="device_dialog_info">• Set the name and button label\n• Optionally offer the action as an app shortcut\n• Android shows at most four enabled shortcuts in dashboard order\n• Choose HTTP or HTTPS\n• Enter the HTTP/RPC method and path\n• For POST, optionally choose request body and Content-Type\n• Wi-Fi assignments define the connection order</string>
+    <string name="group_dialog_info_title">Switch group</string>
+    <string name="group_dialog_info">• Set the name and button label\n• Dashboard order is changed with arrows on the dashboard\n• Use the error switch to stop on the first error or continue after errors\n• Add existing devices as members; the same device can appear more than once\n• Members run from top to bottom\n• Pause is applied after the member action\n• Custom pauses use HH:MM:SS.mmm and are limited to 1 hour</string>
     <string name="app_shortcut">App shortcut</string>
     <string name="app_shortcut_description">Offer this device action when the app icon is long-pressed. Android shows at most four selected actions.</string>
     <string name="help_shortcuts_title">App shortcuts</string>
@@ -62,11 +66,11 @@
     <string name="about_license">License: GNU AGPL-3.0-or-later</string>
     <string name="open_github_project">Open GitHub project</string>
     <string name="help_getting_started_title">Setup</string>
-    <string name="help_getting_started_text">• Existing configuration: open Settings → Configurations and import a configuration\n• Manual setup 1: create the Wi-Fi profiles SwitchWerk should connect to in Settings → Wi-Fi Profiles\n• Manual setup 2: create devices in Settings → Devices and assign them to a Wi-Fi profile\n• Trigger the configured actions on the Dashboard</string>
+    <string name="help_getting_started_text">• Existing configuration: open Settings → Configurations and import a configuration\n• Manual setup 1: create the Wi-Fi profiles SwitchWerk should connect to in Settings → Wi-Fi Profiles\n• Manual setup 2: create devices in Settings → Devices and assign them to a Wi-Fi profile\n• Optional: create switch groups in Settings → Groups\n• Trigger the configured actions on the Dashboard</string>
     <string name="help_connection_title">Connection and troubleshooting</string>
     <string name="help_connection_text">• The status point confirms a Wi-Fi connection, not physical Wi-Fi proximity\n• Green: Wi-Fi connection confirmed\n• Red: Android could not establish the specific Wi-Fi request\n• Gray: Wi-Fi not yet confirmed, no assignment, or detection unavailable\n• A visible SSID alone does not confirm a connection\n• The X at the bottom right cancels a running action and its Wi-Fi request\n• Android\'s system dialog cannot be closed by SwitchWerk\n• A device access point may interrupt internet access\n• HTTP errors come from the device</string>
     <string name="help_import_title">Save and load configurations</string>
-    <string name="help_import_text">• Import configurations only from trusted sources\n• Wi-Fi profiles, devices, language, display, Wi-Fi profile sorting, and external intent permission can be transferred\n• Setup wizard state remains local\n• Changes to external intent permission are shown before import confirmation\n• Password import and export must be selected deliberately before each action: left without passwords, right with passwords\n• The related action stays disabled in the middle position\n• The password choice applies only to the next action and is reset afterwards</string>
+    <string name="help_import_text">• Import configurations only from trusted sources\n• Wi-Fi profiles, devices, switch groups, language, display, Wi-Fi profile sorting, and external intent permission can be transferred\n• Switch groups may reference only existing or imported devices; a device may appear more than once\n• Setup wizard state remains local\n• Changes to external intent permission are shown before import confirmation\n• Password import and export must be selected deliberately before each action: left without passwords, right with passwords\n• The related action stays disabled in the middle position\n• The password choice applies only to the next action and is reset afterwards</string>
     <string name="help_privacy_title">Permissions and privacy</string>
     <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
     <string name="help_updates_title">Updates</string>
@@ -123,6 +127,7 @@
 
     <string name="settings_tab_wifi_profiles">Wi-Fi profiles</string>
     <string name="settings_tab_devices">Devices</string>
+    <string name="settings_tab_groups">Groups</string>
     <string name="settings_tab_system">System</string>
     <string name="settings_tab_backup">Configurations</string>
     <string name="more_tabs_left">More sections to the left</string>
@@ -153,6 +158,10 @@
     <plurals name="devices_found">
         <item quantity="one">%1$d Gerät gefunden</item>
         <item quantity="other">%1$d Geräte gefunden</item>
+    </plurals>
+    <plurals name="dashboard_items_found">
+        <item quantity="one">%1$d dashboard item</item>
+        <item quantity="other">%1$d dashboard items</item>
     </plurals>
     <string name="layout_list">Liste</string>
     <string name="layout_widgets">Widgets</string>
@@ -190,6 +199,36 @@
     <string name="move_wifi_assignment_up">WLAN-Zuordnung nach oben verschieben</string>
     <string name="move_wifi_assignment_down">WLAN-Zuordnung nach unten verschieben</string>
     <string name="no_more_wifi_profiles">Es sind keine weiteren WLAN-Profile verfügbar.</string>
+
+    <string name="switch_groups">Switch groups</string>
+    <string name="add_group">Add group</string>
+    <string name="edit_group">Edit group</string>
+    <string name="delete_group">Delete group</string>
+    <string name="delete_group_confirmation">Really delete switch group %1$s?</string>
+    <string name="no_groups_configured">No switch groups configured.</string>
+    <string name="group_member_count">%1$d members</string>
+    <string name="group_error_strategy">Error handling</string>
+    <string name="group_error_strategy_abort">Off: stop group on first error</string>
+    <string name="group_error_strategy_continue">On: continue after errors</string>
+    <string name="group_members">Members</string>
+    <string name="add_group_member">Add member</string>
+    <string name="delete_group_member">Remove member</string>
+    <string name="delete_group_member_confirmation">Remove %1$s from this group?</string>
+    <string name="no_group_members">No members yet. Use + to add existing devices.</string>
+    <string name="group_order_hint">Use the arrows to reorder. The group runs from top to bottom.</string>
+    <string name="group_pause_after">Pause after action: %1$s</string>
+    <string name="move_group_member_up">Move group member up</string>
+    <string name="move_group_member_down">Move group member down</string>
+    <string name="no_devices_for_group">No devices are configured.</string>
+    <string name="pause_0_ms">0 ms</string>
+    <string name="pause_500_ms">500 ms</string>
+    <string name="pause_1_s">1 s</string>
+    <string name="pause_2_s">2 s</string>
+    <string name="pause_custom">Custom</string>
+    <string name="pause_custom_title">Custom pause</string>
+    <string name="pause_custom_label">Pause as HH:MM:SS.mmm</string>
+    <string name="pause_custom_hint">Allowed range: 00:00:00.000 to 01:00:00.000.</string>
+    <string name="selected_pause">✓ %1$s</string>
 
     <string name="name_and_ssid">Name\nSSID</string>
     <string name="add_wifi_profile">WLAN-Profil hinzufügen</string>
@@ -287,6 +326,7 @@
     <string name="error_invalid_qr_url">QR-Code enthält keine gültige HTTP/HTTPS-URL</string>
     <string name="error_camera_permission">Kamera-Berechtigung wird zum Scannen des QR-Codes benötigt</string>
     <string name="default_action_label">Schalten</string>
+    <string name="default_group_action_label">Run group</string>
     <string name="unknown_wifi">Unbekanntes WLAN</string>
     <string name="error_host_empty">Hostname/IP darf nicht leer sein</string>
     <string name="error_wifi_already_assigned">Dieses WLAN ist bereits zugeordnet</string>
@@ -299,6 +339,9 @@
     <string name="error_device_save">Gerät konnte nicht gespeichert werden</string>
     <string name="error_device_delete">Gerät konnte nicht gelöscht werden</string>
     <string name="error_device_order">Gerätereihenfolge konnte nicht geändert werden</string>
+    <string name="error_group_name_empty">Switch group name must not be empty</string>
+    <string name="error_group_save">Switch group could not be saved</string>
+    <string name="error_group_delete">Switch group could not be deleted</string>
     <string name="error_import_prepare">Import konnte nicht vorbereitet werden</string>
     <string name="configuration_imported">Configuration was imported</string>
     <string name="error_configuration_import">Configuration could not be imported</string>
@@ -335,7 +378,18 @@
     <string name="diagnostic_timeout_dns">Timeout bei der DNS-Auflösung</string>
     <string name="diagnostic_timeout_http">Timeout beim HTTP/RPC-Aufruf</string>
     <string name="diagnostic_action_completed">Geräteaktion abgeschlossen</string>
+    <string name="diagnostic_group_started">Switch group “%1$s” started</string>
+    <string name="diagnostic_group_member_started">Group member %1$d of %2$d started: %3$s</string>
+    <string name="diagnostic_group_member_succeeded">Group member %1$d of %2$d completed: %3$s</string>
+    <string name="diagnostic_group_member_failed">Group member %1$d of %2$d failed: %3$s</string>
+    <string name="diagnostic_group_pause">Pause: %1$s</string>
+    <string name="diagnostic_group_completed">Switch group completed</string>
     <string name="action_success">Erfolg</string>
+    <string name="action_group_success">Group completed</string>
+    <string name="action_group_success_with_failures">Group completed with %1$d errors</string>
+    <string name="action_group_empty">No devices in group</string>
+    <string name="action_group_missing_device">Group stopped: device for step %1$d is missing</string>
+    <string name="action_group_step_failed">Group stopped at step %1$d (%2$s): %3$s</string>
     <string name="action_no_wifi">Kein WLAN für Gerät konfiguriert</string>
     <string name="action_wifi_unreachable">Zugeordnetes WLAN nicht erreichbar</string>
     <string name="action_android_managed_wifi_not_active">Android-verwaltetes WLAN ist nicht aktiv. Bitte in Android mit dem Ziel-WLAN verbinden.</string>

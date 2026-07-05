@@ -75,6 +75,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.SwitchGroup
 import de.piecha.switchwerk.ui.components.AppMenuLayout
 import de.piecha.switchwerk.ui.components.AppOverflowMenu
 import de.piecha.switchwerk.ui.components.InfoHint
@@ -83,6 +84,7 @@ import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.DeviceWifiProximityStatus
 import de.piecha.switchwerk.viewmodel.DiagnosticListItem
+import de.piecha.switchwerk.viewmodel.DashboardItem
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.ui.asString
@@ -99,7 +101,7 @@ fun StartScreen(
     viewModel: MainViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val devices = uiState.devices.sortedBy { it.sortOrder }
+    val dashboardItems = uiState.dashboardItems.sortedBy { it.sortOrder }
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val screenPadding = if (isLandscape) 12.dp else 24.dp
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -170,7 +172,7 @@ fun StartScreen(
             val textMeasurer = rememberTextMeasurer()
             val switchingText = stringResource(R.string.switching)
             val widgetMinWidth = requiredWidgetMinWidth(
-                devices = devices,
+                items = dashboardItems,
                 actionStates = uiState.deviceActionStates,
                 switchingText = switchingText,
                 actionStyle = MaterialTheme.typography.labelSmall,
@@ -178,7 +180,7 @@ fun StartScreen(
                 density = density
             )
             val canShowLayoutSelector = canShowDashboardLayoutSelector(
-                deviceCount = devices.size,
+                itemCount = dashboardItems.size,
                 availableWidth = maxWidth,
                 widgetMinWidth = widgetMinWidth
             )
@@ -194,7 +196,7 @@ fun StartScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 DashboardHeader(
-                    deviceCount = devices.size,
+                    itemCount = dashboardItems.size,
                     selectedMode = uiState.appSettings.dashboardLayoutMode,
                     isLandscape = isLandscape,
                     showLayoutSelector = canShowLayoutSelector,
@@ -228,33 +230,41 @@ fun StartScreen(
                         1f
                     }
 
-                    if (devices.isEmpty()) {
+                    if (dashboardItems.isEmpty()) {
                         EmptyDeviceList(modifier = Modifier.weight(deviceAreaWeight))
                     } else {
                         when (uiState.appSettings.dashboardLayoutMode) {
-                            DashboardLayoutMode.LIST -> DeviceList(
-                                devices = devices,
+                            DashboardLayoutMode.LIST -> DashboardList(
+                                items = dashboardItems,
                                 actionStates = uiState.deviceActionStates,
                                 wifiProximityStatuses = uiState.wifiProximityStatuses,
                                 runningDeviceId = runningDeviceId,
                                 isActionDetailsExpanded = isActionDetailsExpanded,
                                 onDeviceActionClick = viewModel::executeDeviceAction,
+                                onSwitchGroupActionClick = viewModel::executeSwitchGroupAction,
                                 onCancelDeviceActionClick = viewModel::cancelDeviceAction,
+                                onCancelSwitchGroupActionClick = viewModel::cancelSwitchGroupAction,
                                 onMoveUpClick = viewModel::moveDeviceUp,
                                 onMoveDownClick = viewModel::moveDeviceDown,
+                                onMoveGroupUpClick = viewModel::moveSwitchGroupUp,
+                                onMoveGroupDownClick = viewModel::moveSwitchGroupDown,
                                 modifier = Modifier.weight(deviceAreaWeight)
                             )
 
-                            DashboardLayoutMode.WIDGETS -> DeviceWidgetGrid(
-                                devices = devices,
+                            DashboardLayoutMode.WIDGETS -> DashboardWidgetGrid(
+                                items = dashboardItems,
                                 actionStates = uiState.deviceActionStates,
                                 wifiProximityStatuses = uiState.wifiProximityStatuses,
                                 runningDeviceId = runningDeviceId,
                                 isActionDetailsExpanded = isActionDetailsExpanded,
                                 onDeviceActionClick = viewModel::executeDeviceAction,
+                                onSwitchGroupActionClick = viewModel::executeSwitchGroupAction,
                                 onCancelDeviceActionClick = viewModel::cancelDeviceAction,
+                                onCancelSwitchGroupActionClick = viewModel::cancelSwitchGroupAction,
                                 onMoveUpClick = viewModel::moveDeviceUp,
                                 onMoveDownClick = viewModel::moveDeviceDown,
+                                onMoveGroupUpClick = viewModel::moveSwitchGroupUp,
+                                onMoveGroupDownClick = viewModel::moveSwitchGroupDown,
                                 modifier = Modifier.weight(deviceAreaWeight)
                             )
                         }
@@ -314,7 +324,7 @@ private fun UpdateAvailableBanner(
 
 @Composable
 private fun DashboardHeader(
-    deviceCount: Int,
+    itemCount: Int,
     selectedMode: DashboardLayoutMode,
     isLandscape: Boolean,
     showLayoutSelector: Boolean,
@@ -335,7 +345,7 @@ private fun DashboardHeader(
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = pluralStringResource(R.plurals.devices_found, deviceCount, deviceCount),
+                text = pluralStringResource(R.plurals.dashboard_items_found, itemCount, itemCount),
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1
             )
@@ -374,7 +384,7 @@ private fun DashboardHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = pluralStringResource(R.plurals.devices_found, deviceCount, deviceCount),
+                text = pluralStringResource(R.plurals.dashboard_items_found, itemCount, itemCount),
                 style = MaterialTheme.typography.bodyLarge
             )
             if (showLayoutSelector) {
@@ -437,22 +447,26 @@ private fun EmptyDeviceList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun DeviceList(
-    devices: List<Device>,
+private fun DashboardList(
+    items: List<DashboardItem>,
     actionStates: Map<String, DeviceActionUiState>,
     wifiProximityStatuses: Map<String, DeviceWifiProximityStatus>,
     runningDeviceId: String?,
     isActionDetailsExpanded: Boolean,
     onDeviceActionClick: (Device) -> Unit,
+    onSwitchGroupActionClick: (SwitchGroup) -> Unit,
     onCancelDeviceActionClick: (String) -> Unit,
+    onCancelSwitchGroupActionClick: (String) -> Unit,
     onMoveUpClick: (String) -> Unit,
     onMoveDownClick: (String) -> Unit,
+    onMoveGroupUpClick: (String) -> Unit,
+    onMoveGroupDownClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
 
     LaunchedEffect(runningDeviceId, isActionDetailsExpanded) {
-        val runningDeviceIndex = devices.indexOfFirst { it.id == runningDeviceId }
+        val runningDeviceIndex = items.indexOfFirst { it.key == runningDeviceId }
         if (runningDeviceIndex >= 0) {
             listState.animateScrollToItem(runningDeviceIndex)
         }
@@ -467,20 +481,28 @@ private fun DeviceList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(
-                items = devices,
-                key = { device -> device.id }
-            ) { device ->
-                DeviceCard(
-                    device = device,
-                    actionState = actionStates[device.id],
-                    wifiProximityStatus = wifiProximityStatuses[device.id]
+                items = items,
+                key = { item -> item.key }
+            ) { item ->
+                DashboardCard(
+                    item = item,
+                    actionState = actionStates[item.key],
+                    wifiProximityStatus = wifiProximityStatuses[item.key]
                         ?: DeviceWifiProximityStatus.UNKNOWN,
-                    canMoveUp = devices.indexOf(device) > 0,
-                    canMoveDown = devices.indexOf(device) < devices.lastIndex,
-                    onActionClick = { onDeviceActionClick(device) },
-                    onCancelActionClick = { onCancelDeviceActionClick(device.id) },
-                    onMoveUpClick = { onMoveUpClick(device.id) },
-                    onMoveDownClick = { onMoveDownClick(device.id) }
+                    canMoveUp = items.indexOf(item) > 0,
+                    canMoveDown = items.indexOf(item) < items.lastIndex,
+                    onActionClick = {
+                        item.runAction(onDeviceActionClick, onSwitchGroupActionClick)
+                    },
+                    onCancelActionClick = {
+                        item.cancelAction(onCancelDeviceActionClick, onCancelSwitchGroupActionClick)
+                    },
+                    onMoveUpClick = {
+                        item.moveUp(onMoveUpClick, onMoveGroupUpClick)
+                    },
+                    onMoveDownClick = {
+                        item.moveDown(onMoveDownClick, onMoveGroupDownClick)
+                    }
                 )
             }
         }
@@ -492,22 +514,26 @@ private fun DeviceList(
 }
 
 @Composable
-private fun DeviceWidgetGrid(
-    devices: List<Device>,
+private fun DashboardWidgetGrid(
+    items: List<DashboardItem>,
     actionStates: Map<String, DeviceActionUiState>,
     wifiProximityStatuses: Map<String, DeviceWifiProximityStatus>,
     runningDeviceId: String?,
     isActionDetailsExpanded: Boolean,
     onDeviceActionClick: (Device) -> Unit,
+    onSwitchGroupActionClick: (SwitchGroup) -> Unit,
     onCancelDeviceActionClick: (String) -> Unit,
+    onCancelSwitchGroupActionClick: (String) -> Unit,
     onMoveUpClick: (String) -> Unit,
     onMoveDownClick: (String) -> Unit,
+    onMoveGroupUpClick: (String) -> Unit,
+    onMoveGroupDownClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
     LaunchedEffect(runningDeviceId, isActionDetailsExpanded) {
-        val runningDeviceIndex = devices.indexOfFirst { it.id == runningDeviceId }
+        val runningDeviceIndex = items.indexOfFirst { it.key == runningDeviceId }
         if (runningDeviceIndex >= 0) {
             gridState.animateScrollToItem(runningDeviceIndex)
         }
@@ -518,7 +544,7 @@ private fun DeviceWidgetGrid(
         val density = LocalDensity.current
         val switchingText = stringResource(R.string.switching)
         val adaptiveMinWidth = requiredWidgetMinWidth(
-            devices = devices,
+            items = items,
             actionStates = actionStates,
             switchingText = switchingText,
             actionStyle = MaterialTheme.typography.labelSmall,
@@ -536,20 +562,28 @@ private fun DeviceWidgetGrid(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(
-                items = devices,
-                key = { device -> device.id }
-            ) { device ->
-                DeviceWidget(
-                    device = device,
-                    actionState = actionStates[device.id],
-                    wifiProximityStatus = wifiProximityStatuses[device.id]
+                items = items,
+                key = { item -> item.key }
+            ) { item ->
+                DashboardWidget(
+                    item = item,
+                    actionState = actionStates[item.key],
+                    wifiProximityStatus = wifiProximityStatuses[item.key]
                         ?: DeviceWifiProximityStatus.UNKNOWN,
-                    canMoveUp = devices.indexOf(device) > 0,
-                    canMoveDown = devices.indexOf(device) < devices.lastIndex,
-                    onActionClick = { onDeviceActionClick(device) },
-                    onCancelActionClick = { onCancelDeviceActionClick(device.id) },
-                    onMoveUpClick = { onMoveUpClick(device.id) },
-                    onMoveDownClick = { onMoveDownClick(device.id) }
+                    canMoveUp = items.indexOf(item) > 0,
+                    canMoveDown = items.indexOf(item) < items.lastIndex,
+                    onActionClick = {
+                        item.runAction(onDeviceActionClick, onSwitchGroupActionClick)
+                    },
+                    onCancelActionClick = {
+                        item.cancelAction(onCancelDeviceActionClick, onCancelSwitchGroupActionClick)
+                    },
+                    onMoveUpClick = {
+                        item.moveUp(onMoveUpClick, onMoveGroupUpClick)
+                    },
+                    onMoveDownClick = {
+                        item.moveDown(onMoveDownClick, onMoveGroupDownClick)
+                    }
                 )
             }
         }
@@ -561,8 +595,8 @@ private fun DeviceWidgetGrid(
 }
 
 @Composable
-private fun DeviceWidget(
-    device: Device,
+private fun DashboardWidget(
+    item: DashboardItem,
     actionState: DeviceActionUiState?,
     wifiProximityStatus: DeviceWifiProximityStatus,
     canMoveUp: Boolean,
@@ -582,7 +616,7 @@ private fun DeviceWidget(
             )
         ) {
             DeviceTitle(
-                name = device.name,
+                name = item.name,
                 wifiProximityStatus = wifiProximityStatus,
                 isActionRunning = actionState == DeviceActionUiState.Loading,
                 maxLines = 2,
@@ -593,7 +627,7 @@ private fun DeviceWidget(
             Spacer(modifier = Modifier.height(8.dp))
 
             DeviceActionArea(
-                device = device,
+                item = item,
                 actionState = actionState,
                 canMoveUp = canMoveUp,
                 canMoveDown = canMoveDown,
@@ -684,7 +718,7 @@ private fun DeviceActionFooter(
 
 @Composable
 private fun DeviceActionArea(
-    device: Device,
+    item: DashboardItem,
     actionState: DeviceActionUiState?,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
@@ -725,7 +759,7 @@ private fun DeviceActionArea(
     } else {
         Column(modifier = Modifier.height(78.dp)) {
             DeviceActionButton(
-                device = device,
+                item = item,
                 actionState = actionState,
                 onActionClick = onActionClick,
                 singleLineText = singleLineActionText
@@ -745,7 +779,7 @@ private fun DeviceActionArea(
 
 @Composable
 private fun DeviceActionButton(
-    device: Device,
+    item: DashboardItem,
     actionState: DeviceActionUiState?,
     onActionClick: () -> Unit,
     singleLineText: Boolean = false
@@ -754,11 +788,16 @@ private fun DeviceActionButton(
         DeviceActionUiState.Loading -> stringResource(R.string.switching)
         is DeviceActionUiState.Error -> actionState.message.asString()
         is DeviceActionUiState.Success,
-        null -> device.actionLabel
+        null -> if (item is DashboardItem.SwitchGroupItem && !item.isExecutable) {
+            stringResource(R.string.action_group_empty)
+        } else {
+            item.actionLabel
+        }
     }
     Button(
         onClick = onActionClick,
-        enabled = actionState !is DeviceActionUiState.Loading,
+        enabled = actionState !is DeviceActionUiState.Loading &&
+            (item !is DashboardItem.SwitchGroupItem || item.isExecutable),
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -957,8 +996,8 @@ private fun CollapsedActionDetailsPanel(
 }
 
 @Composable
-private fun DeviceCard(
-    device: Device,
+private fun DashboardCard(
+    item: DashboardItem,
     actionState: DeviceActionUiState?,
     wifiProximityStatus: DeviceWifiProximityStatus,
     canMoveUp: Boolean,
@@ -980,7 +1019,7 @@ private fun DeviceCard(
             )
         ) {
             DeviceTitle(
-                name = device.name,
+                name = item.name,
                 wifiProximityStatus = wifiProximityStatus,
                 isActionRunning = actionState == DeviceActionUiState.Loading,
                 maxLines = 1
@@ -989,7 +1028,7 @@ private fun DeviceCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             DeviceActionArea(
-                device = device,
+                item = item,
                 actionState = actionState,
                 canMoveUp = canMoveUp,
                 canMoveDown = canMoveDown,
@@ -1105,11 +1144,11 @@ private val WidgetCardHorizontalPadding = 16.dp
 private val WidgetButtonHorizontalPadding = 12.dp
 
 private fun canShowDashboardLayoutSelector(
-    deviceCount: Int,
+    itemCount: Int,
     availableWidth: Dp,
     widgetMinWidth: Dp
 ): Boolean {
-    if (deviceCount < 2) {
+    if (itemCount < 2) {
         return true
     }
     val widgetAreaWidth = availableWidth - WidgetGridEndPadding
@@ -1143,18 +1182,18 @@ private fun dashboardLayoutDiagnosticsText(
 }
 
 private fun requiredWidgetMinWidth(
-    devices: List<Device>,
+    items: List<DashboardItem>,
     actionStates: Map<String, DeviceActionUiState>,
     switchingText: String,
     actionStyle: androidx.compose.ui.text.TextStyle,
     textMeasurer: androidx.compose.ui.text.TextMeasurer,
     density: androidx.compose.ui.unit.Density
 ): Dp {
-    val actionTextWidth = devices.minOfOrNull { device ->
-        val actionText = if (actionStates[device.id] == DeviceActionUiState.Loading) {
+    val actionTextWidth = items.minOfOrNull { item ->
+        val actionText = if (actionStates[item.key] == DeviceActionUiState.Loading) {
             switchingText
         } else {
-            device.actionLabel
+            item.actionLabel
         }
         measureTextWidth(actionText, actionStyle, textMeasurer, density)
     } ?: 0.dp
@@ -1162,6 +1201,46 @@ private fun requiredWidgetMinWidth(
     val baseScale = if (density.fontScale < 1f) WidgetCompactScale else density.fontScale
     val scaledBaseMinWidth = WidgetBaseMinWidth * baseScale
     return maxOf(scaledBaseMinWidth, measuredMinWidth)
+}
+
+private fun DashboardItem.runAction(
+    onDeviceActionClick: (Device) -> Unit,
+    onSwitchGroupActionClick: (SwitchGroup) -> Unit
+) {
+    when (this) {
+        is DashboardItem.DeviceItem -> onDeviceActionClick(device)
+        is DashboardItem.SwitchGroupItem -> if (isExecutable) onSwitchGroupActionClick(group)
+    }
+}
+
+private fun DashboardItem.cancelAction(
+    onCancelDeviceActionClick: (String) -> Unit,
+    onCancelSwitchGroupActionClick: (String) -> Unit
+) {
+    when (this) {
+        is DashboardItem.DeviceItem -> onCancelDeviceActionClick(device.id)
+        is DashboardItem.SwitchGroupItem -> onCancelSwitchGroupActionClick(group.id)
+    }
+}
+
+private fun DashboardItem.moveUp(
+    onMoveUpClick: (String) -> Unit,
+    onMoveGroupUpClick: (String) -> Unit
+) {
+    when (this) {
+        is DashboardItem.DeviceItem -> onMoveUpClick(device.id)
+        is DashboardItem.SwitchGroupItem -> onMoveGroupUpClick(group.id)
+    }
+}
+
+private fun DashboardItem.moveDown(
+    onMoveDownClick: (String) -> Unit,
+    onMoveGroupDownClick: (String) -> Unit
+) {
+    when (this) {
+        is DashboardItem.DeviceItem -> onMoveDownClick(device.id)
+        is DashboardItem.SwitchGroupItem -> onMoveGroupDownClick(group.id)
+    }
 }
 
 private fun measureTextWidth(

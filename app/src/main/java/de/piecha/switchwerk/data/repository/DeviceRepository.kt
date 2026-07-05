@@ -8,5 +8,6 @@ interface DeviceRepository {
     suspend fun getDevices(): List<Device>
     suspend fun saveDevice(device: Device)
     suspend fun updateDeviceOrder(deviceIds: List<String>)
+    suspend fun updateDeviceSortOrders(sortOrders: Map<String, Int>)
     suspend fun deleteDevice(deviceId: String)
 }

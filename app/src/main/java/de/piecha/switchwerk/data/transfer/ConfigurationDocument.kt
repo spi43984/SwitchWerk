@@ -4,6 +4,7 @@ data class ConfigurationDocument(
     val schemaVersion: Int,
     val wifiProfiles: List<ConfigurationWifiProfile>,
     val devices: List<ConfigurationDevice>,
+    val switchGroups: List<ConfigurationSwitchGroup> = emptyList(),
     val appSettings: ConfigurationAppSettings? = null
 )
 
@@ -51,4 +52,18 @@ data class ConfigurationDeviceConnection(
     val host: String
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 6
+data class ConfigurationSwitchGroup(
+    val id: String,
+    val name: String,
+    val actionLabel: String,
+    val errorStrategy: String = "ABORT_ON_ERROR",
+    val members: List<ConfigurationSwitchGroupMember>
+)
+
+data class ConfigurationSwitchGroupMember(
+    val id: String,
+    val deviceId: String,
+    val pauseAfterMillis: Long
+)
+
+const val CONFIGURATION_SCHEMA_VERSION = 9

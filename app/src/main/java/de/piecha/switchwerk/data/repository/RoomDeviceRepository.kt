@@ -2,6 +2,7 @@ package de.piecha.switchwerk.data.repository
 
 import de.piecha.switchwerk.data.local.dao.DeviceConnectionDao
 import de.piecha.switchwerk.data.local.dao.DeviceDao
+import de.piecha.switchwerk.data.local.dao.SwitchGroupMemberDao
 import de.piecha.switchwerk.data.local.entity.DeviceConnectionEntity
 import de.piecha.switchwerk.data.local.entity.DeviceEntity
 import de.piecha.switchwerk.domain.model.ApiCall
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.combine
 
 class RoomDeviceRepository(
     private val deviceDao: DeviceDao,
-    private val deviceConnectionDao: DeviceConnectionDao
+    private val deviceConnectionDao: DeviceConnectionDao,
+    private val switchGroupMemberDao: SwitchGroupMemberDao
 ) : DeviceRepository {
 
     override fun observeDevices(): Flow<List<Device>> {
@@ -69,7 +71,14 @@ class RoomDeviceRepository(
             }
     }
 
+    override suspend fun updateDeviceSortOrders(sortOrders: Map<String, Int>) {
+        sortOrders.forEach { (deviceId, sortOrder) ->
+            deviceDao.updateSortOrder(deviceId, sortOrder)
+        }
+    }
+
     override suspend fun deleteDevice(deviceId: String) {
+        switchGroupMemberDao.deleteForDevice(deviceId)
         deviceConnectionDao.deleteForDevice(deviceId)
         deviceDao.deleteById(deviceId)
     }
