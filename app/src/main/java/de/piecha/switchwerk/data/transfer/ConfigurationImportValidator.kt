@@ -7,13 +7,17 @@ import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.SwitchGroupErrorStrategy
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
 import de.piecha.switchwerk.domain.model.WifiProfileSortDirection
 
 class ConfigurationImportValidator {
 
-    fun validate(document: ConfigurationDocument) {
+    fun validate(
+        document: ConfigurationDocument,
+        additionalDeviceIds: Set<String> = emptySet()
+    ) {
         require(document.schemaVersion in 1..CONFIGURATION_SCHEMA_VERSION) {
             "Nicht unterstützte schemaVersion: ${document.schemaVersion}"
         }
@@ -60,6 +64,14 @@ class ConfigurationImportValidator {
         requireUniqueIds(
             ids = document.devices.map { it.id },
             type = "Gerät"
+        )
+        requireUniqueIds(
+            ids = document.switchGroups.map { it.id },
+            type = "Schaltgruppe"
+        )
+        requireUniqueIds(
+            ids = document.switchGroups.flatMap { group -> group.members.map { it.id } },
+            type = "Schaltgruppenmitglied"
         )
         requireUniqueNames(
             names = document.wifiProfiles.map { it.name },
@@ -116,6 +128,29 @@ class ConfigurationImportValidator {
                 requireNotBlank(connection.host, "Hostname/IP")
             }
         }
+
+        val deviceIds = document.devices.map { it.id }.toSet() + additionalDeviceIds
+        document.switchGroups.forEach { group ->
+            requireNotBlank(group.id, "Schaltgruppen-ID")
+            requireNotBlank(group.name, "Schaltgruppenname")
+            requireNotBlank(group.actionLabel, "Schaltgruppen-Button-Beschriftung")
+            require(SwitchGroupErrorStrategy.entries.any { it.name == group.errorStrategy }) {
+                "Nicht unterstützte Fehlerstrategie: ${group.errorStrategy}"
+            }
+            requireUniqueIds(
+                ids = group.members.map { it.id },
+                type = "Mitglied in ${group.name}"
+            )
+            group.members.forEach { member ->
+                requireNotBlank(member.id, "Schaltgruppenmitglied-ID")
+                require(member.deviceId in deviceIds) {
+                    "Schaltgruppe ${group.name} verweist auf ein unbekanntes Gerät"
+                }
+                require(member.pauseAfterMillis in 0L..MAX_PAUSE_MILLIS) {
+                    "Nicht unterstützte Pause in Schaltgruppe ${group.name}: ${member.pauseAfterMillis}"
+                }
+            }
+        }
     }
 
     fun validateMerge(
@@ -156,6 +191,7 @@ class ConfigurationImportValidator {
 
     private companion object {
         val SUPPORTED_SECURITY_TYPES = setOf("WPA2_PSK", "WPA3_SAE")
+        const val MAX_PAUSE_MILLIS = 3_600_000L
     }
 }
 

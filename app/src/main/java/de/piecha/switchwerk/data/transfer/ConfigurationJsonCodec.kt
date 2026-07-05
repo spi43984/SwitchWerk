@@ -5,6 +5,7 @@ import android.util.JsonToken
 import android.util.JsonWriter
 import java.io.StringReader
 import java.io.StringWriter
+import java.util.UUID
 
 class ConfigurationJsonCodec {
 
@@ -83,6 +84,27 @@ class ConfigurationJsonCodec {
                     writer.endObject()
                 }
                 writer.endArray()
+                writer.name("switchGroups")
+                writer.beginArray()
+                document.switchGroups.forEach { group ->
+                    writer.beginObject()
+                    writer.name("id").value(group.id)
+                    writer.name("name").value(group.name)
+                    writer.name("actionLabel").value(group.actionLabel)
+                    writer.name("errorStrategy").value(group.errorStrategy)
+                    writer.name("members")
+                    writer.beginArray()
+                    group.members.forEach { member ->
+                        writer.beginObject()
+                        writer.name("id").value(member.id)
+                        writer.name("deviceId").value(member.deviceId)
+                        writer.name("pauseAfterMillis").value(member.pauseAfterMillis)
+                        writer.endObject()
+                    }
+                    writer.endArray()
+                    writer.endObject()
+                }
+                writer.endArray()
                 writer.endObject()
             }
             output.toString()
@@ -94,6 +116,7 @@ class ConfigurationJsonCodec {
             var schemaVersion: Int? = null
             var wifiProfiles: List<ConfigurationWifiProfile>? = null
             var devices: List<ConfigurationDevice>? = null
+            var switchGroups: List<ConfigurationSwitchGroup> = emptyList()
             var appSettings: ConfigurationAppSettings? = null
 
             reader.beginObject()
@@ -103,6 +126,7 @@ class ConfigurationJsonCodec {
                     "appSettings" -> appSettings = reader.readAppSettings()
                     "wifiProfiles" -> wifiProfiles = reader.readWifiProfiles()
                     "devices" -> devices = reader.readDevices()
+                    "switchGroups" -> switchGroups = reader.readSwitchGroups()
                     else -> reader.skipValue()
                 }
             }
@@ -112,6 +136,7 @@ class ConfigurationJsonCodec {
                 schemaVersion = requireField(schemaVersion, "schemaVersion"),
                 wifiProfiles = requireField(wifiProfiles, "wifiProfiles"),
                 devices = requireField(devices, "devices"),
+                switchGroups = switchGroups,
                 appSettings = appSettings
             )
         }
@@ -320,6 +345,70 @@ class ConfigurationJsonCodec {
         }
         endArray()
         return connections
+    }
+
+    private fun JsonReader.readSwitchGroups(): List<ConfigurationSwitchGroup> {
+        val groups = mutableListOf<ConfigurationSwitchGroup>()
+        beginArray()
+        while (hasNext()) {
+            var id: String? = null
+            var name: String? = null
+            var actionLabel: String? = null
+            var errorStrategy: String? = null
+            var members: List<ConfigurationSwitchGroupMember>? = null
+
+            beginObject()
+            while (hasNext()) {
+                when (nextName()) {
+                    "id" -> id = nextString()
+                    "name" -> name = nextString()
+                    "actionLabel" -> actionLabel = nextString()
+                    "errorStrategy" -> errorStrategy = nextString()
+                    "members" -> members = readSwitchGroupMembers()
+                    else -> skipValue()
+                }
+            }
+            endObject()
+
+            groups += ConfigurationSwitchGroup(
+                id = requireField(id, "switchGroups.id"),
+                name = requireField(name, "switchGroups.name"),
+                actionLabel = requireField(actionLabel, "switchGroups.actionLabel"),
+                errorStrategy = errorStrategy ?: "ABORT_ON_ERROR",
+                members = requireField(members, "switchGroups.members")
+            )
+        }
+        endArray()
+        return groups
+    }
+
+    private fun JsonReader.readSwitchGroupMembers(): List<ConfigurationSwitchGroupMember> {
+        val members = mutableListOf<ConfigurationSwitchGroupMember>()
+        beginArray()
+        while (hasNext()) {
+            var id: String? = null
+            var deviceId: String? = null
+            var pauseAfterMillis: Long? = null
+
+            beginObject()
+            while (hasNext()) {
+                when (nextName()) {
+                    "id" -> id = nextString()
+                    "deviceId" -> deviceId = nextString()
+                    "pauseAfterMillis" -> pauseAfterMillis = nextLong()
+                    else -> skipValue()
+                }
+            }
+            endObject()
+
+            members += ConfigurationSwitchGroupMember(
+                id = id ?: UUID.randomUUID().toString(),
+                deviceId = requireField(deviceId, "switchGroups.members.deviceId"),
+                pauseAfterMillis = pauseAfterMillis ?: 0L
+            )
+        }
+        endArray()
+        return members
     }
 
     private fun <T> requireField(value: T?, fieldName: String): T {

@@ -41,6 +41,9 @@ app/src/main/java/.../
 - Keine Netzwerkaufrufe direkt aus Composables
 - Composables möglichst zustandslos halten
 - Zustand kommt aus dem ViewModel
+- In Listen werden Löschaktionen konsistent über Swipe angeboten. Das gilt
+  auch für Mitglieder von Schaltgruppen; dort kein separater sichtbarer
+  Löschen-Button in der Zeile.
 
 ## ViewModel
 

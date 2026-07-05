@@ -283,7 +283,14 @@ fun SettingsScreen(
         viewModel.cancelDeviceEdit()
     }
 
-    BackHandler(enabled = !uiState.isEditingWifiProfile && !uiState.isEditingDevice) {
+    BackHandler(enabled = uiState.isEditingSwitchGroup) {
+        viewModel.cancelSwitchGroupEdit()
+    }
+
+    BackHandler(
+        enabled = !uiState.isEditingWifiProfile && !uiState.isEditingDevice &&
+            !uiState.isEditingSwitchGroup
+    ) {
         onNavigateBack()
     }
 
@@ -388,6 +395,29 @@ fun SettingsScreen(
                     onMoveConnection = viewModel::moveDeviceConnection,
                     onSaveClick = viewModel::saveDevice,
                     onCancelClick = viewModel::cancelDeviceEdit,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                SettingsSection.GROUPS -> SwitchGroupManagementSection(
+                    groups = uiState.switchGroups,
+                    devices = uiState.devices,
+                    isEditing = uiState.isEditingSwitchGroup,
+                    form = uiState.switchGroupForm,
+                    openSwipeItemId = openSwipeItemId,
+                    onOpenSwipeItem = { openSwipeItemId = it },
+                    onCloseSwipeItem = { openSwipeItemId = null },
+                    onAddClick = { runAfterClosingSwipe(viewModel::startNewSwitchGroup) },
+                    onEditClick = viewModel::startEditSwitchGroup,
+                    onDeleteClick = viewModel::deleteSwitchGroup,
+                    onNameChange = viewModel::updateSwitchGroupName,
+                    onActionLabelChange = viewModel::updateSwitchGroupActionLabel,
+                    onErrorStrategyChange = viewModel::updateSwitchGroupErrorStrategy,
+                    onAddMember = viewModel::addSwitchGroupMember,
+                    onDeleteMember = viewModel::deleteSwitchGroupMember,
+                    onMoveMember = viewModel::moveSwitchGroupMember,
+                    onMemberPauseChange = viewModel::updateSwitchGroupMemberPause,
+                    onSaveClick = viewModel::saveSwitchGroup,
+                    onCancelClick = viewModel::cancelSwitchGroupEdit,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -827,6 +857,7 @@ enum class ImportSource {
 enum class SettingsSection(val titleResourceId: Int) {
     WIFI_PROFILES(R.string.settings_tab_wifi_profiles),
     DEVICES(R.string.settings_tab_devices),
+    GROUPS(R.string.settings_tab_groups),
     SYSTEM(R.string.settings_tab_system),
     BACKUP(R.string.settings_tab_backup)
 }

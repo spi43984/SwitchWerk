@@ -12,6 +12,7 @@ import de.piecha.switchwerk.data.repository.ConfigurationImportSummary
 import de.piecha.switchwerk.data.repository.ConfigurationTransferRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.PreparedConfigurationImport
+import de.piecha.switchwerk.data.repository.SwitchGroupRepository
 import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.data.network.WifiConnectionService
 import de.piecha.switchwerk.data.update.AppUpdateInstallService
@@ -30,6 +31,9 @@ import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
+import de.piecha.switchwerk.domain.model.SwitchGroup
+import de.piecha.switchwerk.domain.model.SwitchGroupErrorStrategy
+import de.piecha.switchwerk.domain.model.SwitchGroupMember
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
 import de.piecha.switchwerk.domain.model.WifiProfileSortCriterion
@@ -45,6 +49,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 data class WifiProfileFormState(
@@ -79,6 +84,22 @@ data class DeviceFormState(
     val shortcutEnabled: Boolean = false
 )
 
+data class SwitchGroupMemberFormState(
+    val id: String,
+    val deviceId: String,
+    val deviceName: String,
+    val pauseAfterMillis: Long = 0L
+)
+
+data class SwitchGroupFormState(
+    val id: String? = null,
+    val name: String = "",
+    val actionLabel: String = "",
+    val sortOrder: Int = 0,
+    val errorStrategy: SwitchGroupErrorStrategy = SwitchGroupErrorStrategy.ABORT_ON_ERROR,
+    val members: List<SwitchGroupMemberFormState> = emptyList()
+)
+
 data class WifiProfileDeletionConfirmation(
     val profile: WifiProfile,
     val affectedDeviceNames: List<String>
@@ -87,10 +108,13 @@ data class WifiProfileDeletionConfirmation(
 data class SettingsUiState(
     val wifiProfiles: List<WifiProfile> = emptyList(),
     val devices: List<Device> = emptyList(),
+    val switchGroups: List<SwitchGroup> = emptyList(),
     val form: WifiProfileFormState = WifiProfileFormState(),
     val deviceForm: DeviceFormState = DeviceFormState(),
+    val switchGroupForm: SwitchGroupFormState = SwitchGroupFormState(),
     val isEditingWifiProfile: Boolean = false,
     val isEditingDevice: Boolean = false,
+    val isEditingSwitchGroup: Boolean = false,
     val wifiProfileDeletionConfirmation: WifiProfileDeletionConfirmation? = null,
     val errorMessage: UiText? = null,
     val statusMessage: UiText? = null,
@@ -106,6 +130,7 @@ data class SettingsUiState(
 class SettingsViewModel(
     private val wifiProfileRepository: WifiProfileRepository,
     private val deviceRepository: DeviceRepository,
+    private val switchGroupRepository: SwitchGroupRepository = EmptySettingsSwitchGroupRepository,
     private val configurationTransferRepository: ConfigurationTransferRepository,
     private val appSettingsRepository: AppSettingsRepository,
     private val wifiConnectionService: WifiConnectionService,
@@ -127,6 +152,7 @@ class SettingsViewModel(
     init {
         observeWifiProfiles()
         observeDevices()
+        observeSwitchGroups()
         observeAppSettings()
         loadCachedUpdateState()
     }
@@ -271,6 +297,7 @@ class SettingsViewModel(
             form = WifiProfileFormState(isPasswordChanged = true),
             isEditingWifiProfile = true,
             isEditingDevice = false,
+            isEditingSwitchGroup = false,
             errorMessage = null
         )
     }
@@ -285,6 +312,7 @@ class SettingsViewModel(
             ),
             isEditingWifiProfile = true,
             isEditingDevice = false,
+            isEditingSwitchGroup = false,
             errorMessage = null
         )
 
@@ -588,6 +616,7 @@ class SettingsViewModel(
             ),
             isEditingDevice = true,
             isEditingWifiProfile = false,
+            isEditingSwitchGroup = false,
             errorMessage = null
         )
     }
@@ -618,6 +647,7 @@ class SettingsViewModel(
             ),
             isEditingDevice = true,
             isEditingWifiProfile = false,
+            isEditingSwitchGroup = false,
             errorMessage = null
         )
     }
@@ -628,6 +658,180 @@ class SettingsViewModel(
             isEditingDevice = false,
             errorMessage = null
         )
+    }
+
+    fun startNewSwitchGroup() {
+        val nextSortOrder = (
+            _uiState.value.devices.map { it.sortOrder } +
+                _uiState.value.switchGroups.map { it.sortOrder }
+        ).maxOrNull()?.plus(1) ?: 0
+        _uiState.value = _uiState.value.copy(
+            switchGroupForm = SwitchGroupFormState(
+                actionLabel = stringProvider.get(R.string.default_group_action_label),
+                sortOrder = nextSortOrder
+            ),
+            isEditingSwitchGroup = true,
+            isEditingWifiProfile = false,
+            isEditingDevice = false,
+            errorMessage = null
+        )
+    }
+
+    fun startEditSwitchGroup(group: SwitchGroup) {
+        _uiState.value = _uiState.value.copy(
+            switchGroupForm = SwitchGroupFormState(
+                id = group.id,
+                name = group.name,
+                actionLabel = group.actionLabel,
+                sortOrder = group.sortOrder,
+                errorStrategy = group.errorStrategy,
+                members = group.members.mapNotNull { member ->
+                    val device = _uiState.value.devices.firstOrNull { it.id == member.deviceId }
+                    device?.let {
+                        SwitchGroupMemberFormState(
+                            id = member.id,
+                            deviceId = it.id,
+                            deviceName = it.name,
+                            pauseAfterMillis = member.pauseAfterMillis
+                        )
+                    }
+                }
+            ),
+            isEditingSwitchGroup = true,
+            isEditingWifiProfile = false,
+            isEditingDevice = false,
+            errorMessage = null
+        )
+    }
+
+    fun cancelSwitchGroupEdit() {
+        _uiState.value = _uiState.value.copy(
+            switchGroupForm = SwitchGroupFormState(),
+            isEditingSwitchGroup = false,
+            errorMessage = null
+        )
+    }
+
+    fun updateSwitchGroupName(name: String) {
+        updateSwitchGroupForm { it.copy(name = name) }
+    }
+
+    fun updateSwitchGroupActionLabel(actionLabel: String) {
+        updateSwitchGroupForm { it.copy(actionLabel = actionLabel) }
+    }
+
+    fun updateSwitchGroupErrorStrategy(errorStrategy: SwitchGroupErrorStrategy) {
+        updateSwitchGroupForm { it.copy(errorStrategy = errorStrategy) }
+    }
+
+    fun addSwitchGroupMember(deviceId: String) {
+        val device = _uiState.value.devices.firstOrNull { it.id == deviceId } ?: return
+        updateSwitchGroupForm {
+            it.copy(
+                members = it.members + SwitchGroupMemberFormState(
+                    id = UUID.randomUUID().toString(),
+                    deviceId = device.id,
+                    deviceName = device.name
+                )
+            )
+        }
+    }
+
+    fun deleteSwitchGroupMember(memberId: String) {
+        updateSwitchGroupForm {
+            it.copy(members = it.members.filterNot { member -> member.id == memberId })
+        }
+    }
+
+    fun moveSwitchGroupMember(memberId: String, targetIndex: Int) {
+        val members = _uiState.value.switchGroupForm.members
+        val currentIndex = members.indexOfFirst { it.id == memberId }
+        if (currentIndex !in members.indices || targetIndex !in members.indices) {
+            return
+        }
+        updateSwitchGroupForm {
+            it.copy(
+                members = members.toMutableList().apply {
+                    add(targetIndex, removeAt(currentIndex))
+                }
+            )
+        }
+    }
+
+    fun updateSwitchGroupMemberPause(memberId: String, pauseAfterMillis: Long) {
+        if (pauseAfterMillis !in SUPPORTED_GROUP_PAUSE_MILLIS) {
+            return
+        }
+        updateSwitchGroupForm {
+            it.copy(
+                members = it.members.map { member ->
+                    if (member.id == memberId) {
+                        member.copy(pauseAfterMillis = pauseAfterMillis)
+                    } else {
+                        member
+                    }
+                }
+            )
+        }
+    }
+
+    fun saveSwitchGroup() {
+        val form = _uiState.value.switchGroupForm
+        val trimmedName = form.name.trim()
+        val trimmedActionLabel = form.actionLabel.trim()
+
+        if (trimmedName.isBlank()) {
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_group_name_empty))
+            return
+        }
+        if (trimmedActionLabel.isBlank()) {
+            _uiState.value = _uiState.value.copy(errorMessage = uiText(R.string.error_button_label_empty))
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                switchGroupRepository.saveSwitchGroup(
+                    SwitchGroup(
+                        id = form.id ?: UUID.randomUUID().toString(),
+                        name = trimmedName,
+                        actionLabel = trimmedActionLabel,
+                        sortOrder = form.sortOrder,
+                        errorStrategy = form.errorStrategy,
+                        members = form.members.mapIndexed { index, member ->
+                            SwitchGroupMember(
+                                id = member.id,
+                                deviceId = member.deviceId,
+                                pauseAfterMillis = member.pauseAfterMillis,
+                                sortOrder = index
+                            )
+                        }
+                    )
+                )
+            }.onSuccess {
+                _uiState.value = _uiState.value.copy(
+                    switchGroupForm = SwitchGroupFormState(),
+                    isEditingSwitchGroup = false,
+                    errorMessage = null
+                )
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = error.toUiText(R.string.error_group_save)
+                )
+            }
+        }
+    }
+
+    fun deleteSwitchGroup(groupId: String) {
+        viewModelScope.launch {
+            runCatching {
+                switchGroupRepository.deleteSwitchGroup(groupId)
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = error.toUiText(R.string.error_group_delete)
+                )
+            }
+        }
     }
 
     fun updateDeviceName(name: String) {
@@ -1005,9 +1209,31 @@ class SettingsViewModel(
     private fun observeDevices() {
         viewModelScope.launch {
             deviceRepository.observeDevices().collect { devices ->
+                val devicesById = devices.associateBy { it.id }
                 _uiState.value = _uiState.value.copy(
                     devices = devices.sortedWith(
                         compareBy<Device, String>(String.CASE_INSENSITIVE_ORDER) { it.name }
+                            .thenBy { it.id }
+                    ),
+                    switchGroupForm = _uiState.value.switchGroupForm.copy(
+                        members = _uiState.value.switchGroupForm.members.mapNotNull { member ->
+                            devicesById[member.deviceId]?.let { device ->
+                                member.copy(deviceName = device.name)
+                            }
+                        }
+                    ),
+                    errorMessage = null
+                )
+            }
+        }
+    }
+
+    private fun observeSwitchGroups() {
+        viewModelScope.launch {
+            switchGroupRepository.observeSwitchGroups().collect { groups ->
+                _uiState.value = _uiState.value.copy(
+                    switchGroups = groups.sortedWith(
+                        compareBy<SwitchGroup, String>(String.CASE_INSENSITIVE_ORDER) { it.name }
                             .thenBy { it.id }
                     ),
                     errorMessage = null
@@ -1077,6 +1303,13 @@ class SettingsViewModel(
         )
     }
 
+    private fun updateSwitchGroupForm(update: (SwitchGroupFormState) -> SwitchGroupFormState) {
+        _uiState.value = _uiState.value.copy(
+            switchGroupForm = update(_uiState.value.switchGroupForm),
+            errorMessage = null
+        )
+    }
+
     private fun String.isValidImportUrl(): Boolean {
         val uri = runCatching { URI(this) }.getOrNull() ?: return false
         return (uri.scheme.equals("http", ignoreCase = true) ||
@@ -1110,5 +1343,21 @@ class SettingsViewModel(
 
     private companion object {
         const val PASSWORD_MASK = "********"
+        const val MAX_GROUP_PAUSE_MILLIS = 3_600_000L
+        val SUPPORTED_GROUP_PAUSE_MILLIS = 0L..MAX_GROUP_PAUSE_MILLIS
     }
+}
+
+private object EmptySettingsSwitchGroupRepository : SwitchGroupRepository {
+    override fun observeSwitchGroups() = flowOf(emptyList<SwitchGroup>())
+
+    override suspend fun getSwitchGroups(): List<SwitchGroup> = emptyList()
+
+    override suspend fun saveSwitchGroup(group: SwitchGroup) = Unit
+
+    override suspend fun updateSwitchGroupOrder(groupIds: List<String>) = Unit
+
+    override suspend fun updateSwitchGroupSortOrders(sortOrders: Map<String, Int>) = Unit
+
+    override suspend fun deleteSwitchGroup(groupId: String) = Unit
 }

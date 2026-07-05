@@ -330,14 +330,82 @@ class ConfigurationImportValidatorTest {
         }
     }
 
+    @Test
+    fun switchGroupMayContainSameDeviceMultipleTimes() {
+        validator.validate(
+            validDocument(
+                switchGroups = listOf(
+                    switchGroup(
+                        members = listOf(
+                            switchGroupMember(id = "member-1", deviceId = "device-1"),
+                            switchGroupMember(id = "member-2", deviceId = "device-1")
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    @Test
+    fun duplicateSwitchGroupMemberIdsAreRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument(
+                    switchGroups = listOf(
+                        switchGroup(
+                            members = listOf(
+                                switchGroupMember(id = "member-1", deviceId = "device-1"),
+                                switchGroupMember(id = "member-1", deviceId = "device-1")
+                            )
+                        )
+                    )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun oneHourSwitchGroupPauseIsAccepted() {
+        validator.validate(
+            validDocument(
+                switchGroups = listOf(
+                    switchGroup(
+                        members = listOf(
+                            switchGroupMember(pauseAfterMillis = 3_600_000L)
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    @Test
+    fun switchGroupPauseAboveOneHourIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument(
+                    switchGroups = listOf(
+                        switchGroup(
+                            members = listOf(
+                                switchGroupMember(pauseAfterMillis = 3_600_001L)
+                            )
+                        )
+                    )
+                )
+            )
+        }
+    }
+
     private fun validDocument(
         wifiProfiles: List<ConfigurationWifiProfile> = listOf(wifiProfile()),
-        devices: List<ConfigurationDevice> = listOf(device())
+        devices: List<ConfigurationDevice> = listOf(device()),
+        switchGroups: List<ConfigurationSwitchGroup> = emptyList()
     ): ConfigurationDocument {
         return ConfigurationDocument(
             schemaVersion = CONFIGURATION_SCHEMA_VERSION,
             wifiProfiles = wifiProfiles,
-            devices = devices
+            devices = devices,
+            switchGroups = switchGroups
         )
     }
 
@@ -388,6 +456,29 @@ class ConfigurationImportValidatorTest {
                     host = "192.168.1.10"
                 )
             )
+        )
+    }
+
+    private fun switchGroup(
+        members: List<ConfigurationSwitchGroupMember> = listOf(switchGroupMember())
+    ): ConfigurationSwitchGroup {
+        return ConfigurationSwitchGroup(
+            id = "group-1",
+            name = "Group",
+            actionLabel = "Run",
+            members = members
+        )
+    }
+
+    private fun switchGroupMember(
+        id: String = "member-1",
+        deviceId: String = "device-1",
+        pauseAfterMillis: Long = 0L
+    ): ConfigurationSwitchGroupMember {
+        return ConfigurationSwitchGroupMember(
+            id = id,
+            deviceId = deviceId,
+            pauseAfterMillis = pauseAfterMillis
         )
     }
 }

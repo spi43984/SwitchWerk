@@ -689,6 +689,8 @@ class SettingsViewModelTest {
 
         override suspend fun updateDeviceOrder(deviceIds: List<String>) = Unit
 
+        override suspend fun updateDeviceSortOrders(sortOrders: Map<String, Int>) = Unit
+
         override suspend fun deleteDevice(deviceId: String) = Unit
     }
 

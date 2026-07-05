@@ -553,6 +553,15 @@ class MainViewModelTest {
             }
         }
 
+        override suspend fun updateDeviceSortOrders(sortOrders: Map<String, Int>) {
+            devicesFlow.value = devicesFlow.value.map { device ->
+                sortOrders[device.id]?.let { device.copy(sortOrder = it) } ?: device
+            }
+            lastDeviceOrder = devicesFlow.value
+                .sortedBy { it.sortOrder }
+                .map { it.id }
+        }
+
         override suspend fun deleteDevice(deviceId: String) = Unit
 
         fun setDevices(devices: List<Device>) {

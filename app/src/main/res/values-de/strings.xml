@@ -22,22 +22,26 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Geräteaktion antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
-    <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• System: Darstellung, Updates, Aktionsdetails und externe Intents\n• Konfigurationen: Konfiguration exportieren oder importieren</string>
+    <string name="dashboard_info">• Geräteaktion oder Schaltgruppe antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Dashboard-Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Leere Schaltgruppen werden angezeigt, können aber nicht ausgeführt werden\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
+    <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• Gruppen: mehrere bestehende Geräteaktionen nacheinander ausführen\n• System: Darstellung, Updates, Aktionsdetails und externe Intents\n• Konfigurationen: Konfiguration exportieren oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden\n• Externe Intents erlauben oder sperren</string>
-    <string name="backup_info">• Export sichert WLAN-Profile, Geräte und übertragbare App-Einstellungen\n• Sprache, Darstellung, WLAN-Profil-Sortierung und Freigabe externer Intents werden übertragen\n• Der Zustand des Einrichtungs-Assistenten bleibt lokal\n• Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt\n• Passwörter nur bewusst ohne oder mit Passwortwerten auswählen\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
+    <string name="backup_info">• Export sichert WLAN-Profile, Geräte, Schaltgruppen und übertragbare App-Einstellungen\n• Gruppenmitglieder, Reihenfolge und Pausen werden übertragen\n• Sprache, Darstellung, WLAN-Profil-Sortierung und Freigabe externer Intents werden übertragen\n• Der Zustand des Einrichtungs-Assistenten bleibt lokal\n• Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt\n• Passwörter nur bewusst ohne oder mit Passwortwerten auswählen\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
     <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
     <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /relay/0?turn=on</string>
     <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
     <string name="wifi_profiles_info_title">WLAN-Profile verwalten</string>
     <string name="devices_info_title">Geräte verwalten</string>
+    <string name="groups_info_title">Schaltgruppen verwalten</string>
+    <string name="groups_info">• Gruppen führen bestehende Geräteaktionen nacheinander aus\n• Dasselbe Gerät kann mehrfach hinzugefügt werden\n• Leere Gruppen sind im Dashboard sichtbar, aber nicht ausführbar\n• Mit Pfeilen wird die Reihenfolge der Mitglieder festgelegt\n• Die Pause gilt nach der jeweiligen Geräteaktion</string>
     <string name="list_interaction_info">• + legt einen neuen Eintrag an\n• Eintrag antippen zum Bearbeiten\n• Nach links oder rechts wischen zum Löschen\n• Löschen anschließend bestätigen</string>
     <string name="wifi_profile_dialog_info_title">WLAN-Profil</string>
     <string name="wifi_profile_dialog_info">• SSID des Ziel-WLANs eintragen\n• Name muss eindeutig sein\n• Passwort bleibt verschlüsselt auf dem Gerät</string>
     <string name="device_dialog_info_title">Gerät</string>
     <string name="device_dialog_info">• Namen und Button-Beschriftung festlegen\n• Aktion optional als App-Shortcut anbieten\n• Android zeigt höchstens vier aktivierte Shortcuts gemäß Dashboard-Reihenfolge\n• HTTP oder HTTPS wählen\n• HTTP/RPC-Methode und -Pfad eintragen\n• Für POST optional Request-Body und Content-Type wählen\n• WLAN-Zuordnungen bestimmen die Verbindungsreihenfolge</string>
+    <string name="group_dialog_info_title">Schaltgruppe</string>
+    <string name="group_dialog_info">• Namen und Button-Beschriftung festlegen\n• Dashboard-Reihenfolge wird im Dashboard mit Pfeilen geändert\n• Mit dem Fehlerschalter festlegen, ob die Gruppe beim ersten Fehler stoppt oder nach Fehlern weiterläuft\n• Bestehende Geräte als Mitglieder hinzufügen; dasselbe Gerät darf mehrfach vorkommen\n• Mitglieder laufen von oben nach unten\n• Die Pause wird nach der jeweiligen Geräteaktion angewendet\n• Eigene Pausen nutzen HH:MM:SS.mmm und sind auf 1 Stunde begrenzt</string>
     <string name="app_shortcut">App-Shortcut</string>
     <string name="app_shortcut_description">Geräteaktion beim langen Drücken auf das App-Symbol anbieten. Android zeigt höchstens vier ausgewählte Aktionen.</string>
     <string name="help_shortcuts_title">App-Shortcuts</string>
@@ -62,11 +66,11 @@
     <string name="about_license">Lizenz: GNU AGPL-3.0-or-later</string>
     <string name="open_github_project">GitHub-Projekt öffnen</string>
     <string name="help_getting_started_title">Schnellstart</string>
-    <string name="help_getting_started_text">• Bestehende Konfiguration: Einstellungen → Konfigurationen öffnen und Konfiguration importieren\n• Manuelle Einrichtung 1: In Einstellungen → WLAN-Profile die WLANs anlegen, mit denen sich SwitchWerk verbinden soll\n• Manuelle Einrichtung 2: In Einstellungen → Geräte Geräte anlegen und einem WLAN-Profil zuordnen\n• Im Dashboard die konfigurierten Aktionen auslösen</string>
+    <string name="help_getting_started_text">• Bestehende Konfiguration: Einstellungen → Konfigurationen öffnen und Konfiguration importieren\n• Manuelle Einrichtung 1: In Einstellungen → WLAN-Profile die WLANs anlegen, mit denen sich SwitchWerk verbinden soll\n• Manuelle Einrichtung 2: In Einstellungen → Geräte Geräte anlegen und einem WLAN-Profil zuordnen\n• Optional: Unter Einstellungen → Gruppen Schaltgruppen anlegen\n• Im Dashboard die konfigurierten Aktionen auslösen</string>
     <string name="help_connection_title">Verbindung</string>
     <string name="help_connection_text">• Der Statuspunkt bestätigt eine WLAN-Verbindung, nicht die physische WLAN-Nähe\n• Grün: WLAN-Verbindung bestätigt\n• Rot: Android konnte die konkrete WLAN-Anfrage nicht verbinden\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID allein bestätigt keine Verbindung\n• X rechts unten bricht eine laufende Aktion und ihre WLAN-Anfrage ab\n• Androids Systemdialog kann nicht durch SwitchWerk beendet werden\n• Geräte-AP kann Internetzugang unterbrechen\n• HTTP-Fehler kommen vom Gerät</string>
     <string name="help_import_title">Konfigurationen sichern und laden</string>
-    <string name="help_import_text">• Konfigurationen nur aus vertrauenswürdigen Quellen importieren\n• WLAN-Profile, Geräte, Sprache, Darstellung, WLAN-Profil-Sortierung und Freigabe externer Intents können übernommen werden\n• Der Zustand des Einrichtungs-Assistenten bleibt lokal\n• Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt\n• Passwortimport und Passwortexport müssen vor jeder Aktion bewusst gewählt werden: links ohne Passwörter, rechts mit Passwörtern\n• In der Mittelposition bleibt die jeweilige Aktion deaktiviert\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
+    <string name="help_import_text">• Konfigurationen nur aus vertrauenswürdigen Quellen importieren\n• WLAN-Profile, Geräte, Schaltgruppen, Sprache, Darstellung, WLAN-Profil-Sortierung und Freigabe externer Intents können übernommen werden\n• Schaltgruppen dürfen nur auf vorhandene oder importierte Geräte verweisen; ein Gerät darf mehrfach vorkommen\n• Der Zustand des Einrichtungs-Assistenten bleibt lokal\n• Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt\n• Passwortimport und Passwortexport müssen vor jeder Aktion bewusst gewählt werden: links ohne Passwörter, rechts mit Passwörtern\n• In der Mittelposition bleibt die jeweilige Aktion deaktiviert\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
     <string name="help_privacy_title">Datenschutz</string>
     <string name="help_privacy_text">• ausschließlich lokal\n• keine Konten, Cloud oder Tracking\n• WLAN- und Standortrechte nur für WLAN-Funktionen</string>
     <string name="help_updates_title">Updates</string>
@@ -123,6 +127,7 @@
 
     <string name="settings_tab_wifi_profiles">WLAN-Profile</string>
     <string name="settings_tab_devices">Geräte</string>
+    <string name="settings_tab_groups">Gruppen</string>
     <string name="settings_tab_system">System</string>
     <string name="settings_tab_backup">Konfigurationen</string>
     <string name="more_tabs_left">Weitere Bereiche links</string>
@@ -150,6 +155,10 @@
     <plurals name="devices_found">
         <item quantity="one">%1$d Gerät gefunden</item>
         <item quantity="other">%1$d Geräte gefunden</item>
+    </plurals>
+    <plurals name="dashboard_items_found">
+        <item quantity="one">%1$d Dashboard-Eintrag</item>
+        <item quantity="other">%1$d Dashboard-Einträge</item>
     </plurals>
     <string name="layout_list">Liste</string>
     <string name="layout_widgets">Widgets</string>
@@ -187,6 +196,36 @@
     <string name="move_wifi_assignment_up">WLAN-Zuordnung nach oben verschieben</string>
     <string name="move_wifi_assignment_down">WLAN-Zuordnung nach unten verschieben</string>
     <string name="no_more_wifi_profiles">Es sind keine weiteren WLAN-Profile verfügbar.</string>
+
+    <string name="switch_groups">Schaltgruppen</string>
+    <string name="add_group">Gruppe hinzufügen</string>
+    <string name="edit_group">Gruppe bearbeiten</string>
+    <string name="delete_group">Gruppe löschen</string>
+    <string name="delete_group_confirmation">Schaltgruppe %1$s wirklich löschen?</string>
+    <string name="no_groups_configured">Keine Schaltgruppen konfiguriert.</string>
+    <string name="group_member_count">%1$d Mitglieder</string>
+    <string name="group_error_strategy">Fehlerbehandlung</string>
+    <string name="group_error_strategy_abort">Aus: Gruppe beim ersten Fehler abbrechen</string>
+    <string name="group_error_strategy_continue">An: Nach Fehlern weiter ausführen</string>
+    <string name="group_members">Mitglieder</string>
+    <string name="add_group_member">Mitglied hinzufügen</string>
+    <string name="delete_group_member">Mitglied entfernen</string>
+    <string name="delete_group_member_confirmation">%1$s aus dieser Gruppe entfernen?</string>
+    <string name="no_group_members">Noch keine Mitglieder. Über + kannst du bestehende Geräte hinzufügen.</string>
+    <string name="group_order_hint">Mit den Pfeilen sortieren. Die Gruppe läuft von oben nach unten.</string>
+    <string name="group_pause_after">Pause nach Aktion: %1$s</string>
+    <string name="move_group_member_up">Gruppenmitglied nach oben verschieben</string>
+    <string name="move_group_member_down">Gruppenmitglied nach unten verschieben</string>
+    <string name="no_devices_for_group">Es sind keine Geräte konfiguriert.</string>
+    <string name="pause_0_ms">0 ms</string>
+    <string name="pause_500_ms">500 ms</string>
+    <string name="pause_1_s">1 s</string>
+    <string name="pause_2_s">2 s</string>
+    <string name="pause_custom">Eigene</string>
+    <string name="pause_custom_title">Eigene Pause</string>
+    <string name="pause_custom_label">Pause als HH:MM:SS.mmm</string>
+    <string name="pause_custom_hint">Erlaubter Bereich: 00:00:00.000 bis 01:00:00.000.</string>
+    <string name="selected_pause">✓ %1$s</string>
 
     <string name="name_and_ssid">Name\nSSID</string>
     <string name="add_wifi_profile">WLAN-Profil hinzufügen</string>
@@ -284,6 +323,7 @@
     <string name="error_invalid_qr_url">QR-Code enthält keine gültige HTTP/HTTPS-URL</string>
     <string name="error_camera_permission">Kamera-Berechtigung wird zum Scannen des QR-Codes benötigt</string>
     <string name="default_action_label">Schalten</string>
+    <string name="default_group_action_label">Gruppe starten</string>
     <string name="unknown_wifi">Unbekanntes WLAN</string>
     <string name="error_host_empty">Hostname/IP darf nicht leer sein</string>
     <string name="error_wifi_already_assigned">Dieses WLAN ist bereits zugeordnet</string>
@@ -296,6 +336,9 @@
     <string name="error_device_save">Gerät konnte nicht gespeichert werden</string>
     <string name="error_device_delete">Gerät konnte nicht gelöscht werden</string>
     <string name="error_device_order">Gerätereihenfolge konnte nicht geändert werden</string>
+    <string name="error_group_name_empty">Schaltgruppenname darf nicht leer sein</string>
+    <string name="error_group_save">Schaltgruppe konnte nicht gespeichert werden</string>
+    <string name="error_group_delete">Schaltgruppe konnte nicht gelöscht werden</string>
     <string name="error_import_prepare">Import konnte nicht vorbereitet werden</string>
     <string name="configuration_imported">Konfiguration wurde importiert</string>
     <string name="error_configuration_import">Konfiguration konnte nicht importiert werden</string>
@@ -332,7 +375,18 @@
     <string name="diagnostic_timeout_dns">Timeout bei der DNS-Auflösung</string>
     <string name="diagnostic_timeout_http">Timeout beim HTTP/RPC-Aufruf</string>
     <string name="diagnostic_action_completed">Geräteaktion abgeschlossen</string>
+    <string name="diagnostic_group_started">Schaltgruppe „%1$s“ gestartet</string>
+    <string name="diagnostic_group_member_started">Gruppenmitglied %1$d von %2$d gestartet: %3$s</string>
+    <string name="diagnostic_group_member_succeeded">Gruppenmitglied %1$d von %2$d abgeschlossen: %3$s</string>
+    <string name="diagnostic_group_member_failed">Gruppenmitglied %1$d von %2$d fehlgeschlagen: %3$s</string>
+    <string name="diagnostic_group_pause">Pause: %1$s</string>
+    <string name="diagnostic_group_completed">Schaltgruppe abgeschlossen</string>
     <string name="action_success">Erfolg</string>
+    <string name="action_group_success">Gruppe abgeschlossen</string>
+    <string name="action_group_success_with_failures">Gruppe mit %1$d Fehlern abgeschlossen</string>
+    <string name="action_group_empty">Keine Geräte in Gruppe</string>
+    <string name="action_group_missing_device">Gruppe gestoppt: Gerät für Schritt %1$d fehlt</string>
+    <string name="action_group_step_failed">Gruppe bei Schritt %1$d (%2$s) gestoppt: %3$s</string>
     <string name="action_no_wifi">Kein WLAN für Gerät konfiguriert</string>
     <string name="action_wifi_unreachable">Zugeordnetes WLAN nicht verfügbar</string>
     <string name="action_android_managed_wifi_not_active">Android-verwaltetes WLAN ist nicht aktiv. Bitte in Android mit dem Ziel-WLAN verbinden.</string>
