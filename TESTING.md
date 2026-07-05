@@ -10,6 +10,31 @@ GitHub Actions prüft Android-Änderungen nur noch im Pull Request. Vor einer
 Veröffentlichung auf dem Ubuntu-Host ausführen. Die Variante für Build und
 Installation muss zur aktuell auf dem Testgerät installierten Variante passen.
 
+Codex soll dem Benutzer nicht automatisch immer den vollständigen Block mit
+`clean` ausgeben. Stattdessen sollen die Befehle passend zur Situation gewählt
+werden:
+
+- Schnelle Iteration nach kleinen Code- oder Textänderungen:
+
+      ./gradlew testDebugUnitTest
+      ./gradlew lintDebug
+
+- Android-Integration, Manifest, Widget, Launcher, Installation oder
+  gerätespezifisches Verhalten zusätzlich ohne `clean` bauen und installieren:
+
+      ./gradlew assembleDebug
+      ./gradlew installDebug
+
+- Release-nahe Prüfung ohne vollständigen Neuaufbau:
+
+      ./gradlew lintRelease
+      ./gradlew testDebugUnitTest
+      ./gradlew assembleRelease
+      ./gradlew installRelease
+
+- Vollständige Prüfung vor Veröffentlichung oder bei unklaren Build-Problemen
+  einmalig mit `clean` ausführen.
+
 Debug:
 
     ./gradlew lintDebug

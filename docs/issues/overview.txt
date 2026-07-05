@@ -110,8 +110,8 @@ es verändert die Priorisierungslogik nicht.
 
 1. 081 Homescreen Widgets
 2. 073 Farbige Geräte
-3. 076 Templates
-4. 075 Schnellkacheln (Backlog)
+3. 075 Schnellkacheln (Backlog)
+4. 076 Templates (Backlog)
 5. 024 Authenticated Import Sources Backlog
 6. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
 7. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)

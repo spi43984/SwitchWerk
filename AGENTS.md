@@ -194,8 +194,23 @@ Nicht erlaubt ohne ausdrückliche Freigabe:
 - GitHub-Issue schließen
 - Branch löschen
 
+Codex soll dem Benutzer passende, möglichst schnelle Prüfbefehle nennen und
+nicht automatisch immer den vollständigen Block mit `clean` ausgeben. Für
+schnelle Iterationen reichen oft `testDebugUnitTest` und `lintDebug`; bei
+Android-Integration, Manifest, Widget, Launcher oder Installation zusätzlich
+ohne `clean` bauen und installieren. Der vollständige Block mit `clean` ist vor
+Veröffentlichung oder bei unklaren Build-Problemen sinnvoll.
+
+Der Benutzer testet standardmäßig die Release-Variante. Nach implementierten
+Code-, UI-, Android-Integrations- oder Widget-Änderungen gibt Codex deshalb im
+Abschluss automatisch die passenden vollständigen Release-Befehle aus. Für den
+schnellen Geräte-Test sind das normalerweise `./gradlew assembleRelease` und
+`./gradlew installRelease`, jeweils als eigene direkt kopierbare Befehlszeile
+und ohne `clean`. Debug-Befehle nur nennen, wenn der Benutzer ausdrücklich die
+Debug-Variante testet oder die Release-Variante technisch ungeeignet ist.
+
 Mindestens auf dem Host zu prüfen. Codex bietet abhängig von der aktuell auf dem
-Testgerät installierten Variante den passenden vollständigen Block an.
+Testgerät installierten Variante passende vollständige Copy-&-Paste-Befehle an.
 
 Debug:
 
