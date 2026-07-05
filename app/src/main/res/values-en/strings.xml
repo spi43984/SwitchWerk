@@ -75,6 +75,24 @@
     <string name="help_updates_text">• Release updates are checked through the official GitHub project\n• GitHub release notes open the release page in the browser\n• Automatic checks run at most once per day\n• APK download and installation start only after user action</string>
     <string name="help_privacy_title">Permissions and privacy</string>
     <string name="help_privacy_text">• Local operation only\n• No accounts, cloud, or tracking\n• Wi-Fi and location permissions only for Wi-Fi features</string>
+    <string name="setup_wizard_title">Setup Wizard</string>
+    <string name="setup_wizard_return_hint">When you open a linked page from this wizard, Back returns here until you close the wizard with one of the buttons at the bottom.</string>
+    <string name="setup_wizard_intro_title">Introduction</string>
+    <string name="setup_wizard_intro_text">SwitchWerk switches Wi-Fi devices that are not part of another network and cannot be reached through it.</string>
+    <string name="setup_wizard_intro_steps">1. In Settings → Wi-Fi Profiles, configure the Wi-Fi networks SwitchWerk should connect to.\n2. In Settings → Devices, create devices and assign them to a Wi-Fi profile.\n3. On the app home screen (Dashboard), trigger the configured actions.</string>
+    <string name="setup_wizard_status_lights_text">The colored LED-style indicators show the last known connection status: green means confirmed, red means the connection failed, and gray means unknown or not assigned. Treat them as guidance only, because Android policies can limit Wi-Fi detection and connection feedback.</string>
+    <string name="setup_wizard_import_title">Do you want to import an existing configuration?</string>
+    <string name="setup_wizard_import_text">Open Configurations if you want to load a prepared file, URL or QR code.</string>
+    <string name="setup_wizard_manual_title">Do you want to set up devices yourself?</string>
+    <string name="setup_wizard_manual_text">Use the three steps in order if you want to create Wi-Fi profiles and devices manually.</string>
+    <string name="setup_wizard_open_backup">Import Configuration</string>
+    <string name="setup_wizard_open_wifi_profiles">1. Set up Wi-Fi Profiles</string>
+    <string name="setup_wizard_open_devices">2. Set up Devices</string>
+    <string name="setup_wizard_open_dashboard">3. Dashboard</string>
+    <string name="setup_wizard_skip">Skip</string>
+    <string name="setup_wizard_do_not_show_again">Do not show again</string>
+    <string name="setup_wizard_show_again">Show Setup Wizard again</string>
+    <string name="setup_wizard_system_title">Setup Wizard</string>
 
     <string name="settings_tab_wifi_profiles">Wi-Fi profiles</string>
     <string name="settings_tab_devices">Devices</string>

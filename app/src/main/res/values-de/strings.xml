@@ -22,15 +22,15 @@
     <string name="ok">OK</string>
     <string name="show_information">Information anzeigen</string>
     <string name="dashboard_info_title">Dashboard</string>
-    <string name="dashboard_info">• Geräteaktion oder Schaltgruppe antippen zum Ausführen\n• Listen- oder Widgetansicht wählen\n• Pfeile ändern die Dashboard-Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Leere Schaltgruppen werden angezeigt, können aber nicht ausgeführt werden\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
+    <string name="dashboard_info">• Geräteaktion oder Schaltgruppe antippen zum Ausführen\n• Listen- oder Widgetansicht wählen, wenn genügend Platz für lesbare Widgets vorhanden ist\n• Pfeile ändern die Dashboard-Reihenfolge\n• X rechts unten bricht eine laufende Aktion ab\n• Leere Schaltgruppen werden angezeigt, können aber nicht ausgeführt werden\n• Aktionsdetails: kompakte Leiste antippen zum Öffnen, Titel antippen zum Minimieren\n• Grün: WLAN-Verbindung bestätigt\n• Rot: konkrete WLAN-Verbindung fehlgeschlagen\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID bestätigt keine Verbindung\n• Menü öffnet Einstellungen, Updates, Hilfe und Über SwitchWerk</string>
     <string name="settings_info">• WLAN-Profile: Zugangsdaten verwalten\n• Geräte: Aktionen und WLAN-Zuordnungen festlegen\n• Gruppen: mehrere bestehende Geräteaktionen nacheinander ausführen\n• System: Darstellung, Updates, Aktionsdetails und externe Intents\n• Konfigurationen: Konfiguration exportieren oder importieren</string>
     <string name="system_info_title">System</string>
     <string name="system_info">• Darstellung und Sprache wählen\n• Updates prüfen und GitHub Release Notes öffnen\n• Aktionsdetails ein- oder ausblenden\n• Externe Intents erlauben oder sperren</string>
     <string name="backup_info">• Export sichert WLAN-Profile, Geräte, Schaltgruppen und übertragbare App-Einstellungen\n• Gruppenmitglieder, Reihenfolge und Pausen werden übertragen\n• Sprache, Darstellung, WLAN-Profil-Sortierung und Freigabe externer Intents werden übertragen\n• Der Zustand des Einrichtungs-Assistenten bleibt lokal\n• Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt\n• Passwörter nur bewusst ohne oder mit Passwortwerten auswählen\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
     <string name="password_storage_info">• verschlüsselt auf diesem Gerät gespeichert\n• keine Cloud-Übertragung\n• nie in Aktionsdetails</string>
-    <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1\n• kein Internet erforderlich</string>
+    <string name="hostname_ip_info">• lokale Adresse im zugeordneten WLAN\n• Beispiel: 192.168.33.1 oder ein lokal aufgelöster Hostname\n• kein Internet erforderlich</string>
     <string name="api_call_info">• wird an die lokale Geräteadresse angehängt\n• nur unterstützte Gerätepfade verwenden\n• POST kann einen optionalen Request-Body mit Content-Type senden\n• Beispiel: /relay/0?turn=on</string>
-    <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
+    <string name="action_details_info">• zeigt WLAN-, Timeout- und HTTP-Status\n• Layoutwerte bleiben als ältester scrollbarer Protokolleintrag verfügbar\n• X rechts unten bricht die laufende Aktion ab\n• kompakte Leiste antippen zum Öffnen\n• Titel Aktionsdetails im geöffneten Bereich antippen zum Minimieren\n• nur lokaler Ablauf\n• keine Passwörter im Protokoll</string>
     <string name="wifi_profiles_info_title">WLAN-Profile verwalten</string>
     <string name="devices_info_title">Geräte verwalten</string>
     <string name="groups_info_title">Schaltgruppen verwalten</string>
@@ -60,14 +60,14 @@
     <string name="wifi_assignment_dialog_info_title">WLAN-Zuordnung</string>
     <string name="wifi_assignment_dialog_info">• WLAN-Profil für das Gerät auswählen\n• lokale Geräteadresse eintragen\n• kein Internetzugang erforderlich</string>
     <string name="about_switchwerk">Über SwitchWerk</string>
-    <string name="about_description">SwitchWerk schaltet WLAN-Geräte, die nicht Teil anderer Netzwerke und darüber erreichbar sind. Sofern diese Geräte ein eigenes kleines WLAN aufspannen, kann SwitchWerk sich mit diesem verbinden und Aktionen auslösen. Dazu ist die Kenntnis erforderlich, welcher Art Aktionen diese Geräte unterstützen - Informationen dazu finden sich üblicherweise beim Hersteller oder entsprechenden Internetforen.\n\nDie Konfiguration bleibt auf diesem Gerät. SwitchWerk arbeitet lokal und benötigt keine Konten, Cloud oder Tracking.</string>
+    <string name="about_description">SwitchWerk schaltet WLAN-Geräte, die nicht Teil anderer Netzwerke und darüber nicht erreichbar sind. Sofern diese Geräte ein eigenes kleines WLAN aufspannen, kann SwitchWerk sich mit diesem verbinden und Aktionen auslösen. Dazu ist die Kenntnis erforderlich, welcher Art Aktionen diese Geräte unterstützen - Informationen dazu finden sich üblicherweise beim Hersteller oder entsprechenden Internetforen.\n\nDie Konfiguration bleibt auf diesem Gerät. SwitchWerk arbeitet lokal und benötigt keine Konten, Cloud oder Tracking.</string>
     <string name="version_value">Version %1$s</string>
     <string name="about_author">Entwickelt von Sebastian Piecha</string>
     <string name="about_license">Lizenz: GNU AGPL-3.0-or-later</string>
     <string name="open_github_project">GitHub-Projekt öffnen</string>
     <string name="help_getting_started_title">Schnellstart</string>
     <string name="help_getting_started_text">• Bestehende Konfiguration: Einstellungen → Konfigurationen öffnen und Konfiguration importieren\n• Manuelle Einrichtung 1: In Einstellungen → WLAN-Profile die WLANs anlegen, mit denen sich SwitchWerk verbinden soll\n• Manuelle Einrichtung 2: In Einstellungen → Geräte Geräte anlegen und einem WLAN-Profil zuordnen\n• Optional: Unter Einstellungen → Gruppen Schaltgruppen anlegen\n• Im Dashboard die konfigurierten Aktionen auslösen</string>
-    <string name="help_connection_title">Verbindung</string>
+    <string name="help_connection_title">Verbindung und Fehlerbehebung</string>
     <string name="help_connection_text">• Der Statuspunkt bestätigt eine WLAN-Verbindung, nicht die physische WLAN-Nähe\n• Grün: WLAN-Verbindung bestätigt\n• Rot: Android konnte die konkrete WLAN-Anfrage nicht verbinden\n• Grau: WLAN noch nicht bestätigt, keine Zuordnung oder Erkennung nicht verfügbar\n• Eine sichtbare SSID allein bestätigt keine Verbindung\n• X rechts unten bricht eine laufende Aktion und ihre WLAN-Anfrage ab\n• Androids Systemdialog kann nicht durch SwitchWerk beendet werden\n• Geräte-AP kann Internetzugang unterbrechen\n• HTTP-Fehler kommen vom Gerät</string>
     <string name="help_import_title">Konfigurationen sichern und laden</string>
     <string name="help_import_text">• Konfigurationen nur aus vertrauenswürdigen Quellen importieren\n• WLAN-Profile, Geräte, Schaltgruppen, Sprache, Darstellung, WLAN-Profil-Sortierung und Freigabe externer Intents können übernommen werden\n• Schaltgruppen dürfen nur auf vorhandene oder importierte Geräte verweisen; ein Gerät darf mehrfach vorkommen\n• Der Zustand des Einrichtungs-Assistenten bleibt lokal\n• Änderungen der Intent-Freigabe werden vor der Importbestätigung angezeigt\n• Passwortimport und Passwortexport müssen vor jeder Aktion bewusst gewählt werden: links ohne Passwörter, rechts mit Passwörtern\n• In der Mittelposition bleibt die jeweilige Aktion deaktiviert\n• Die Passwort-Auswahl gilt nur für die nächste Aktion und wird danach zurückgesetzt</string>
@@ -78,7 +78,7 @@
     <string name="setup_wizard_title">Einrichtungs-Assistent</string>
     <string name="setup_wizard_return_hint">Wenn du aus diesem Assistenten eine verlinkte Seite öffnest, führt Zurück wieder hierher, bis du den Assistenten über einen der unteren Buttons schließt.</string>
     <string name="setup_wizard_intro_title">Einführung</string>
-    <string name="setup_wizard_intro_text">SwitchWerk schaltet WLAN-Geräte, die nicht Teil anderer Netzwerke und darüber erreichbar sind.</string>
+    <string name="setup_wizard_intro_text">SwitchWerk schaltet WLAN-Geräte, die nicht Teil eines anderen Netzwerks und darüber nicht erreichbar sind.</string>
     <string name="setup_wizard_intro_steps">1. Im Menü Einstellungen → WLAN-Profile werden die WLANs eingerichtet, mit denen sich SwitchWerk verbinden soll.\n2. Im Menü Einstellungen → Geräte werden die Geräte angelegt und einem WLAN-Profil zugeordnet.\n3. Auf der Hauptseite der App (Dashboard) können anschließend die konfigurierten Aktionen ausgelöst werden.</string>
     <string name="setup_wizard_status_lights_text">Die farbigen LED-Anzeigen zeigen den zuletzt bekannten Verbindungsstatus: Grün bedeutet bestätigt, Rot bedeutet fehlgeschlagen, Grau bedeutet unbekannt oder nicht zugeordnet. Verlasse dich nicht zwingend darauf, weil Androids Richtlinien die WLAN-Erkennung und Rückmeldungen zur Verbindung einschränken können.</string>
     <string name="setup_wizard_import_title">Möchtest du eine bestehende Konfiguration importieren?</string>
@@ -151,6 +151,9 @@
     <string name="action_details_sort_order">Sortierung Aktionsdetails</string>
     <string name="newest_first">Neueste oben</string>
     <string name="newest_last">Neueste unten</string>
+    <string name="dashboard_layout_diagnostics">Layout: Bildschirm %1$d dp, Dashboard %2$d dp, Schrift %3$.2f, Widget min. %4$d dp, Umschaltung %5$s</string>
+    <string name="dashboard_layout_selector_visible">sichtbar</string>
+    <string name="dashboard_layout_selector_hidden">ausgeblendet</string>
 
     <plurals name="devices_found">
         <item quantity="one">%1$d Gerät gefunden</item>
