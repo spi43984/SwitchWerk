@@ -28,8 +28,8 @@ Stand: 5. Juli 2026
 
 ## Nächster Stand
 
-- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 073
-  "Farbige Geräte".
+- Nächstes offenes Issue nach `docs/issues/overview.txt`: Issue 081
+  "Homescreen Widgets".
 - Weitere Reihenfolge und Status ausschließlich aus
   `docs/issues/overview.txt` entnehmen.
 
