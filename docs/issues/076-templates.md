@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Backlog
 - Priorität: P2
 - Typ: Feature / UX
 - Bereich: Gerätevorlagen / Geräteverwaltung / Einrichtung

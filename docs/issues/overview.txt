@@ -99,7 +99,7 @@ es verändert die Priorisierungslogik nicht.
 | 073 | P2 | offen | Farbige Geräte |
 | 074 | P1 | abgeschlossen | Gruppen |
 | 075 | P2 | Backlog | Schnellkacheln |
-| 076 | P2 | offen | Templates |
+| 076 | P2 | Backlog | Templates |
 | 077 | P0 | abgeschlossen | Import/Export fehlender App-Einstellungen |
 | 078 | P0 | abgeschlossen | Release Notes mit GitHub Models vorbefüllen |
 | 079 | P1 | abgeschlossen | Schaltgruppen App Shortcuts |
