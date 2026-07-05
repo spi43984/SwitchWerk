@@ -32,13 +32,13 @@ Stand: 6. Juli 2026
 
 ## Nächster Auftrag
 
-- Der Benutzer möchte als Nächstes ein separates lokales Planungs-Issue für
-  gemeinsame Aktionsdetails dokumentieren.
-- Hintergrund: Widget-Aktionen schreiben aktuell nicht in die vom Dashboard
-  gehaltenen Aktionsdetails. Zu prüfen ist ein gemeinsamer sicherer Detail-Store
-  für Dashboard, Widgets, App Shortcuts und externe Intents.
-- Vor dem Anlegen gemäß `AGENTS.md` GitHub lesend prüfen,
-  `docs/issues/overview.txt` lesen und die nächste freie lokale Issue-ID
-  bestimmen. Noch kein Issue wurde dafür angelegt.
+- Das lokale Planungs-Issue 082 "Gemeinsame Aktionsdetails für alle
+  Einstiegspfade" wurde unter `docs/issues` angelegt und in
+  `docs/issues/overview.txt` nach Issue 073 eingeordnet.
+- Issue 082 plant einen gemeinsamen flüchtigen, sicheren Detail-Store für
+  Dashboard, Widgets, App Shortcuts und externe Intents. Es wurde noch nicht
+  implementiert und nicht als GitHub-Issue veröffentlicht.
+- Nächstes offenes Implementierungs-Issue bleibt gemäß Priorisierung Issue 073
+  "Farbige Geräte".
 - Der Benutzer testet standardmäßig Release. Nach Änderungen die passenden
   schnellen Release-Befehle ohne `clean` ausgeben.
