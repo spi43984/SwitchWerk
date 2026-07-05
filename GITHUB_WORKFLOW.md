@@ -152,6 +152,31 @@ verwendet werden, zum Beispiel `--squash`. Ein geschlossener PR ohne
 
 Für AI-gestützte Arbeit gelten zusätzlich die Freigaberegeln aus `AGENTS.md`, `ai-context.md` und `AI_SESSION_PROMPT.md`: PRs und Merge nur nach ausdrücklicher Freigabe. Status, Priorisierung und Reihenfolge der Issues stehen ausschließlich in `docs/issues/overview.txt`.
 
+### GitHub-Actions-Status ohne Polling
+
+Der Assistent fragt den Check-Status eines Pull Requests nach Push oder
+PR-Erstellung höchstens einmal aktiv ab. Nicht verwenden:
+
+- `gh pr checks --watch`
+- Polling-Schleifen mit `gh pr checks`, `gh run watch` oder `gh run view`
+- wiederholte manuelle Statusabfragen während derselben Wartephase
+
+Wenn der Merge bereits ausdrücklich freigegeben wurde und die Checks noch
+laufen, soll der Assistent bevorzugt Auto-Merge aktivieren:
+
+```bash
+gh pr merge <PR-NUMMER> --auto --squash
+```
+
+Danach endet der Arbeitsschritt ohne Warten auf GitHub Actions. Ist Auto-Merge
+im Repository nicht verfügbar, wird der ausstehende Status gemeldet und erst
+nach einer späteren Benutzer-Rückmeldung erneut geprüft. Ohne ausdrückliche
+Merge-Freigabe wird kein Auto-Merge aktiviert.
+
+Nach dem tatsächlichen Merge bleiben die bestehenden Abschlussprüfungen
+verbindlich: `state=MERGED`, gesetztes `mergedAt`, Merge-/Squash-Commit auf
+`main`, Dokumentationsabschluss, Issue-Schließung und Branch-Bereinigung.
+
 ## Lokale Befehlsausgaben
 
 Wenn der Assistent Befehle ausgibt, die der Benutzer lokal kopieren und

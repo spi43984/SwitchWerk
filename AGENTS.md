@@ -260,6 +260,30 @@ ausgeführt werden:
 14. Feature-Branch remote löschen.
 15. Remote-Referenzen bereinigen.
 
+### Budgetschonender Umgang mit GitHub Actions
+
+GitHub-Actions-Status nach dem Push oder Erstellen eines Pull Requests höchstens
+einmal aktiv abfragen. Codex verwendet dafür kein `gh pr checks --watch`, keine
+Polling-Schleife und keine wiederholten Statusabfragen, weil das unnötig
+Sitzungs- und Wochenbudget verbraucht.
+
+Wenn der Benutzer den Merge bereits ausdrücklich freigegeben hat und Checks
+noch laufen:
+
+1. Nach Möglichkeit Auto-Merge mit der im Repository erlaubten Merge-Strategie
+   aktivieren, zum Beispiel `gh pr merge <PR-NUMMER> --auto --squash`.
+2. Danach nicht auf GitHub Actions warten und die Checks nicht pollen.
+3. Den Benutzer über den ausstehenden automatischen Merge informieren und den
+   Arbeitsschritt beenden.
+
+Wenn Auto-Merge nicht verfügbar ist, den einmalig festgestellten ausstehenden
+Status melden und auf eine spätere Rückmeldung oder Fortsetzungsanweisung des
+Benutzers warten. Erst dann den Status erneut prüfen und den Abschlussworkflow
+fortsetzen.
+
+Liegt keine ausdrückliche Merge-Freigabe vor, darf Auto-Merge nicht aktiviert
+werden. Dann nur den einmaligen Status melden und auf die Freigabe warten.
+
 ### Verbindliche Issue-Abschluss-Checkliste
 
 Ein Issue gilt erst als vollständig abgeschlossen, wenn alle Punkte geprüft wurden:
