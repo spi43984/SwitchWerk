@@ -339,6 +339,10 @@ mit `\`. Nur die letzte Argumentzeile bleibt ohne `\`, damit die Shell den
 Befehl ausführt und nicht auf eine weitere Zeile wartet. Mehrere eigenständige
 Befehle sowie alternative oder bedingte Abläufe werden in getrennten
 Befehlsblöcken ausgegeben.
+Erklärende Überschriften und Hinweise zu lokalen Befehlen werden innerhalb des
+kopierbaren Terminalblocks als Shell-Kommentare mit `#` ausgegeben. Dadurch
+kann der Benutzer den vollständigen Block einschließlich der Erläuterungen
+direkt in das Terminal einfügen.
 
 ## AI-Handoff
 
