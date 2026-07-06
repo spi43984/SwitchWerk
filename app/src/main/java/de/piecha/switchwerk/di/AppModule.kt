@@ -9,7 +9,9 @@ import android.content.pm.ShortcutManager
 import androidx.room.Room
 import de.piecha.switchwerk.data.action.DefaultDeviceActionService
 import de.piecha.switchwerk.data.action.DefaultSwitchGroupActionService
+import de.piecha.switchwerk.data.action.ActionDetailStore
 import de.piecha.switchwerk.data.action.DeviceActionService
+import de.piecha.switchwerk.data.action.InMemoryActionDetailStore
 import de.piecha.switchwerk.data.action.SwitchGroupActionService
 import de.piecha.switchwerk.data.local.AppDatabase
 import de.piecha.switchwerk.data.network.AndroidWifiConnectionService
@@ -114,6 +116,7 @@ val appModule = module {
         AndroidAppShortcutPublisher(androidContext(), get())
     }
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single<ActionDetailStore> { InMemoryActionDetailStore() }
     single { AppShortcutCoordinator(get(), get(), get(), get()) }
     single<WidgetActionStore> { SharedPreferencesWidgetActionStore(androidContext()) }
     single {
@@ -265,7 +268,8 @@ val appModule = module {
             appSettingsRepository = get(),
             wifiProfileRepository = get(),
             wifiProximityService = get(),
-            appUpdateRepository = get()
+            appUpdateRepository = get(),
+            actionDetailStore = get()
         )
     }
 
