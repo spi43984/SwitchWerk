@@ -10,5 +10,6 @@ data class SwitchGroupEntity(
     val actionLabel: String,
     val sortOrder: Int,
     val shortcutEnabled: Boolean = false,
+    val color: String = "NONE",
     val errorStrategy: String = "ABORT_ON_ERROR"
 )

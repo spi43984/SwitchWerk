@@ -36,7 +36,8 @@ data class ConfigurationDevice(
     val actionLabel: String,
     val action: ConfigurationDeviceAction,
     val connections: List<ConfigurationDeviceConnection>,
-    val shortcutEnabled: Boolean = false
+    val shortcutEnabled: Boolean = false,
+    val color: String = "NONE"
 )
 
 data class ConfigurationDeviceAction(
@@ -57,6 +58,7 @@ data class ConfigurationSwitchGroup(
     val name: String,
     val actionLabel: String,
     val shortcutEnabled: Boolean = false,
+    val color: String = "NONE",
     val errorStrategy: String = "ABORT_ON_ERROR",
     val members: List<ConfigurationSwitchGroupMember>
 )
@@ -67,4 +69,4 @@ data class ConfigurationSwitchGroupMember(
     val pauseAfterMillis: Long
 )
 
-const val CONFIGURATION_SCHEMA_VERSION = 10
+const val CONFIGURATION_SCHEMA_VERSION = 12

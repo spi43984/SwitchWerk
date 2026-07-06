@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
@@ -26,12 +27,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,9 +55,13 @@ import de.piecha.switchwerk.R
 import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.WifiProfile
 import de.piecha.switchwerk.ui.components.InfoHint
+import de.piecha.switchwerk.ui.components.DeviceColorPicker
+import de.piecha.switchwerk.ui.components.contentColor
+import de.piecha.switchwerk.ui.components.toComposeColor
 import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
@@ -90,6 +97,7 @@ fun DeviceManagementSection(
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onShortcutEnabledChange: (Boolean) -> Unit,
+    onColorChange: (DeviceColor) -> Unit,
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
@@ -113,6 +121,7 @@ fun DeviceManagementSection(
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
             onShortcutEnabledChange = onShortcutEnabledChange,
+            onColorChange = onColorChange,
             onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
@@ -176,6 +185,7 @@ private fun DeviceEditDialog(
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onShortcutEnabledChange: (Boolean) -> Unit,
+    onColorChange: (DeviceColor) -> Unit,
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
@@ -211,6 +221,7 @@ private fun DeviceEditDialog(
             onNameChange = onNameChange,
             onActionLabelChange = onActionLabelChange,
             onShortcutEnabledChange = onShortcutEnabledChange,
+            onColorChange = onColorChange,
             onApiProtocolChange = onApiProtocolChange,
             onApiMethodChange = onApiMethodChange,
             onApiPathChange = onApiPathChange,
@@ -332,21 +343,26 @@ private fun DeviceRow(
             pendingDeleteDevice = device
         }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
+        val containerColor = device.color.toComposeColor()
+        val contentColor = if (containerColor == null) {
+            LocalContentColor.current
+        } else {
+            device.color.contentColor()
+        }
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(top = 4.dp, bottom = 4.dp)
+                    .fillMaxWidth()
+                    .then(if (containerColor != null) Modifier.background(containerColor) else Modifier)
+                    .padding(vertical = 8.dp, horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = device.name,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = device.name,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
@@ -379,6 +395,7 @@ private fun DeviceForm(
     onNameChange: (String) -> Unit,
     onActionLabelChange: (String) -> Unit,
     onShortcutEnabledChange: (Boolean) -> Unit,
+    onColorChange: (DeviceColor) -> Unit,
     onApiProtocolChange: (String) -> Unit,
     onApiMethodChange: (String) -> Unit,
     onApiPathChange: (String) -> Unit,
@@ -409,6 +426,15 @@ private fun DeviceForm(
                 onNext = { actionLabelFocusRequester.requestFocus() }
             ),
             modifier = Modifier.fillMaxWidth()
+        )
+
+        Text(
+            text = stringResource(R.string.device_color),
+            style = MaterialTheme.typography.labelLarge
+        )
+        DeviceColorPicker(
+            selectedColor = form.color,
+            onColorChange = onColorChange
         )
 
         OutlinedTextField(

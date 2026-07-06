@@ -1,6 +1,7 @@
 package de.piecha.switchwerk.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,12 +25,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,9 +46,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import de.piecha.switchwerk.R
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.SwitchGroup
 import de.piecha.switchwerk.domain.model.SwitchGroupErrorStrategy
 import de.piecha.switchwerk.ui.components.InfoHint
+import de.piecha.switchwerk.ui.components.DeviceColorPicker
+import de.piecha.switchwerk.ui.components.contentColor
+import de.piecha.switchwerk.ui.components.toComposeColor
 import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
@@ -69,6 +76,7 @@ fun SwitchGroupManagementSection(
     onActionLabelChange: (String) -> Unit,
     onErrorStrategyChange: (SwitchGroupErrorStrategy) -> Unit,
     onShortcutEnabledChange: (Boolean) -> Unit,
+    onColorChange: (DeviceColor) -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
@@ -85,6 +93,7 @@ fun SwitchGroupManagementSection(
             onActionLabelChange = onActionLabelChange,
             onErrorStrategyChange = onErrorStrategyChange,
             onShortcutEnabledChange = onShortcutEnabledChange,
+            onColorChange = onColorChange,
             onAddMember = onAddMember,
             onDeleteMember = onDeleteMember,
             onMoveMember = onMoveMember,
@@ -140,6 +149,7 @@ private fun SwitchGroupEditDialog(
     onActionLabelChange: (String) -> Unit,
     onErrorStrategyChange: (SwitchGroupErrorStrategy) -> Unit,
     onShortcutEnabledChange: (Boolean) -> Unit,
+    onColorChange: (DeviceColor) -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
@@ -162,6 +172,7 @@ private fun SwitchGroupEditDialog(
             onActionLabelChange = onActionLabelChange,
             onErrorStrategyChange = onErrorStrategyChange,
             onShortcutEnabledChange = onShortcutEnabledChange,
+            onColorChange = onColorChange,
             onAddMember = onAddMember,
             onDeleteMember = onDeleteMember,
             onMoveMember = onMoveMember,
@@ -256,16 +267,25 @@ private fun SwitchGroupRow(
         onContentClick = onContentClick,
         onDeleteClick = { pendingDeleteGroup = group }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        ) {
-            Text(text = group.name, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text = stringResource(R.string.group_member_count, group.members.size),
-                style = MaterialTheme.typography.bodySmall
-            )
+        val containerColor = group.color.toComposeColor()
+        val contentColor = if (containerColor == null) {
+            LocalContentColor.current
+        } else {
+            group.color.contentColor()
+        }
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (containerColor != null) Modifier.background(containerColor) else Modifier)
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+            ) {
+                Text(text = group.name, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(R.string.group_member_count, group.members.size),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
@@ -278,6 +298,7 @@ private fun SwitchGroupForm(
     onActionLabelChange: (String) -> Unit,
     onErrorStrategyChange: (SwitchGroupErrorStrategy) -> Unit,
     onShortcutEnabledChange: (Boolean) -> Unit,
+    onColorChange: (DeviceColor) -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
@@ -294,6 +315,14 @@ private fun SwitchGroupForm(
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth()
+        )
+        Text(
+            text = stringResource(R.string.group_color),
+            style = MaterialTheme.typography.labelLarge
+        )
+        DeviceColorPicker(
+            selectedColor = form.color,
+            onColorChange = onColorChange
         )
         OutlinedTextField(
             value = form.actionLabel,

@@ -14,5 +14,6 @@ data class DeviceEntity(
     val apiRequestBody: String,
     val apiContentType: String,
     val sortOrder: Int,
-    val shortcutEnabled: Boolean = false
+    val shortcutEnabled: Boolean = false,
+    val color: String = "NONE"
 )

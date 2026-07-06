@@ -172,6 +172,7 @@ class DefaultConfigurationTransferRepository(
                     name = device.name,
                     actionLabel = device.actionLabel,
                     shortcutEnabled = device.shortcutEnabled,
+                    color = device.color,
                     action = ConfigurationDeviceAction(
                         protocol = device.apiProtocol,
                         method = device.apiMethod,
@@ -196,6 +197,7 @@ class DefaultConfigurationTransferRepository(
                     name = group.name,
                     actionLabel = group.actionLabel,
                     shortcutEnabled = group.shortcutEnabled,
+                    color = group.color,
                     errorStrategy = group.errorStrategy,
                     members = groupMembers
                         .filter { it.groupId == group.id }
@@ -392,7 +394,8 @@ class DefaultConfigurationTransferRepository(
             apiRequestBody = action.requestBody.orEmpty(),
             apiContentType = action.contentType,
             sortOrder = sortOrder,
-            shortcutEnabled = shortcutEnabled
+            shortcutEnabled = shortcutEnabled,
+            color = color
         )
     }
 
@@ -417,6 +420,7 @@ class DefaultConfigurationTransferRepository(
             actionLabel = actionLabel,
             sortOrder = sortOrder,
             shortcutEnabled = shortcutEnabled,
+            color = color,
             errorStrategy = errorStrategy
         )
     }

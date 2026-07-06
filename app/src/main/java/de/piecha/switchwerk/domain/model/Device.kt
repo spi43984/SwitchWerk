@@ -8,5 +8,6 @@ data class Device(
     val apiCall: ApiCall,
     val connections: List<DeviceConnection>,
     val sortOrder: Int,
-    val shortcutEnabled: Boolean = false
+    val shortcutEnabled: Boolean = false,
+    val color: DeviceColor = DeviceColor.NONE
 )

@@ -29,6 +29,7 @@ import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.SwitchGroup
@@ -81,7 +82,8 @@ data class DeviceFormState(
     val apiRequestBody: String = "",
     val apiContentType: String = ApiContentType.APPLICATION_JSON.name,
     val connections: List<DeviceConnectionFormState> = emptyList(),
-    val shortcutEnabled: Boolean = false
+    val shortcutEnabled: Boolean = false,
+    val color: DeviceColor = DeviceColor.NONE
 )
 
 data class SwitchGroupMemberFormState(
@@ -97,6 +99,7 @@ data class SwitchGroupFormState(
     val actionLabel: String = "",
     val sortOrder: Int = 0,
     val shortcutEnabled: Boolean = false,
+    val color: DeviceColor = DeviceColor.NONE,
     val errorStrategy: SwitchGroupErrorStrategy = SwitchGroupErrorStrategy.ABORT_ON_ERROR,
     val members: List<SwitchGroupMemberFormState> = emptyList()
 )
@@ -634,6 +637,7 @@ class SettingsViewModel(
                 apiRequestBody = device.apiCall.requestBody,
                 apiContentType = device.apiCall.contentType.name,
                 shortcutEnabled = device.shortcutEnabled,
+                color = device.color,
                 connections = device.connections.map { connection ->
                     val profile = _uiState.value.wifiProfiles.firstOrNull {
                         it.id == connection.wifiProfileId
@@ -686,6 +690,7 @@ class SettingsViewModel(
                 actionLabel = group.actionLabel,
                 sortOrder = group.sortOrder,
                 shortcutEnabled = group.shortcutEnabled,
+                color = group.color,
                 errorStrategy = group.errorStrategy,
                 members = group.members.mapNotNull { member ->
                     val device = _uiState.value.devices.firstOrNull { it.id == member.deviceId }
@@ -728,6 +733,10 @@ class SettingsViewModel(
 
     fun updateSwitchGroupShortcutEnabled(enabled: Boolean) {
         updateSwitchGroupForm { it.copy(shortcutEnabled = enabled) }
+    }
+
+    fun updateSwitchGroupColor(color: DeviceColor) {
+        updateSwitchGroupForm { it.copy(color = color) }
     }
 
     fun addSwitchGroupMember(deviceId: String) {
@@ -804,6 +813,7 @@ class SettingsViewModel(
                         actionLabel = trimmedActionLabel,
                         sortOrder = form.sortOrder,
                         shortcutEnabled = form.shortcutEnabled,
+                        color = form.color,
                         errorStrategy = form.errorStrategy,
                         members = form.members.mapIndexed { index, member ->
                             SwitchGroupMember(
@@ -851,6 +861,10 @@ class SettingsViewModel(
 
     fun updateDeviceShortcutEnabled(enabled: Boolean) {
         updateDeviceForm { it.copy(shortcutEnabled = enabled) }
+    }
+
+    fun updateDeviceColor(color: DeviceColor) {
+        updateDeviceForm { it.copy(color = color) }
     }
 
     fun updateDeviceApiMethod(apiMethod: String) {
@@ -1031,7 +1045,8 @@ class SettingsViewModel(
                             )
                         },
                         sortOrder = sortOrder,
-                        shortcutEnabled = form.shortcutEnabled
+                        shortcutEnabled = form.shortcutEnabled,
+                        color = form.color
                     )
                 )
             }.onSuccess {

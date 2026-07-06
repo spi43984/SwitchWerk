@@ -5,6 +5,7 @@ import de.piecha.switchwerk.data.local.dao.SwitchGroupMemberDao
 import de.piecha.switchwerk.data.local.entity.SwitchGroupEntity
 import de.piecha.switchwerk.data.local.entity.SwitchGroupMemberEntity
 import de.piecha.switchwerk.domain.model.SwitchGroup
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.SwitchGroupErrorStrategy
 import de.piecha.switchwerk.domain.model.SwitchGroupMember
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +78,7 @@ class RoomSwitchGroupRepository(
             actionLabel = actionLabel,
             sortOrder = sortOrder,
             shortcutEnabled = shortcutEnabled,
+            color = DeviceColor.entries.firstOrNull { it.name == color } ?: DeviceColor.NONE,
             errorStrategy = SwitchGroupErrorStrategy.valueOf(errorStrategy),
             members = members.map { it.toDomain() }
         )
@@ -89,6 +91,7 @@ class RoomSwitchGroupRepository(
             actionLabel = actionLabel,
             sortOrder = sortOrder,
             shortcutEnabled = shortcutEnabled,
+            color = color.name,
             errorStrategy = errorStrategy.name
         )
     }
