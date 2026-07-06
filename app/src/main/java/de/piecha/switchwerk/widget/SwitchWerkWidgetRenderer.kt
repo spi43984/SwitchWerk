@@ -16,6 +16,7 @@ import de.piecha.switchwerk.data.repository.WifiProfileRepository
 import de.piecha.switchwerk.viewmodel.DashboardItem
 import de.piecha.switchwerk.viewmodel.DeviceWifiProximityStatus
 import de.piecha.switchwerk.viewmodel.resolveWifiProximityStatuses
+import java.util.concurrent.ConcurrentHashMap
 
 class SwitchWerkWidgetRenderer(
     private val context: Context,
@@ -26,6 +27,8 @@ class SwitchWerkWidgetRenderer(
     private val wifiProfileRepository: WifiProfileRepository,
     private val wifiProximityService: WifiProximityService
 ) {
+    private val proximityStatusesByWidget =
+        ConcurrentHashMap<Int, Map<String, DeviceWifiProximityStatus>>()
 
     suspend fun updateAllWidgets() {
         store.getWidgetIds().forEach { appWidgetId ->
@@ -34,18 +37,29 @@ class SwitchWerkWidgetRenderer(
     }
 
     suspend fun updateWidget(appWidgetId: Int) {
+        updateWidget(appWidgetId, refreshProximity = true)
+    }
+
+    suspend fun updateWidgetFast(appWidgetId: Int) {
+        updateWidget(appWidgetId, refreshProximity = false)
+    }
+
+    private suspend fun updateWidget(appWidgetId: Int, refreshProximity: Boolean) {
         val physicalDimensions = appWidgetManager.getAppWidgetOptions(appWidgetId).toDimensions()
         val dimensions = physicalDimensions
             .withColumnMode(store.getColumnMode(appWidgetId))
         val devices = deviceRepository.getDevices()
         val groups = switchGroupRepository.getSwitchGroups()
-        val wifiProfiles = wifiProfileRepository.getWifiProfiles()
-        val proximityStatuses = resolveWidgetWifiProximityStatuses(
-            devices = devices,
-            groups = groups,
-            wifiProfiles = wifiProfiles,
-            snapshot = wifiProximityService.refresh()
-        )
+        val proximityStatuses = if (refreshProximity) {
+            resolveWidgetWifiProximityStatuses(
+                devices = devices,
+                groups = groups,
+                wifiProfiles = wifiProfileRepository.getWifiProfiles(),
+                snapshot = wifiProximityService.refresh()
+            ).also { proximityStatusesByWidget[appWidgetId] = it }
+        } else {
+            proximityStatusesByWidget[appWidgetId].orEmpty()
+        }
         val actions = resolveWidgetActions(
             assignedTargets = store.getTargets(appWidgetId),
             devices = devices,

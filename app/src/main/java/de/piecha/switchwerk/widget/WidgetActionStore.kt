@@ -14,6 +14,7 @@ interface WidgetActionStore {
     fun saveTargets(appWidgetId: Int, targets: List<WidgetActionTarget>)
     fun deleteWidget(appWidgetId: Int)
     fun getStatus(appWidgetId: Int, entryIndex: Int): WidgetActionStatus
+    fun trySetRunning(appWidgetId: Int, entryIndex: Int): Boolean
     fun setStatus(appWidgetId: Int, entryIndex: Int, status: WidgetActionStatus)
 }
 
