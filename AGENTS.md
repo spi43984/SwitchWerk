@@ -333,6 +333,12 @@ Der Assistent gibt für alle vom Benutzer lokal auszuführenden Schritte immer d
 vollständigen Copy-&-Paste-Befehle aus.
 Lokale Befehle werden ohne führende Leerzeichen und ohne Shell-Variablen
 ausgegeben, damit sie direkt fehlerfrei kopiert und eingefügt werden können.
+Lange einzelne Terminalbefehle werden für direktes Copy & Paste auf mehrere
+Zeilen verteilt. Die Befehlszeile und jede fortgesetzte Argumentzeile enden
+mit `\`. Nur die letzte Argumentzeile bleibt ohne `\`, damit die Shell den
+Befehl ausführt und nicht auf eine weitere Zeile wartet. Mehrere eigenständige
+Befehle sowie alternative oder bedingte Abläufe werden in getrennten
+Befehlsblöcken ausgegeben.
 
 ## AI-Handoff
 
