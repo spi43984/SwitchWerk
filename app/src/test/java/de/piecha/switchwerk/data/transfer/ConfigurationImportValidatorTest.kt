@@ -396,6 +396,26 @@ class ConfigurationImportValidatorTest {
         }
     }
 
+    @Test
+    fun unknownDeviceColorIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument(devices = listOf(device().copy(color = "CUSTOM")))
+            )
+        }
+    }
+
+    @Test
+    fun unknownSwitchGroupColorIsRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            validator.validate(
+                validDocument(
+                    switchGroups = listOf(switchGroup().copy(color = "CUSTOM"))
+                )
+            )
+        }
+    }
+
     private fun validDocument(
         wifiProfiles: List<ConfigurationWifiProfile> = listOf(wifiProfile()),
         devices: List<ConfigurationDevice> = listOf(device()),

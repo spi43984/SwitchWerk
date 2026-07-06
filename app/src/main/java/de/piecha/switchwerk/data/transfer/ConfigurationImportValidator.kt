@@ -6,6 +6,7 @@ import de.piecha.switchwerk.domain.model.AppThemeMode
 import de.piecha.switchwerk.domain.model.AppLanguage
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.DeviceProtocol
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.DetailPanelHeight
 import de.piecha.switchwerk.domain.model.SwitchGroupErrorStrategy
 import de.piecha.switchwerk.domain.model.WifiConnectionMode
@@ -100,6 +101,9 @@ class ConfigurationImportValidator {
             requireNotBlank(device.id, "Geräte-ID")
             requireNotBlank(device.name, "Gerätename")
             requireNotBlank(device.actionLabel, "Button-Beschriftung")
+            require(DeviceColor.entries.any { color -> color.name == device.color }) {
+                "Nicht unterstützte Gerätefarbe: ${device.color}"
+            }
             requireNotBlank(device.action.path, "API-Aufruf")
             require(
                 DeviceProtocol.entries.any { protocol -> protocol.name == device.action.protocol }
@@ -134,6 +138,9 @@ class ConfigurationImportValidator {
             requireNotBlank(group.id, "Schaltgruppen-ID")
             requireNotBlank(group.name, "Schaltgruppenname")
             requireNotBlank(group.actionLabel, "Schaltgruppen-Button-Beschriftung")
+            require(DeviceColor.entries.any { color -> color.name == group.color }) {
+                "Nicht unterstützte Schaltgruppenfarbe: ${group.color}"
+            }
             require(SwitchGroupErrorStrategy.entries.any { it.name == group.errorStrategy }) {
                 "Nicht unterstützte Fehlerstrategie: ${group.errorStrategy}"
             }

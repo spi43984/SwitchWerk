@@ -62,6 +62,7 @@ class ConfigurationJsonCodec {
                     writer.name("name").value(device.name)
                     writer.name("actionLabel").value(device.actionLabel)
                     writer.name("shortcutEnabled").value(device.shortcutEnabled)
+                    writer.name("color").value(device.color)
                     writer.name("action")
                     writer.beginObject()
                     writer.name("protocol").value(device.action.protocol)
@@ -92,6 +93,7 @@ class ConfigurationJsonCodec {
                     writer.name("name").value(group.name)
                     writer.name("actionLabel").value(group.actionLabel)
                     writer.name("shortcutEnabled").value(group.shortcutEnabled)
+                    writer.name("color").value(group.color)
                     writer.name("errorStrategy").value(group.errorStrategy)
                     writer.name("members")
                     writer.beginArray()
@@ -258,6 +260,7 @@ class ConfigurationJsonCodec {
             var action: ConfigurationDeviceAction? = null
             var connections: List<ConfigurationDeviceConnection>? = null
             var shortcutEnabled = false
+            var color = "NONE"
 
             beginObject()
             while (hasNext()) {
@@ -266,6 +269,7 @@ class ConfigurationJsonCodec {
                     "name" -> name = nextString()
                     "actionLabel" -> actionLabel = nextString()
                     "shortcutEnabled" -> shortcutEnabled = nextBoolean()
+                    "color" -> color = nextString()
                     "action" -> action = readAction()
                     "connections" -> connections = readConnections()
                     else -> skipValue()
@@ -279,7 +283,8 @@ class ConfigurationJsonCodec {
                 actionLabel = requireField(actionLabel, "devices.actionLabel"),
                 action = requireField(action, "devices.action"),
                 connections = requireField(connections, "devices.connections"),
-                shortcutEnabled = shortcutEnabled
+                shortcutEnabled = shortcutEnabled,
+                color = color
             )
         }
         endArray()
@@ -356,6 +361,7 @@ class ConfigurationJsonCodec {
             var name: String? = null
             var actionLabel: String? = null
             var shortcutEnabled = false
+            var color = "NONE"
             var errorStrategy: String? = null
             var members: List<ConfigurationSwitchGroupMember>? = null
 
@@ -366,6 +372,7 @@ class ConfigurationJsonCodec {
                     "name" -> name = nextString()
                     "actionLabel" -> actionLabel = nextString()
                     "shortcutEnabled" -> shortcutEnabled = nextBoolean()
+                    "color" -> color = nextString()
                     "errorStrategy" -> errorStrategy = nextString()
                     "members" -> members = readSwitchGroupMembers()
                     else -> skipValue()
@@ -378,6 +385,7 @@ class ConfigurationJsonCodec {
                 name = requireField(name, "switchGroups.name"),
                 actionLabel = requireField(actionLabel, "switchGroups.actionLabel"),
                 shortcutEnabled = shortcutEnabled,
+                color = color,
                 errorStrategy = errorStrategy ?: "ABORT_ON_ERROR",
                 members = requireField(members, "switchGroups.members")
             )

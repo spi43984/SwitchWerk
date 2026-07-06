@@ -6,6 +6,7 @@ data class SwitchGroup(
     val actionLabel: String,
     val sortOrder: Int,
     val shortcutEnabled: Boolean = false,
+    val color: DeviceColor = DeviceColor.NONE,
     val errorStrategy: SwitchGroupErrorStrategy = SwitchGroupErrorStrategy.ABORT_ON_ERROR,
     val members: List<SwitchGroupMember>
 )

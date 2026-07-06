@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -69,16 +71,20 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import de.piecha.switchwerk.domain.model.DashboardLayoutMode
 import de.piecha.switchwerk.domain.model.Device
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.SwitchGroup
 import de.piecha.switchwerk.ui.components.AppMenuLayout
 import de.piecha.switchwerk.ui.components.AppOverflowMenu
 import de.piecha.switchwerk.ui.components.InfoHint
+import de.piecha.switchwerk.ui.components.contentColor
+import de.piecha.switchwerk.ui.components.toComposeColor
 import de.piecha.switchwerk.ui.components.LazyGridScrollIndicator
 import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
@@ -606,7 +612,11 @@ private fun DashboardWidget(
     onMoveUpClick: () -> Unit,
     onMoveDownClick: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    val itemColor = item.deviceColor()
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = itemColor.cardColors()
+    ) {
         Column(
             modifier = Modifier.padding(
                 start = 8.dp,
@@ -663,7 +673,7 @@ private fun DeviceActionFooter(
             CircularProgressIndicator(
                 modifier = Modifier.size(18.dp),
                 strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = LocalContentColor.current
             )
             Spacer(modifier = Modifier.weight(1f))
             CompositionLocalProvider(
@@ -832,7 +842,7 @@ private fun DeviceActionStatus(
         is DeviceActionUiState.Error -> actionState.message.asString()
     }
     val color = when (actionState) {
-        is DeviceActionUiState.Success -> MaterialTheme.colorScheme.primary
+        is DeviceActionUiState.Success -> LocalContentColor.current
         is DeviceActionUiState.Error -> MaterialTheme.colorScheme.error
         DeviceActionUiState.Loading -> MaterialTheme.colorScheme.onSurfaceVariant
     }
@@ -1007,8 +1017,10 @@ private fun DashboardCard(
     onMoveUpClick: () -> Unit,
     onMoveDownClick: () -> Unit
 ) {
+    val itemColor = item.deviceColor()
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = itemColor.cardColors()
     ) {
         Column(
             modifier = Modifier.padding(
@@ -1072,6 +1084,21 @@ internal fun DeviceTitle(
     }
 }
 
+private fun DashboardItem.deviceColor(): DeviceColor = when (this) {
+    is DashboardItem.DeviceItem -> device.color
+    is DashboardItem.SwitchGroupItem -> group.color
+}
+
+@Composable
+private fun DeviceColor.cardColors() = if (this == DeviceColor.NONE) {
+    CardDefaults.cardColors()
+} else {
+    CardDefaults.cardColors(
+        containerColor = requireNotNull(toComposeColor()),
+        contentColor = contentColor()
+    )
+}
+
 @Composable
 private fun WifiProximityIndicator(
     status: DeviceWifiProximityStatus,
@@ -1109,6 +1136,7 @@ private fun WifiProximityIndicator(
     Box(
         modifier = modifier
             .size(14.dp)
+            .border(3.dp, LocalContentColor.current, CircleShape)
             .alpha(alpha)
             .background(color = color, shape = CircleShape)
             .clearAndSetSemantics { contentDescription = description }

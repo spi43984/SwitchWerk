@@ -17,6 +17,7 @@ import android.content.pm.PackageManager
 import androidx.core.location.LocationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.annotation.RequiresApi
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -275,9 +276,10 @@ class AndroidWifiProximityService(
         return try {
             val scanUpdated = withTimeoutOrNull(SCAN_TIMEOUT_MILLIS) {
                 suspendCancellableCoroutine { continuation ->
+                    val completed = AtomicBoolean(false)
                     val receiver = object : BroadcastReceiver() {
                         override fun onReceive(context: Context?, intent: Intent?) {
-                            if (continuation.isActive) {
+                            if (completed.compareAndSet(false, true)) {
                                 unregisterReceiver(this)
                                 continuation.resume(
                                     intent?.getBooleanExtra(
@@ -290,31 +292,38 @@ class AndroidWifiProximityService(
                     }
                     registerReceiver(receiver, scanIntentFilter())
                     continuation.invokeOnCancellation {
+                        completed.set(true)
                         unregisterReceiver(receiver)
                     }
 
                     if (!hasWifiScanPermission()) {
-                        unregisterReceiver(receiver)
-                        continuation.resumeWith(
-                            Result.failure(
-                                SecurityException("Missing Wi-Fi scan permission")
+                        if (completed.compareAndSet(false, true)) {
+                            unregisterReceiver(receiver)
+                            continuation.resumeWith(
+                                Result.failure(
+                                    SecurityException("Missing Wi-Fi scan permission")
+                                )
                             )
-                        )
+                        }
                         return@suspendCancellableCoroutine
                     }
 
                     val started = try {
                         wifiManager.startScan()
                     } catch (exception: SecurityException) {
-                        unregisterReceiver(receiver)
-                        continuation.resumeWith(Result.failure(exception))
+                        if (completed.compareAndSet(false, true)) {
+                            unregisterReceiver(receiver)
+                            continuation.resumeWith(Result.failure(exception))
+                        }
                         return@suspendCancellableCoroutine
                     } catch (_: RuntimeException) {
                         false
                     }
-                    if (!started && continuation.isActive) {
-                        unregisterReceiver(receiver)
-                        continuation.resume(false)
+                    if (!started) {
+                        if (completed.compareAndSet(false, true)) {
+                            unregisterReceiver(receiver)
+                            continuation.resume(false)
+                        }
                     }
                 }
             } ?: false

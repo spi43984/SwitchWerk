@@ -10,6 +10,7 @@ import de.piecha.switchwerk.domain.model.ApiContentType
 import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.Device
 import de.piecha.switchwerk.domain.model.DeviceConnection
+import de.piecha.switchwerk.domain.model.DeviceColor
 import de.piecha.switchwerk.domain.model.DeviceProtocol
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -97,7 +98,8 @@ class RoomDeviceRepository(
             ),
             connections = connections.map { it.toDomain() },
             sortOrder = sortOrder,
-            shortcutEnabled = shortcutEnabled
+            shortcutEnabled = shortcutEnabled,
+            color = DeviceColor.entries.firstOrNull { it.name == color } ?: DeviceColor.NONE
         )
     }
 
@@ -112,7 +114,8 @@ class RoomDeviceRepository(
             apiRequestBody = apiCall.requestBody,
             apiContentType = apiCall.contentType.name,
             sortOrder = sortOrder,
-            shortcutEnabled = shortcutEnabled
+            shortcutEnabled = shortcutEnabled,
+            color = color.name
         )
     }
 
