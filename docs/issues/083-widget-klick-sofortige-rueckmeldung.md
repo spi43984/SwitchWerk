@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: Bug / UX / Android Integration
 - Bereich: Android Homescreen Widgets / Aktionsausführung / Feedback
@@ -95,20 +95,28 @@ Das Verhalten betrifft nur flüchtigen Laufzeitstatus eines lokal vorhandenen An
 
 ## Akzeptanzkriterien
 
-- [ ] Nach Antippen einer Widget-Aktion erscheint ohne spürbare Verzögerung eine sichtbare Rückmeldung.
-- [ ] Die erste Widget-Rückmeldung wartet nicht auf WLAN-Scan, WLAN-Verbindung, HTTP/RPC-Aufruf oder Gruppenverarbeitung.
-- [ ] Anwender erkennen eindeutig, dass der Klick angenommen wurde.
-- [ ] Laufende Widget-Aktionen werden verständlich dargestellt.
-- [ ] Dieselbe Widget-Aktion kann während laufender Ausführung nicht mehrfach parallel gestartet werden.
-- [ ] Erfolg und Fehler werden nach Abschluss weiterhin sichtbar dargestellt.
-- [ ] Die bestehende Rücksetzung nach kurzer Feedbackdauer bleibt erhalten.
-- [ ] Geräteaktionen verwenden weiterhin `DeviceActionService`.
-- [ ] Schaltgruppenaktionen verwenden weiterhin `SwitchGroupActionService`.
-- [ ] Es wird keine neue Netzwerk-, WLAN-, HTTP- oder RPC-Logik im Widget-Code eingeführt.
-- [ ] Keine neuen Android-Berechtigungen werden eingeführt.
-- [ ] Keine sensiblen Daten werden angezeigt, gespeichert oder geloggt.
-- [ ] Default-, deutsche und englische Texte sind bei Bedarf konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte sind geprüft und bei Bedarf aktualisiert.
+- [x] Nach Antippen einer Widget-Aktion erscheint ohne spürbare Verzögerung eine sichtbare Rückmeldung.
+- [x] Die erste Widget-Rückmeldung wartet nicht auf WLAN-Scan, WLAN-Verbindung, HTTP/RPC-Aufruf oder Gruppenverarbeitung.
+- [x] Anwender erkennen eindeutig, dass der Klick angenommen wurde.
+- [x] Laufende Widget-Aktionen werden verständlich dargestellt.
+- [x] Dieselbe Widget-Aktion kann während laufender Ausführung nicht mehrfach parallel gestartet werden.
+- [x] Erfolg und Fehler werden nach Abschluss weiterhin sichtbar dargestellt.
+- [x] Die bestehende Rücksetzung nach kurzer Feedbackdauer bleibt erhalten.
+- [x] Geräteaktionen verwenden weiterhin `DeviceActionService`.
+- [x] Schaltgruppenaktionen verwenden weiterhin `SwitchGroupActionService`.
+- [x] Es wird keine neue Netzwerk-, WLAN-, HTTP- oder RPC-Logik im Widget-Code eingeführt.
+- [x] Keine neuen Android-Berechtigungen werden eingeführt.
+- [x] Keine sensiblen Daten werden angezeigt, gespeichert oder geloggt.
+- [x] Default-, deutsche und englische Texte sind bei Bedarf konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte sind geprüft und bei Bedarf aktualisiert.
+
+## Abschluss
+
+- Der laufende Zustand wird vor Proximity-, Geräte- und Gruppenverarbeitung ohne WLAN-Refresh gerendert.
+- Eine atomare Statusübernahme verhindert parallele Wiederholung derselben laufenden Widget-Aktion.
+- Geräte- und Gruppenaktionen verwenden weiterhin die bestehenden Action-Services.
+- Sofortige sichtbare Rückmeldung wurde auf dem Gerät erfolgreich bestätigt.
+- Widget-Hilfe sowie Default-, deutsche und englische Texte wurden konsistent aktualisiert.
 
 ## Testhinweise
 

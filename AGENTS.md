@@ -336,13 +336,18 @@ ausgegeben, damit sie direkt fehlerfrei kopiert und eingefügt werden können.
 Lange einzelne Terminalbefehle werden für direktes Copy & Paste auf mehrere
 Zeilen verteilt. Die Befehlszeile und jede fortgesetzte Argumentzeile enden
 mit `\`. Nur die letzte Argumentzeile bleibt ohne `\`, damit die Shell den
-Befehl ausführt und nicht auf eine weitere Zeile wartet. Mehrere eigenständige
-Befehle sowie alternative oder bedingte Abläufe werden in getrennten
-Befehlsblöcken ausgegeben.
-Erklärende Überschriften und Hinweise zu lokalen Befehlen werden innerhalb des
-kopierbaren Terminalblocks als Shell-Kommentare mit `#` ausgegeben. Dadurch
-kann der Benutzer den vollständigen Block einschließlich der Erläuterungen
-direkt in das Terminal einfügen.
+Befehl ausführt und nicht auf eine weitere Zeile wartet. Das gilt auch für ein
+letztes mehrzeiliges Argument wie `--body "..."`: Die Zeile mit dem letzten
+Argument erhält kein abschließendes `\`; der Text bleibt bis zum schließenden
+Anführungszeichen Teil desselben Arguments. Mehrere eigenständige Befehle sowie
+alternative oder bedingte Abläufe werden in getrennten Befehlsblöcken
+ausgegeben.
+Erklärende Überschriften, Bedingungen und Hinweise zu lokalen Befehlen werden
+innerhalb des kopierbaren Terminalblocks als Shell-Kommentare mit `#`
+ausgegeben. Das gilt ausdrücklich auch für Hinweise wie „Wenn alle Checks
+erfolgreich sind“ oder „Nur bei noch laufenden Checks“. Dadurch kann der
+Benutzer den vollständigen Block einschließlich der Erläuterungen direkt in das
+Terminal einfügen.
 
 ## AI-Handoff
 
