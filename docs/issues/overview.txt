@@ -105,18 +105,17 @@ es verändert die Priorisierungslogik nicht.
 | 079 | P1 | abgeschlossen | Schaltgruppen App Shortcuts |
 | 080 | P0 | abgeschlossen | String-Ressourcen und Lokalisierung bereinigen |
 | 081 | P1 | abgeschlossen | Homescreen Widgets |
-| 082 | P2 | offen | Gemeinsame Aktionsdetails für alle Einstiegspfade |
+| 082 | P2 | abgeschlossen | Gemeinsame Aktionsdetails für alle Einstiegspfade |
 | 083 | P0 | abgeschlossen | Widget-Klick sofort sichtbar machen |
 
 ## Empfohlene Umsetzungsreihenfolge
 
-1. 082 Gemeinsame Aktionsdetails für alle Einstiegspfade
-2. 075 Schnellkacheln (Backlog)
-3. 076 Templates (Backlog)
-4. 024 Authenticated Import Sources Backlog
-5. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
-6. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
-7. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
-8. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
-9. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
-10. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)
+1. 075 Schnellkacheln (Backlog)
+2. 076 Templates (Backlog)
+3. 024 Authenticated Import Sources Backlog
+4. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+5. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
+6. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
+7. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
+8. 050 iOS: Shelly HTTP/RPC Client (Backlog; nach 047 und 049)
+9. 051 iOS: WLAN Join Flow (Backlog; nach 047 und 049)

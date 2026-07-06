@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P2
 - Typ: Architektur / Diagnose / UX
 - Bereich: Aktionsdetails / Dashboard / Widgets / Shortcuts / Intents
@@ -138,24 +138,46 @@ Laufzeitdiagnose ohne übertragbaren Konfigurationswert.
 
 ## Akzeptanzkriterien
 
-- [ ] Alle unterstützten Einstiegspfade schreiben in denselben Detail-Store.
-- [ ] Dashboard-Geräteaktionen erscheinen weiterhin vollständig in den Aktionsdetails.
-- [ ] Dashboard-Schaltgruppenaktionen erscheinen weiterhin vollständig in den Aktionsdetails.
-- [ ] Widget-Geräteaktionen erscheinen in den Aktionsdetails.
-- [ ] Widget-Schaltgruppenaktionen erscheinen in den Aktionsdetails.
-- [ ] App-Shortcut-Aktionen erscheinen in den Aktionsdetails.
-- [ ] Unterstützte externe Intent-Aktionen erscheinen in den Aktionsdetails.
-- [ ] Die Herkunft eines Aktionsblocks ist verständlich erkennbar.
-- [ ] Start, Erfolg und Fehler werden pro Aktion nachvollziehbar getrennt.
-- [ ] Gleichzeitige Aktionen beschädigen oder vermischen keine Einträge.
-- [ ] Das manuelle Leeren funktioniert weiterhin für alle Einträge.
-- [ ] Aktionsdetails bleiben ausschließlich im Arbeitsspeicher.
-- [ ] Die gemeinsame Erfassung verändert keine Geräteaktionslogik.
-- [ ] Keine sensiblen Daten werden angezeigt, gespeichert oder geloggt.
-- [ ] Keine neuen Berechtigungen werden eingeführt.
-- [ ] Aktionsdetails werden nicht in Konfigurationsimport/-export aufgenommen.
-- [ ] Default-, deutsche und englische Texte sind konsistent gepflegt.
-- [ ] Hilfe-, Info- und Tooltip-Texte sind geprüft und bei Bedarf aktualisiert.
+- [x] Alle unterstützten Einstiegspfade schreiben in denselben Detail-Store.
+- [x] Dashboard-Geräteaktionen erscheinen weiterhin vollständig in den Aktionsdetails.
+- [x] Dashboard-Schaltgruppenaktionen erscheinen weiterhin vollständig in den Aktionsdetails.
+- [x] Widget-Geräteaktionen erscheinen in den Aktionsdetails.
+- [x] Widget-Schaltgruppenaktionen erscheinen in den Aktionsdetails.
+- [x] App-Shortcut-Aktionen erscheinen in den Aktionsdetails.
+- [x] Unterstützte externe Intent-Aktionen erscheinen in den Aktionsdetails.
+- [x] Die Herkunft eines Aktionsblocks ist verständlich erkennbar.
+- [x] Start, Erfolg und Fehler werden pro Aktion nachvollziehbar getrennt.
+- [x] Gleichzeitige Aktionen beschädigen oder vermischen keine Einträge.
+- [x] Das manuelle Leeren funktioniert weiterhin für alle Einträge.
+- [x] Aktionsdetails bleiben ausschließlich im Arbeitsspeicher.
+- [x] Die gemeinsame Erfassung verändert keine Geräteaktionslogik.
+- [x] Keine sensiblen Daten werden angezeigt, gespeichert oder geloggt.
+- [x] Keine neuen Berechtigungen werden eingeführt.
+- [x] Aktionsdetails werden nicht in Konfigurationsimport/-export aufgenommen.
+- [x] Default-, deutsche und englische Texte sind konsistent gepflegt.
+- [x] Hilfe-, Info- und Tooltip-Texte sind geprüft und bei Bedarf aktualisiert.
+
+## Umsetzung
+
+- `InMemoryActionDetailStore` hält prozessweit flüchtige, threadsicher getrennte
+  Aktionsblöcke und wird als gemeinsame Koin-Instanz bereitgestellt.
+- Dashboard, Homescreen-Widgets, App Shortcuts und externe Intents kennzeichnen
+  ihre Herkunft und verwenden dieselben Diagnoseereignisse der vorhandenen
+  Action-Services.
+- Ungültige Ziele werden ohne Ziel-ID oder veraltete Konfigurationswerte
+  beschrieben. Geräteadressen werden in Geräte-, HTTP- und DNS-Diagnosen nicht
+  angezeigt.
+- Import und Export bleiben unverändert, weil der Store ausschließlich
+  flüchtigen Laufzeitzustand enthält.
+- Hilfe- und Info-Texte wurden angepasst. Separate Tooltips sind für die
+  nicht interaktive Herkunftskennzeichnung nicht erforderlich.
+
+## Abschlussprüfung
+
+- `testDebugUnitTest` wurde auf dem Ubuntu-Host erfolgreich bestätigt.
+- Die zunächst gemeldeten Release-Lint-Befunde zu `removeFirst()` wurden durch
+  API-26-kompatibles `removeAt(0)` behoben.
+- Pull Request #191 wurde erfolgreich nach `main` gemergt.
 
 ## Testhinweise
 

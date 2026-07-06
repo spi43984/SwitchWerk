@@ -190,6 +190,14 @@ gerätelokal; sie sind kein Bestandteil von Konfigurationsimport/-export, weil
 Android-AppWidget-IDs nicht übertragbar sind. PendingIntents enthalten nur die
 Widget-ID und den Eintragsindex, keine Ziel-IDs oder sensiblen Konfigurationsdaten.
 
+Dashboard, Homescreen-Widgets, App Shortcuts und externe Intents schreiben ihre
+Diagnoseereignisse in denselben prozessweiten `InMemoryActionDetailStore`. Der
+über Koin bereitgestellte Store hält getrennte Aktionsblöcke ausschließlich im
+Arbeitsspeicher und ist nicht Bestandteil von Import oder Export. Einstiegscode
+bleibt dünn und verwendet weiterhin `DeviceActionService` beziehungsweise
+`SwitchGroupActionService`. Sichtbare Diagnosen enthalten keine Geräteadressen,
+Hostnamen, IP-Adressen oder internen Transportdaten.
+
 Externe Android-Intents für Geräteaktionen sind global in den
 Systemeinstellungen aktivierbar und verwenden den sicheren Default `false`.
 Die dokumentierte Action `de.piecha.switchwerk.action.RUN_DEVICE_ACTION`
