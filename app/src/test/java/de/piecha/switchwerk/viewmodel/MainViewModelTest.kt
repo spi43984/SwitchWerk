@@ -4,6 +4,7 @@ import de.piecha.switchwerk.R
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
+import de.piecha.switchwerk.data.action.DiagnosticListItem
 import de.piecha.switchwerk.data.action.SwitchGroupActionResult
 import de.piecha.switchwerk.data.action.SwitchGroupActionService
 import de.piecha.switchwerk.data.action.SwitchGroupDiagnosticEvent
@@ -86,13 +87,13 @@ class MainViewModelTest {
             R.string.external_intent_disabled_error,
             (actionError.message as UiText.Resource).resourceId
         )
-        assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+        assertEquals(2, viewModel.uiState.value.diagnosticItems.size)
 
         advanceTimeBy(4_001L)
         runCurrent()
 
         assertEquals(null, viewModel.uiState.value.deviceActionStates["device-1"])
-        assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+        assertEquals(2, viewModel.uiState.value.diagnosticItems.size)
     }
 
     @Test
@@ -113,18 +114,19 @@ class MainViewModelTest {
             viewModel.handleExternalDeviceAction(
                 ExternalDeviceActionIntentResult.MissingDeviceId
             )
+            runCurrent()
 
             assertEquals(
                 R.string.external_intent_missing_device_id_error,
                 (viewModel.uiState.value.errorMessage as UiText.Resource).resourceId
             )
-            assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+            assertEquals(2, viewModel.uiState.value.diagnosticItems.size)
 
             advanceTimeBy(4_001L)
             runCurrent()
 
             assertEquals(null, viewModel.uiState.value.errorMessage)
-            assertEquals(1, viewModel.uiState.value.diagnosticItems.size)
+            assertEquals(2, viewModel.uiState.value.diagnosticItems.size)
         }
 
     @Test
@@ -264,6 +266,7 @@ class MainViewModelTest {
         assertTrue(viewModel.uiState.value.deviceActionStates[device.id] is DeviceActionUiState.Success)
         val firstDiagnostic = viewModel.uiState.value.diagnosticItems
             .filterIsInstance<DiagnosticListItem.Message>()
+            .drop(1)
             .first()
             .text as UiText.Resource
         assertEquals(R.string.diagnostic_entry, firstDiagnostic.resourceId)
@@ -284,6 +287,7 @@ class MainViewModelTest {
         )
 
         viewModel.clearDiagnosticMessages()
+        runCurrent()
 
         assertTrue(viewModel.uiState.value.diagnosticItems.isEmpty())
     }

@@ -135,24 +135,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             val mainViewModel: MainViewModel = koinViewModel()
             val uiState by mainViewModel.uiState.collectAsState()
-            LaunchedEffect(pendingShortcutDeviceId, uiState.devices) {
+            LaunchedEffect(pendingShortcutDeviceId, uiState.isLoading) {
                 pendingShortcutDeviceId?.let { deviceId ->
-                    if (uiState.devices.any { it.id == deviceId }) {
-                        mainViewModel.executeDeviceAction(deviceId)
+                    if (!uiState.isLoading) {
                         pendingShortcutDeviceId = null
-                    } else if (!uiState.isLoading) {
-                        pendingShortcutDeviceId = null
+                        mainViewModel.handleShortcutDeviceAction(deviceId)
                     }
                 }
             }
-            LaunchedEffect(pendingShortcutGroupId, uiState.switchGroups) {
+            LaunchedEffect(pendingShortcutGroupId, uiState.isLoading) {
                 pendingShortcutGroupId?.let { groupId ->
-                    val group = uiState.switchGroups.firstOrNull { it.id == groupId }
-                    if (group != null && group.members.isNotEmpty()) {
-                        mainViewModel.executeSwitchGroupAction(group)
+                    if (!uiState.isLoading) {
                         pendingShortcutGroupId = null
-                    } else if (!uiState.isLoading) {
-                        pendingShortcutGroupId = null
+                        mainViewModel.handleShortcutSwitchGroupAction(groupId)
                     }
                 }
             }

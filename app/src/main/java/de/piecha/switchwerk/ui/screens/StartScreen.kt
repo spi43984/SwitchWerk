@@ -89,7 +89,7 @@ import de.piecha.switchwerk.ui.components.LazyGridScrollIndicator
 import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.viewmodel.DeviceActionUiState
 import de.piecha.switchwerk.viewmodel.DeviceWifiProximityStatus
-import de.piecha.switchwerk.viewmodel.DiagnosticListItem
+import de.piecha.switchwerk.data.action.DiagnosticListItem
 import de.piecha.switchwerk.viewmodel.DashboardItem
 import de.piecha.switchwerk.viewmodel.MainViewModel
 import de.piecha.switchwerk.R

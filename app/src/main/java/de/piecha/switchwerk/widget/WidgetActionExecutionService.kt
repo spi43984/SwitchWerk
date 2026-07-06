@@ -10,12 +10,17 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import de.piecha.switchwerk.R
+import de.piecha.switchwerk.data.action.ActionDetailSession
+import de.piecha.switchwerk.data.action.ActionDetailStore
+import de.piecha.switchwerk.data.action.ActionOrigin
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionService
 import de.piecha.switchwerk.data.action.SwitchGroupActionResult
 import de.piecha.switchwerk.data.action.SwitchGroupActionService
+import de.piecha.switchwerk.data.action.toActionDetailMessage
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.SwitchGroupRepository
+import de.piecha.switchwerk.ui.uiText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,6 +33,7 @@ class WidgetActionExecutionService : Service() {
     private val switchGroupRepository: SwitchGroupRepository by inject()
     private val deviceActionService: DeviceActionService by inject()
     private val switchGroupActionService: SwitchGroupActionService by inject()
+    private val actionDetailStore: ActionDetailStore by inject()
     private val renderer: SwitchWerkWidgetRenderer by inject()
     private val scope: CoroutineScope by inject()
 
@@ -51,10 +57,12 @@ class WidgetActionExecutionService : Service() {
         }
 
         startForeground(FOREGROUND_NOTIFICATION_ID, runningNotification())
+        val actionDetails = actionDetailStore.start(ActionOrigin.WIDGET)
         scope.launch(Dispatchers.IO) {
             runCatching {
-                executeWidgetAction(appWidgetId, entryIndex)
+                executeWidgetAction(appWidgetId, entryIndex, actionDetails)
             }.onFailure {
+                actionDetails.append(uiText(R.string.diagnostic_action_failed))
                 store.setStatus(appWidgetId, entryIndex, WidgetActionStatus.ERROR)
                 renderer.updateWidget(appWidgetId)
                 resetStatusAfterFeedback(appWidgetId, entryIndex)
@@ -67,11 +75,16 @@ class WidgetActionExecutionService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private suspend fun executeWidgetAction(appWidgetId: Int, entryIndex: Int) {
+    private suspend fun executeWidgetAction(
+        appWidgetId: Int,
+        entryIndex: Int,
+        actionDetails: ActionDetailSession
+    ) {
         renderer.updateWidgetFast(appWidgetId)
 
         val target = store.getTargets(appWidgetId).getOrNull(entryIndex)
         if (target == null) {
+            actionDetails.append(uiText(R.string.diagnostic_target_unavailable))
             markError(appWidgetId, entryIndex)
             return
         }
@@ -81,21 +94,25 @@ class WidgetActionExecutionService : Service() {
         val result = when (target.type) {
             WidgetActionTargetType.DEVICE -> {
                 val device = devices.firstOrNull { it.id == target.id }
-                    ?: return markError(appWidgetId, entryIndex)
-                deviceActionService.execute(device) == DeviceActionResult.Success
+                    ?: return markMissingTarget(appWidgetId, entryIndex, actionDetails)
+                deviceActionService.execute(device) { event ->
+                    actionDetails.append(event.toActionDetailMessage(device.name))
+                } == DeviceActionResult.Success
             }
 
             WidgetActionTargetType.SWITCH_GROUP -> {
                 val group = groups.firstOrNull { it.id == target.id }
-                    ?: return markError(appWidgetId, entryIndex)
+                    ?: return markMissingTarget(appWidgetId, entryIndex, actionDetails)
                 if (group.members.isEmpty()) {
-                    return markError(appWidgetId, entryIndex)
+                    return markMissingTarget(appWidgetId, entryIndex, actionDetails)
                 }
                 when (
                     switchGroupActionService.execute(
                         group = group,
                         devices = devices,
-                        onDiagnosticEvent = { }
+                        onDiagnosticEvent = { event ->
+                            actionDetails.append(event.toActionDetailMessage(group.name))
+                        }
                     )
                 ) {
                     SwitchGroupActionResult.Success -> true
@@ -113,6 +130,15 @@ class WidgetActionExecutionService : Service() {
         )
         renderer.updateWidget(appWidgetId)
         resetStatusAfterFeedback(appWidgetId, entryIndex)
+    }
+
+    private suspend fun markMissingTarget(
+        appWidgetId: Int,
+        entryIndex: Int,
+        actionDetails: ActionDetailSession
+    ) {
+        actionDetails.append(uiText(R.string.diagnostic_target_unavailable))
+        markError(appWidgetId, entryIndex)
     }
 
     private suspend fun markError(appWidgetId: Int, entryIndex: Int) {

@@ -3,14 +3,18 @@ package de.piecha.switchwerk.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.piecha.switchwerk.R
+import de.piecha.switchwerk.data.action.ActionDetailStore
+import de.piecha.switchwerk.data.action.ActionOrigin
 import de.piecha.switchwerk.data.action.DeviceActionResult
 import de.piecha.switchwerk.data.action.DeviceActionDiagnosticEvent
 import de.piecha.switchwerk.data.action.DeviceActionService
-import de.piecha.switchwerk.data.action.DiagnosticStage
+import de.piecha.switchwerk.data.action.DiagnosticListItem
+import de.piecha.switchwerk.data.action.InMemoryActionDetailStore
 import de.piecha.switchwerk.data.action.NetworkFailureReason
 import de.piecha.switchwerk.data.action.SwitchGroupActionResult
 import de.piecha.switchwerk.data.action.SwitchGroupActionService
 import de.piecha.switchwerk.data.action.SwitchGroupDiagnosticEvent
+import de.piecha.switchwerk.data.action.toActionDetailMessage
 import de.piecha.switchwerk.data.repository.AppSettingsRepository
 import de.piecha.switchwerk.data.repository.DeviceRepository
 import de.piecha.switchwerk.data.repository.SwitchGroupRepository
@@ -19,7 +23,6 @@ import de.piecha.switchwerk.data.network.WifiProximityIssue
 import de.piecha.switchwerk.data.network.WifiProximityService
 import de.piecha.switchwerk.data.network.WifiProximitySnapshot
 import de.piecha.switchwerk.data.update.AppUpdateRepository
-import de.piecha.switchwerk.domain.model.ApiMethod
 import de.piecha.switchwerk.domain.model.AppSettings
 import de.piecha.switchwerk.domain.model.AppUpdateCheckResult
 import de.piecha.switchwerk.domain.model.AppUpdateSnapshot
@@ -31,9 +34,6 @@ import de.piecha.switchwerk.ui.UiText
 import de.piecha.switchwerk.ui.uiText
 import de.piecha.switchwerk.intent.ExternalDeviceActionIntentResult
 import de.piecha.switchwerk.intent.ExternalSwitchGroupActionIntentResult
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -58,12 +58,6 @@ sealed interface MainUiEvent {
     data class ConfirmOpenAndroidWifiSettings(val ssid: String) : MainUiEvent
 
     data object OpenSetupWizard : MainUiEvent
-}
-
-sealed interface DiagnosticListItem {
-    data class Message(val text: UiText) : DiagnosticListItem
-
-    data object Separator : DiagnosticListItem
 }
 
 enum class DeviceWifiProximityStatus {
@@ -131,7 +125,8 @@ class MainViewModel(
     private val appSettingsRepository: AppSettingsRepository,
     private val wifiProfileRepository: WifiProfileRepository,
     private val wifiProximityService: WifiProximityService,
-    private val appUpdateRepository: AppUpdateRepository
+    private val appUpdateRepository: AppUpdateRepository,
+    private val actionDetailStore: ActionDetailStore = InMemoryActionDetailStore()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -157,7 +152,16 @@ class MainViewModel(
         observeSwitchGroups()
         observeAppSettings()
         observeWifiProfiles()
+        observeActionDetails()
         checkForUpdatesAutomatically()
+    }
+
+    private fun observeActionDetails() {
+        viewModelScope.launch {
+            actionDetailStore.items.collect { items ->
+                _uiState.value = _uiState.value.copy(diagnosticItems = items)
+            }
+        }
     }
 
     private fun observeDevices() {
@@ -223,7 +227,7 @@ class MainViewModel(
         }
     }
 
-    fun executeDeviceAction(device: Device) {
+    fun executeDeviceAction(device: Device, origin: ActionOrigin = ActionOrigin.DASHBOARD) {
         val actionKey = DashboardItem.actionKey(device.id)
         if (actionJobs[actionKey]?.isActive == true) {
             return
@@ -231,22 +235,11 @@ class MainViewModel(
 
         actionStateResetJobs.remove(actionKey)?.cancel()
         updateDeviceActionState(actionKey, DeviceActionUiState.Loading)
+        val actionDetails = actionDetailStore.start(origin)
         actionJobs[actionKey] = viewModelScope.launch {
             try {
-                var previousDiagnosticAtNanos: Long? = null
                 val result = deviceActionService.execute(device) { event ->
-                    val nowNanos = System.nanoTime()
-                    val elapsedMillis = previousDiagnosticAtNanos?.let { previous ->
-                        ((nowNanos - previous) / NANOS_PER_MILLISECOND).coerceAtLeast(0L)
-                    } ?: 0L
-                    previousDiagnosticAtNanos = nowNanos
-                    if (event == DeviceActionDiagnosticEvent.ActionStarted) {
-                        appendActionSeparator()
-                    }
-                    appendDiagnosticMessage(
-                        message = event.toUserMessage(device.name),
-                        elapsedMillis = elapsedMillis
-                    )
+                    actionDetails.append(event.toActionDetailMessage(device.name))
                 }
                 val resultState = result.toUiState()
                 updateDeviceActionState(actionKey, resultState)
@@ -270,9 +263,8 @@ class MainViewModel(
                 if (actionKey !in userCancelledActionIds) {
                     throw exception
                 }
-                appendDiagnosticMessage(
-                    message = DeviceActionDiagnosticEvent.ActionCancelled.toUserMessage(device.name),
-                    elapsedMillis = 0L
+                actionDetails.append(
+                    DeviceActionDiagnosticEvent.ActionCancelled.toActionDetailMessage(device.name)
                 )
                 val cancelledState = DeviceActionUiState.Error(uiText(R.string.action_cancelled))
                 updateDeviceActionState(actionKey, cancelledState)
@@ -291,7 +283,10 @@ class MainViewModel(
         }
     }
 
-    fun executeSwitchGroupAction(group: SwitchGroup) {
+    fun executeSwitchGroupAction(
+        group: SwitchGroup,
+        origin: ActionOrigin = ActionOrigin.DASHBOARD
+    ) {
         val actionKey = DashboardItem.groupKey(group.id)
         if (actionJobs[actionKey]?.isActive == true) {
             return
@@ -299,25 +294,14 @@ class MainViewModel(
 
         actionStateResetJobs.remove(actionKey)?.cancel()
         updateDeviceActionState(actionKey, DeviceActionUiState.Loading)
+        val actionDetails = actionDetailStore.start(origin)
         actionJobs[actionKey] = viewModelScope.launch {
             try {
-                var previousDiagnosticAtNanos: Long? = null
                 val result = switchGroupActionService.execute(
                     group = group,
                     devices = _uiState.value.devices
                 ) { event ->
-                    val nowNanos = System.nanoTime()
-                    val elapsedMillis = previousDiagnosticAtNanos?.let { previous ->
-                        ((nowNanos - previous) / NANOS_PER_MILLISECOND).coerceAtLeast(0L)
-                    } ?: 0L
-                    previousDiagnosticAtNanos = nowNanos
-                    if (event == SwitchGroupDiagnosticEvent.GroupStarted) {
-                        appendActionSeparator()
-                    }
-                    appendDiagnosticMessage(
-                        message = event.toUserMessage(group.name),
-                        elapsedMillis = elapsedMillis
-                    )
+                    actionDetails.append(event.toActionDetailMessage(group.name))
                 }
                 val resultState = result.toUiState()
                 updateDeviceActionState(actionKey, resultState)
@@ -355,8 +339,28 @@ class MainViewModel(
         }
     }
 
-    fun executeDeviceAction(deviceId: String) {
-        _uiState.value.devices.firstOrNull { it.id == deviceId }?.let(::executeDeviceAction)
+    fun handleShortcutDeviceAction(deviceId: String) {
+        val device = _uiState.value.devices.firstOrNull { it.id == deviceId }
+        if (device == null) {
+            reportEntryPointError(
+                message = uiText(R.string.diagnostic_target_unavailable),
+                origin = ActionOrigin.APP_SHORTCUT
+            )
+        } else {
+            executeDeviceAction(device, ActionOrigin.APP_SHORTCUT)
+        }
+    }
+
+    fun handleShortcutSwitchGroupAction(groupId: String) {
+        val group = _uiState.value.switchGroups.firstOrNull { it.id == groupId }
+        if (group == null || group.members.isEmpty()) {
+            reportEntryPointError(
+                message = uiText(R.string.diagnostic_target_unavailable),
+                origin = ActionOrigin.APP_SHORTCUT
+            )
+        } else {
+            executeSwitchGroupAction(group, ActionOrigin.APP_SHORTCUT)
+        }
     }
 
     fun handleExternalDeviceAction(result: ExternalDeviceActionIntentResult) {
@@ -378,7 +382,7 @@ class MainViewModel(
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(errorMessage = null)
-                    executeDeviceAction(validDevice)
+                    executeDeviceAction(validDevice, ActionOrigin.EXTERNAL_INTENT)
                 }
             }
             ExternalDeviceActionIntentResult.MissingDeviceId -> {
@@ -422,7 +426,7 @@ class MainViewModel(
                     }
                     else -> {
                         _uiState.value = _uiState.value.copy(errorMessage = null)
-                        executeSwitchGroupAction(validGroup)
+                        executeSwitchGroupAction(validGroup, ActionOrigin.EXTERNAL_INTENT)
                     }
                 }
             }
@@ -441,8 +445,7 @@ class MainViewModel(
     }
 
     private fun reportExternalIntentError(message: UiText, actionKey: String? = null) {
-        appendActionSeparator()
-        appendDiagnosticMessage(message, elapsedMillis = 0L)
+        reportEntryPointError(message, ActionOrigin.EXTERNAL_INTENT)
         if (actionKey != null) {
             actionStateResetJobs.remove(actionKey)?.cancel()
             val errorState = DeviceActionUiState.Error(message)
@@ -463,6 +466,10 @@ class MainViewModel(
                 _uiState.value = _uiState.value.copy(errorMessage = null)
             }
         }
+    }
+
+    private fun reportEntryPointError(message: UiText, origin: ActionOrigin) {
+        actionDetailStore.start(origin).append(message)
     }
 
     fun cancelDeviceAction(deviceId: String) {
@@ -536,7 +543,7 @@ class MainViewModel(
     }
 
     fun clearDiagnosticMessages() {
-        _uiState.value = _uiState.value.copy(diagnosticItems = emptyList())
+        actionDetailStore.clear()
     }
 
     fun hideSetupWizardOnStart() {
@@ -650,132 +657,6 @@ class MainViewModel(
         )
     }
 
-    private fun appendDiagnosticMessage(message: UiText, elapsedMillis: Long) {
-        val timestamp = SimpleDateFormat(DIAGNOSTIC_TIMESTAMP_PATTERN, Locale.getDefault())
-            .format(Date())
-        _uiState.value = _uiState.value.copy(
-            diagnosticItems = (
-                _uiState.value.diagnosticItems + DiagnosticListItem.Message(
-                    uiText(R.string.diagnostic_entry, timestamp, elapsedMillis, message)
-                )
-            )
-                .takeLast(MAX_DIAGNOSTIC_MESSAGES)
-        )
-    }
-
-    private fun appendActionSeparator() {
-        if (_uiState.value.diagnosticItems.isEmpty()) {
-            return
-        }
-        _uiState.value = _uiState.value.copy(
-            diagnosticItems = (_uiState.value.diagnosticItems + DiagnosticListItem.Separator)
-                .takeLast(MAX_DIAGNOSTIC_MESSAGES)
-        )
-    }
-
-    private fun DeviceActionDiagnosticEvent.toUserMessage(deviceName: String): UiText {
-        return when (this) {
-            DeviceActionDiagnosticEvent.ActionStarted ->
-                uiText(R.string.diagnostic_action_started, deviceName)
-            is DeviceActionDiagnosticEvent.WifiProfileAttempt -> {
-                uiText(R.string.diagnostic_wifi_profile_attempt, index, total, profileName)
-            }
-            is DeviceActionDiagnosticEvent.WifiRequestStarted -> {
-                uiText(R.string.diagnostic_wifi_request_started, profileName)
-            }
-            DeviceActionDiagnosticEvent.WifiSecurityDetectionStarted -> {
-                uiText(R.string.diagnostic_wifi_security_started)
-            }
-            DeviceActionDiagnosticEvent.WifiSecurityDetectionSucceeded -> {
-                uiText(R.string.diagnostic_wifi_security_succeeded)
-            }
-            DeviceActionDiagnosticEvent.WifiSecurityDetectionUnavailable -> {
-                uiText(R.string.diagnostic_wifi_security_unavailable)
-            }
-            DeviceActionDiagnosticEvent.WifiFound -> uiText(R.string.diagnostic_wifi_found)
-            DeviceActionDiagnosticEvent.WifiConnected -> uiText(R.string.diagnostic_wifi_connected)
-            DeviceActionDiagnosticEvent.IpAddressReceived -> uiText(R.string.diagnostic_ip_received)
-            DeviceActionDiagnosticEvent.WifiConnectionFailed -> {
-                uiText(R.string.diagnostic_wifi_failed)
-            }
-            DeviceActionDiagnosticEvent.WifiDisabled -> uiText(R.string.diagnostic_wifi_disabled)
-            DeviceActionDiagnosticEvent.MissingWifiPassword -> {
-                uiText(R.string.diagnostic_wifi_missing_password)
-            }
-            is DeviceActionDiagnosticEvent.DeviceAddress -> {
-                uiText(R.string.diagnostic_device_address, address)
-            }
-            is DeviceActionDiagnosticEvent.HttpRequestStarted -> when (method) {
-                ApiMethod.GET -> uiText(R.string.diagnostic_http_get_started, address)
-                ApiMethod.POST -> uiText(R.string.diagnostic_http_post_started, address)
-            }
-            is DeviceActionDiagnosticEvent.HttpResponseReceived -> {
-                uiText(R.string.diagnostic_http_response, statusCode)
-            }
-            is DeviceActionDiagnosticEvent.HttpRequestSucceeded -> {
-                uiText(R.string.diagnostic_http_success, statusCode)
-            }
-            is DeviceActionDiagnosticEvent.DnsResolutionStarted -> {
-                uiText(R.string.diagnostic_dns_started, address)
-            }
-            DeviceActionDiagnosticEvent.DnsResolutionSucceeded ->
-                uiText(R.string.diagnostic_dns_succeeded)
-            DeviceActionDiagnosticEvent.DnsResolutionFailed -> {
-                uiText(R.string.diagnostic_dns_failed)
-            }
-            DeviceActionDiagnosticEvent.DeviceNotReachable -> {
-                uiText(R.string.diagnostic_device_unreachable)
-            }
-            DeviceActionDiagnosticEvent.RequestSucceeded ->
-                uiText(R.string.diagnostic_request_succeeded)
-            DeviceActionDiagnosticEvent.RequestFailed -> uiText(R.string.diagnostic_request_failed)
-            DeviceActionDiagnosticEvent.ActionCancelled -> uiText(R.string.diagnostic_action_cancelled)
-            is DeviceActionDiagnosticEvent.Timeout -> when (stage) {
-                DiagnosticStage.WIFI_REQUEST -> {
-                    uiText(R.string.diagnostic_timeout_wifi_request)
-                }
-                DiagnosticStage.WIFI -> {
-                    uiText(R.string.diagnostic_timeout_wifi)
-                }
-                DiagnosticStage.DNS -> {
-                    uiText(R.string.diagnostic_timeout_dns)
-                }
-                DiagnosticStage.HTTP -> {
-                    uiText(R.string.diagnostic_timeout_http)
-                }
-            }
-            DeviceActionDiagnosticEvent.ActionCompleted ->
-                uiText(R.string.diagnostic_action_completed)
-        }
-    }
-
-    private fun SwitchGroupDiagnosticEvent.toUserMessage(groupName: String): UiText {
-        return when (this) {
-            SwitchGroupDiagnosticEvent.GroupStarted -> {
-                uiText(R.string.diagnostic_group_started, groupName)
-            }
-            is SwitchGroupDiagnosticEvent.MemberStarted -> {
-                uiText(R.string.diagnostic_group_member_started, step, total, deviceName)
-            }
-            is SwitchGroupDiagnosticEvent.MemberSucceeded -> {
-                uiText(R.string.diagnostic_group_member_succeeded, step, total, deviceName)
-            }
-            is SwitchGroupDiagnosticEvent.MemberFailed -> {
-                uiText(R.string.diagnostic_group_member_failed, step, total, deviceName)
-            }
-            is SwitchGroupDiagnosticEvent.PauseStarted -> {
-                uiText(R.string.diagnostic_group_pause, pauseMillis.toPauseDurationLabel())
-            }
-            SwitchGroupDiagnosticEvent.GroupCompleted -> {
-                uiText(R.string.diagnostic_group_completed)
-            }
-            SwitchGroupDiagnosticEvent.GroupCancelled -> {
-                uiText(R.string.diagnostic_action_cancelled)
-            }
-            is SwitchGroupDiagnosticEvent.DeviceEvent -> event.toUserMessage(deviceName)
-        }
-    }
-
     private fun DeviceActionResult.toUiState(): DeviceActionUiState {
         return when (this) {
             DeviceActionResult.Success -> DeviceActionUiState.Success(uiText(R.string.action_success))
@@ -879,9 +760,6 @@ class MainViewModel(
             ?: uiText(fallbackResourceId)
 
     private companion object {
-        const val DIAGNOSTIC_TIMESTAMP_PATTERN = "HH:mm:ss.SSS"
-        const val MAX_DIAGNOSTIC_MESSAGES = 200
-        const val NANOS_PER_MILLISECOND = 1_000_000L
         const val ACTION_SUCCESS_DISPLAY_MILLIS = 2_000L
         const val ACTION_ERROR_DISPLAY_MILLIS = 4_000L
     }
@@ -1006,19 +884,4 @@ private fun DeviceWifiProximityStatus.isNegativeWifiStatus(): Boolean {
         DeviceWifiProximityStatus.NO_ASSIGNMENT,
         DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> false
     }
-}
-
-private fun Long.toPauseDurationLabel(): String {
-    val hours = this / 3_600_000
-    val minutes = (this % 3_600_000) / 60_000
-    val seconds = (this % 60_000) / 1_000
-    val milliseconds = this % 1_000
-    return String.format(
-        Locale.ROOT,
-        "%02d:%02d:%02d.%03d",
-        hours,
-        minutes,
-        seconds,
-        milliseconds
-    )
 }
