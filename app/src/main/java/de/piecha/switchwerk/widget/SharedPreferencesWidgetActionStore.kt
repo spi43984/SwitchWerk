@@ -62,6 +62,7 @@ class SharedPreferencesWidgetActionStore(
             .apply()
     }
 
+    @Synchronized
     override fun getStatus(appWidgetId: Int, entryIndex: Int): WidgetActionStatus {
         val statusName = preferences.getStringSet(keyStatus(appWidgetId), emptySet())
             .orEmpty()
@@ -72,6 +73,14 @@ class SharedPreferencesWidgetActionStore(
             ?: WidgetActionStatus.IDLE
     }
 
+    @Synchronized
+    override fun trySetRunning(appWidgetId: Int, entryIndex: Int): Boolean {
+        if (getStatus(appWidgetId, entryIndex) == WidgetActionStatus.RUNNING) return false
+        setStatus(appWidgetId, entryIndex, WidgetActionStatus.RUNNING)
+        return true
+    }
+
+    @Synchronized
     override fun setStatus(appWidgetId: Int, entryIndex: Int, status: WidgetActionStatus) {
         val statusValues = preferences.getStringSet(keyStatus(appWidgetId), emptySet())
             .orEmpty()

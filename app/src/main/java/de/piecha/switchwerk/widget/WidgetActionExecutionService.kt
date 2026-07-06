@@ -45,6 +45,10 @@ class WidgetActionExecutionService : Service() {
             stopSelf(startId)
             return START_NOT_STICKY
         }
+        if (!store.trySetRunning(appWidgetId, entryIndex)) {
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
 
         startForeground(FOREGROUND_NOTIFICATION_ID, runningNotification())
         scope.launch(Dispatchers.IO) {
@@ -64,15 +68,13 @@ class WidgetActionExecutionService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private suspend fun executeWidgetAction(appWidgetId: Int, entryIndex: Int) {
+        renderer.updateWidgetFast(appWidgetId)
+
         val target = store.getTargets(appWidgetId).getOrNull(entryIndex)
         if (target == null) {
-            store.setStatus(appWidgetId, entryIndex, WidgetActionStatus.ERROR)
-            renderer.updateWidget(appWidgetId)
+            markError(appWidgetId, entryIndex)
             return
         }
-
-        store.setStatus(appWidgetId, entryIndex, WidgetActionStatus.RUNNING)
-        renderer.updateWidget(appWidgetId)
 
         val devices = deviceRepository.getDevices()
         val groups = switchGroupRepository.getSwitchGroups()
