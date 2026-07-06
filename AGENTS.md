@@ -240,11 +240,35 @@ Erst wenn die Implementierung geprüft wurde und der Benutzer ausdrücklich die
 Veröffentlichung oder den Abschluss anfordert, dürfen folgende Schritte
 ausgeführt werden:
 
+Vor der Ausgabe lokaler Git-Befehle muss Codex den tatsächlichen Branch- und
+Arbeitsbaumstatus prüfen und die Befehle daran anpassen. Codex darf keinen
+`git pull` oder Branchwechsel mit anschließendem Pull ausgeben, solange
+uncommittierte Änderungen vorhanden sind. Das gilt insbesondere bei lokal
+vorbereiteter Abschlussdokumentation und aktiviertem `pull.rebase`.
+
+Die Abschlussdokumentation wird bevorzugt erst nach dem bestätigten Merge und
+nach der Aktualisierung von `main` bearbeitet. Wurde sie ausnahmsweise bereits
+auf dem Feature-Branch vorbereitet, muss sie vor dem Wechsel auf `main` mit
+explizit aufgeführten Dateipfaden gezielt gestasht und nach der Aktualisierung
+von `main` wiederhergestellt werden. Codex gibt dafür vollständige
+Copy-&-Paste-Befehle aus und verwendet keinen pauschalen Stash, der andere
+Benutzeränderungen einschließen könnte.
+
+Pull Requests dürfen das GitHub-Issue nicht automatisch schließen, weil der
+Dokumentationsabschluss erst nach dem Merge veröffentlicht wird. Im PR-Text
+deshalb `Refs #<NUMMER>` verwenden, nicht `Closes`, `Fixes` oder `Resolves`.
+Das GitHub-Issue wird erst nach dem erfolgreichen Dokumentations-Push explizit
+geschlossen.
+
 1. Änderungen committen.
 2. Feature-Branch pushen.
 3. Pull Request erstellen.
 4. Pull Request prüfen und nach ausdrücklicher Freigabe nach `main` mergen.
-5. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+5. Nach dem Merge den Merge-Status prüfen, `origin` abrufen, auf den sauberen
+   Branch `main` wechseln und `main` per Fast-Forward auf `origin/main`
+   aktualisieren. Bevorzugt `git fetch origin` und danach
+   `git merge --ff-only origin/main` verwenden, damit eine lokale
+   `pull.rebase`-Konfiguration den Ablauf nicht verändert.
 6. Lokale Issue-Datei unter `docs/issues` abhaken.
 7. `docs/issues/overview.txt` aktualisieren.
 8. Prüfen, dass `docs/issues/overview.txt` und die lokale Issue-Datei denselben
@@ -320,10 +344,11 @@ Beispiel für Implementierungsstart:
 `gh issue create` im Beispiel darf nur ausgeführt werden, wenn die vorherige
 GitHub-Prüfung kein passendes bestehendes Issue ergeben hat.
 
-Beispiel nach Merge:
+Beispiel nach Merge bei sauberem Arbeitsbaum:
 
+    git fetch origin
     git switch main
-    git pull
+    git merge --ff-only origin/main
     git branch -d wifi-connection-service
     git push origin --delete wifi-connection-service
     git fetch --prune
@@ -348,6 +373,13 @@ ausgegeben. Das gilt ausdrücklich auch für Hinweise wie „Wenn alle Checks
 erfolgreich sind“ oder „Nur bei noch laufenden Checks“. Dadurch kann der
 Benutzer den vollständigen Block einschließlich der Erläuterungen direkt in das
 Terminal einfügen.
+
+Vor Veröffentlichung und Abschluss gibt Codex keine generische Befehlsfolge
+aus, sondern berücksichtigt mindestens `git status --short --branch`, den
+aktuellen Branch, vorhandene lokale Commits, uncommittierte Dateien und den
+Stand von `origin/main`. Bereits ausgeführte Schritte werden nicht erneut
+ausgegeben. Bei Divergenz werden zuerst Ursache und Commit-Spitzen geprüft;
+ein Force-Push wird nicht als Standardlösung vorgeschlagen.
 
 ## AI-Handoff
 

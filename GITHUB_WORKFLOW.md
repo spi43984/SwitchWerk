@@ -145,6 +145,11 @@ Für die allgemeine GitHub-Nutzung und manuelle Repository-Arbeit:
   Merge-Commit beziehungsweise Squash-Commit auf `main` angekommen ist
 - das zugehörige GitHub-Issue erst nach dieser Prüfung schließen
 
+Der PR-Text verknüpft das Issue mit `Refs #<NUMMER>`. Die Schlüsselwörter
+`Closes`, `Fixes` und `Resolves` werden nicht verwendet, weil GitHub das Issue
+sonst bereits beim Merge automatisch schließt. Nach diesem Projektworkflow
+wird das Issue erst nach dem separaten Dokumentations-Push explizit geschlossen.
+
 Wenn ein Repository Merge-Commits nicht erlaubt, ist `gh pr merge --merge`
 nicht geeignet. In diesem Fall muss die im Repository erlaubte Strategie
 verwendet werden, zum Beispiel `--squash`. Ein geschlossener PR ohne
@@ -177,6 +182,47 @@ Nach dem tatsächlichen Merge bleiben die bestehenden Abschlussprüfungen
 verbindlich: `state=MERGED`, gesetztes `mergedAt`, Merge-/Squash-Commit auf
 `main`, Dokumentationsabschluss, Issue-Schließung und Branch-Bereinigung.
 
+### Sauberer Wechsel auf main nach dem Merge
+
+Die Abschlussdokumentation wird im Normalfall erst nach dem Merge auf dem
+aktualisierten Branch `main` geändert. Vor dem Wechsel müssen Branch und
+Arbeitsbaum mit `git status --short --branch` geprüft werden.
+
+Bei sauberem Arbeitsbaum wird `main` unabhängig von einer lokalen
+`pull.rebase`-Konfiguration so aktualisiert:
+
+```bash
+git fetch origin
+git switch main
+git merge --ff-only origin/main
+```
+
+Wurde Abschlussdokumentation bereits auf dem Feature-Branch vorbereitet, darf
+nicht mit diesen uncommittierten Änderungen gepullt werden. Die betroffenen
+Dateien werden vorher mit expliziten Pfaden gezielt gestasht, nach dem
+Fast-Forward wiederhergestellt und erst dann auf `main` committet:
+
+```bash
+git stash push \
+-m "Issue-Abschlussdokumentation" \
+-- \
+AI_HANDOFF.md \
+docs/issues/<issue>.md \
+docs/issues/overview.txt
+
+git fetch origin
+git switch main
+git merge --ff-only origin/main
+
+git stash pop
+```
+
+Weitere tatsächlich geänderte Abschlussdateien, etwa `AGENTS.md` oder
+String-Ressourcen, müssen in diesem gezielten Stash ausdrücklich ergänzt
+werden. Ein pauschaler Stash ist unzulässig, wenn er fremde Benutzeränderungen
+einschließen könnte. Bei Konflikten nach `git stash pop` wird nicht automatisch
+weitercommittet; zuerst werden die Konflikte geprüft und gelöst.
+
 ## Lokale Befehlsausgaben
 
 Wenn der Assistent Befehle ausgibt, die der Benutzer lokal kopieren und
@@ -186,6 +232,15 @@ einfügen soll, gelten diese Regeln:
 - keine Shell-Variablen in Copy-&-Paste-Befehlen
 - lange Befehle mit `\` am Zeilenende umbrechen
 - nach kritischen GitHub-Aktionen immer Prüfkommandos mit ausgeben
+- vor Abschlussbefehlen den tatsächlichen Git-Status prüfen und nur noch nicht
+  ausgeführte, zum Zustand passende Schritte ausgeben
+- niemals `git pull` mit uncommittierten Änderungen anweisen; vorbereitete
+  Abschlussdateien bei Bedarf gezielt stashen
+- nach einem Merge bevorzugt `git fetch origin`, `git switch main` und
+  `git merge --ff-only origin/main` statt eines konfigurationsabhängigen
+  `git pull` ausgeben
+- PR-Texte mit `Refs #<NUMMER>` verknüpfen und keine automatisch schließenden
+  Schlüsselwörter verwenden
 - Nach Implementierungen oder prüfpflichtigen Änderungen immer auch die
   vollständigen Release-Befehle zum Kompilieren und Installieren ausgeben,
   unabhängig davon, ob der konkrete Prompt nur allgemein nach Prüfungen oder
@@ -290,7 +345,11 @@ ohne bei jedem Push erneut erzeugt zu werden.
        --json state,mergedAt,mergeCommit
 
    `state` muss `MERGED` sein und `mergedAt` darf nicht leer sein.
-19. Nach dem Merge auf `main` wechseln und aktuellen Stand holen.
+19. Sicherstellen, dass der Arbeitsbaum sauber ist. Bereits vorbereitete
+    Abschlussdokumentation andernfalls mit expliziten Dateipfaden gezielt
+    stashen. Danach `origin` abrufen, auf `main` wechseln und per
+    `git merge --ff-only origin/main` aktualisieren. Anschließend einen
+    angelegten Dokumentations-Stash wiederherstellen.
 20. Prüfen, dass `main` den Merge- oder Squash-Commit enthält:
 
        git log \

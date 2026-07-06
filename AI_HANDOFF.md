@@ -19,9 +19,13 @@ Stand: 6. Juli 2026
 - Die lokale Issue-Datei und `docs/issues/overview.txt` sind konsistent auf
   abgeschlossen gesetzt. Nächstes offenes Implementierungs-Issue ist 082
   "Gemeinsame Aktionsdetails für alle Einstiegspfade".
-- Veröffentlichung, Merge, Dokumentations-Push, Schließen von GitHub-Issue #188
-  und Branch-Bereinigung sind vom Benutzer freigegeben, aber noch lokal
-  auszuführen.
+- Pull Request #189 ist gemergt, GitHub-Issue #188 ist geschlossen und der
+  Feature-Branch wurde lokal sowie remote gelöscht.
+- Der Abschlussworkflow wurde nach einem fehlgeschlagenen Pull präzisiert:
+  Abschlussdokumentation bevorzugt erst nach dem Merge bearbeiten, bereits
+  vorbereitete Abschlussdateien vor dem Wechsel gezielt stashen, `main` per
+  `fetch` und Fast-Forward aktualisieren und PRs nur mit `Refs #...` statt
+  automatisch schließenden Schlüsselwörtern verknüpfen.
 
 ## Prüfungen
 
@@ -34,8 +38,6 @@ Stand: 6. Juli 2026
 
 ## Nächste Schritte
 
-- Implementierung und Hilfe committen, pushen und Pull Request erstellen.
-- GitHub-Actions höchstens einmal prüfen; bei noch laufenden Checks Auto-Merge
-  aktivieren und die Sitzung beenden.
-- Nach dem Merge Abschlussdokumentation auf `main` committen und pushen,
-  GitHub-Issue #188 schließen und den Feature-Branch lokal sowie remote löschen.
+- Die Präzisierungen in `AGENTS.md`, `GITHUB_WORKFLOW.md` und `AI_HANDOFF.md`
+  committen und auf `main` pushen.
+- Nächstes offenes Implementierungs-Issue ist 082.
