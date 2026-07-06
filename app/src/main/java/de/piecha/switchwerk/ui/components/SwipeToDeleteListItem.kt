@@ -6,6 +6,8 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
@@ -26,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
@@ -36,6 +40,38 @@ private enum class SwipeRevealValue {
     Closed,
     OpenStart,
     OpenEnd
+}
+
+fun Modifier.closeSwipeOnTap(
+    enabled: Boolean,
+    onCloseSwipeItem: () -> Unit
+): Modifier = pointerInput(enabled, onCloseSwipeItem) {
+    if (!enabled) return@pointerInput
+
+    awaitEachGesture {
+        val down = awaitFirstDown(
+            requireUnconsumed = false,
+            pass = PointerEventPass.Final
+        )
+        var movedBeyondTap = false
+        var isPressed = true
+
+        while (isPressed) {
+            val event = awaitPointerEvent(PointerEventPass.Final)
+            val change = event.changes.firstOrNull { it.id == down.id }
+            if (change != null) {
+                movedBeyondTap = movedBeyondTap ||
+                    (change.position - down.position).getDistance() > viewConfiguration.touchSlop
+                isPressed = change.pressed
+            } else {
+                isPressed = false
+            }
+        }
+
+        if (!movedBeyondTap) {
+            onCloseSwipeItem()
+        }
+    }
 }
 
 @Composable

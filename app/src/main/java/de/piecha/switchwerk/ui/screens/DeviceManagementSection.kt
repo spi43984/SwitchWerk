@@ -2,8 +2,6 @@ package de.piecha.switchwerk.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,8 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,6 +61,7 @@ import de.piecha.switchwerk.ui.components.toComposeColor
 import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
+import de.piecha.switchwerk.ui.components.closeSwipeOnTap
 import de.piecha.switchwerk.viewmodel.DeviceConnectionFormState
 import de.piecha.switchwerk.viewmodel.DeviceFormState
 
@@ -754,38 +751,6 @@ private fun DeviceConnectionList(
                     .align(Alignment.BottomCenter)
                     .size(16.dp)
             )
-        }
-    }
-}
-
-private fun Modifier.closeSwipeOnTap(
-    enabled: Boolean,
-    onCloseSwipeItem: () -> Unit
-): Modifier = pointerInput(enabled, onCloseSwipeItem) {
-    if (!enabled) return@pointerInput
-
-    awaitEachGesture {
-        val down = awaitFirstDown(
-            requireUnconsumed = false,
-            pass = PointerEventPass.Final
-        )
-        var movedBeyondTap = false
-        var isPressed = true
-
-        while (isPressed) {
-            val event = awaitPointerEvent(PointerEventPass.Final)
-            val change = event.changes.firstOrNull { it.id == down.id }
-            if (change != null) {
-                movedBeyondTap = movedBeyondTap ||
-                    (change.position - down.position).getDistance() > viewConfiguration.touchSlop
-                isPressed = change.pressed
-            } else {
-                isPressed = false
-            }
-        }
-
-        if (!movedBeyondTap) {
-            onCloseSwipeItem()
         }
     }
 }
