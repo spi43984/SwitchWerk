@@ -56,6 +56,7 @@ import de.piecha.switchwerk.ui.components.toComposeColor
 import de.piecha.switchwerk.ui.components.LazyListScrollIndicator
 import de.piecha.switchwerk.ui.components.StandardConfigurationDialog
 import de.piecha.switchwerk.ui.components.SwipeToDeleteListItem
+import de.piecha.switchwerk.ui.components.closeSwipeOnTap
 import de.piecha.switchwerk.viewmodel.SwitchGroupFormState
 import de.piecha.switchwerk.viewmodel.SwitchGroupMemberFormState
 import java.util.Locale
@@ -304,8 +305,15 @@ private fun SwitchGroupForm(
     onMoveMember: (String, Int) -> Unit,
     onMemberPauseChange: (String, Long) -> Unit
 ) {
+    var openMemberSwipeId by remember { mutableStateOf<String?>(null) }
+
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .closeSwipeOnTap(
+                enabled = openMemberSwipeId != null,
+                onCloseSwipeItem = { openMemberSwipeId = null }
+            ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedTextField(
@@ -346,6 +354,9 @@ private fun SwitchGroupForm(
         SwitchGroupMemberList(
             devices = devices,
             members = form.members,
+            openMemberSwipeId = openMemberSwipeId,
+            onOpenMemberSwipe = { openMemberSwipeId = it },
+            onCloseMemberSwipe = { openMemberSwipeId = null },
             onAddMember = onAddMember,
             onDeleteMember = onDeleteMember,
             onMoveMember = onMoveMember,
@@ -437,13 +448,15 @@ private fun SwitchGroupShortcutSwitch(
 private fun SwitchGroupMemberList(
     devices: List<Device>,
     members: List<SwitchGroupMemberFormState>,
+    openMemberSwipeId: String?,
+    onOpenMemberSwipe: (String) -> Unit,
+    onCloseMemberSwipe: () -> Unit,
     onAddMember: (String) -> Unit,
     onDeleteMember: (String) -> Unit,
     onMoveMember: (String, Int) -> Unit,
     onMemberPauseChange: (String, Long) -> Unit
 ) {
     var isAddingMember by remember { mutableStateOf(false) }
-    var openMemberSwipeId by remember { mutableStateOf<String?>(null) }
     var pendingDeleteMember by remember { mutableStateOf<SwitchGroupMemberFormState?>(null) }
     val selectableDevices = devices
 
@@ -465,7 +478,7 @@ private fun SwitchGroupMemberList(
             actionText = stringResource(R.string.yes),
             onAction = {
                 pendingDeleteMember = null
-                openMemberSwipeId = null
+                onCloseMemberSwipe()
                 onDeleteMember(member.id)
             },
             cancelText = stringResource(R.string.no)
@@ -519,7 +532,7 @@ private fun SwitchGroupMemberList(
                 .fillMaxSize()
                 .clickable(
                     enabled = openMemberSwipeId != null,
-                    onClick = { openMemberSwipeId = null }
+                    onClick = onCloseMemberSwipe
                 )
         ) {
             itemsIndexed(items = members, key = { _, member -> member.id }) { index, member ->
@@ -528,8 +541,8 @@ private fun SwitchGroupMemberList(
                     member = member,
                     isOpen = openMemberSwipeId == swipeItemId,
                     isAnyItemOpen = openMemberSwipeId != null,
-                    onOpen = { openMemberSwipeId = swipeItemId },
-                    onClose = { openMemberSwipeId = null },
+                    onOpen = { onOpenMemberSwipe(swipeItemId) },
+                    onClose = onCloseMemberSwipe,
                     canMoveUp = index > 0,
                     canMoveDown = index < members.lastIndex,
                     onMoveUpClick = { onMoveMember(member.id, index - 1) },
