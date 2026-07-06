@@ -151,8 +151,8 @@ Aktionsdetails verfügbar. Sie scrollt mit den echten Ereignissen und erscheint
 nach dem Löschen des Aktionsprotokolls wieder zuerst.
 
 Die Einstellungen sind in die exklusiv sichtbaren Bereiche WLAN-Profile,
-Geräte, System und Backup gegliedert. Gemeinsame Dialog-, Button-, Tab- und
-Hilfe-Komponenten liegen unter `ui/components/`. Hamburger-Menü und
+Geräte, Gruppen, System und Backup gegliedert. Gemeinsame Dialog-, Button-,
+Tab- und Hilfe-Komponenten liegen unter `ui/components/`. Hamburger-Menü und
 System-Einstellungen öffnen dieselbe Hilfeansicht.
 
 Die App unterstützt eine persistierte Sprachauswahl für System, Deutsch und

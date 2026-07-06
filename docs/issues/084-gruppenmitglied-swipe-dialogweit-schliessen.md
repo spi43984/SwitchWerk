@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P1
 - Typ: Bugfix
 - Bereich: Schaltgruppen / Einstellungen / Bedienung
@@ -41,14 +41,24 @@ Namensfeld oder bei den Gruppeneinstellungen, lassen ihn geöffnet.
 
 ## Akzeptanzkriterien
 
-- [ ] Ein geöffneter Mitglieder-Swipe wird durch Antippen oberhalb der
+- [x] Ein geöffneter Mitglieder-Swipe wird durch Antippen oberhalb der
       Mitgliederliste geschlossen.
-- [ ] Ein geöffneter Mitglieder-Swipe wird weiterhin durch Antippen innerhalb
+- [x] Ein geöffneter Mitglieder-Swipe wird weiterhin durch Antippen innerhalb
       der Mitgliederliste geschlossen.
-- [ ] Vertikales Scrollen und horizontales Swipen werden nicht als Tap zum
+- [x] Vertikales Scrollen und horizontales Swipen werden nicht als Tap zum
       Schließen fehlinterpretiert.
-- [ ] Die Löschaktion bleibt von links und rechts erreichbar.
-- [ ] Das Verhalten entspricht den WLAN-Zuordnungen in `Gerät bearbeiten`.
+- [x] Die Löschaktion bleibt von links und rechts erreichbar.
+- [x] Das Verhalten entspricht den WLAN-Zuordnungen in `Gerät bearbeiten`.
+
+## Abschluss
+
+- Implementierung: Pull Request #193
+- GitHub-Issue: #192
+- Squash-Merge auf `main`: `ebfcaeb`
+- Lokale Prüfungen im Container: `./gradlew testDebugUnitTest lintDebug`
+- Host-Test wurde vom Benutzer bestätigt.
+- Hilfe-, Info-, Tooltip- und Übersetzungstexte wurden geprüft; Änderungen
+  waren nicht erforderlich.
 
 ## Testhinweise
 
@@ -59,4 +69,3 @@ Namensfeld oder bei den Gruppeneinstellungen, lassen ihn geöffnet.
 - Mitgliederliste vertikal scrollen und prüfen, dass keine unbeabsichtigte
   Aktion ausgelöst wird.
 - Mitglied löschen, verschieben und seine Pause ändern.
-
