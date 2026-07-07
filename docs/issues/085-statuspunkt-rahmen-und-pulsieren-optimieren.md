@@ -2,7 +2,7 @@
 
 ## Metadaten
 
-- Status: Offen
+- Status: Abgeschlossen
 - Priorität: P0
 - Typ: UX / UI
 - Bereich: Dashboard / Geräte- und Gruppenkacheln / Statusanzeige
@@ -61,19 +61,34 @@ geht die eigentliche Statusfarbe teilweise verloren.
 
 ## Akzeptanzkriterien
 
-- [ ] Der Rahmen um den Statuspunkt ist sichtbar, aber weniger dominant als bisher.
-- [ ] Der Statuspunkt ist insgesamt etwas größer als bisher.
-- [ ] Der innere farbige Kreis ist größer und seine Farbe besser erkennbar.
-- [ ] Auf farbigen Kacheln hebt sich der Rahmen weiterhin zuverlässig vom
+- [x] Der Rahmen um den Statuspunkt ist sichtbar, aber weniger dominant als bisher.
+- [x] Der Statuspunkt ist insgesamt etwas größer als bisher.
+- [x] Der innere farbige Kreis ist größer und seine Farbe besser erkennbar.
+- [x] Auf farbigen Kacheln hebt sich der Rahmen weiterhin zuverlässig vom
       Kachelhintergrund ab.
-- [ ] Nach einer ausgeführten Aktion pulsiert der innere Kreis zwischen
+- [x] Nach einer ausgeführten Aktion pulsiert der innere Kreis zwischen
       Statusfarbe und Rahmenfarbe.
-- [ ] Der innere Kreis pulsiert nicht mehr gegen die Kachelhintergrundfarbe.
-- [ ] Geräte- und Gruppenkacheln verhalten sich optisch konsistent.
-- [ ] Darstellung funktioniert im hellen und dunklen Theme.
-- [ ] Darstellung bleibt bei größerer Android-Schriftgröße erkennbar und
+- [x] Der innere Kreis pulsiert nicht mehr gegen die Kachelhintergrundfarbe.
+- [x] Geräte- und Gruppenkacheln verhalten sich optisch konsistent.
+- [x] Darstellung funktioniert im hellen und dunklen Theme.
+- [x] Darstellung bleibt bei größerer Android-Schriftgröße erkennbar und
       bedienbar.
-- [ ] Keine Änderung an Import, Export oder gespeicherten Konfigurationsdaten.
+- [x] Keine Änderung an Import, Export oder gespeicherten Konfigurationsdaten.
+
+## Abschluss
+
+- Umsetzung über Pull Request #195 nach `main` gemergt.
+- Statuspunkt auf 16 dp und inneren Farbkreis auf 12 dp vergrößert; der
+  kontrastierende Rahmen ist dadurch 2 dp breit.
+- Pulsieren von Alpha auf eine Farbinterpolation zwischen Status- und
+  Rahmenfarbe umgestellt.
+- Deutsche und englische Statusbeschreibung mit Hilfe- und Infotexten auf
+  „WLAN-Verbindung bestätigt“ beziehungsweise „Wi-Fi connection confirmed“
+  vereinheitlicht.
+- Keine Änderung an WLAN-/Aktionslogik, Datenmodellen, Einstellungen oder
+  Konfigurationsimport und -export.
+- Release-Prüfungen und Installation wurden auf dem Ubuntu-Host erfolgreich
+  bestätigt.
 
 ## Testhinweise
 

@@ -1,29 +1,27 @@
 # AI Handoff
 
-Stand: 6. Juli 2026
+Stand: 7. Juli 2026
 
 ## Aktueller Stand
 
-- Issue 084 / GitHub-Issue #192 `Gruppenmitglied-Swipe dialogweit schließen`
-  ist über Pull Request #193 nach `main` gemergt.
-- Der offene Swipe-Zustand eines Gruppenmitglieds wird im gesamten
-  Gruppenformular verwaltet. Ein kurzer Tap oberhalb oder innerhalb der
-  Mitgliederliste schließt den Swipe.
-- Die bewegungstolerante Tap-Erkennung aus dem Geräteformular liegt jetzt bei
-  der gemeinsamen Swipe-Komponente und wird von Geräte- und Gruppenformular
-  identisch verwendet.
-- Konfigurationsimport und -export sowie gespeicherte Gruppendaten sind nicht
-  betroffen. Hilfe-, Info- und Tooltip-Texte mussten nicht geändert werden, da
-  bestehendes Bedienverhalten nur vereinheitlicht wurde.
-- GitHub-Issue #192 ist geschlossen; der Feature-Branch ist nach dem Merge
-  entfernt.
+- Issue 085 / GitHub-Issue #194 `Statuspunkt-Rahmen und Pulsieren optimieren`
+  ist über Pull Request #195 nach `main` gemergt.
+- Der Statuspunkt in Geräte- und Gruppenkacheln ist insgesamt größer, während
+  der kontrastierende Rahmen dünner dargestellt wird.
+- Bei laufenden Aktionen pulsiert nur die innere Farbe zwischen Status- und
+  Rahmenfarbe; die Alpha-Animation der gesamten Anzeige wurde entfernt.
+- Hilfe-, Info- und Statusbeschreibungen wurden auf Konsistenz geprüft. Die
+  deutsche und englische Beschreibung des grünen Status nennt jetzt eindeutig
+  die bestätigte WLAN-Verbindung.
+- WLAN-/Aktionslogik, Datenmodelle, Einstellungen sowie Konfigurationsimport
+  und -export sind nicht betroffen.
 
 ## Prüfungen
 
-- `./gradlew testDebugUnitTest lintDebug` war im Container erfolgreich.
-- Die Kotlin-Kompilierung war erfolgreich; es erschienen nur bestehende
-  Deprecation-Warnungen außerhalb des Fixes.
-- Der manuelle Release-Test auf dem Ubuntu-Host wurde vom Benutzer bestätigt.
+- `./gradlew lintRelease` war auf dem Ubuntu-Host erfolgreich.
+- `./gradlew testDebugUnitTest` war auf dem Ubuntu-Host erfolgreich.
+- `./gradlew assembleRelease` war auf dem Ubuntu-Host erfolgreich.
+- `./gradlew installRelease` war auf dem Ubuntu-Host erfolgreich.
 
 ## Nächste Schritte
 
