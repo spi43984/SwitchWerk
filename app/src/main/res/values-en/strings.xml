@@ -459,7 +459,7 @@
     <string name="action_network_error">Failed to access device over the network</string>
     <string name="action_failed">Device action failed</string>
     <string name="action_cancelled">Action cancelled</string>
-    <string name="wifi_proximity_nearby">Wi-Fi nearby</string>
+    <string name="wifi_proximity_nearby">Wi-Fi connection confirmed</string>
     <string name="wifi_proximity_not_nearby">Wi-Fi connection unavailable</string>
     <string name="wifi_proximity_unknown">Wi-Fi not yet confirmed</string>
     <string name="wifi_proximity_no_assignment">No Wi-Fi assigned</string>

@@ -7,7 +7,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
@@ -59,8 +58,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -1111,36 +1110,43 @@ private fun WifiProximityIndicator(
     } else {
         statusDescription
     }
-    val alpha = if (isActionRunning) {
-        val transition = rememberInfiniteTransition(label = "wifi proximity pulse")
-        transition.animateFloat(
-            initialValue = 0.35f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 650),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "wifi proximity alpha"
-        ).value
-    } else {
-        1f
-    }
-    val color = when (status) {
+    val statusColor = when (status) {
         DeviceWifiProximityStatus.NEARBY -> WifiNearbyColor
         DeviceWifiProximityStatus.UNKNOWN,
         DeviceWifiProximityStatus.NO_ASSIGNMENT,
         DeviceWifiProximityStatus.LOCATION_SERVICES_DISABLED -> WifiUnavailableColor
         else -> WifiNotNearbyColor
     }
+    val frameColor = LocalContentColor.current
+    val innerColor = if (isActionRunning) {
+        val transition = rememberInfiniteTransition(label = "wifi proximity pulse")
+        val pulseProgress = transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 650),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "wifi proximity color progress"
+        ).value
+        lerp(statusColor, frameColor, pulseProgress)
+    } else {
+        statusColor
+    }
 
     Box(
         modifier = modifier
-            .size(14.dp)
-            .border(3.dp, LocalContentColor.current, CircleShape)
-            .alpha(alpha)
-            .background(color = color, shape = CircleShape)
-            .clearAndSetSemantics { contentDescription = description }
-    )
+            .size(16.dp)
+            .background(color = frameColor, shape = CircleShape)
+            .clearAndSetSemantics { contentDescription = description },
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(12.dp)
+                .background(color = innerColor, shape = CircleShape)
+        )
+    }
 }
 
 @Composable
