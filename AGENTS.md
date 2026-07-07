@@ -300,6 +300,13 @@ noch laufen:
 3. Den Benutzer über den ausstehenden automatischen Merge informieren und den
    Arbeitsschritt beenden.
 
+Mit diesem Stop endet auch eine zuvor erteilte Freigabe zur Ausführung des
+Abschlussworkflows. Eine spätere Frage wie „Wie weiter?“ oder „Status?“ erlaubt
+nur eine einmalige Statusprüfung und die Ausgabe der nächsten Schritte. Commit,
+Push, Pull Request, Merge, GitHub-Issue-Schließung und Branch-Löschung dürfen
+erst nach einer erneuten ausdrücklichen Ausführungsaufforderung wie
+„Abschlussworkflow jetzt ausführen“ durchgeführt werden.
+
 Wenn Auto-Merge nicht verfügbar ist, den einmalig festgestellten ausstehenden
 Status melden und auf eine spätere Rückmeldung oder Fortsetzungsanweisung des
 Benutzers warten. Erst dann den Status erneut prüfen und den Abschlussworkflow
@@ -356,6 +363,11 @@ Beispiel nach Merge bei sauberem Arbeitsbaum:
 
 Der Assistent gibt für alle vom Benutzer lokal auszuführenden Schritte immer die
 vollständigen Copy-&-Paste-Befehle aus.
+Eine Aufforderung, Befehle auszugeben, ist keine Freigabe, diese Befehle selbst
+auszuführen. Git- oder GitHub-Befehle führt Codex nur aus, wenn der Benutzer
+ausdrücklich „ausführen“ oder eine gleichwertige eindeutige Formulierung
+verwendet. Reine Fragen nach dem weiteren Vorgehen gelten nicht als
+Ausführungsfreigabe.
 Lokale Befehle werden ohne führende Leerzeichen und ohne Shell-Variablen
 ausgegeben, damit sie direkt fehlerfrei kopiert und eingefügt werden können.
 Lange einzelne Terminalbefehle werden für direktes Copy & Paste auf mehrere
