@@ -459,7 +459,7 @@
     <string name="action_network_error">Netzwerkzugriff zum Gerät fehlgeschlagen</string>
     <string name="action_failed">Geräteaktion fehlgeschlagen</string>
     <string name="action_cancelled">Aktion abgebrochen</string>
-    <string name="wifi_proximity_nearby">WLAN in der Nähe</string>
+    <string name="wifi_proximity_nearby">WLAN-Verbindung bestätigt</string>
     <string name="wifi_proximity_not_nearby">WLAN-Verbindung nicht möglich</string>
     <string name="wifi_proximity_unknown">WLAN noch nicht bestätigt</string>
     <string name="wifi_proximity_no_assignment">Kein WLAN zugeordnet</string>
