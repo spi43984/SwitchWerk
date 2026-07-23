@@ -75,7 +75,7 @@ es verändert die Priorisierungslogik nicht.
 | 049 | P4 | Backlog | iOS: App Foundation SwiftUI |
 | 050 | P4 | Backlog | iOS: Shelly HTTP/RPC Client |
 | 051 | P4 | Backlog | iOS: WLAN Join Flow |
-| 052 | P4 | Backlog | iOS: Development Workflow, Toolchain & Delivery |
+| 052 | P4 | Aktiv | iOS: Development Workflow, Toolchain & Delivery |
 | 053 | P1 | abgeschlossen | Hamburger And About Release Metadata |
 | 054 | P0 | abgeschlossen | App Icon Replacement |
 | 055 | P0 | abgeschlossen | App Icon In Settings And About |
@@ -115,7 +115,7 @@ es verändert die Priorisierungslogik nicht.
 1. 075 Schnellkacheln (Backlog)
 2. 076 Templates (Backlog)
 3. 024 Authenticated Import Sources Backlog
-4. 052 iOS: Development Workflow, Toolchain & Delivery (Backlog; Voraussetzung für 047)
+4. 052 iOS: Development Workflow, Toolchain & Delivery (Aktiv; Voraussetzung für 047)
 5. 047 iOS: WLAN/AP/HTTP Feasibility (Backlog; nach 052)
 6. 048 iOS: Shared Config & Translation Model (Backlog; nach 047)
 7. 049 iOS: App Foundation SwiftUI (Backlog; nach 047 und 048)
